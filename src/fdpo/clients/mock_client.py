@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 
+
 from fdpo.clients.base import ChatResult, ModelClient
 from fdpo.utils.budget import BudgetGuard, TokenLedger
 

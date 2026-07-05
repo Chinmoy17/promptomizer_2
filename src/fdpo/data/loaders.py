@@ -1,27 +1,30 @@
-"""HuggingFace dataset loaders with deterministic seeded subsampling.
+"""Dataset loading from the committed Dataset/ folder, with deterministic
+seeded subsampling.
 
-Each loader returns (train_pool, test_pool) of Example objects; subsampling
-to n_train / n_test happens in load_splits() with a seeded shuffle so any
-machine with the same seed sees the same example ids.
+Datasets are fetched ONCE via `python -m scripts.download_datasets` and
+committed to Dataset/<name>/{train,test}.jsonl (mirroring this project's
+convention of shipping raw data in-repo). Experiment runs never touch
+HuggingFace — this keeps runs fast, offline-capable, and byte-identical
+between this machine and the TAMU cluster (both read the same committed
+files instead of two independent HF downloads).
 """
 
 from __future__ import annotations
 
 import random
 from dataclasses import dataclass, field
+from pathlib import Path
 
-from fdpo.data.extraction import gsm8k_gold
+from fdpo.utils.io import read_jsonl
 
-MMLU_SUBJECTS = (
-    "college_mathematics",
-    "philosophy",
-    "high_school_biology",
-    "econometrics",
-    "computer_security",
-    "professional_law",
-)
+DATASET_DIRS = {
+    "gsm8k": "gsm8k",
+    "arc": "arc_challenge",
+    "mmlu": "mmlu",
+    "legalbench_hearsay": "legalbench_hearsay",
+}
 
-_LETTERS = "ABCDE"
+DEFAULT_DATASET_ROOT = "Dataset"
 
 
 @dataclass
@@ -33,100 +36,15 @@ class Example:
     meta: dict = field(default_factory=dict)
 
 
-def _hf_load(*args, **kwargs):
-    from datasets import load_dataset  # lazy: offline tests never import HF
-    return load_dataset(*args, **kwargs)
-
-
-def _format_mc(question: str, choices: list[str]) -> str:
-    lines = [question.strip(), ""]
-    for letter, text in zip(_LETTERS, choices):
-        lines.append(f"{letter}. {text}")
-    return "\n".join(lines)
-
-
-def _load_gsm8k() -> tuple[list[Example], list[Example]]:
-    ds = _hf_load("openai/gsm8k", "main")
-
-    def convert(split: str) -> list[Example]:
-        return [
-            Example(
-                id=f"gsm8k_{split}_{i}",
-                question=row["question"],
-                gold=gsm8k_gold(row["answer"]),
-                reference=row["answer"],
-            )
-            for i, row in enumerate(ds[split])
-        ]
-
-    return convert("train"), convert("test")
-
-
-def _load_arc() -> tuple[list[Example], list[Example]]:
-    ds = _hf_load("allenai/ai2_arc", "ARC-Challenge")
-
-    def convert(split: str) -> list[Example]:
-        out = []
-        for i, row in enumerate(ds[split]):
-            labels = list(row["choices"]["label"])
-            texts = list(row["choices"]["text"])
-            if row["answerKey"] not in labels:
-                continue
-            gold = _LETTERS[labels.index(row["answerKey"])]
-            out.append(Example(
-                id=f"arc_{split}_{i}",
-                question=_format_mc(row["question"], texts),
-                gold=gold,
-                reference=gold,
-            ))
-        return out
-
-    return convert("train"), convert("test")
-
-
-def _load_mmlu() -> tuple[list[Example], list[Example]]:
-    train, test = [], []
-    for subject in MMLU_SUBJECTS:
-        ds = _hf_load("cais/mmlu", subject)
-        for split, bucket in (("validation", train), ("dev", train), ("test", test)):
-            for i, row in enumerate(ds[split]):
-                gold = _LETTERS[int(row["answer"])]
-                bucket.append(Example(
-                    id=f"mmlu_{subject}_{split}_{i}",
-                    question=_format_mc(row["question"], list(row["choices"])),
-                    gold=gold,
-                    reference=gold,
-                    meta={"subject": subject},
-                ))
-    return train, test
-
-
-def _load_legalbench_hearsay() -> tuple[list[Example], list[Example]]:
-    ds = _hf_load("nguha/legalbench", "hearsay")
-
-    def convert(split: str) -> list[Example]:
-        return [
-            Example(
-                id=f"hearsay_{split}_{i}",
-                question=(
-                    "Is the following statement hearsay?\n\n"
-                    f"Statement: {row['text']}"
-                ),
-                gold=row["answer"].strip().capitalize(),
-                reference=row["answer"],
-            )
-            for i, row in enumerate(ds[split])
-        ]
-
-    return convert("train"), convert("test")
-
-
-_LOADERS = {
-    "gsm8k": _load_gsm8k,
-    "arc": _load_arc,
-    "mmlu": _load_mmlu,
-    "legalbench_hearsay": _load_legalbench_hearsay,
-}
+def _load_local(dataset: str, split: str,
+                dataset_root: str) -> list[Example]:
+    path = Path(dataset_root) / DATASET_DIRS[dataset] / f"{split}.jsonl"
+    if not path.exists():
+        raise FileNotFoundError(
+            f"{path} not found. Fetch datasets first:\n"
+            f"    uv run python -m scripts.download_datasets --dataset {dataset}"
+        )
+    return [Example(**row) for row in read_jsonl(path)]
 
 
 def synthetic_splits(dataset: str, n_train: int,
@@ -168,15 +86,18 @@ def subsample(pool: list[Example], n: int, seed: int) -> list[Example]:
     return [pool[i] for i in idx[: min(n, len(pool))]]
 
 
-def load_splits(dataset: str, n_train: int, n_test: int,
-                seed: int) -> tuple[list[Example], list[Example]]:
-    """Deterministic (train, test) subsamples.
+def load_splits(dataset: str, n_train: int, n_test: int, seed: int,
+                dataset_root: str = DEFAULT_DATASET_ROOT
+                ) -> tuple[list[Example], list[Example]]:
+    """Deterministic (train, test) subsamples read from the committed
+    Dataset/ folder.
 
     If the official train pool is too small (LegalBench hearsay has ~5 train
     examples), the shortfall is carved from the shuffled test pool BEFORE the
     test subsample is taken, so train and test never overlap.
     """
-    train_pool, test_pool = _LOADERS[dataset]()
+    train_pool = _load_local(dataset, "train", dataset_root)
+    test_pool = _load_local(dataset, "test", dataset_root)
     train = subsample(train_pool, n_train, seed)
 
     rng = random.Random(seed + 1)

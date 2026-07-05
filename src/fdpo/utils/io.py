@@ -60,3 +60,18 @@ class JsonlAppender:
     def append(self, obj: dict) -> None:
         with open(self.path, "a", encoding="utf-8") as f:
             f.write(json.dumps(obj, ensure_ascii=False) + "\n")
+
+
+def write_jsonl(path: str | Path, rows: list[dict]) -> None:
+    """Overwrite a JSONL file with exactly these rows (used for committed,
+    reproducible dataset exports, not append-only logs)."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        for row in rows:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+
+def read_jsonl(path: str | Path) -> list[dict]:
+    with open(path, encoding="utf-8") as f:
+        return [json.loads(line) for line in f if line.strip()]

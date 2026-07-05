@@ -1,4 +1,4 @@
-"""OpenAI-compatible client: OpenAI API, vLLM, Ollama, TGI, Together, DeepSeek.
+"""OpenAI-compatible client: OpenAI API, Azure OpenAI, vLLM, Ollama, TGI, Together, DeepSeek.
 
 Sequential with exponential backoff — deliberate: basic API tiers, and
 sequential calls keep the budget ledger and registry persistence trivially
@@ -14,6 +14,7 @@ import time
 from openai import (
     APIConnectionError,
     APITimeoutError,
+    AzureOpenAI,
     InternalServerError,
     OpenAI,
     RateLimitError,
@@ -34,7 +35,16 @@ class OpenAICompatClient(ModelClient):
                  ledger: TokenLedger | None = None,
                  guard: BudgetGuard | None = None):
         super().__init__(role_cfg.role, role_cfg.model, ledger, guard)
-        self._client = OpenAI(base_url=role_cfg.base_url, api_key=role_cfg.api_key)
+        if role_cfg.api_version:
+            # Azure OpenAI: needs api-version + azure_endpoint, and `model` below
+            # is actually the deployment name, not the underlying model name.
+            self._client = AzureOpenAI(
+                azure_endpoint=role_cfg.base_url,
+                api_key=role_cfg.api_key,
+                api_version=role_cfg.api_version,
+            )
+        else:
+            self._client = OpenAI(base_url=role_cfg.base_url, api_key=role_cfg.api_key)
 
     def _complete(self, messages: list[dict], *, json_mode: bool,
                   temperature: float, max_tokens: int) -> ChatResult:

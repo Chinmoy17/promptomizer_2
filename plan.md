@@ -30,6 +30,12 @@ provided in case TAMU prefers direct GPU loading.
   later as ablation A10).
 - **Datasets**: GSM8K, ARC-Challenge (smoke matrix); MMLU (6 subjects) and
   LegalBench *hearsay* loaders included, ready for the next phase.
+- **Datasets are committed to the repo**, not fetched at run time. `scripts/
+  download_datasets.py` pulls from HuggingFace once and writes
+  `Dataset/<name>/{train,test}.jsonl`; experiment runs read only from that
+  folder. This mirrors the FL-for-Aircraft repo's `Dataset/CMAPSS_NASA/`
+  convention, keeps runs offline-capable, and guarantees TAMU sees byte-identical
+  data via `git clone` instead of a second independent HF download.
 - **Solvers**: gpt-4o-mini + gpt-4o locally; Llama-3-8B / Qwen3-8B / DeepSeek at TAMU.
   No legacy GPT-4 (12–24× the cost of gpt-4o).
 - **Baselines**: zero-shot CoT, few-shot CoT, monolithic-FDPO (whole-prompt rewrite,
@@ -78,6 +84,7 @@ cumulative $25.
 plan.md                       # this file
 pyproject.toml / uv.lock      # uv-managed, Python 3.12.10
 .env.example                  # per-role model/endpoint/key placeholders (copy to .env)
+Dataset/<name>/{train,test}.jsonl  # committed data, fetched via scripts/download_datasets.py
 src/fdpo/
   config.py                   # ExperimentConfig + argparse + .env role resolution
   clients/                    # ModelClient ABC, OpenAI-compatible impl, mock, HF stub (TAMU)
@@ -88,6 +95,7 @@ src/fdpo/
   prompts/                    # seed section prompts, judge/optimizer templates
   utils/                      # budget guard, io, logging
 scripts/
+  download_datasets.py        # one-time HF fetch -> Dataset/<name>/{train,test}.jsonl (commit the result)
   run_experiment.py           # entry point: --method {zeroshot_cot,fewshot_cot,monolithic,fdpo}
   run_smoke.py                # Phase-0: {GSM8K, ARC} x 4 methods under a shared $25 cap
   build_results_summary.py    # results/**/metrics.json -> results/summary.json
@@ -101,6 +109,7 @@ results/                      # per-run outputs (metrics/config/registry committ
 uv sync
 Copy-Item .env.example .env       # fill in real keys
 uv run python -m pytest
+uv run python -m scripts.download_datasets --dataset all   # once; commit Dataset/
 uv run python -m scripts.run_experiment --help
 uv run python -m scripts.run_experiment --method fdpo --dataset gsm8k --n-train 10 --n-test 10 --max-rounds 2 --budget-usd 1
 uv run python -m scripts.run_smoke --budget-usd 25
@@ -113,7 +122,7 @@ uv run python -m scripts.build_results_summary
 |---|---|---|
 | M1 | Scaffold (pyproject, .env.example, config, utils) | `uv run python -m pytest` passes; `--help` prints flags |
 | M2 | Clients + budget guard | budget tests green; HF stub raises instructive NotImplementedError |
-| M3 | Loaders + extraction | extraction tests green; deterministic subsampling |
+| M3 | Loaders + extraction | extraction tests green; deterministic subsampling; `Dataset/` populated and committed |
 | M4 | Prompt schema + registry | registry state-machine tests green |
 | M5 | Judge / optimizer / gate | parsing + gate tests green (mock) |
 | M6 | Loop + baselines + entry point | mock end-to-end writes full results tree |

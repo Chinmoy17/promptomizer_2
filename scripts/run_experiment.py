@@ -48,7 +48,8 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
     if cfg.dry_run:
         train, test = synthetic_splits(cfg.dataset, cfg.n_train, cfg.n_test)
     else:
-        train, test = load_splits(cfg.dataset, cfg.n_train, cfg.n_test, cfg.seed)
+        train, test = load_splits(cfg.dataset, cfg.n_train, cfg.n_test, cfg.seed,
+                                  dataset_root=cfg.dataset_root)
     logger.info("data: %d train / %d test", len(train), len(test))
 
     schema = SCHEMA_MONOLITHIC if cfg.method == "monolithic" else SCHEMA_5

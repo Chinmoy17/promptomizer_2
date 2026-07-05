@@ -21,19 +21,35 @@ class RoleConfig:
     model: str
     base_url: str
     api_key: str
+    api_version: str = ""  # set (non-empty) => Azure OpenAI, else plain OpenAI-compatible
 
 
 def load_role(role: str) -> RoleConfig:
+    """Resolve one role from .env.
+
+    Per-role `{ROLE}_*` vars take priority; any left unset fall back to the
+    shared `AZURE_OPENAI_*` vars, so one Azure deployment can back all three
+    roles (solver/judge/optimizer) without repeating the same endpoint/key
+    three times. `api_version` is the Azure marker: non-empty => use the
+    `AzureOpenAI` client instead of plain `OpenAI` (see openai_client.py).
+    """
     prefix = role.upper()
-    model = os.environ.get(f"{prefix}_MODEL", "")
-    base_url = os.environ.get(f"{prefix}_BASE_URL", "https://api.openai.com/v1")
-    api_key = os.environ.get(f"{prefix}_API_KEY", "")
+    model = (os.environ.get(f"{prefix}_MODEL")
+             or os.environ.get("AZURE_OPENAI_DEPLOYMENT_NAME", ""))
+    base_url = (os.environ.get(f"{prefix}_BASE_URL")
+                or os.environ.get("AZURE_OPENAI_ENDPOINT")
+                or "https://api.openai.com/v1")
+    api_key = (os.environ.get(f"{prefix}_API_KEY")
+               or os.environ.get("AZURE_OPENAI_API_KEY", ""))
+    api_version = (os.environ.get(f"{prefix}_API_VERSION")
+                   or os.environ.get("AZURE_OPENAI_API_VERSION", ""))
     if not model:
         raise ValueError(
-            f"{prefix}_MODEL is not set. Copy .env.example to .env and fill in the "
-            f"{role} role (see README)."
+            f"{prefix}_MODEL (or AZURE_OPENAI_DEPLOYMENT_NAME) is not set. Copy "
+            f".env.example to .env and fill in the {role} role (see README)."
         )
-    return RoleConfig(role=role, model=model, base_url=base_url, api_key=api_key)
+    return RoleConfig(role=role, model=model, base_url=base_url, api_key=api_key,
+                       api_version=api_version)
 
 
 @dataclass
@@ -74,6 +90,7 @@ class ExperimentConfig:
     # output
     phase: str = "00_smoke"
     results_root: str = "results"
+    dataset_root: str = "Dataset"
 
     # testing / offline
     dry_run: bool = False      # use the mock client instead of real APIs
@@ -124,6 +141,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help="$/M output tokens for models missing from the price table")
     p.add_argument("--phase", default=d.phase)
     p.add_argument("--results-root", default=d.results_root)
+    p.add_argument("--dataset-root", default=d.dataset_root,
+                   help="folder holding committed Dataset/<name>/{train,test}.jsonl")
     p.add_argument("--dry-run", action="store_true",
                    help="use the mock client (no API calls, no cost)")
     return p
@@ -156,6 +175,7 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         price_out=args.price_out,
         phase=args.phase,
         results_root=args.results_root,
+        dataset_root=args.dataset_root,
         dry_run=args.dry_run,
     )
     if not cfg.dry_run:

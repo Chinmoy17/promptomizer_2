@@ -7,7 +7,10 @@ requires-python = ">=3.12"
 dependencies = [
     "openai>=1.40",
     "python-dotenv>=1.0",
-    "datasets>=2.20",
+    "pandas>=2.0",
+    "pyarrow>=15.0",
+    "requests>=2.30",
+    "truststore>=0.10.4",
 ]
 
 [dependency-groups]
