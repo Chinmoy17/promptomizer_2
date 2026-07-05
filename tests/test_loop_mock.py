@@ -14,7 +14,7 @@ def make_cfg(tmp_path, method, **overrides) -> ExperimentConfig:
     cfg = ExperimentConfig(
         method=method, dataset="arc", seed=0,
         n_train=8, n_test=6, n_shots=2, max_rounds=2,
-        gate_batch_size=4, budget_usd=0.0,  # guard disabled
+        val_size=4, budget_usd=0.0,  # guard disabled
         dry_run=True, results_root=str(tmp_path / "results"),
         phase="test_phase",
     )
@@ -100,4 +100,4 @@ def test_events_jsonl_is_valid(tmp_path):
     assert lines
     for line in lines:
         event = json.loads(line)
-        assert event["event"] == "rewrite"
+        assert event["event"] == "bundle"

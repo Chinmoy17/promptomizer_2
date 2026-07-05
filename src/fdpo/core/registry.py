@@ -1,8 +1,15 @@
-"""PromptRegistry: per-section versions, archive, best-snapshot, stagnation.
+"""PromptRegistry: per-section version history + whole-run bundle commit/reject.
 
 Pure state machine — no LLM calls — so it is fully unit-testable. Persisted
 atomically to registry.json after every mutation; the whole history (including
 rejected candidates) is kept for the paper's per-section trajectory analysis.
+
+v2 mechanism (see Docs/fdpo_mechanism.md): a round edits zero or more sections
+at once via a single optimizer call, gated as ONE whole-prompt candidate.
+Stagnation and best-snapshot tracking are therefore whole-run concepts, not
+per-section: a bundle either commits (every edited section's new version
+activates together) or rejects (every edited section's candidate is recorded
+but none activate) atomically.
 """
 
 from __future__ import annotations
@@ -12,7 +19,7 @@ from pathlib import Path
 
 from fdpo.utils.io import atomic_write_json, read_json
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 
 @dataclass
@@ -40,9 +47,6 @@ class Version:
 class SectionState:
     name: str
     active_version: int = 0
-    stagnant_rounds: int = 0
-    best_version: int = 0
-    best_acc: float = -1.0
     versions: list[Version] = field(default_factory=list)
 
     @property
@@ -60,6 +64,11 @@ class PromptRegistry:
             state = SectionState(name=name)
             state.versions.append(Version(0, seed_sections[name], 0, "active"))
             self.sections[name] = state
+        # whole-run stagnation / best-snapshot (v2): starts pointing at the
+        # seed (version 0) for every section.
+        self.run_stagnant_rounds = 0
+        self.run_best_acc = -1.0
+        self.run_best_versions: dict[str, int] = {name: 0 for name in self.schema}
         self._save()
 
     # ---- reads -------------------------------------------------------------
@@ -67,55 +76,78 @@ class PromptRegistry:
     def active_prompt(self) -> dict[str, str]:
         return {name: self.sections[name].active_text for name in self.schema}
 
-    def prompt_with(self, section: str, candidate_text: str) -> dict[str, str]:
-        """Active prompt with one section swapped for a candidate (gate eval)."""
+    def best_prompt(self) -> dict[str, str]:
+        """The whole-run best-known full prompt (may differ from active_prompt
+        if rounds have been attempted since the last commit)."""
+        return {name: self.sections[name].versions[v].text
+                for name, v in self.run_best_versions.items()}
+
+    def prompt_with_edits(self, edits: dict[str, str]) -> dict[str, str]:
+        """Active prompt with a bundle of sections swapped for candidates
+        (gate eval) -- edits maps section name -> full new text for that section."""
         prompt = self.active_prompt()
-        prompt[section] = candidate_text
+        prompt.update(edits)
         return prompt
 
-    # ---- mutations ---------------------------------------------------------
+    # ---- mutations: whole-prompt bundles ------------------------------------
 
-    def commit(self, section: str, text: str, round_num: int,
-               gate: GateResult) -> int:
-        """Gate passed: archive the old active version, activate the new one."""
-        state = self.sections[section]
-        state.versions[state.active_version].status = "archived"
-        new_version = Version(len(state.versions), text, round_num,
-                              "active", asdict(gate))
-        state.versions.append(new_version)
-        state.active_version = new_version.version
-        self._save()
-        return new_version.version
+    def commit_bundle(self, edits: dict[str, str], round_num: int,
+                      gate: GateResult) -> dict[str, int]:
+        """Gate passed: every edited section's new version activates together.
 
-    def reject(self, section: str, text: str, round_num: int,
-               gate: GateResult) -> None:
-        """Gate failed: record the candidate as rejected; active is unchanged."""
-        state = self.sections[section]
-        state.versions.append(Version(len(state.versions), text, round_num,
-                                      "rejected", asdict(gate)))
-        self._save()
-
-    def record_round_acc(self, section: str, acc: float,
-                         improve_eps: float = 1e-9) -> None:
-        """Track best snapshot and stagnation for a section after a gate eval."""
-        state = self.sections[section]
-        if acc > state.best_acc + improve_eps:
-            state.best_acc = acc
-            state.best_version = state.active_version
-            state.stagnant_rounds = 0
-        else:
-            state.stagnant_rounds += 1
-        self._save()
-
-    def restore_best_snapshot(self, section: str) -> int:
-        state = self.sections[section]
-        if state.active_version != state.best_version:
+        Returns {section: new_version_number} for the edited sections.
+        """
+        new_versions: dict[str, int] = {}
+        for section, text in edits.items():
+            state = self.sections[section]
             state.versions[state.active_version].status = "archived"
-            state.versions[state.best_version].status = "active"
-            state.active_version = state.best_version
-        state.stagnant_rounds = 0
+            new_version = Version(len(state.versions), text, round_num,
+                                  "active", asdict(gate))
+            state.versions.append(new_version)
+            state.active_version = new_version.version
+            new_versions[section] = new_version.version
         self._save()
-        return state.active_version
+        return new_versions
+
+    def reject_bundle(self, edits: dict[str, str], round_num: int,
+                      gate: GateResult) -> None:
+        """Gate failed: record every edited section's candidate as rejected;
+        no section's active version changes."""
+        for section, text in edits.items():
+            state = self.sections[section]
+            state.versions.append(Version(len(state.versions), text, round_num,
+                                          "rejected", asdict(gate)))
+        self._save()
+
+    # ---- mutations: whole-run stagnation / best-snapshot --------------------
+
+    def record_round(self, passed: bool, acc: float) -> None:
+        """v2 stagnation fix: ANY gate pass resets stagnation and updates the
+        best-known snapshot to the just-committed state -- a tie ("held
+        steady, zero regressions") counts as progress, not stagnation. Only a
+        REJECTED round (or a round where nothing was attempted) increments
+        the stagnant-round counter.
+        """
+        if passed:
+            self.run_stagnant_rounds = 0
+            self.run_best_acc = acc
+            self.run_best_versions = {name: s.active_version
+                                      for name, s in self.sections.items()}
+        else:
+            self.run_stagnant_rounds += 1
+        self._save()
+
+    def restore_best_snapshot(self) -> dict[str, str]:
+        """Roll every section back to the whole-run best-known snapshot."""
+        for name, best_version in self.run_best_versions.items():
+            state = self.sections[name]
+            if state.active_version != best_version:
+                state.versions[state.active_version].status = "archived"
+                state.versions[best_version].status = "active"
+                state.active_version = best_version
+        self.run_stagnant_rounds = 0
+        self._save()
+        return self.active_prompt()
 
     # ---- stats -------------------------------------------------------------
 
@@ -135,13 +167,13 @@ class PromptRegistry:
         return {
             "schema_version": SCHEMA_VERSION,
             "schema": list(self.schema),
+            "run_stagnant_rounds": self.run_stagnant_rounds,
+            "run_best_acc": self.run_best_acc,
+            "run_best_versions": self.run_best_versions,
             "sections": {
                 name: {
                     "name": s.name,
                     "active_version": s.active_version,
-                    "stagnant_rounds": s.stagnant_rounds,
-                    "best_version": s.best_version,
-                    "best_acc": s.best_acc,
                     "versions": [asdict(v) for v in s.versions],
                 }
                 for name, s in self.sections.items()
@@ -159,15 +191,16 @@ class PromptRegistry:
         reg = cls.__new__(cls)
         reg.schema = schema
         reg.path = Path(path)
+        reg.run_stagnant_rounds = data.get("run_stagnant_rounds", 0)
+        reg.run_best_acc = data.get("run_best_acc", -1.0)
+        reg.run_best_versions = data.get("run_best_versions",
+                                         {name: 0 for name in schema})
         reg.sections = {}
         for name in schema:
             raw = data["sections"][name]
             state = SectionState(
                 name=name,
                 active_version=raw["active_version"],
-                stagnant_rounds=raw["stagnant_rounds"],
-                best_version=raw["best_version"],
-                best_acc=raw["best_acc"],
                 versions=[Version(**v) for v in raw["versions"]],
             )
             reg.sections[name] = state

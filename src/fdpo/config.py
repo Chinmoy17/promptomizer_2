@@ -67,11 +67,17 @@ class ExperimentConfig:
     max_rounds: int = 5
     rho: float = 0.02          # regression gate: reject if acc_new < acc_old - rho
     eps: float = 0.01          # stabilization: |delta pool acc| < eps for 3 rounds
-    n_fail: int = 5            # failure examples fed to the optimizer per rewrite
+    n_fail: int = 20           # failure examples fed to the optimizer per section per round
+                                # (soft cap so prompt size stays bounded; rarely truncates
+                                # at pilot scale -- see fdpo_mechanism.md for tuning guidance)
     n_gold: int = 3            # gold exemplars fed to the optimizer per rewrite
-    gate_batch_size: int = 20  # previously-correct examples per gate evaluation
-    pool_cap: int = 200        # FIFO cap on the gate's correct pool
-    stagnation_limit: int = 3  # stagnant rounds before best-snapshot restore
+    val_size: int = 20         # size of the FIXED held-out validation slice, carved once
+                                # from train at run start; used for every gate check and
+                                # for full-prompt accuracy tracking (v2 mechanism -- replaces
+                                # the old per-call resampled gate_batch_size)
+    pool_cap: int = 200        # FIFO cap on the gold-example correct pool
+    stagnation_limit: int = 3  # rounds with no committed bundle before best-snapshot restore
+    history_window: int = 3    # how many past round outcomes the optimizer sees in context
     early_stop: bool = True
 
     # verdicts: "programmatic" = extracted answer vs gold; "llm" = trust the judge
@@ -80,7 +86,9 @@ class ExperimentConfig:
     # generation
     solver_max_tokens: int = 1024
     solver_temperature: float = 0.0
-    optimizer_temperature: float = 1.0
+    optimizer_temperature: float = 0.3  # low, not 1.0: the optimizer now must reproduce
+                                         # exact substrings for find/replace edits (v2
+                                         # mechanism) -- high temp made quoting unreliable
 
     # budget
     budget_usd: float = 4.0    # per-run cap; <= 0 disables the guard
@@ -127,9 +135,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--eps", type=float, default=d.eps)
     p.add_argument("--n-fail", type=int, default=d.n_fail)
     p.add_argument("--n-gold", type=int, default=d.n_gold)
-    p.add_argument("--gate-batch-size", type=int, default=d.gate_batch_size)
+    p.add_argument("--val-size", type=int, default=d.val_size,
+                   help="fixed held-out validation slice size (carved once from train)")
     p.add_argument("--pool-cap", type=int, default=d.pool_cap)
     p.add_argument("--stagnation-limit", type=int, default=d.stagnation_limit)
+    p.add_argument("--history-window", type=int, default=d.history_window,
+                   help="past round outcomes shown to the optimizer")
     p.add_argument("--no-early-stop", action="store_true")
     p.add_argument("--verdict-mode", choices=("programmatic", "llm"),
                    default=d.verdict_mode)
@@ -168,9 +179,10 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         eps=args.eps,
         n_fail=args.n_fail,
         n_gold=args.n_gold,
-        gate_batch_size=args.gate_batch_size,
+        val_size=args.val_size,
         pool_cap=args.pool_cap,
         stagnation_limit=args.stagnation_limit,
+        history_window=args.history_window,
         early_stop=not args.no_early_stop,
         verdict_mode=args.verdict_mode,
         solver_max_tokens=args.solver_max_tokens,

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Callable
 
 
@@ -64,7 +65,15 @@ def dry_run_client(role: str, ledger: TokenLedger | None = None,
                 "error_type": "WRONG",
             })
         if role == "optimizer":
-            return "Respond concisely. End with the exact required answer format."
+            # v2 bundle format: {"edits": [{"section", "find", "replace"}, ...]}.
+            # `find` = the whole current text of each flagged section (always an
+            # exact substring of itself), so apply_edits() always succeeds
+            # deterministically regardless of what the real section text is.
+            sections = re.findall(r'### .+? \("([^"]+)"\)\nCurrent text: (.+)', text_all)
+            edits = [{"section": name, "find": current,
+                     "replace": current + " Respond concisely."}
+                    for name, current in sections]
+            return json.dumps({"edits": edits})
         text = " ".join(m.get("content", "") for m in messages)
         if "####" in text:
             return "Let's think step by step. The total is 42.\n#### 42"
