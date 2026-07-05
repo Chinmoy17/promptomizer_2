@@ -1,0 +1,4 @@
+round,section,n_failures,acc_old,acc_new,passed,broke,recovered,batch_size
+1,task_details,3,1.0,1.0,True,0,1,12
+2,task_details,2,1.0,0.9230769230769231,False,1,0,13
+3,task_details,2,1.0,0.9230769230769231,False,1,0,13

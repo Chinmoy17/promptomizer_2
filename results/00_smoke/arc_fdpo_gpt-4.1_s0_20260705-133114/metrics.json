@@ -1,0 +1,54 @@
+{
+  "run_id": "arc_fdpo_gpt-4.1_s0_20260705-133114",
+  "status": "completed",
+  "method": "fdpo",
+  "dataset": "arc",
+  "solver_model": "gpt-4.1",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 1.0,
+    "n_examples": 10,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 1.0,
+    "n_examples": 10,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "rounds_run": 2,
+    "train_acc_per_round": [
+      1.0,
+      1.0
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "registry_counts": {
+      "commits": 0,
+      "rejects": 0
+    }
+  },
+  "wall_clock_s": 98.4,
+  "cost": {
+    "total_calls": 40,
+    "total_cost_usd": 0.059012,
+    "by_role": {
+      "solver": {
+        "calls": 40,
+        "prompt_tokens": 6294,
+        "completion_tokens": 5803,
+        "cost_usd": 0.059012
+      }
+    }
+  },
+  "fdpo_metrics": {
+    "regression_rate": 0.0,
+    "section_attribution_accuracy": null,
+    "cost_per_accuracy_point_usd": null,
+    "optimization_cost_usd": 0,
+    "n_rewrites_attempted": 0,
+    "n_commits": 0,
+    "n_rollbacks": 0,
+    "time_to_stabilization": null
+  }
+}

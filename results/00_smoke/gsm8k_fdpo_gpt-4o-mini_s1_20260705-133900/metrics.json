@@ -1,0 +1,69 @@
+{
+  "run_id": "gsm8k_fdpo_gpt-4o-mini_s1_20260705-133900",
+  "status": "completed",
+  "method": "fdpo",
+  "dataset": "gsm8k",
+  "solver_model": "gpt-4o-mini",
+  "seed": 1,
+  "seed_test": {
+    "accuracy": 1.0,
+    "n_examples": 15,
+    "extraction_failures": 0,
+    "exact_match": 1.0
+  },
+  "final_test": {
+    "accuracy": 1.0,
+    "n_examples": 15,
+    "extraction_failures": 0,
+    "exact_match": 1.0
+  },
+  "optimization": {
+    "rounds_run": 3,
+    "train_acc_per_round": [
+      0.8,
+      0.8666666666666667,
+      0.8666666666666667
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "registry_counts": {
+      "commits": 1,
+      "rejects": 2
+    }
+  },
+  "wall_clock_s": 665.5,
+  "cost": {
+    "total_calls": 168,
+    "total_cost_usd": 0.071489,
+    "by_role": {
+      "solver": {
+        "calls": 158,
+        "prompt_tokens": 28966,
+        "completion_tokens": 59354,
+        "cost_usd": 0.039957
+      },
+      "judge": {
+        "calls": 7,
+        "prompt_tokens": 6561,
+        "completion_tokens": 717,
+        "cost_usd": 0.018858
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 5713,
+        "completion_tokens": 156,
+        "cost_usd": 0.012674
+      }
+    }
+  },
+  "fdpo_metrics": {
+    "regression_rate": 0.0,
+    "section_attribution_accuracy": 0.3333333333333333,
+    "cost_per_accuracy_point_usd": null,
+    "optimization_cost_usd": 0.053623,
+    "n_rewrites_attempted": 3,
+    "n_commits": 1,
+    "n_rollbacks": 2,
+    "time_to_stabilization": null
+  }
+}
