@@ -1,0 +1,43 @@
+{
+  "method": "zeroshot_cot",
+  "dataset": "arc",
+  "seed": 0,
+  "n_train": 150,
+  "n_test": 300,
+  "n_shots": 4,
+  "max_rounds": 5,
+  "rho": 0.02,
+  "eps": 0.01,
+  "n_fail": 5,
+  "n_gold": 3,
+  "gate_batch_size": 20,
+  "pool_cap": 200,
+  "stagnation_limit": 3,
+  "early_stop": true,
+  "verdict_mode": "programmatic",
+  "solver_max_tokens": 1024,
+  "solver_temperature": 0.0,
+  "optimizer_temperature": 1.0,
+  "budget_usd": 1.0,
+  "price_in": 0.0,
+  "price_out": 0.0,
+  "phase": "00_smoke",
+  "results_root": "results",
+  "dataset_root": "Dataset",
+  "dry_run": false,
+  "roles": {
+    "solver": {
+      "model": "gpt-4o-mini",
+      "base_url": "https://aifeedbackloop.openai.azure.com/"
+    },
+    "judge": {
+      "model": "gpt-4.1",
+      "base_url": "https://shift-llm.openai.azure.com/"
+    },
+    "optimizer": {
+      "model": "gpt-4.1",
+      "base_url": "https://shift-llm.openai.azure.com/"
+    }
+  },
+  "run_id": "arc_zeroshot_cot_gpt-4o-mini_s0_20260705-173014"
+}

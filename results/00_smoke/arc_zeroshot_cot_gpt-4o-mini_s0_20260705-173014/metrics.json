@@ -1,0 +1,32 @@
+{
+  "run_id": "arc_zeroshot_cot_gpt-4o-mini_s0_20260705-173014",
+  "status": "completed",
+  "method": "zeroshot_cot",
+  "dataset": "arc",
+  "solver_model": "gpt-4o-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.95,
+    "n_examples": 300,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.95,
+    "n_examples": 300,
+    "extraction_failures": 0
+  },
+  "optimization": null,
+  "wall_clock_s": 674.7,
+  "cost": {
+    "total_calls": 300,
+    "total_cost_usd": 0.037934,
+    "by_role": {
+      "solver": {
+        "calls": 300,
+        "prompt_tokens": 46607,
+        "completion_tokens": 51572,
+        "cost_usd": 0.037934
+      }
+    }
+  }
+}

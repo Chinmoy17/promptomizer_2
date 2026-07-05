@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "stagnant_rounds": 0,
+      "best_version": 0,
+      "best_acc": -1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "stagnant_rounds": 1,
+      "best_version": 0,
+      "best_acc": 1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of what it asserts. A statement is not hearsay if it is offered for another purpose—such as showing the effect on the listener, the speaker’s state of mind or knowledge, or reputation—rather than to prove the truth of the matter asserted.",
+          "created_round": 1,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 1.0,
+            "acc_new": 0.9,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of what it asserts, not for another purpose such as showing the speaker’s knowledge, notice, effect on a listener, state of mind, or reputation. Statements offered for these other purposes are not hearsay.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 1.0,
+            "acc_new": 1.0,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "Hearsay is an out-of-court assertion—spoken, written, or nonverbal—offered to prove the truth of the matter asserted, rather than for another purpose such as showing the speaker’s knowledge, notice, effect on a listener or reputation. Assertive conduct (nonverbal acts intended as a statement) is hearsay if offered for its truth. Statements offered only to show someone’s state of mind, knowledge, notice, or effect on reputation are not hearsay.",
+          "created_round": 3,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 1.0,
+            "acc_new": 0.9,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        },
+        {
+          "version": 4,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of its content, not when used for a purpose such as showing the speaker’s notice, knowledge, effect on a listener, state of mind, reputation, or that a discussion or event occurred. If a statement is offered for one of these other purposes and not to prove the truth of what it asserts, it is not hearsay.",
+          "created_round": 4,
+          "status": "archived",
+          "gate": {
+            "acc_old": 1.0,
+            "acc_new": 1.0,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 4,
+            "broke": 0
+          }
+        },
+        {
+          "version": 5,
+          "text": "A statement is hearsay if it is (1) a statement made outside of court, (2) offered in evidence to prove the truth of what it asserts, and (3) not excluded by a rule (such as a party's own prior statements, or statements offered only to show effect on the listener, notice, knowledge, belief, or state of mind—not the truth of the statement). If a statement is offered for any non-truth purpose (such as to show state of mind, effect on listener, or knowledge), it is not hearsay.",
+          "created_round": 5,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.95,
+            "acc_new": 0.85,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "stagnant_rounds": 0,
+      "best_version": 0,
+      "best_acc": -1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 0,
+      "stagnant_rounds": 1,
+      "best_version": 0,
+      "best_acc": 1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Treat both verbal and nonverbal conduct as hearsay if it is intended as an assertion and is offered to prove the truth of the matter asserted; consider implied assertions. If the conduct or statement is not assertive and not offered for its truth, it is not hearsay. Apply the definition strictly.",
+          "created_round": 1,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 1.0,
+            "acc_new": 0.75,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 20,
+            "n_failures": 4,
+            "recovered_failures": 4,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "Classify conduct or statements as hearsay if they are out-of-court and assertive—meaning intended to communicate a fact—regardless of whether verbal or nonverbal. Exclude any in-court statements, and do not treat non-assertive conduct or statements as hearsay.",
+          "created_round": 2,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 1.0,
+            "acc_new": 0.95,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "Apply the definition strictly; conduct is hearsay if it is intended as an assertion—that is, if the person meant their words, writing, or conduct (including gestures) to communicate a fact, and it is offered for the truth of that fact. Non-assertive conduct is not hearsay.",
+          "created_round": 3,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.95,
+            "acc_new": 0.85,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 20,
+            "n_failures": 1,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        },
+        {
+          "version": 4,
+          "text": "Treat both verbal statements and assertive conduct as possibly hearsay. If conduct is intended by the actor as an assertion and is offered to prove the truth of that assertion, classify it as hearsay. If the conduct is not intended as an assertion, it is not hearsay. Apply these rules strictly to each example.",
+          "created_round": 4,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.95,
+            "acc_new": 0.8,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 20,
+            "n_failures": 3,
+            "recovered_failures": 2,
+            "broke": 3
+          }
+        },
+        {
+          "version": 5,
+          "text": "Treat any conduct—verbal or nonverbal—as a statement if it is intended as an assertion or is a response to a question that communicates affirmation or denial. Do not classify a statement as hearsay unless it directly asserts, or is intended to assert, the matter to be proved.",
+          "created_round": 5,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.95,
+            "acc_new": 0.9,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 20,
+            "n_failures": 4,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "stagnant_rounds": 0,
+      "best_version": 0,
+      "best_acc": -1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form: Answer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

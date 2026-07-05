@@ -1,0 +1,11 @@
+round,section,n_failures,acc_old,acc_new,passed,broke,recovered,batch_size
+1,context,5,1.0,0.9,False,2,3,20
+1,constraints,4,1.0,0.75,False,5,4,20
+2,context,5,1.0,1.0,True,0,2,20
+2,constraints,5,1.0,0.95,False,1,2,20
+3,context,5,1.0,0.9,False,2,1,20
+3,constraints,1,0.95,0.85,False,2,0,20
+4,context,5,1.0,1.0,True,0,4,20
+4,constraints,3,0.95,0.8,False,3,2,20
+5,context,5,0.95,0.85,False,3,2,20
+5,constraints,4,0.95,0.9,False,1,0,20

@@ -92,6 +92,10 @@ class ExperimentConfig:
     results_root: str = "results"
     dataset_root: str = "Dataset"
 
+    # concurrency
+    max_workers: int = 8       # concurrent solver calls per eval batch (conservative default;
+                                # bounded by the deployment's RPM, not just TPM)
+
     # testing / offline
     dry_run: bool = False      # use the mock client instead of real APIs
 
@@ -145,6 +149,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help="folder holding committed Dataset/<name>/{train,test}.jsonl")
     p.add_argument("--dry-run", action="store_true",
                    help="use the mock client (no API calls, no cost)")
+    p.add_argument("--max-workers", type=int, default=d.max_workers,
+                   help="concurrent solver calls per eval batch")
     return p
 
 
@@ -177,6 +183,7 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         results_root=args.results_root,
         dataset_root=args.dataset_root,
         dry_run=args.dry_run,
+        max_workers=args.max_workers,
     )
     if not cfg.dry_run:
         cfg.roles = {role: load_role(role) for role in ROLES}

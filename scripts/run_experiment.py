@@ -71,7 +71,8 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
         seed_result = evaluate(clients["solver"], registry.active_prompt(), test,
                                cfg.dataset, shots=shots,
                                temperature=cfg.solver_temperature,
-                               max_tokens=cfg.solver_max_tokens, purpose="eval")
+                               max_tokens=cfg.solver_max_tokens, purpose="eval",
+                               max_workers=cfg.max_workers)
         for row in seed_result.rows:
             eval_log.append({"phase": "seed", "example_id": row.example_id,
                              "correct": row.correct, "pred": row.pred,
@@ -86,7 +87,7 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
                                     test, cfg.dataset,
                                     temperature=cfg.solver_temperature,
                                     max_tokens=cfg.solver_max_tokens,
-                                    purpose="eval")
+                                    purpose="eval", max_workers=cfg.max_workers)
             for row in final_result.rows:
                 eval_log.append({"phase": "final", "example_id": row.example_id,
                                  "correct": row.correct, "pred": row.pred,

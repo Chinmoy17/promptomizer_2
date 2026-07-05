@@ -54,7 +54,8 @@ def run_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
         active = registry.active_prompt()
         result = evaluate(solver, active, train, dataset,
                           temperature=cfg.solver_temperature,
-                          max_tokens=cfg.solver_max_tokens, purpose="train")
+                          max_tokens=cfg.solver_max_tokens, purpose="train",
+                          max_workers=cfg.max_workers)
         round_accs.append(result.accuracy)
         logger.info("round %d: train accuracy %.3f", round_num, result.accuracy)
 
@@ -108,7 +109,8 @@ def run_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
                 solver, dataset, active, registry.prompt_with(section, candidate),
                 gate_batch, [f["example"] for f in sampled_failures],
                 rho=cfg.rho, solver_temperature=cfg.solver_temperature,
-                solver_max_tokens=cfg.solver_max_tokens)
+                solver_max_tokens=cfg.solver_max_tokens,
+                max_workers=cfg.max_workers)
 
             if gate.passed:
                 registry.commit(section, candidate, round_num, gate)
