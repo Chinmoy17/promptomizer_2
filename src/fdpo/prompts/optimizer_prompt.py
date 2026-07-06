@@ -25,6 +25,13 @@ Rules:
   section. If only one phrase is wrong, edit only that phrase.
 - Address the failure patterns in the evidence below. Do not undo anything
   the "PREVIOUS BEST FULL PROMPT" was already getting right.
+- **Prefer scoped, narrow rules over broad single-keyword triggers.** A rule
+  like "if the statement mentions X, it is not Y" tends to over-apply to
+  unrelated cases that share the keyword X. Tie the rule to the underlying
+  structural condition instead (e.g. "if the argument works even when the
+  statement's content is false, it is not Y"). If you cannot phrase the
+  condition narrowly, add a concrete clarifying example (both a positive and
+  a negative case) rather than a broad rule.
 - Return ONLY a JSON object of this exact shape, no markdown fences, no
   commentary outside the JSON:
   {"edits": [{"section": "<name>", "find": "<exact substring>", "replace": "<new text>"}, ...]}

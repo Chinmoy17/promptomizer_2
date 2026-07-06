@@ -139,7 +139,7 @@ caused it, why), never to decide correctness.
 ## 6. One full round, walked through with real numbers
 
 This is what actually happened in a completed run
-(`results/00_smoke/gsm8k_fdpo_gpt-4o-mini_s1_20260705-133900/`, gpt-4o-mini
+(`results/smoke/gsm8k_fdpo_gpt-4o-mini_s1_20260705-133900/`, gpt-4o-mini
 solver, 15 train / 15 test, `ρ=0.02`):
 
 **Step 0 — seed eval.** Solver answers all 15 test questions with the

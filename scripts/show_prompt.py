@@ -5,7 +5,7 @@ Usage:
     uv run python -m scripts.show_prompt --dataset legalbench_hearsay
         # the SEED prompt (version 0 of every section)
 
-    uv run python -m scripts.show_prompt --registry results/00_smoke/<run_id>/registry.json
+    uv run python -m scripts.show_prompt --registry results/<phase>/<run_id>/registry.json
         # the ACTIVE (final, or current-mid-run) prompt from a completed/in-progress run
 
     uv run python -m scripts.show_prompt --registry <path> --best

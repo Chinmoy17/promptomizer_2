@@ -78,6 +78,11 @@ class ExperimentConfig:
     pool_cap: int = 200        # FIFO cap on the gold-example correct pool
     stagnation_limit: int = 3  # rounds with no committed bundle before best-snapshot restore
     history_window: int = 3    # how many past round outcomes the optimizer sees in context
+
+    # bookkeeping
+    phase: str = "smoke"       # results/<phase>/<run_id>/. Default `smoke` is for
+                                # exploratory/dev runs; use `main` for real, publishable
+                                # experiments (see results/README.md for the scheme).
     early_stop: bool = True
 
     # verdicts: "programmatic" = extracted answer vs gold; "llm" = trust the judge
@@ -96,7 +101,7 @@ class ExperimentConfig:
     price_out: float = 0.0     # $/M output-token fallback for unknown models
 
     # output
-    phase: str = "00_smoke"
+
     results_root: str = "results"
     dataset_root: str = "Dataset"
 
