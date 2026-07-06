@@ -1,0 +1,262 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.7333333333333333,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 5,
+    "task_details": 0,
+    "constraints": 5,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 5,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay is an out-of-court statement (including verbal or nonverbal conduct intended as an assertion) offered to prove the truth of the matter asserted. A statement is only hearsay if it is made out of court and is offered for the truth of what it asserts, not for another purpose (such as showing the speaker's state of mind or beliefs).",
+          "created_round": 1,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "Hearsay is an out-of-court statement (including verbal or non-verbal conduct intended as an assertion) offered to prove the truth of the matter asserted. A statement is only hearsay if it is made outside the current proceeding and is offered to prove the content of the assertion, not merely to show the speaker's state of mind or belief.",
+          "created_round": 2,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted, meaning it is used to show that what the statement claims is actually true. If a statement is offered only to show the speaker's state of mind, belief, or emotional condition, and not to prove the factual content of the statement, it is not hearsay. An in-court statement is not hearsay.",
+          "created_round": 3,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        },
+        {
+          "version": 4,
+          "text": "Hearsay is an out-of-court statement (including verbal or nonverbal assertions) offered to prove the truth of the matter asserted. A statement is only hearsay if it is made outside the current proceeding and is offered to prove the truth of what it asserts, not for another purpose (such as showing the speaker's state of mind or belief).",
+          "created_round": 4,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.8,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 0
+          }
+        },
+        {
+          "version": 5,
+          "text": "Hearsay is an out-of-court statement (including verbal or nonverbal assertions) offered to prove the truth of the matter asserted. A statement is only hearsay if it is made outside the current proceeding and is offered to prove the truth of what it asserts, not for another purpose (such as showing the speaker's state of mind or belief). Facts, events, or conduct that are not intended as assertions are not hearsay.",
+          "created_round": 5,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Decide whether the given statement is hearsay, considering whether it is being offered to prove the truth of the assertion, or merely to show something else (such as the speaker's belief, emotion, or state of mind).",
+          "created_round": 2,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 5,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Apply the definition strictly. Nonverbal conduct is hearsay only if it is intended as an assertion. If a statement or conduct is offered to prove something other than the truth of the assertion (such as the speaker's beliefs or intentions), it is not hearsay. For example: If Tim says 'Real Madrid is the best soccer team' to show Tim's fandom, it is not hearsay; if offered to prove that Real Madrid is the best, it is hearsay.",
+          "created_round": 1,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is intended as an assertion. Assertive conduct includes non-verbal actions meant to communicate a message (e.g., a thumbs up in response to a question about wellbeing). If a statement is offered to prove the speaker's belief, emotion, or state of mind, and not the truth of the content, it is not hearsay. However, if the statement or conduct is offered to prove the truth of the matter asserted, it is hearsay.",
+          "created_round": 2,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "Apply the definition strictly. Conduct is not hearsay unless it is intended as an assertion. If conduct or a gesture is meant to communicate a fact or belief, it is assertive and may be hearsay. If a statement is offered to prove the truth of a fact asserted within it, it is hearsay—even if the statement expresses intent or belief. If a statement is offered only to show the declarant's state of mind, it is not hearsay.",
+          "created_round": 3,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        },
+        {
+          "version": 4,
+          "text": "Apply the definition strictly. Conduct is not hearsay unless it is intended as an assertion (including nonverbal gestures made to communicate something). If a statement or gesture is offered to prove the truth of what it asserts, it is hearsay; if it is offered for another purpose (such as showing intent, belief, or emotional state), it is not hearsay. An out-of-court statement asserting intent can be hearsay if offered to prove a fact (e.g., ownership) rather than just intent.",
+          "created_round": 4,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.8,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 0
+          }
+        },
+        {
+          "version": 5,
+          "text": "Apply the definition strictly. Conduct is not hearsay unless it is intended as an assertion (including nonverbal gestures made to communicate something). If a statement or gesture is offered to prove the truth of what it asserts, it is hearsay; if it is offered for another purpose (such as showing intent, belief, or emotional state), it is not hearsay. However, if a nonverbal gesture is intended as an assertion and is offered to prove the truth of what it asserts (e.g., a thumbs up to indicate wellbeing), it is hearsay. An out-of-court statement asserting intent can be hearsay if offered to prove a fact (e.g., ownership) rather than just intent. If a statement is offered to show the speaker's belief or state of mind (such as being a fan), it is not hearsay unless it is offered to prove the truth of the content itself.",
+          "created_round": 5,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form: Answer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

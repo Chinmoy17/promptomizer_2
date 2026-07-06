@@ -86,11 +86,85 @@ def subsample(pool: list[Example], n: int, seed: int) -> list[Example]:
     return [pool[i] for i in idx[: min(n, len(pool))]]
 
 
+def _stratum_key(ex: Example) -> str:
+    """Preferred stratification key. `meta['slice']` when the dataset carries
+    upstream slice metadata (LegalBench-style); otherwise the gold label."""
+    return ex.meta.get("slice", ex.gold) if ex.meta else ex.gold
+
+
+def _stratified_take(pool: list[Example], n: int, rng: random.Random,
+                     ) -> tuple[list[Example], list[Example]]:
+    """Take n examples from pool, stratified by `_stratum_key`, using
+    proportional allocation with rounding-drift correction.
+    Returns (selected, remainder). Deterministic under a fixed `rng`.
+    """
+    if n >= len(pool):
+        shuffled = pool.copy()
+        rng.shuffle(shuffled)
+        return shuffled, []
+
+    strata: dict[str, list[Example]] = {}
+    for e in pool:
+        strata.setdefault(_stratum_key(e), []).append(e)
+    stratum_names = sorted(strata)  # deterministic iteration order
+
+    total = len(pool)
+    # Proportional allocation (rounded)
+    allocated = {k: round(n * len(strata[k]) / total) for k in stratum_names}
+
+    # Correct for rounding drift by adjusting the largest strata first.
+    order_by_size = sorted(stratum_names, key=lambda k: -len(strata[k]))
+    diff = n - sum(allocated.values())
+    i = 0
+    guard = 100 * max(len(order_by_size), 1)
+    while diff != 0 and i < guard:
+        k = order_by_size[i % len(order_by_size)]
+        if diff > 0 and allocated[k] < len(strata[k]):
+            allocated[k] += 1
+            diff -= 1
+        elif diff < 0 and allocated[k] > 0:
+            allocated[k] -= 1
+            diff += 1
+        i += 1
+
+    selected: list[Example] = []
+    remainder: list[Example] = []
+    for k in stratum_names:
+        exs = strata[k].copy()
+        rng.shuffle(exs)
+        selected.extend(exs[: allocated[k]])
+        remainder.extend(exs[allocated[k]:])
+    return selected, remainder
+
+
 def load_splits(dataset: str, n_train: int, n_test: int, seed: int,
-                dataset_root: str = DEFAULT_DATASET_ROOT
+                dataset_root: str = DEFAULT_DATASET_ROOT,
+                split_mode: str = "seeded",
                 ) -> tuple[list[Example], list[Example]]:
     """Deterministic (train, test) subsamples read from the committed
     Dataset/ folder.
+
+    `split_mode`:
+      - "seeded" (default, backward-compatible): random shuffle by seed;
+        train/test composition varies per seed.
+      - "stratified": pool train + test, stratify by `meta['slice']` (or gold
+        as fallback), carve TEST with a FIXED rng (seed=0) so test is
+        identical across user seeds, then carve TRAIN from the remainder
+        using the user seed. Strongly recommended for legalbench_hearsay
+        (5 semantic slices) — removes cross-seed test-composition variance.
+    """
+    if split_mode == "stratified":
+        return _load_splits_stratified(dataset, n_train, n_test, seed, dataset_root)
+    if split_mode != "seeded":
+        raise ValueError(f"unknown split_mode: {split_mode!r} "
+                         "(expected 'seeded' or 'stratified')")
+    return _load_splits_seeded(dataset, n_train, n_test, seed, dataset_root)
+
+
+def _load_splits_seeded(dataset: str, n_train: int, n_test: int, seed: int,
+                        dataset_root: str,
+                        ) -> tuple[list[Example], list[Example]]:
+    """Original seeded split (unchanged behavior).
 
     If the official train pool is too small (LegalBench hearsay has ~5 train
     examples), the shortfall is carved from the shuffled test pool BEFORE the
@@ -111,4 +185,24 @@ def load_splits(dataset: str, n_train: int, n_test: int, seed: int,
         shuffled_test = shuffled_test[shortfall:]
 
     test = shuffled_test[: min(n_test, len(shuffled_test))]
+    return train, test
+
+
+def _load_splits_stratified(dataset: str, n_train: int, n_test: int, seed: int,
+                            dataset_root: str,
+                            ) -> tuple[list[Example], list[Example]]:
+    """Pool official train + test, then take a FIXED stratified test set
+    (rng seeded to 0 -- identical across user seeds) and a seed-dependent
+    stratified train set from the remainder."""
+    pool = (_load_local(dataset, "train", dataset_root)
+            + _load_local(dataset, "test", dataset_root))
+    if n_test + n_train > len(pool):
+        # Trim train silently; test is the deterministic anchor and gets priority.
+        n_train = max(0, len(pool) - n_test)
+
+    fixed_rng = random.Random(0)  # test is fixed across user seeds
+    test, remainder = _stratified_take(pool, n_test, fixed_rng)
+
+    user_rng = random.Random(seed)
+    train, _ = _stratified_take(remainder, n_train, user_rng)
     return train, test

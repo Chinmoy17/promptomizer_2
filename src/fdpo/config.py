@@ -84,6 +84,10 @@ class ExperimentConfig:
                                 # exploratory/dev runs; use `main` for real, publishable
                                 # experiments (see results/README.md for the scheme).
     early_stop: bool = True
+    split_mode: str = "seeded"  # "seeded" (default, backward-compat) | "stratified".
+                                 # Stratified: test set FIXED across seeds, stratified
+                                 # by meta['slice'] (or gold as fallback). Strongly
+                                 # recommended for legalbench_hearsay (5 semantic slices).
 
     # verdicts: "programmatic" = extracted answer vs gold; "llm" = trust the judge
     verdict_mode: str = "programmatic"
@@ -160,6 +164,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--price-out", type=float, default=d.price_out,
                    help="$/M output tokens for models missing from the price table")
     p.add_argument("--phase", default=d.phase)
+    p.add_argument("--split-mode", choices=("seeded", "stratified"),
+                   default=d.split_mode,
+                   help="'seeded' (default): random per-seed splits. "
+                        "'stratified': test set FIXED across seeds, stratified "
+                        "by meta['slice'] (or gold). Recommended for legalbench.")
     p.add_argument("--results-root", default=d.results_root)
     p.add_argument("--dataset-root", default=d.dataset_root,
                    help="folder holding committed Dataset/<name>/{train,test}.jsonl")
@@ -199,6 +208,7 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         phase=args.phase,
         results_root=args.results_root,
         dataset_root=args.dataset_root,
+        split_mode=args.split_mode,
         dry_run=args.dry_run,
         max_workers=args.max_workers,
     )

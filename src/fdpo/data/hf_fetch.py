@@ -131,6 +131,11 @@ def fetch_legalbench_hearsay() -> tuple[list[Example], list[Example]]:
                 ),
                 gold=row["answer"].strip().capitalize(),
                 reference=row["answer"],
+                # 'slice' is the upstream category (Standard hearsay /
+                # Non-assertive conduct / Statement made in court /
+                # Non-verbal hearsay / Not introduced to prove truth) --
+                # the natural stratification key for splits & per-slice metrics.
+                meta={"slice": row["slice"]} if "slice" in row.index else {},
             )
             for i, row in df.iterrows()
         ]

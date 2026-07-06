@@ -1,0 +1,246 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 2,
+  "run_best_acc": 0.7333333333333333,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 3,
+    "task_details": 0,
+    "constraints": 3,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay is an out-of-court statement or nonverbal conduct intended as an assertion, offered to prove the truth of the matter asserted. A statement made in court is not hearsay. If a statement or conduct is offered to show something other than the truth of the assertion (such as knowledge or notice), it is not hearsay.",
+          "created_round": 1,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.6,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 5,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "Hearsay is an out-of-court statement—oral, written, or nonverbal—offered to prove the truth of the matter asserted in the statement. A statement made during the current court proceeding is not hearsay. A statement is only hearsay if it is offered to prove the truth of what it asserts, not for another purpose (such as showing knowledge, notice, or that a discussion occurred).",
+          "created_round": 2,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.4666666666666667,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 8,
+            "recovered_failures": 5,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "Hearsay is an out-of-court statement (oral, written, or nonverbal conduct intended as an assertion) offered to prove the truth of the matter asserted. Statements made by a witness while testifying in court are not hearsay.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 7,
+            "recovered_failures": 6,
+            "broke": 0
+          }
+        },
+        {
+          "version": 4,
+          "text": "Hearsay is an out-of-court statement (oral, written, or nonverbal conduct intended as an assertion) offered to prove the truth of the matter asserted. Statements made by a witness while testifying in court are not hearsay. Prior identification by a witness who testifies and is subject to cross-examination is also not hearsay.",
+          "created_round": 4,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 3,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 5,
+          "text": "Hearsay is an out-of-court statement (oral, written, or nonverbal conduct intended as an assertion) offered to prove the truth of the matter asserted. Statements made by a witness while testifying in court are not hearsay, even if the witness recounts their own prior out-of-court statements. Prior identifications by a witness who testifies and is subject to cross-examination are also not hearsay.",
+          "created_round": 5,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 3,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Apply the definition strictly; conduct is hearsay if it is intended as an assertion and is offered for its truth. Nonverbal conduct such as nodding or shaking one's head in response to a question is assertive and can be hearsay if offered for its truth.",
+          "created_round": 1,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.6,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 5,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "Apply the definition strictly; conduct is hearsay if it is intended as an assertion, including nonverbal gestures (such as nodding or shaking one's head to communicate 'yes' or 'no'). If an out-of-court statement or gesture is offered to prove the truth of what it asserts—whether directly or by implication—it is hearsay.",
+          "created_round": 2,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.4666666666666667,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 8,
+            "recovered_failures": 5,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "Apply the definition strictly. Nonverbal conduct is hearsay if it is intended as an assertion and is offered for its truth. If a statement or conduct is offered to show something other than the truth of the matter asserted (such as knowledge, notice, or effect on the listener), it is not hearsay. For example, a head shake or nod in response to a question can be assertive and hearsay if offered for its truth.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 7,
+            "recovered_failures": 6,
+            "broke": 0
+          }
+        },
+        {
+          "version": 4,
+          "text": "Apply the definition strictly. Nonverbal conduct is hearsay if it is intended as an assertion and is offered for its truth. If a statement or conduct is offered to show something other than the truth of the matter asserted (such as knowledge, notice, effect on the listener, or simply that a conversation or discussion occurred), it is not hearsay. For example, a head shake or nod in response to a question can be assertive and hearsay if offered for its truth.",
+          "created_round": 4,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 3,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 5,
+          "text": "Apply the definition strictly. Nonverbal conduct is hearsay if it is intended as an assertion and is offered for its truth. If a statement or conduct is offered to show something other than the truth of the matter asserted (such as knowledge, notice, effect on the listener, or simply that a conversation or event occurred), it is not hearsay. For example, a head shake or nod in response to a question can be assertive and hearsay if offered for its truth.",
+          "created_round": 5,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 3,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form: Answer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}
