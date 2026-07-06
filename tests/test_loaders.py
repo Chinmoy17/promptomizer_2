@@ -114,6 +114,26 @@ def test_stratified_falls_back_to_gold_when_no_slice_meta():
     assert dist["B"] >= 2   # at least a couple from minority class
 
 
+def test_stratified_uses_subject_meta_key_for_mmlu():
+    """MMLU carries meta['subject'] not meta['slice']; stratification should
+    still work per-subject."""
+    import random
+    pool = [
+        Example(id=f"m_{i}", question="q",
+                gold=("A" if i % 2 else "B"),
+                reference="ref",
+                meta={"subject": "philosophy" if i < 30 else "econometrics"})
+        for i in range(50)
+    ]
+    selected, _ = _stratified_take(pool, 20, random.Random(0))
+    subjects = Counter(e.meta["subject"] for e in selected)
+    # 30 philosophy / 20 econometrics -> take 20 total -> ~12 philo / ~8 econ
+    assert subjects["philosophy"] + subjects["econometrics"] == 20
+    # Both subjects represented
+    assert subjects["philosophy"] >= 6
+    assert subjects["econometrics"] >= 4
+
+
 def test_unknown_split_mode_raises():
     import pytest
     with pytest.raises(ValueError, match="unknown split_mode"):

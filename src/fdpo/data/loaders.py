@@ -87,9 +87,16 @@ def subsample(pool: list[Example], n: int, seed: int) -> list[Example]:
 
 
 def _stratum_key(ex: Example) -> str:
-    """Preferred stratification key. `meta['slice']` when the dataset carries
-    upstream slice metadata (LegalBench-style); otherwise the gold label."""
-    return ex.meta.get("slice", ex.gold) if ex.meta else ex.gold
+    """Preferred stratification key. Falls back through common category-label
+    field names in meta (`slice`, `subject`, `category`) before defaulting to
+    the gold answer -- so LegalBench uses its `slice`, MMLU uses `subject`,
+    and datasets without any category metadata (GSM8K, ARC) fall back to the
+    gold label."""
+    if ex.meta:
+        for key in ("slice", "subject", "category"):
+            if key in ex.meta:
+                return ex.meta[key]
+    return ex.gold
 
 
 def _stratified_take(pool: list[Example], n: int, rng: random.Random,

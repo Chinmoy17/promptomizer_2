@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.7,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted. Under the Federal Rules of Evidence, a \"statement\" is a person's oral or written assertion, or nonverbal conduct intended as an assertion.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay. Carefully consider:\n- Whether the evidence involves an out-of-court assertion by a person.\n- Whether the evidence is being offered to prove the truth of the content of that assertion, rather than for some other purpose (such as showing the effect on the listener, the speaker's state of mind, or simply that the statement was made).\n- Whether the conduct described is intended as an assertion.\n\nApply the following reasoning principles:\n- If the statement or conduct is not offered to prove the truth of its content, but rather to show something else (such as the speaker's knowledge, belief, intent, or the effect on the listener), it is not hearsay.\n- If the statement is offered as circumstantial evidence of the declarant’s knowledge, belief, or presence, and not for the truth of the matter asserted, it is not hearsay.\n- If the statement is offered to prove that the declarant made the statement (regardless of its truth), it is not hearsay.\n- If the statement is offered as direct evidence of the declarant’s state of mind, intent, or knowledge, and not for the truth of what was asserted, it is not hearsay.\n- If a statement is offered to prove the truth of the matter asserted (that is, the content of the assertion itself is at issue), it is hearsay.\n- If the statement is offered to show that the declarant held a particular belief, or had a particular relationship or knowledge, and not to prove the literal truth of the assertion, it is not hearsay.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Decide whether the given statement is hearsay. Carefully consider:\n- Whether the evidence involves an out-of-court assertion by a person.\n- Whether the evidence is being offered to prove the truth of the content of that assertion, rather than for some other purpose (such as showing the effect on the listener, the speaker's state of mind, or simply that the statement was made).\n- Whether the conduct described is intended as an assertion.\n\nApply the following reasoning principles:\n- A statement or conduct is hearsay only if: (1) it is an out-of-court assertion by a person, and (2) it is offered to prove the truth of the content of that assertion.\n- If the evidence is offered to prove a person's knowledge, belief, intent, notice, or state of mind, first determine whether the assertion is being used as circumstantial evidence of that mental state, or as direct evidence of the truth of the asserted fact. If the statement is used to show the declarant’s awareness, belief, or relationship (and not the literal truth of the assertion), it is not hearsay.\n- If the statement is offered solely to prove that the declarant made the statement, regardless of its truth, it is not hearsay.\n- If the evidence is offered to show the effect on the listener or recipient (such as notice or motive), and not to prove the truth of the assertion, it is not hearsay.\n- If the evidence is offered to prove the truth of the matter asserted (that is, the content of the assertion itself is at issue), it is hearsay.\n- Nonverbal conduct is hearsay only if it is intended as an assertion and is offered for the truth of what is asserted by that conduct.\n- When the evidence is a report, record, or document, determine whether it contains a person's assertion and whether it is offered for the truth of that assertion.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.725,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 11,
+            "recovered_failures": 2,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "- Apply the definition strictly and precisely.\n- Evidence is only hearsay if it is a person's out-of-court assertion offered to prove the truth of what was asserted.\n- Non-assertive conduct, or conduct not intended as an assertion, is not hearsay.\n- Statements offered to show their effect on the listener, the speaker's state of mind, or to prove that the statement was made (rather than the truth of its content), are not hearsay.\n- Statements that are circumstantial evidence of knowledge, belief, or presence, but not offered for the truth of the matter asserted, are not hearsay.\n- Reports, records, or other writings are only hearsay if they contain a person's assertion and are offered for the truth of that assertion.\n- Non-human-generated information (such as machine data or scientific findings not reflecting a person's assertion) is not hearsay.\n- If a statement or conduct is offered to prove that a person had knowledge, intent, or belief, or was present, and not to prove the literal truth of the assertion, it is not hearsay—even if the assertion is relevant to the inference.\n- If a statement is offered to prove that a person made a particular assertion or took a particular action, regardless of the truth of the assertion, it is not hearsay.\n- If the evidence is a report or record that contains a person's assertion and is offered to prove the truth of that assertion, it is hearsay—even if the report is scientific or official in nature.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Apply the definition strictly and precisely.\n- Evidence is only hearsay if it is a person's out-of-court assertion offered to prove the truth of what was asserted.\n- Non-assertive conduct, or conduct not intended as an assertion, is not hearsay.\n- Statements offered to show their effect on the listener, the speaker's state of mind, or to prove that the statement was made (rather than the truth of its content), are not hearsay.\n- Statements that are circumstantial evidence of knowledge, belief, or presence, but not offered for the truth of the matter asserted, are not hearsay.\n- Reports, records, or other writings are only hearsay if they contain a person's assertion and are offered for the truth of that assertion.\n- Non-human-generated information (such as machine data or scientific findings not reflecting a person's assertion) is not hearsay.\n- If a statement or conduct is offered to prove that a person had knowledge, intent, or belief, or was present, and not to prove the literal truth of the assertion, it is not hearsay—even if the assertion is relevant to the inference.\n- If a statement is offered to prove that a person made a particular assertion or took a particular action, regardless of the truth of the assertion, it is not hearsay.\n- If the evidence is a report or record that contains a person's assertion and is offered to prove the truth of that assertion, it is hearsay—even if the report is scientific or official in nature.\n- If the evidence is a report or record prepared by a person and describes or interprets physical evidence or events, and is offered to prove the truth of the matters asserted in that description or interpretation, it is hearsay.\n- If the statement or conduct is offered as circumstantial evidence of a person's presence, identity, or mental state, and not for the truth of the content asserted, it is not hearsay.\n- If the evidence is offered to show that a person had notice or awareness of a fact, but the assertion is being used as proof that the fact was true (not just that the person heard it), it is hearsay.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.725,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 11,
+            "recovered_failures": 2,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}
