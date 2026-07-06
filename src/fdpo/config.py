@@ -8,7 +8,7 @@ from dataclasses import asdict, dataclass, field
 
 from dotenv import load_dotenv
 
-METHODS = ("zeroshot_cot", "fewshot_cot", "monolithic", "fdpo")
+METHODS = ("zeroshot_cot", "fewshot_cot", "monolithic", "fdpo", "simple_fdpo")
 DATASETS = ("gsm8k", "arc", "mmlu", "legalbench_hearsay")
 ROLES = ("solver", "judge", "optimizer")
 
@@ -71,6 +71,8 @@ class ExperimentConfig:
                                 # (soft cap so prompt size stays bounded; rarely truncates
                                 # at pilot scale -- see fdpo_mechanism.md for tuning guidance)
     n_gold: int = 3            # gold exemplars fed to the optimizer per rewrite
+    tau: int = 5               # simple_fdpo: min failures on baseline batch to trigger
+                                # one-shot optimization (paper's `|F_f| >= tau`).
     val_size: int = 20         # size of the FIXED held-out validation slice, carved once
                                 # from train at run start; used for every gate check and
                                 # for full-prompt accuracy tracking (v2 mechanism -- replaces
@@ -144,6 +146,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--eps", type=float, default=d.eps)
     p.add_argument("--n-fail", type=int, default=d.n_fail)
     p.add_argument("--n-gold", type=int, default=d.n_gold)
+    p.add_argument("--tau", type=int, default=d.tau,
+                   help="simple_fdpo: min failures on the baseline batch "
+                        "required to trigger a single-pass rewrite")
     p.add_argument("--val-size", type=int, default=d.val_size,
                    help="fixed held-out validation slice size (carved once from train)")
     p.add_argument("--pool-cap", type=int, default=d.pool_cap)
@@ -193,6 +198,7 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         eps=args.eps,
         n_fail=args.n_fail,
         n_gold=args.n_gold,
+        tau=args.tau,
         val_size=args.val_size,
         pool_cap=args.pool_cap,
         stagnation_limit=args.stagnation_limit,

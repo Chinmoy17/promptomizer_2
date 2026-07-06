@@ -1,0 +1,93 @@
+{
+  "run_id": "legalbench_hearsay_simple_fdpo_mock_s0_20260706-160421",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "legalbench_hearsay",
+  "solver_model": "mock",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.5,
+    "n_examples": 6,
+    "extraction_failures": 0,
+    "macro_f1": 0.3333333333333333
+  },
+  "final_test": {
+    "accuracy": 0.5,
+    "n_examples": 6,
+    "extraction_failures": 0,
+    "macro_f1": 0.3333333333333333
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 3,
+    "n_failures_triggering": 5,
+    "optimizer_calls": 1,
+    "baseline_train": {
+      "accuracy": 0.5,
+      "n_correct": 5,
+      "n_wrong": 5
+    },
+    "current_train": {
+      "accuracy": 0.5,
+      "n_correct": 5,
+      "n_wrong": 5
+    },
+    "train_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "syn_train_1",
+        "syn_train_3",
+        "syn_train_5",
+        "syn_train_7",
+        "syn_train_9"
+      ],
+      "still_right_count": 5,
+      "net_gain": 0
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 1,
+      "rejects": 0
+    },
+    "rounds_run": 1,
+    "train_acc_per_round": [
+      0.5
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "syn_test_1",
+        "syn_test_3",
+        "syn_test_5"
+      ],
+      "still_right_count": 3,
+      "net_gain": 0
+    },
+    "markdown_source": "prompts\\legalbench_hearsay.md"
+  },
+  "wall_clock_s": 0.0,
+  "cost": {
+    "total_calls": 33,
+    "total_cost_usd": 0.0,
+    "by_role": {
+      "solver": {
+        "calls": 32,
+        "prompt_tokens": 3632,
+        "completion_tokens": 448,
+        "cost_usd": 0.0
+      },
+      "optimizer": {
+        "calls": 1,
+        "prompt_tokens": 771,
+        "completion_tokens": 105,
+        "cost_usd": 0.0
+      }
+    }
+  }
+}

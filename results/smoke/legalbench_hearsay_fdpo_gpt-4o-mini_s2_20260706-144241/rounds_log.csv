@@ -1,0 +1,6 @@
+round,sections,n_failures,acc_old,acc_new,passed,broke,recovered,batch_size
+1,constraints+context+task_details,6,0.7333333333333333,0.8,True,0,0,15
+2,constraints+context,8,0.7333333333333333,0.8,True,0,1,15
+3,constraints,7,0.8,0.7333333333333333,False,2,2,15
+4,constraints,7,0.8,0.6666666666666666,False,3,0,15
+5,constraints,7,0.6666666666666666,0.6,False,1,1,15

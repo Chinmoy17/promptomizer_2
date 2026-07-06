@@ -1,0 +1,214 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.8,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 2,
+    "task_details": 1,
+    "constraints": 2,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay is an out-of-court statement (oral, written, or nonverbal) offered to prove the truth of the matter asserted in the statement.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.8,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "Hearsay is an out-of-court statement (oral, written, or nonverbal) offered to prove the truth of the matter asserted in the statement. Statements made while testifying in court are not hearsay.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.8,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 8,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Decide whether the given statement is hearsay, considering both what the statement asserts and the purpose for which it is offered.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.8,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Apply the definition strictly: a statement is hearsay only if it is offered to prove the truth of what it asserts. If the statement is offered for another purpose (such as showing knowledge, presence, or state of mind), it is not hearsay. Conduct is not hearsay unless it is intended as an assertion. Nonverbal conduct intended to assert something can be hearsay; mere actions not meant as assertions are not hearsay. For example, a nod to indicate agreement is hearsay if offered to prove agreement, but buying a ticket is not hearsay if offered to show presence.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.8,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "Apply the definition strictly: a statement is hearsay only if it is offered to prove the truth of what it asserts. If the statement is offered for another purpose (such as showing knowledge, presence, or state of mind), and does not depend on the truth of the assertion, it is not hearsay. However, if the statement or conduct is offered to prove someone's belief, knowledge, or presence, and that depends on the truth of what was asserted or implied, it may be hearsay. Conduct is not hearsay unless it is intended as an assertion. Nonverbal conduct intended to assert something can be hearsay; mere actions not meant as assertions are not hearsay. For example, a nod to indicate agreement is hearsay if offered to prove agreement, but buying a ticket is not hearsay if offered to show presence. Facts or events (such as academic performance or physical acts) are not hearsay unless they are intended as assertions.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.8,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 8,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "Apply the definition strictly: a statement is hearsay only if it is offered to prove the truth of what it asserts. If the statement is offered for another purpose (such as showing knowledge, presence, or state of mind), and the purpose does not depend on the truth of the assertion, it is not hearsay. However, if the statement or conduct is offered to prove someone's belief, knowledge, or presence, and that proof depends on the truth of what was asserted or implied (for example, showing someone knew a fact only if the asserted fact was true), it may be hearsay. Conduct is not hearsay unless it is intended as an assertion. Nonverbal conduct intended to assert something can be hearsay; mere actions not meant as assertions are not hearsay. For example, a nod to indicate agreement is hearsay if offered to prove agreement, but buying a ticket is not hearsay if offered to show presence. Facts or events (such as academic performance or physical acts) are not hearsay unless they are intended as assertions. For example, coming first in a class is not hearsay, but saying 'I am the smartest in my class' may be hearsay if offered to prove that fact.",
+          "created_round": 3,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 4,
+          "text": "Apply the definition strictly: a statement is hearsay only if it is offered to prove the truth of what it asserts. If the statement is offered for another purpose (such as showing knowledge, presence, or state of mind), and the purpose does not depend on the truth of the assertion, it is not hearsay. For example, if a statement is offered to show that the speaker had knowledge or notice of a fact, but the truth of the statement is not at issue, it is not hearsay. However, if the statement or conduct is offered to prove someone's belief, knowledge, or presence, and that proof depends on the truth of what was asserted or implied (for example, if the conduct or statement itself contains an assertion about the belief or knowledge), it may be hearsay. If the inference about belief or knowledge relies on the truth of the assertion, it is hearsay. Conduct is not hearsay unless it is intended as an assertion. Nonverbal conduct intended to assert something can be hearsay; mere actions not meant as assertions are not hearsay. For example, a nod to indicate agreement is hearsay if offered to prove agreement, but buying a ticket is not hearsay if offered to show presence. Facts or events (such as academic performance or physical acts) are not hearsay unless they are intended as assertions. For example, academic performance is a fact, not an assertion, so it is not hearsay.",
+          "created_round": 4,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 7,
+            "recovered_failures": 0,
+            "broke": 3
+          }
+        },
+        {
+          "version": 5,
+          "text": "Apply the definition strictly: a statement is hearsay only if it is offered to prove the truth of what it asserts. If the statement is offered for another purpose (such as showing knowledge, presence, or state of mind), and the purpose does not depend on the truth of the assertion, it is not hearsay. For example, if the statement is offered to show that the speaker had knowledge or notice, but the fact of knowledge depends on the truth of what was asserted or implied, it may be hearsay. However, if the statement or conduct is offered to prove someone's belief, knowledge, or presence, and that belief, knowledge, or presence depends on the truth of what was asserted or implied, it may be hearsay. For example, if the conduct or statement is offered to show that someone believed or knew a fact, and that belief or knowledge is only relevant if the asserted fact is true, it is hearsay. Conduct is not hearsay unless it is intended as an assertion. Nonverbal conduct intended to assert something can be hearsay; mere actions not meant as assertions are not hearsay. For example, a nod to indicate agreement is hearsay if offered to prove agreement, but buying a ticket is not hearsay if offered to show presence. Facts or events (such as academic performance or physical acts) are not hearsay unless they are intended as assertions. For example, coming first in a class is not hearsay unless it is presented as an assertion by someone, rather than simply as a fact or event.",
+          "created_round": 5,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.6,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 7,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form: Answer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

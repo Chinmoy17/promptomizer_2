@@ -65,6 +65,23 @@ def dry_run_client(role: str, ledger: TokenLedger | None = None,
                 "error_type": "WRONG",
             })
         if role == "optimizer":
+            # simple_fdpo path: prompt asks for whole-markdown rewrite.
+            if "FULL CURRENT PROMPT (markdown)" in text_all:
+                m = re.search(r"```\n(.+?)\n```", text_all, re.DOTALL)
+                if m:
+                    md = m.group(1)
+                    # Trivially modify a section so tests can see a real edit.
+                    md = md.replace("Apply the definition strictly",
+                                    "Apply the definition strictly. Be careful.")
+                    md = md.replace("Do not skip steps.",
+                                    "Do not skip steps. Be careful.")
+                    md = md.replace("Choose exactly one of",
+                                    "Be careful. Choose exactly one of")
+                    return md
+                # Fallback: return the standard hearsay markdown to satisfy the parser.
+                return ("## System Role\nMock\n\n## Context\nMock ctx\n\n"
+                        "## Task Details\nDo it\n\n## Constraints\nBe careful\n\n"
+                        "## Output Format\nAnswer: Yes  (or)  Answer: No")
             # v2 bundle format: {"edits": [{"section", "find", "replace"}, ...]}.
             # `find` = the whole current text of each flagged section (always an
             # exact substring of itself), so apply_edits() always succeeds

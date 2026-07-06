@@ -16,6 +16,8 @@ from fdpo.config import ExperimentConfig, build_arg_parser, config_from_args
 from fdpo.core.loop import run_optimization
 from fdpo.core.prompt import SCHEMA_5, SCHEMA_MONOLITHIC
 from fdpo.core.registry import PromptRegistry
+from fdpo.core.simple_loop import (bootstrap_registry_from_markdown,
+                                    run_simple_optimization)
 from fdpo.data.loaders import load_splits, synthetic_splits
 from fdpo.eval.evaluator import evaluate
 from fdpo.eval.metrics import novel_metrics, standard_metrics
@@ -56,6 +58,15 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
     schema = SCHEMA_MONOLITHIC if cfg.method == "monolithic" else SCHEMA_5
     registry = PromptRegistry(schema, seed_sections(cfg.dataset, schema),
                               path=run_dir / "registry.json")
+
+    # simple_fdpo: swap seed sections with markdown-loaded prompt BEFORE
+    # baseline eval, so the paper-faithful path measures against the human-
+    # editable prompts/<dataset>.md as the true baseline.
+    md_source = None
+    if cfg.method == "simple_fdpo":
+        md_source = bootstrap_registry_from_markdown(cfg.dataset, run_dir, registry)
+        logger.info("simple_fdpo: prompt source = %s", md_source)
+
     eval_log = CsvAppender(run_dir / "eval_log.csv", EVAL_LOG_FIELDS)
 
     shots = None
@@ -94,6 +105,37 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
                                  "correct": row.correct, "pred": row.pred,
                                  "gold": row.gold})
             logger.info("final test accuracy: %.3f", final_result.accuracy)
+        elif cfg.method == "simple_fdpo":
+            opt_summary = run_simple_optimization(cfg, registry, train, cfg.dataset,
+                                                  clients["solver"], clients["optimizer"],
+                                                  run_dir)
+            final_result = evaluate(clients["solver"], registry.active_prompt(),
+                                    test, cfg.dataset,
+                                    temperature=cfg.solver_temperature,
+                                    max_tokens=cfg.solver_max_tokens,
+                                    purpose="eval", max_workers=cfg.max_workers)
+            for row in final_result.rows:
+                eval_log.append({"phase": "final", "example_id": row.example_id,
+                                 "correct": row.correct, "pred": row.pred,
+                                 "gold": row.gold})
+            logger.info("final test accuracy: %.3f", final_result.accuracy)
+            # Test-set confusion matrix: which examples flipped vs the seed_test?
+            seed_correct = {r.example_id for r in seed_result.rows if r.correct}
+            final_correct = {r.example_id for r in final_result.rows if r.correct}
+            seed_wrong = {r.example_id for r in seed_result.rows if not r.correct}
+            final_wrong = {r.example_id for r in final_result.rows if not r.correct}
+            opt_summary["test_confusion"] = {
+                "recoveries": sorted(seed_wrong & final_correct),
+                "regressions": sorted(seed_correct & final_wrong),
+                "still_wrong": sorted(seed_wrong & final_wrong),
+                "still_right_count": len(seed_correct & final_correct),
+                "net_gain": len(seed_wrong & final_correct) - len(seed_correct & final_wrong),
+            }
+            opt_summary["markdown_source"] = md_source
+            logger.info("simple: TEST confusion matrix -- recovered %d, regressed %d, net %+d",
+                        len(opt_summary["test_confusion"]["recoveries"]),
+                        len(opt_summary["test_confusion"]["regressions"]),
+                        opt_summary["test_confusion"]["net_gain"])
     except BudgetExceededError as e:
         status = "budget_aborted"
         logger.error("BUDGET ABORT: %s — partial results saved", e)

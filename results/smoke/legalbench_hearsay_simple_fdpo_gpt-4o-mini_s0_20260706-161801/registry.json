@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.725,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 1,
+    "task_details": 0,
+    "constraints": 1,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted. Not all out-of-court statements or actions are hearsay; the purpose for which the evidence is offered is critical. Evidence is only hearsay if its value depends on the truth of the statement's content, not merely on the fact that it was made or on the effect it had on the listener or observer.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.725,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 3,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Apply the definition strictly.\n- Distinguish between evidence offered to prove the truth of the matter asserted and evidence offered for other purposes, such as to show the effect on the listener, the declarant's state of mind, or simply that the statement or act occurred.\n- Conduct (actions or nonverbal behavior) is not hearsay unless it is intended as an assertion. However, if conduct or nonverbal acts are introduced as substitutes for statements to prove the truth of an implied assertion, they may be considered hearsay.\n- Physical evidence, reports, or actions that are introduced as evidence of the truth of an implied or explicit assertion can constitute hearsay if their evidentiary value depends on the accuracy of an out-of-court assertion.\n- Statements offered only to prove that someone had knowledge, notice, belief, or a particular state of mind, or to show the effect on the listener, are not hearsay if their truth is not at issue.\n- Statements or acts offered solely to show that a conversation or event occurred, regardless of the truth of the content, are not hearsay.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.725,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 3,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}
