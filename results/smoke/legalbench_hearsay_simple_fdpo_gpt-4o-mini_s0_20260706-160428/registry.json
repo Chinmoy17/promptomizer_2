@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.825,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted. Not every out-of-court statement is hearsay; it depends on what the statement is offered to prove. Conduct may be hearsay if it is intended as an assertion.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.825,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 8,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Decide whether the given statement is hearsay.\n\n- If the evidence is an out-of-court statement (oral, written, or assertive conduct) and is offered to prove the truth of what it asserts, it is hearsay.\n- If the evidence is a statement offered for a purpose other than proving the truth of the matter asserted (such as showing the speaker's state of mind, knowledge, notice, or effect on the listener), it is NOT hearsay.\n- If the evidence is a report or written statement describing facts or observations, and is offered to prove the truth of those facts, it is hearsay.\n- Assertive conduct (actions intended to communicate a fact) can be hearsay if offered for the truth of the fact asserted by the conduct.\n\nInclude contrastive examples:\n- If a statement is offered to show what someone knew, believed, or felt (state of mind), or to show that someone was present, it is NOT hearsay.\n- If a statement is offered to prove the truth of an assertion about an external fact (e.g., \"the car was blue\"), it IS hearsay.\n\nWorked examples:\n- Statement: \"Real Madrid was the best soccer team in the world,\" offered to show Tim is a soccer fan (not to prove Real Madrid is the best).  \n  Answer: No\n- Statement: A forensics report describing DNA, offered to prove the defendant's presence at the scene.  \n  Answer: Yes\n- Statement: A bystander points to a blue sedan to indicate which car was responsible, offered to prove the car's identity.  \n  Answer: Yes\n- Statement: Mary told a mall employee she was planning to buy diamonds, offered to show she was at the mall (not to prove she bought diamonds).  \n  Answer: No\n- Statement: Bob told Jane he suspected Arthur was up to something, offered to show Jane had knowledge (not to prove Arthur was up to something).  \n  Answer: No\n- Statement: Patty told Arthur \"Dave is really dishonest,\" offered to show Patty knew Dave (not to prove Dave is dishonest).  \n  Answer: No\n- Statement: Sean called his lawyer to make final changes to his will, offered to show Sean knew he was going to die (conduct indicating state of mind).  \n  Answer: Yes\n- Statement: Anne said \"David was the best boss in the world,\" offered to show Anne supported David (not to prove David is the best boss).  \n  Answer: No\n- Statement: Gerald said \"I was attacked by Kathryn,\" offered to show Gerald was alive after the attack (not to prove Kathryn attacked him).  \n  Answer: No\n- Statement: Adam testified \"he regretted his actions,\" offered to show Adam was remorseful (not to prove the actions occurred).  \n  Answer: No",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.825,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 8,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive. Consider the purpose for which the statement or conduct is offered. If the statement is offered for something other than the truth of the matter asserted (such as state of mind, presence, knowledge, or effect on listener), it is NOT hearsay. If the evidence is a report or written description offered to prove the facts described, it IS hearsay.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.825,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 8,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

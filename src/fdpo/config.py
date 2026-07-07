@@ -8,7 +8,7 @@ from dataclasses import asdict, dataclass, field
 
 from dotenv import load_dotenv
 
-METHODS = ("zeroshot_cot", "fewshot_cot", "monolithic", "fdpo")
+METHODS = ("zeroshot_cot", "fewshot_cot", "monolithic", "fdpo", "simple_fdpo")
 DATASETS = ("gsm8k", "arc", "mmlu", "legalbench_hearsay")
 ROLES = ("solver", "judge", "optimizer")
 
@@ -71,6 +71,8 @@ class ExperimentConfig:
                                 # (soft cap so prompt size stays bounded; rarely truncates
                                 # at pilot scale -- see fdpo_mechanism.md for tuning guidance)
     n_gold: int = 3            # gold exemplars fed to the optimizer per rewrite
+    tau: int = 5               # simple_fdpo: min failures on baseline batch to trigger
+                                # one-shot optimization (paper's `|F_f| >= tau`).
     val_size: int = 20         # size of the FIXED held-out validation slice, carved once
                                 # from train at run start; used for every gate check and
                                 # for full-prompt accuracy tracking (v2 mechanism -- replaces
@@ -78,7 +80,16 @@ class ExperimentConfig:
     pool_cap: int = 200        # FIFO cap on the gold-example correct pool
     stagnation_limit: int = 3  # rounds with no committed bundle before best-snapshot restore
     history_window: int = 3    # how many past round outcomes the optimizer sees in context
+
+    # bookkeeping
+    phase: str = "smoke"       # results/<phase>/<run_id>/. Default `smoke` is for
+                                # exploratory/dev runs; use `main` for real, publishable
+                                # experiments (see results/README.md for the scheme).
     early_stop: bool = True
+    split_mode: str = "seeded"  # "seeded" (default, backward-compat) | "stratified".
+                                 # Stratified: test set FIXED across seeds, stratified
+                                 # by meta['slice'] (or gold as fallback). Strongly
+                                 # recommended for legalbench_hearsay (5 semantic slices).
 
     # verdicts: "programmatic" = extracted answer vs gold; "llm" = trust the judge
     verdict_mode: str = "programmatic"
@@ -96,7 +107,7 @@ class ExperimentConfig:
     price_out: float = 0.0     # $/M output-token fallback for unknown models
 
     # output
-    phase: str = "00_smoke"
+
     results_root: str = "results"
     dataset_root: str = "Dataset"
 
@@ -135,6 +146,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--eps", type=float, default=d.eps)
     p.add_argument("--n-fail", type=int, default=d.n_fail)
     p.add_argument("--n-gold", type=int, default=d.n_gold)
+    p.add_argument("--tau", type=int, default=d.tau,
+                   help="simple_fdpo: min failures on the baseline batch "
+                        "required to trigger a single-pass rewrite")
     p.add_argument("--val-size", type=int, default=d.val_size,
                    help="fixed held-out validation slice size (carved once from train)")
     p.add_argument("--pool-cap", type=int, default=d.pool_cap)
@@ -155,6 +169,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--price-out", type=float, default=d.price_out,
                    help="$/M output tokens for models missing from the price table")
     p.add_argument("--phase", default=d.phase)
+    p.add_argument("--split-mode", choices=("seeded", "stratified"),
+                   default=d.split_mode,
+                   help="'seeded' (default): random per-seed splits. "
+                        "'stratified': test set FIXED across seeds, stratified "
+                        "by meta['slice'] (or gold). Recommended for legalbench.")
     p.add_argument("--results-root", default=d.results_root)
     p.add_argument("--dataset-root", default=d.dataset_root,
                    help="folder holding committed Dataset/<name>/{train,test}.jsonl")
@@ -179,6 +198,7 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         eps=args.eps,
         n_fail=args.n_fail,
         n_gold=args.n_gold,
+        tau=args.tau,
         val_size=args.val_size,
         pool_cap=args.pool_cap,
         stagnation_limit=args.stagnation_limit,
@@ -194,6 +214,7 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         phase=args.phase,
         results_root=args.results_root,
         dataset_root=args.dataset_root,
+        split_mode=args.split_mode,
         dry_run=args.dry_run,
         max_workers=args.max_workers,
     )

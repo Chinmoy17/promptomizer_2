@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.9466666666666667,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a careful math tutor who solves word problems.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You will be given a grade-school math word problem.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Solve the problem step by step, showing your arithmetic.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Solve the problem step by step, showing your arithmetic and logical reasoning. Clearly define variables for unknown quantities and set up equations when relationships are described. When quantities change incrementally or proportionally, ensure you interpret the wording correctly (e.g., distinguish between \"each month, 30 more than the first\" and \"each month, 30 more than the previous\"). For problems involving intervals, groupings, or repeated actions, carefully consider how the intervals or groups are counted (e.g., the number of intervals between points is one less than the number of points). When a problem describes an extension or increase on multiple sides, add the change to each relevant dimension. When a total is distributed over multiple periods or groups, ensure you divide by the correct total number of periods or groups, not just those in a subset. If a problem involves multiple trips or repeated actions, account for all necessary legs of the journey if implied by the context. Always check that your answer is reasonable and matches the context of the problem.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9466666666666667,
+            "acc_new": 0.9466666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 150,
+            "n_failures": 8,
+            "recovered_failures": 4,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Do not skip steps. Do not invent quantities that are not in the problem.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Do not skip steps. Do not invent quantities that are not in the problem. Use only the information provided and make explicit any assumptions if absolutely necessary. If the answer involves a count of objects or people, do not round fractional results unless the context requires whole numbers.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9466666666666667,
+            "acc_new": 0.9466666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 150,
+            "n_failures": 8,
+            "recovered_failures": 4,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "After your reasoning, write the final numeric answer on its own line in exactly this form: #### <number>",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

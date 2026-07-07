@@ -98,6 +98,11 @@ def test_events_jsonl_is_valid(tmp_path):
     run_dir = run(make_cfg(tmp_path, "fdpo"))
     lines = (run_dir / "events.jsonl").read_text().strip().splitlines()
     assert lines
-    for line in lines:
-        event = json.loads(line)
-        assert event["event"] == "bundle"
+    valid_events = {"bundle", "edits"}
+    events = [json.loads(line) for line in lines]
+    for event in events:
+        assert event["event"] in valid_events, f"unexpected event type: {event['event']}"
+    # every round that produced a bundle must have logged its edits first
+    assert any(e["event"] == "bundle" for e in events)
+    assert any(e["event"] == "edits" for e in events), \
+        "edits events must be persisted for post-hoc analysis"

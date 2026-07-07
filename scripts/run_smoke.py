@@ -30,7 +30,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--n-test", type=int, default=200)
     p.add_argument("--max-rounds", type=int, default=5)
     p.add_argument("--seed", type=int, default=0)
-    p.add_argument("--phase", default="00_smoke")
+    p.add_argument("--phase", default="smoke",
+                   help="target results/<phase>/ folder. Default `smoke` for\n"
+                        "exploratory runs; use `main` for real experiments\n"
+                        "(see results/README.md for the scheme).")
     p.add_argument("--dry-run", action="store_true")
     args = p.parse_args(argv)
 

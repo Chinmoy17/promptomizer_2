@@ -128,6 +128,13 @@ def run_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
                 history[-cfg.history_window:], registry.schema,
                 temperature=cfg.optimizer_temperature)
 
+            # Log every proposed edit's fate (applied / skipped-with-reason /
+            # parse-failed). Fires even for no-edit rounds so we can inspect
+            # what the optimizer tried but the find-string never matched.
+            events.append({"event": "edits", "round": round_num,
+                           "parse_failed": edit_result.parse_failed,
+                           "edits": edit_result.edit_log})
+
             all_failures_flat = [f["example"] for name in implicated_names
                                  for f in implicated[name]["failures"]]
 

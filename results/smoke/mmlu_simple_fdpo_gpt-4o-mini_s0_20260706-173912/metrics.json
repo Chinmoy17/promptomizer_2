@@ -1,0 +1,199 @@
+{
+  "run_id": "mmlu_simple_fdpo_gpt-4o-mini_s0_20260706-173912",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "mmlu",
+  "solver_model": "gpt-4o-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.5933333333333334,
+    "n_examples": 150,
+    "extraction_failures": 2
+  },
+  "final_test": {
+    "accuracy": 0.6066666666666667,
+    "n_examples": 150,
+    "extraction_failures": 2
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 5,
+    "n_failures_triggering": 41,
+    "optimizer_calls": 1,
+    "baseline_train": {
+      "accuracy": 0.6583333333333333,
+      "n_correct": 79,
+      "n_wrong": 41
+    },
+    "current_train": {
+      "accuracy": 0.7,
+      "n_correct": 84,
+      "n_wrong": 36
+    },
+    "train_confusion": {
+      "recoveries": [
+        "mmlu_college_mathematics_test_65",
+        "mmlu_econometrics_test_21",
+        "mmlu_professional_law_test_1033",
+        "mmlu_professional_law_test_1169",
+        "mmlu_professional_law_test_313",
+        "mmlu_professional_law_test_657",
+        "mmlu_professional_law_test_771",
+        "mmlu_professional_law_test_81"
+      ],
+      "regressions": [
+        "mmlu_professional_law_test_1063",
+        "mmlu_professional_law_test_1184",
+        "mmlu_professional_law_test_328"
+      ],
+      "still_wrong": [
+        "mmlu_college_mathematics_test_9",
+        "mmlu_econometrics_test_19",
+        "mmlu_philosophy_test_138",
+        "mmlu_philosophy_test_181",
+        "mmlu_philosophy_test_94",
+        "mmlu_philosophy_validation_5",
+        "mmlu_professional_law_test_1013",
+        "mmlu_professional_law_test_1017",
+        "mmlu_professional_law_test_1234",
+        "mmlu_professional_law_test_1264",
+        "mmlu_professional_law_test_1374",
+        "mmlu_professional_law_test_1396",
+        "mmlu_professional_law_test_17",
+        "mmlu_professional_law_test_190",
+        "mmlu_professional_law_test_395",
+        "mmlu_professional_law_test_432",
+        "mmlu_professional_law_test_440",
+        "mmlu_professional_law_test_444",
+        "mmlu_professional_law_test_461",
+        "mmlu_professional_law_test_497",
+        "mmlu_professional_law_test_504",
+        "mmlu_professional_law_test_557",
+        "mmlu_professional_law_test_605",
+        "mmlu_professional_law_test_642",
+        "mmlu_professional_law_test_647",
+        "mmlu_professional_law_test_661",
+        "mmlu_professional_law_test_831",
+        "mmlu_professional_law_test_858",
+        "mmlu_professional_law_test_95",
+        "mmlu_professional_law_test_973",
+        "mmlu_professional_law_validation_150",
+        "mmlu_professional_law_validation_43",
+        "mmlu_professional_law_validation_70"
+      ],
+      "still_right_count": 76,
+      "net_gain": 5
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 2,
+      "rejects": 0
+    },
+    "rounds_run": 1,
+    "train_acc_per_round": [
+      0.7
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "mmlu_high_school_biology_test_65",
+        "mmlu_philosophy_test_149",
+        "mmlu_professional_law_test_1143",
+        "mmlu_professional_law_test_136",
+        "mmlu_professional_law_test_1386",
+        "mmlu_professional_law_test_1464",
+        "mmlu_professional_law_test_1472",
+        "mmlu_professional_law_test_253",
+        "mmlu_professional_law_test_823"
+      ],
+      "regressions": [
+        "mmlu_professional_law_test_1048",
+        "mmlu_professional_law_test_1131",
+        "mmlu_professional_law_test_1240",
+        "mmlu_professional_law_test_1509",
+        "mmlu_professional_law_test_23",
+        "mmlu_professional_law_test_236",
+        "mmlu_professional_law_validation_154"
+      ],
+      "still_wrong": [
+        "mmlu_college_mathematics_test_28",
+        "mmlu_college_mathematics_test_85",
+        "mmlu_college_mathematics_test_89",
+        "mmlu_college_mathematics_test_97",
+        "mmlu_computer_security_test_20",
+        "mmlu_econometrics_test_41",
+        "mmlu_high_school_biology_test_189",
+        "mmlu_high_school_biology_test_249",
+        "mmlu_high_school_biology_validation_17",
+        "mmlu_philosophy_test_116",
+        "mmlu_philosophy_test_124",
+        "mmlu_philosophy_test_238",
+        "mmlu_philosophy_test_77",
+        "mmlu_philosophy_validation_33",
+        "mmlu_professional_law_dev_4",
+        "mmlu_professional_law_test_111",
+        "mmlu_professional_law_test_1111",
+        "mmlu_professional_law_test_1174",
+        "mmlu_professional_law_test_1179",
+        "mmlu_professional_law_test_1196",
+        "mmlu_professional_law_test_1198",
+        "mmlu_professional_law_test_1211",
+        "mmlu_professional_law_test_1213",
+        "mmlu_professional_law_test_1250",
+        "mmlu_professional_law_test_1256",
+        "mmlu_professional_law_test_1300",
+        "mmlu_professional_law_test_1460",
+        "mmlu_professional_law_test_1494",
+        "mmlu_professional_law_test_1504",
+        "mmlu_professional_law_test_156",
+        "mmlu_professional_law_test_230",
+        "mmlu_professional_law_test_238",
+        "mmlu_professional_law_test_269",
+        "mmlu_professional_law_test_280",
+        "mmlu_professional_law_test_315",
+        "mmlu_professional_law_test_33",
+        "mmlu_professional_law_test_358",
+        "mmlu_professional_law_test_431",
+        "mmlu_professional_law_test_478",
+        "mmlu_professional_law_test_481",
+        "mmlu_professional_law_test_579",
+        "mmlu_professional_law_test_580",
+        "mmlu_professional_law_test_600",
+        "mmlu_professional_law_test_620",
+        "mmlu_professional_law_test_627",
+        "mmlu_professional_law_test_655",
+        "mmlu_professional_law_test_69",
+        "mmlu_professional_law_test_782",
+        "mmlu_professional_law_test_839",
+        "mmlu_professional_law_test_854",
+        "mmlu_professional_law_validation_130",
+        "mmlu_professional_law_validation_153"
+      ],
+      "still_right_count": 82,
+      "net_gain": 2
+    },
+    "markdown_source": "prompts\\mmlu.md"
+  },
+  "wall_clock_s": 298.1,
+  "cost": {
+    "total_calls": 541,
+    "total_cost_usd": 0.161525,
+    "by_role": {
+      "solver": {
+        "calls": 540,
+        "prompt_tokens": 227774,
+        "completion_tokens": 167752,
+        "cost_usd": 0.134817
+      },
+      "optimizer": {
+        "calls": 1,
+        "prompt_tokens": 11750,
+        "completion_tokens": 401,
+        "cost_usd": 0.026708
+      }
+    }
+  }
+}

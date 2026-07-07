@@ -3,25 +3,39 @@
 # Run this from the repo root.
 #
 # Usage:
-#   .\scripts\watch_run.ps1                     # watches results\00_smoke\<latest>
-#   .\scripts\watch_run.ps1 -Phase 01_full       # watch a different phase folder
+#   .\scripts\watch_run.ps1                # watches the latest run under results/, across ALL phases
+#   .\scripts\watch_run.ps1 -Phase smoke   # restrict to results/smoke/
+#   .\scripts\watch_run.ps1 -Phase main    # restrict to results/main/
 #   Ctrl+C stops watching; the run itself keeps going either way.
 
 param(
     [string]$ResultsRoot = "results",
-    [string]$Phase = "00_smoke"
+    [string]$Phase = ""
 )
 
-$phaseDir = Join-Path $ResultsRoot $Phase
-if (-not (Test-Path $phaseDir)) {
-    Write-Host "No runs yet under $phaseDir"
-    exit 1
+if ($Phase) {
+    $searchRoots = @(Join-Path $ResultsRoot $Phase)
+    if (-not (Test-Path $searchRoots[0])) {
+        Write-Host "No such phase folder: $($searchRoots[0])"
+        exit 1
+    }
+} else {
+    # any subdirectory of results/ that isn't a summary artifact
+    $searchRoots = Get-ChildItem -Path $ResultsRoot -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -notmatch '^\.' } |
+        ForEach-Object { $_.FullName }
+    if (-not $searchRoots) {
+        Write-Host "No phase folders yet under $ResultsRoot"
+        exit 1
+    }
 }
 
-$runDir = Get-ChildItem -Path $phaseDir -Directory |
-    Sort-Object LastWriteTime -Descending | Select-Object -First 1
+$runDir = $searchRoots |
+    ForEach-Object { Get-ChildItem -Path $_ -Directory -ErrorAction SilentlyContinue } |
+    Sort-Object LastWriteTime -Descending |
+    Select-Object -First 1
 if (-not $runDir) {
-    Write-Host "No run directories found under $phaseDir"
+    Write-Host "No run directories found under: $($searchRoots -join ', ')"
     exit 1
 }
 
