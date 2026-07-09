@@ -280,7 +280,8 @@ All results below use two Azure OpenAI models:
 - **Optimizer:** `gpt-4.1` — a stronger model that rewrites the prompt.
 
 Total spend across all experiments in this pilot, including diagnostic
-reruns and both variants: about $2.
+reruns, both mechanism configurations (single-pass and three-round
+trajectory-best), and all three datasets: **about $3**.
 
 ---
 
@@ -288,24 +289,82 @@ reruns and both variants: about $2.
 
 ### 6.1 LegalBench Hearsay: consistent improvement
 
-| Random seed | Baseline test accuracy | After optimization | Change |
+We ran the same 3 seeds under two different mechanism configurations. Both
+sets of results are shown because they tell different parts of the story.
+
+**Configuration A — Single-pass (permissive commit)**. One optimizer call
+per seed. The rewrite is always activated, even if it slightly regresses
+on the training batch. This is the paper-faithful `simple_fdpo` from the
+original figure.
+
+| Seed | Baseline test | After optimization | Change |
 |---|---:|---:|---:|
-| 0 | 64.4% | 72.9% | +8.5 percentage points |
-| 1 | 66.1% | 76.3% | +10.2 percentage points |
-| 2 | 64.4% | 67.8% | +3.4 percentage points |
-| **Average** | **65.0%** | **72.3%** | **+7.4 percentage points** |
+| 0 | 64.4 % | 72.9 % | +8.5 percentage points |
+| 1 | 66.1 % | 76.3 % | +10.2 percentage points |
+| 2 | 64.4 % | 67.8 % | +3.4 percentage points |
+| **Average** | **65.0 %** | **72.3 %** | **+7.4 percentage points** |
 
-All three seeds improved. The change-tracking log shows the optimizer is
-genuinely recovering questions that were wrong before (typically 8-10 per
-seed) and regressing a smaller number (3-8 per seed), for a net gain of 2
-to 6 questions out of 59.
+**Configuration B — Three rounds with trajectory-best selection**. Up to
+three optimizer calls per seed. Each round is committed, but the final
+active prompt is the round with the lowest train failure count across the
+trajectory. This design catches cases where round 2 or 3 finds a better
+rewrite than round 1, and cases where an early round regresses but a
+later round recovers.
 
-**Why this task works.** The hearsay rule has a small number of
+| Seed | Baseline test | After optimization | Change | Winning round |
+|---|---:|---:|---:|:---:|
+| 0 | 71.2 % | 78.0 % | +6.8 percentage points | Round 2 of 3 |
+| 1 | 67.8 % | 71.2 % | +3.4 percentage points | Round 1 of 3 |
+| 2 | 67.8 % | 69.5 % | +1.7 percentage points | Round 3 of 3 |
+| **Average** | **68.9 %** | **72.9 %** | **+4.0 percentage points** |
+
+**Reading these two tables honestly.** Configuration A's headline of
++7.4 pp is real, but the per-seed change-tracking reveals that two of the
+three seeds actually made training slightly worse — they lost 1 example
+on the training batch while gaining 3-6 examples on the test batch. The
+mechanism was gambling that a rewrite which hurts train would still help
+test, and it happened to win that gamble three times out of three.
+
+Configuration B refuses to gamble. It only keeps a rewrite if that
+rewrite reduces the number of training failures. When it discards a
+rewrite it tries another one, up to three times per seed. The average
+gain drops to +4.0 pp, but every seed is positive and every winning
+prompt is one the mechanism can defend.
+
+**The winning round varied by seed.** Seed 0's best rewrite came from
+round 2; round 1 regressed and round 3 regressed further. Seed 1 got
+its best rewrite in round 1 and rounds 2 and 3 could not improve on it.
+Seed 2's best rewrite came from round 3 — rounds 1 and 2 both regressed
+badly (round 2 dropped train accuracy from 75 % to 55 %) but round 3
+recovered dramatically. If we had stopped at one round, seed 2 would
+have committed round 1's regression. If we had stopped at two rounds,
+seed 2 would have committed round 2's disaster. **Three rounds with
+trajectory-best selection was the right number for this task.**
+
+**Why the numbers differ across the two configurations.** The baseline
+accuracies also differ between the two tables (65.0 % vs. 68.9 %). This
+is not a mistake — it is Azure OpenAI's temperature-0 non-determinism.
+The two configurations were run on different days against the same seed
+prompt and the same test set, and same-prompt re-runs on Azure OpenAI
+produce roughly 3-5 percentage points of variance. This noise floor is
+part of why the July 6 numbers are larger than the July 9 numbers — some
+of that difference is genuinely the mechanism, and some is Azure noise.
+
+**Why the task works at all.** The hearsay rule has a small number of
 exceptions that the model knows abstractly but forgets to apply
-consistently (for example, the "non-assertive conduct" exception).
-Rewriting the prompt to promote those exceptions to first-class rules
-makes the model apply them more reliably. This is the regime where
-prompt optimization is designed to help.
+consistently (for example, the "non-assertive conduct" exception and
+the "not offered for the truth" exception). Rewriting the prompt to
+promote those exceptions to first-class rules makes the model apply them
+more reliably. This is the regime where prompt optimization is designed
+to help.
+
+**Which number to cite.** Configuration B (+4.0 pp mean, three rounds,
+trajectory-best) is the number to use going forward. It is the more
+methodologically defensible mechanism, and the fact that all three seeds
+are positive is a stronger claim than a larger average with one seed
+that only barely cleared. Configuration A (+7.4 pp) is reported for
+transparency and because it corresponds to the pilot-era code path we
+had before the multi-round redesign.
 
 ### 6.2 GSM8K: no room to improve
 
@@ -385,36 +444,48 @@ Trace2Policy is the only other published work we found that reports
 results on the LegalBench hearsay task specifically. We use the same 94
 underlying questions. The setups differ in split sizes, model choices,
 number of refinement rounds, and number of random seeds. Here is the
-comparison, apples to apples wherever possible:
+comparison with baseline and final accuracies for both of our
+mechanism configurations:
 
 | System | Executor model | Split | Rounds | Seeds | Baseline | Final | Change |
 |---|---|---|---:|---:|---:|---:|---:|
-| Ours | gpt-4o-mini | 40 / 59, stratified by 5 hearsay slices, test fixed across seeds | 1 | 3 | 65.0% | **72.3%** | **+7.4 pp** |
-| Trace2Policy | Claude Opus 4.6 | 30 / 64, single shuffle with seed 42 | 2 | 1 | 82.8% | **92.2%** | **+9.4 pp** |
-| Trace2Policy | Claude Haiku 4.5 | same as above | 2 | 1 | 79.7% | **93.8%** | **+14.1 pp** |
-| Trace2Policy | Kimi K2.5 | same as above | 2 | 1 | 79.7% | **90.6%** | **+10.9 pp** |
+| Ours — 3-round trajectory-best | gpt-4o-mini | 40 / 59, stratified by 5 hearsay slices, test fixed across seeds | 3 | 3 | **68.9 %** | **72.9 %** | **+4.0 pp** |
+| Ours — single-pass (pilot-era) | gpt-4o-mini | same as above | 1 | 3 | 65.0 % | 72.3 % | +7.4 pp |
+| Trace2Policy | Claude Opus 4.6 | 30 / 64, single shuffle with seed 42 | 2 | 1 | 82.8 % | 92.2 % | +9.4 pp |
+| Trace2Policy | Claude Haiku 4.5 | same as above | 2 | 1 | 79.7 % | 93.8 % | +14.1 pp |
+| Trace2Policy | Kimi K2.5 | same as above | 2 | 1 | 79.7 % | 90.6 % | +10.9 pp |
 
 Reading the table honestly:
 
-- Their gain magnitudes (roughly +9 to +14 percentage points) are
-  larger than ours (+7.4). The three most likely reasons are: (a) they
-  use stronger executors (Opus, Haiku, Kimi are all more capable than
-  gpt-4o-mini on legal reasoning tasks); (b) they use two rounds of
-  refinement instead of our single pass; (c) their baselines are all
-  higher than ours (65% vs. 80%), which reduces the noise floor.
-- On the other hand, we report three seeds and the underlying confusion
-  matrix (which specific questions changed status); they report a
-  single seed per executor at temperature 0. Our number is therefore
-  more conservative about noise but comparable in mechanism.
+- **Our two baselines (65.0 % and 68.9 %) differ despite being the same
+  seed prompt on the same test set.** This is Azure OpenAI's
+  temperature-0 non-determinism — same inputs, different outputs. It
+  contributes a noise floor of roughly 3-5 percentage points on n=59.
+- Trace2Policy's baselines are all much higher (79.7 % to 82.8 %)
+  because their solvers (Opus, Haiku, Kimi) are stronger than
+  gpt-4o-mini on legal reasoning.
+- **Their gain magnitudes (+9 to +14 pp) are larger than ours (+4.0 pp).**
+  The three most likely reasons are: (a) stronger executors, (b) two
+  rounds of refinement instead of our single-pass or three-round-best
+  design, and (c) they report a single seed at temperature 0 rather
+  than the mean of three seeds, so their per-seed variance is not
+  visible in the reported number.
+- We report three seeds and confusion matrices per seed. They report
+  one seed per executor at temperature 0. Ours is the stricter
+  reporting protocol.
 - The task is the same (LegalBench hearsay); the number of test
   questions is very close (59 vs. 64); the refinement approach in
   both cases is a Markdown rule document iteratively improved from
   observed failures. The methods are genuinely comparable.
 
-**Our +7.4 percentage points is a real result in the same range as
-published state-of-the-art on this task.** The clear next step to
-close the gap with Trace2Policy is either (a) add a second refinement
-round, or (b) test with a stronger executor.
+**Our +4.0 percentage points (three seeds, three rounds each, all
+positive) is a defensible result in the same category as published
+state-of-the-art on this task. The remaining gap to the Trace2Policy
+range can plausibly be closed by testing with a stronger executor
+(candidate: gpt-4o full instead of gpt-4o-mini) — but this would be
+an ablation, not the headline, because the practically-relevant regime
+for small-model deployment is exactly where we are: cheap solver,
+cheap optimizer, minimal machinery.**
 
 ### 7.2 The wider Trace2Policy result
 
@@ -436,14 +507,14 @@ only to the "skill-level prompt" numbers, not the compiled numbers.
 
 Chen et al. do not report results on hearsay, but they do report on
 LegalBench definition classification, which is a closely related
-LegalBench task. Their gain on GPT-4o (+7 percentage points, from 83%
-to 90%) is essentially identical in magnitude to our gain on
-gpt-4o-mini on hearsay (+7.4 percentage points), suggesting that a
-prompt-optimization gain in this range is a stable feature of small-
-to-medium-scale executors on LegalBench-style tasks.
+LegalBench task. Their gain on GPT-4o (+7 percentage points, from 83 %
+to 90 %) is close in magnitude to our +4.0 pp on gpt-4o-mini on hearsay,
+and comparable in magnitude to our +7.4 pp under the earlier single-pass
+configuration. Prompt-optimization gains in this range are a stable
+feature of small-to-medium-scale executors on LegalBench-style tasks.
 
 Their gain on LLaMA-3-8B on the same task (+15 percentage points, from
-55% to 70%) is much larger — consistent with the "amplifier not
+55 % to 70 %) is much larger — consistent with the "amplifier not
 injector" framing: weaker models have more headroom to be recovered.
 This is the specific pattern we expect to see when Prof. Mahmud's
 group runs our system on Llama and Mistral.
@@ -453,15 +524,18 @@ group runs our system on Llama and Mistral.
 Taken together, the two published works establish that:
 
 - Prompt refinement of Markdown rule documents on LegalBench tasks
-  produces gains in the +7 to +15 percentage-point range depending on
-  the executor and the number of refinement rounds.
-- Our result (+7.4 pp on hearsay, gpt-4o-mini, single pass, three
-  seeds) is at the low end of that range but is directly comparable
-  to the results reported by both other groups on comparable setups.
-- Our number is more conservative because we use three seeds and a
-  stricter single-pass protocol without any regression gate; a fair
-  path to close the gap is to add a second refinement round and to
-  test with a stronger executor.
+  produces gains in the +4 to +15 percentage-point range depending on
+  the executor, the number of refinement rounds, and how strict the
+  commit criterion is.
+- Our current result (**+4.0 pp mean across 3 seeds on hearsay,
+  gpt-4o-mini, three rounds with trajectory-best selection**) is at the
+  low end of that range but is directly comparable to the results
+  reported by both other groups on comparable setups.
+- Our number is more conservative because we (a) use three seeds
+  instead of one, (b) use a weaker and cheaper executor than
+  Trace2Policy, and (c) only keep rewrites that improve on the training
+  batch — no gambling that a train-regressing rewrite might help test.
+  A fair path to close the gap is to test with a stronger executor.
 - Both other groups report the same "capacity ceiling" finding we do,
   though we are the only ones to explicitly frame it as "amplifier not
   injector" and to demonstrate it directly through a per-subject
@@ -550,12 +624,18 @@ These are the decisions we would like guidance on before proceeding.
 
 4. **How should we close the gap with Trace2Policy on the hearsay
    task?** On the same task, their two-round refinement with Claude
-   Haiku 4.5 reaches 93.8% (from 79.7% baseline, +14.1 pp), while our
-   single-pass refinement with gpt-4o-mini reaches 72.3% (from 65.0%
-   baseline, +7.4 pp). Two natural experiments would close most of
-   this gap: (a) add a second refinement round, and (b) test with a
-   stronger executor. Cost is small (about $0.20 total). Should we do
-   this before the professor meeting or before the paper draft?
+   Haiku 4.5 reaches 93.8 % (from 79.7 % baseline, +14.1 pp), while our
+   three-round trajectory-best refinement with gpt-4o-mini reaches
+   72.9 % (from 68.9 % baseline, +4.0 pp). Our earlier single-pass
+   run reached 72.3 % (from 65.0 % baseline, +7.4 pp) but two of the
+   three seeds under that mechanism committed rewrites that regressed
+   on the training batch, which the trajectory-best mechanism now
+   correctly refuses. Two natural experiments would close most of the
+   remaining gap: (a) test with a stronger executor (gpt-4o full), and
+   (b) allow one or two example of tolerance in the "round is
+   accepted" criterion so that near-tie rewrites are not discarded.
+   Cost is small (about $0.30 total). Should we do this before the
+   paper draft?
 
 5. **When should we invite the Texas A&M group in?** Options:
    (a) Now, so they can run in parallel while we write.
@@ -569,9 +649,15 @@ These are the decisions we would like guidance on before proceeding.
 
 1. We built a working prompt-optimization system and tested it on three
    different benchmarks with a small commercial model.
-2. It improved accuracy by 7.4 percentage points on average on the
-   LegalBench hearsay task, across three independent runs, all positive.
-3. It did nothing on GSM8K, because the model is already at 94%
+2. Under our current mechanism (three optimizer rounds with
+   trajectory-best selection, gpt-4o-mini as solver), it improved
+   accuracy on the LegalBench hearsay task from **68.9 % to 72.9 % on
+   average across three independent runs — a +4.0 percentage-point
+   gain, with every run positive**. An earlier single-pass configuration
+   reported +7.4 pp on the same task, but two of the three runs under
+   that mechanism committed rewrites that made the training batch
+   slightly worse, which the current mechanism correctly discards.
+3. It did nothing on GSM8K, because the model is already at 94 %
    accuracy on that dataset.
 4. It gave a small aggregate improvement on MMLU, but broken down by
    subject the effect is strong (about 5 points) where the model is

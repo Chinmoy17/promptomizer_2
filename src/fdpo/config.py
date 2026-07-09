@@ -67,12 +67,23 @@ class ExperimentConfig:
     max_rounds: int = 5
     rho: float = 0.02          # regression gate: reject if acc_new < acc_old - rho
     eps: float = 0.01          # stabilization: |delta pool acc| < eps for 3 rounds
-    n_fail: int = 20           # failure examples fed to the optimizer per section per round
-                                # (soft cap so prompt size stays bounded; rarely truncates
-                                # at pilot scale -- see fdpo_mechanism.md for tuning guidance)
-    n_gold: int = 3            # gold exemplars fed to the optimizer per rewrite
+    n_fail: int = 100          # max failures shown to the optimizer per rewrite. Set high
+                                # (100) so on our benchmark sizes (<=120 train) essentially
+                                # ALL failures are shown — the optimizer needs to see the
+                                # pattern of what the solver is actually getting wrong, not
+                                # a small random subset. Kept as a soft cap so prompt size
+                                # stays bounded for very large train batches.
+    n_gold: int = 10           # correctly-solved exemplars shown alongside failures. 10 gives
+                                # the optimizer a real sample of "what already works" to
+                                # protect against; 3 (the paper default) is too few for the
+                                # optimizer to reliably avoid breaking existing successes.
     tau: int = 5               # simple_fdpo: min failures on baseline batch to trigger
                                 # one-shot optimization (paper's `|F_f| >= tau`).
+    simple_max_rounds: int = 1 # simple_fdpo: max optimizer rounds. 1 = paper-faithful
+                                # single-pass (backward compatible default). >1 wraps the
+                                # loop with best-snapshot rescue: a round is committed only
+                                # if it reduces the train failure count; a regressing round
+                                # stops the loop and reverts to the best snapshot seen.
     val_size: int = 20         # size of the FIXED held-out validation slice, carved once
                                 # from train at run start; used for every gate check and
                                 # for full-prompt accuracy tracking (v2 mechanism -- replaces
@@ -95,11 +106,19 @@ class ExperimentConfig:
     verdict_mode: str = "programmatic"
 
     # generation
-    solver_max_tokens: int = 1024
+    solver_max_tokens: int = 2048   # was 1024; raised because reasoning-heavy MMLU
+                                     # subjects (professional_law, philosophy) truncate
+                                     # before emitting the 'Answer: X' sentinel, causing
+                                     # silent extraction failures counted as wrong.
     solver_temperature: float = 0.0
-    optimizer_temperature: float = 0.3  # low, not 1.0: the optimizer now must reproduce
-                                         # exact substrings for find/replace edits (v2
-                                         # mechanism) -- high temp made quoting unreliable
+    optimizer_temperature: float = 0.7  # was 0.3 (v2 constraint for find/replace exact
+                                         # substring reproduction). simple_fdpo returns
+                                         # full markdown so that constraint is gone;
+                                         # 0.7 matches ProTeGi / mid of literature norm
+                                         # (OPRO/APE use 1.0). Higher temp is important
+                                         # for multi-round: rounds 2/3 need to explore
+                                         # genuinely different rewrites, not paraphrase
+                                         # round 1's output.
 
     # budget
     budget_usd: float = 4.0    # per-run cap; <= 0 disables the guard
@@ -149,6 +168,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--tau", type=int, default=d.tau,
                    help="simple_fdpo: min failures on the baseline batch "
                         "required to trigger a single-pass rewrite")
+    p.add_argument("--simple-max-rounds", type=int, default=d.simple_max_rounds,
+                   help="simple_fdpo: max optimizer rounds. 1 = paper-faithful "
+                        "single-pass (default). >1 enables best-snapshot rescue: "
+                        "a round is committed only if it reduces the train failure "
+                        "count; a regressing round reverts to the best snapshot.")
     p.add_argument("--val-size", type=int, default=d.val_size,
                    help="fixed held-out validation slice size (carved once from train)")
     p.add_argument("--pool-cap", type=int, default=d.pool_cap)
@@ -199,6 +223,7 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         n_fail=args.n_fail,
         n_gold=args.n_gold,
         tau=args.tau,
+        simple_max_rounds=args.simple_max_rounds,
         val_size=args.val_size,
         pool_cap=args.pool_cap,
         stagnation_limit=args.stagnation_limit,
