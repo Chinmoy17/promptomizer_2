@@ -1,0 +1,279 @@
+{
+  "run_id": "legalbench_hearsay_simple_fdpo_gpt-4o-mini_s2_20260725-231801",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "legalbench_hearsay",
+  "solver_model": "gpt-4o-mini",
+  "seed": 2,
+  "seed_test": {
+    "accuracy": 0.6440677966101694,
+    "n_examples": 59,
+    "extraction_failures": 0,
+    "macro_f1": 0.6374012291483757
+  },
+  "final_test": {
+    "accuracy": 0.6440677966101694,
+    "n_examples": 59,
+    "extraction_failures": 0,
+    "macro_f1": 0.6374012291483757
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 5,
+    "simple_max_rounds": 3,
+    "n_failures_triggering": 10,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed_no_best_update",
+        "n_failures_before": 10,
+        "n_failures_after": 12,
+        "train_acc_after": 0.7,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "output_format",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "hearsay_test_39",
+          "hearsay_test_47",
+          "hearsay_test_61",
+          "hearsay_test_64",
+          "hearsay_test_65",
+          "hearsay_test_82",
+          "hearsay_test_85",
+          "hearsay_test_86",
+          "hearsay_test_88",
+          "hearsay_train_2"
+        ],
+        "failing_ids_after": [
+          "hearsay_test_39",
+          "hearsay_test_41",
+          "hearsay_test_48",
+          "hearsay_test_59",
+          "hearsay_test_61",
+          "hearsay_test_64",
+          "hearsay_test_65",
+          "hearsay_test_79",
+          "hearsay_test_82",
+          "hearsay_test_84",
+          "hearsay_test_85",
+          "hearsay_test_86"
+        ],
+        "recovered_this_round": [
+          "hearsay_test_47",
+          "hearsay_test_88",
+          "hearsay_train_2"
+        ],
+        "regressed_this_round": [
+          "hearsay_test_41",
+          "hearsay_test_48",
+          "hearsay_test_59",
+          "hearsay_test_79",
+          "hearsay_test_84"
+        ]
+      },
+      {
+        "round": 2,
+        "status": "committed_no_best_update",
+        "n_failures_before": 12,
+        "n_failures_after": 10,
+        "train_acc_after": 0.75,
+        "sections_changed": [
+          "context",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "hearsay_test_39",
+          "hearsay_test_41",
+          "hearsay_test_48",
+          "hearsay_test_59",
+          "hearsay_test_61",
+          "hearsay_test_64",
+          "hearsay_test_65",
+          "hearsay_test_79",
+          "hearsay_test_82",
+          "hearsay_test_84",
+          "hearsay_test_85",
+          "hearsay_test_86"
+        ],
+        "failing_ids_after": [
+          "hearsay_test_39",
+          "hearsay_test_48",
+          "hearsay_test_49",
+          "hearsay_test_61",
+          "hearsay_test_64",
+          "hearsay_test_79",
+          "hearsay_test_84",
+          "hearsay_test_85",
+          "hearsay_test_86",
+          "hearsay_train_2"
+        ],
+        "recovered_this_round": [
+          "hearsay_test_41",
+          "hearsay_test_59",
+          "hearsay_test_65",
+          "hearsay_test_82"
+        ],
+        "regressed_this_round": [
+          "hearsay_test_49",
+          "hearsay_train_2"
+        ]
+      },
+      {
+        "round": 3,
+        "status": "committed_no_best_update",
+        "n_failures_before": 10,
+        "n_failures_after": 12,
+        "train_acc_after": 0.7,
+        "sections_changed": [
+          "context",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "hearsay_test_39",
+          "hearsay_test_48",
+          "hearsay_test_49",
+          "hearsay_test_61",
+          "hearsay_test_64",
+          "hearsay_test_79",
+          "hearsay_test_84",
+          "hearsay_test_85",
+          "hearsay_test_86",
+          "hearsay_train_2"
+        ],
+        "failing_ids_after": [
+          "hearsay_test_31",
+          "hearsay_test_39",
+          "hearsay_test_48",
+          "hearsay_test_61",
+          "hearsay_test_64",
+          "hearsay_test_65",
+          "hearsay_test_79",
+          "hearsay_test_82",
+          "hearsay_test_84",
+          "hearsay_test_85",
+          "hearsay_test_86",
+          "hearsay_train_2"
+        ],
+        "recovered_this_round": [
+          "hearsay_test_49"
+        ],
+        "regressed_this_round": [
+          "hearsay_test_31",
+          "hearsay_test_65",
+          "hearsay_test_82"
+        ]
+      }
+    ],
+    "baseline_failing_ids": [
+      "hearsay_test_39",
+      "hearsay_test_47",
+      "hearsay_test_61",
+      "hearsay_test_64",
+      "hearsay_test_65",
+      "hearsay_test_82",
+      "hearsay_test_85",
+      "hearsay_test_86",
+      "hearsay_test_88",
+      "hearsay_train_2"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.75,
+      "n_correct": 30,
+      "n_wrong": 10
+    },
+    "current_train": {
+      "accuracy": 0.75,
+      "n_correct": 30,
+      "n_wrong": 10
+    },
+    "train_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "hearsay_test_39",
+        "hearsay_test_47",
+        "hearsay_test_61",
+        "hearsay_test_64",
+        "hearsay_test_65",
+        "hearsay_test_82",
+        "hearsay_test_85",
+        "hearsay_test_86",
+        "hearsay_test_88",
+        "hearsay_train_2"
+      ],
+      "still_right_count": 30,
+      "net_gain": 0
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 9,
+      "rejects": 0
+    },
+    "rounds_run": 0,
+    "train_acc_per_round": [
+      0.7,
+      0.75,
+      0.7
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "hearsay_test_15",
+        "hearsay_test_19",
+        "hearsay_test_29",
+        "hearsay_test_32",
+        "hearsay_test_52",
+        "hearsay_test_58",
+        "hearsay_test_62",
+        "hearsay_test_63",
+        "hearsay_test_66",
+        "hearsay_test_68",
+        "hearsay_test_69",
+        "hearsay_test_70",
+        "hearsay_test_73",
+        "hearsay_test_76",
+        "hearsay_test_77",
+        "hearsay_test_78",
+        "hearsay_test_83",
+        "hearsay_test_90",
+        "hearsay_test_91",
+        "hearsay_test_92",
+        "hearsay_train_4"
+      ],
+      "still_right_count": 38,
+      "net_gain": 0
+    },
+    "markdown_source": "prompts\\hearsay_oneliner.md"
+  },
+  "wall_clock_s": 53.1,
+  "cost": {
+    "total_calls": 281,
+    "total_cost_usd": 0.052116,
+    "by_role": {
+      "solver": {
+        "calls": 278,
+        "prompt_tokens": 123028,
+        "completion_tokens": 556,
+        "cost_usd": 0.018788
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 6380,
+        "completion_tokens": 2571,
+        "cost_usd": 0.033328
+      }
+    }
+  }
+}

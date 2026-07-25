@@ -1,0 +1,230 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.75,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are an expert legal assistant trained to apply the U.S. Federal Rules of Evidence to classify whether a statement is hearsay.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "A judge must decide if a statement offered in court is \"hearsay\" under Federal Rule of Evidence 801. Hearsay is generally defined as an out-of-court statement that is offered to prove the truth of the matter asserted. However, some statements that mention what was said or written are not hearsay if they are offered for another purpose—such as to show the effect on the listener, the speaker's knowledge, or their state of mind, rather than to prove that the content of the statement is true.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "A judge must decide if a statement offered in court is \"hearsay\" under Federal Rule of Evidence 801. Hearsay is generally defined as an out-of-court statement that is offered to prove the truth of the matter asserted. However, not every statement referencing what was said or written is hearsay—some are offered for other purposes, such as to show the effect on the listener, the knowledge or intent of the speaker, or simply that the statement was made.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7,
+            "acc_new": 0.75,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 12,
+            "recovered_failures": 4,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "A judge must decide if a statement offered in court is \"hearsay\" under Federal Rule of Evidence 801. Hearsay is defined as an out-of-court statement offered to prove the truth of the matter asserted. Not all statements referencing what was said or done are hearsay—sometimes statements are introduced for other purposes, such as showing the effect on the listener, the knowledge or intent of the speaker, or simply that a statement or act occurred.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "This is a legal hearsay task. For each statement, decide whether it is hearsay and answer Yes or No.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "For each statement, decide if it is hearsay. Use the following reasoning steps to guide your answer:\n\n1. **Identify the Statement and Purpose**: What was said, written, or communicated, and for what reason is it being introduced in court?\n2. **Determine if the Statement Is Offered for Its Truth**: Is the statement being used to prove that what it asserts actually happened or is accurate? If yes, it is likely hearsay.\n3. **Check for Non-Hearsay Purposes**: If the statement is introduced for a reason other than to prove its truth (e.g., to show the speaker's knowledge, the listener's state of mind, or that the statement was simply made), it is generally not hearsay.\n4. **Consider Non-Person Statements**: If the statement at issue is not a person's assertion (such as a machine-generated record or a physical gesture with no intent to assert a fact), it is generally not hearsay. However, written reports or statements by people, even if formal or scientific, can be hearsay if offered for the truth of their contents.\n5. **Apply the Definition**: Under FRE 801, a statement is hearsay if:\n    - It is an out-of-court statement (oral, written, or nonverbal conduct intended as an assertion),\n    - Offered to prove the truth of the matter asserted in the statement.\n\n**Key principle**: The critical distinction is why the statement is being offered—not just what was said, but what the evidence is meant to prove.\n\n**Illustrative Examples** (not from the training set):\n\n- If a witness testifies that \"Alex said he saw the accident\" to prove the accident happened, this is hearsay.\n- If a witness testifies that \"Alex said he saw the accident\" to show Alex was aware of the event (Alex's state of mind), this is not hearsay.\n- If a bystander points at a car and this gesture is used to prove the car's involvement, it is hearsay if intended as an assertion.\n- If a statement is introduced just to show that words were spoken (regardless of their truth), it is not hearsay.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "For each statement, decide if it is hearsay. Use this structured reasoning process:\n\n1. **Identify the Statement and Its Purpose in Court**: Determine what was said, written, or communicated, and specifically why it is being introduced as evidence. Is the purpose to show the statement's content is true, or for some other reason (such as to show notice, effect, knowledge, or state of mind)?\n\n2. **Assess Whether the Statement Is Offered to Prove Its Truth**:\n   - If the statement is introduced as evidence that what it claims actually happened or is accurate, it is being offered for its truth.\n   - If the statement is introduced for a different purpose—such as to show the speaker’s or listener’s knowledge, intent, or reaction, or simply that the words were spoken/written regardless of their truth—it is not being offered for its truth.\n\n3. **Apply the Definition of Hearsay**: Under FRE 801, a statement is hearsay only if:\n   - It is an out-of-court statement (oral, written, or nonverbal conduct intended as an assertion), **and**\n   - It is offered to prove the truth of the matter asserted.\n\n4. **Pay Attention to Subtle Purpose Distinctions**:\n   - If the statement's content is at issue (e.g., \"He said he was attacked\" to prove the attack happened), it is hearsay.\n   - If the statement is used to show knowledge, belief, or intent (e.g., \"She said she would make a will\" to prove she anticipated death), that is only non-hearsay if the truth of the statement is not in dispute; but if the truth is relevant (e.g., to prove she actually did anticipate death), it may still be hearsay.\n   - Testimony about what someone said to prove that the words were spoken (not their truth) is not hearsay.\n\n5. **Special Caution with Written Reports or Nonverbal Conduct**:\n   - Written statements or reports by people, even if official or scientific, are hearsay if offered for the truth of their contents.\n   - Nonverbal conduct (like a gesture or pointing) is hearsay if intended as an assertion and offered to prove the truth of what is implied.\n\n**Key Principle:** Always focus on the **purpose** for which the statement is being introduced. If any part of the statement is being used to prove the truth of what it asserts, it is hearsay. If it is introduced for another legitimate purpose (effect on listener, knowledge, intent, or simply that the statement was made), it is not hearsay.\n\n**Illustrative Examples (invented, not from training set):**\n\n- If a witness testifies, \"Jordan said, 'I finished the report,'\" and this is introduced to prove Jordan finished the report, it is hearsay.\n- If a witness testifies, \"Jordan said, 'I finished the report,'\" but it is introduced to show that Jordan was aware of the report deadline, it is not hearsay.\n- If the court considers evidence that a scientist wrote, \"The water contains lead,\" to prove the water actually contains lead, that is hearsay.\n- If a defendant's statement, \"I heard the siren,\" is introduced to show he was alert to police presence (not whether a siren sounded), it is not hearsay.\n- If a person points at a suspect and the gesture is offered to show the person believed the suspect was guilty, but not to prove the suspect was actually guilty, it is not hearsay.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7,
+            "acc_new": 0.75,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 12,
+            "recovered_failures": 4,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "For each statement, decide if it is hearsay. Use the following reasoning procedure:\n\n1. **Identify the Statement and Its Evidentiary Purpose**: Determine what the statement is (oral, written, or conduct) and why it is being offered in court. Ask: Is the statement being used to prove that what it asserts is true, or for a different purpose (such as showing knowledge, notice, effect on listener, state of mind, or merely that something was said or done)?\n\n2. **Apply the \"Matter Asserted\" Test**:\n   - If the statement is introduced to show that what is asserted actually occurred or is accurate, it is being offered for its truth.\n   - If the statement is introduced for a reason unrelated to the truth of its content—such as to show the knowledge, belief, intent, or notice of a person, or simply to show words were spoken or an act occurred—it is not being offered for its truth.\n\n3. **Apply the Hearsay Definition Precisely**:\n   - A statement is hearsay only if:\n     - It is an out-of-court statement (oral, written, or nonverbal conduct intended as an assertion), **and**\n     - It is offered to prove the truth of what it asserts.\n\n4. **Disambiguate Purpose Carefully**:\n   - When a statement is offered to show a person’s knowledge, notice, or state of mind, make sure that the truth of the assertion is not also at issue. If the truth of the statement is necessary for the fact to be proved, it is hearsay.\n   - If a statement is used to prove an action was taken or a belief was held (and not that the content of the statement is true), it is not hearsay.\n   - If testimony or evidence is about a person’s conduct or gesture (like pointing or nodding) and it is intended as an assertion and is being used to show the truth of the implied message, it is hearsay.\n\n5. **Pay Special Attention to the Link Between Purpose and Truth**:\n   - Statements may appear to be about intent, knowledge, or effect, but if the fact to be proven depends on the truth of the statement’s content, that is hearsay.\n   - If a statement is introduced to prove a person knew a fact (e.g., “He said, ‘I heard the news’” to show he was informed), but also to establish the truth of that fact (e.g., that the news event happened), it is hearsay.\n   - If a written report or nonverbal act is offered to prove the truth of what it asserts or implies, it is hearsay.\n\n**Key Principle:** Focus strictly on the **purpose** for which the statement is introduced. Ask: Would the evidence have any value if the statement were false? If so, it is likely not offered for its truth and is not hearsay. If the purpose is to show that the assertion is true, it is hearsay. Purpose trumps form: similar statements can be hearsay or not, depending on the use.\n\n**Illustrative Examples (invented, not from training set):**\n\n- A witness testifies, “Taylor said, ‘I paid the bill.’” If this is used to prove Taylor actually paid the bill, it is hearsay.\n- A witness testifies, “Taylor said, ‘I paid the bill.’” If this is used to show Taylor believed the bill was due (regardless of whether it was paid), it is not hearsay.\n- A manager’s email, “We completed the project on time,” is introduced to prove the project was completed on time—this is hearsay.\n- If a person shouts “Fire!” and this is introduced to show why people evacuated (effect on listener), not to prove there was a fire, it is not hearsay.\n- If a bystander points at a suspect and the gesture is offered to prove the suspect was the perpetrator (i.e., the implication is true), it is hearsay. If the gesture is offered to show the bystander was aware of the suspect, it is not hearsay.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Do not consider hearsay exceptions or exclusions—focus solely on whether the statement is hearsay under the definition.\n- Do not provide explanations; answer only Yes or No.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Yes\n\nNo",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        }
+      ]
+    }
+  }
+}

@@ -24,6 +24,12 @@ _TASK_DESCRIPTIONS = {
         "Evidence 801 (deciding whether a courtroom statement is hearsay). "
         "The output is Yes or No."
     ),
+    "legalbench_contract_nli": (
+        "a binary contract-clause classification task (deciding whether a "
+        "confidentiality clause requires Confidential Information to be "
+        "explicitly marked or identified as confidential). The output is "
+        "Yes or No."
+    ),
     "gsm8k": (
         "a grade-school math word problem where the correct answer is a "
         "specific integer. The output must end with a line containing the "

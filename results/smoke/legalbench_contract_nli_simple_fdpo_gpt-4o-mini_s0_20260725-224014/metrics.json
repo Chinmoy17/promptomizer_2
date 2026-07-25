@@ -1,0 +1,135 @@
+{
+  "run_id": "legalbench_contract_nli_simple_fdpo_gpt-4o-mini_s0_20260725-224014",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "legalbench_contract_nli",
+  "solver_model": "gpt-4o-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.92,
+    "n_examples": 50,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.9,
+    "n_examples": 50,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 5,
+    "simple_max_rounds": 3,
+    "n_failures_triggering": 5,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed_no_best_update",
+        "n_failures_before": 5,
+        "n_failures_after": 5,
+        "train_acc_after": 0.9166666666666666,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "task_details"
+        ]
+      },
+      {
+        "round": 2,
+        "status": "committed_no_best_update",
+        "n_failures_before": 5,
+        "n_failures_after": 8,
+        "train_acc_after": 0.8666666666666667,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "task_details"
+        ]
+      },
+      {
+        "round": 3,
+        "status": "committed_no_best_update",
+        "n_failures_before": 8,
+        "n_failures_after": 9,
+        "train_acc_after": 0.85,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "task_details"
+        ]
+      }
+    ],
+    "baseline_train": {
+      "accuracy": 0.9166666666666666,
+      "n_correct": 55,
+      "n_wrong": 5
+    },
+    "current_train": {
+      "accuracy": 0.9166666666666666,
+      "n_correct": 55,
+      "n_wrong": 5
+    },
+    "train_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "contract_nli_test_11",
+        "contract_nli_test_33",
+        "contract_nli_test_36",
+        "contract_nli_test_44",
+        "contract_nli_test_9"
+      ],
+      "still_right_count": 55,
+      "net_gain": 0
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 9,
+      "rejects": 0
+    },
+    "rounds_run": 0,
+    "train_acc_per_round": [
+      0.9166666666666666,
+      0.8666666666666667,
+      0.85
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [],
+      "regressions": [
+        "contract_nli_train_5"
+      ],
+      "still_wrong": [
+        "contract_nli_test_14",
+        "contract_nli_test_23",
+        "contract_nli_test_27",
+        "contract_nli_test_39"
+      ],
+      "still_right_count": 45,
+      "net_gain": -1
+    },
+    "markdown_source": "prompts\\legalbench_contract_nli.md"
+  },
+  "wall_clock_s": 103.0,
+  "cost": {
+    "total_calls": 343,
+    "total_cost_usd": 0.092924,
+    "by_role": {
+      "solver": {
+        "calls": 340,
+        "prompt_tokens": 232806,
+        "completion_tokens": 24176,
+        "cost_usd": 0.049426
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 10341,
+        "completion_tokens": 2852,
+        "cost_usd": 0.043498
+      }
+    }
+  }
+}

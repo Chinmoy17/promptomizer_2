@@ -241,6 +241,10 @@ def run_simple_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
             "n_failures_after": len(new_wrong),
             "train_acc_after": new_eval.accuracy,
             "sections_changed": sorted(changed.keys()),
+            "failing_ids_before": sorted(current_wrong),
+            "failing_ids_after": sorted(new_wrong),
+            "recovered_this_round": sorted(current_wrong - new_wrong),
+            "regressed_this_round": sorted(new_wrong - current_wrong),
         })
         logger.info(
             "simple: round %d COMMITTED — |F| %d -> %d, train acc %.3f -> %.3f%s",
@@ -293,6 +297,9 @@ def run_simple_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
         "n_failures_triggering": len(baseline_wrong),
         "optimizer_calls": optimizer_calls,
         "rounds_log": rounds_log,
+        "baseline_failing_ids": sorted(baseline_wrong),
+        "solver_temperature": cfg.solver_temperature,
+        "optimizer_temperature": cfg.optimizer_temperature,
         "baseline_train": {
             "accuracy": baseline.accuracy,
             "n_correct": len(baseline_correct),
@@ -324,14 +331,26 @@ def run_simple_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
 
 
 def bootstrap_registry_from_markdown(dataset: str, run_dir: Path,
-                                      registry: PromptRegistry) -> str:
+                                     registry: PromptRegistry,
+                                     prompt_file: str | None = None) -> str:
     """Replace the registry's seed sections with what's loaded from
-    `prompts/<dataset>.md` (or fallback). Returns the source path or 'seed'.
+    `prompts/<dataset>.md` (or `prompt_file` if given, or the Python seed
+    fallback). Returns the source path or 'seed'.
 
     Called from `run_experiment.run` for `--method simple_fdpo` BEFORE the
     seed_test eval, so the baseline uses the markdown-file prompt.
     """
-    sections, _, md_source = load_markdown_prompt(dataset, schema=registry.schema)
+    sections, _, md_source = load_markdown_prompt(
+        dataset, schema=registry.schema, override_path=prompt_file)
+    # When an override prompt is used, warn about any schema section it omits:
+    # those would silently keep the (good) Python-seed text and contaminate a
+    # deliberately-vague-prompt experiment.
+    if prompt_file:
+        missing = [s for s in registry.schema if s not in sections]
+        if missing:
+            logger.warning("--prompt-file %s omits sections %s; they keep the "
+                           "default seed text (possible experiment contamination)",
+                           prompt_file, missing)
     # Swap the version-0 text in place -- registry was init'd from Python seeds
     # and no rounds have run yet, so this is safe.
     for name in registry.schema:

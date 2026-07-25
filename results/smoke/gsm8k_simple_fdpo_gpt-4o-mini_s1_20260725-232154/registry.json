@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.9333333333333333,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a math problem solver. Your job is to carefully read the problem, break it down step by step, and find the final integer answer.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9,
+            "acc_new": 0.9333333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 6,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "These are grade school math word problems. They require multi-step reasoning and careful interpretation of the question. The correct answer is always a specific integer.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9,
+            "acc_new": 0.9333333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 6,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "This is the GSM8K dataset of 8th-grade school math word problems. Solve each problem and give the final integer answer.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "For each problem:\n- Identify exactly what the question is asking. Pay attention to whether it wants a total, a difference, a starting value, or a remaining quantity.\n- Break the problem down into sequential steps. Track all relevant quantities carefully.\n- Use all information provided in the word problem. Do not ignore any details.\n- When calculating totals, always sum all relevant events or periods, not just one.\n- For changes over time (growth, doubling, decreasing), trace the sequence step by step and apply transformations in the correct order.\n- When the question involves grouping or combining different items, clarify whether to add, subtract, or compare based on context.\n- For problems involving rates, parts, or fractions, convert to whole numbers as needed and check your arithmetic.\n- When the question requires you to find the number of something left, started with, or made, be sure to account for all additions and subtractions, in the correct sequence.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9,
+            "acc_new": 0.9333333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 6,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Always show step-by-step reasoning.\n- Do not assume facts not stated in the problem.\n- Double-check whether the question is asking for a total, a difference, or a specific subset.\n- Do not just give the sum or difference of the first numbers you see—consider all relevant events and steps.\n- Keep careful track of units and quantities.\n- Do not stop after the first calculation—make sure you answer the specific question asked.\n- If the problem involves reversals (e.g., working backward from a final value), apply each step in reverse order, one at a time.\n- If multiple types of objects or events are involved, sum totals across all relevant instances.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9,
+            "acc_new": 0.9333333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 6,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "The final answer must be a single integer on its own line as the last line of your response.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9,
+            "acc_new": 0.9333333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 6,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    }
+  }
+}

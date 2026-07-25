@@ -57,14 +57,35 @@ def to_markdown(sections: dict[str, str], schema: tuple[str, ...] = SCHEMA_5) ->
 def load_markdown_prompt(dataset: str,
                          prompts_root: str = DEFAULT_PROMPTS_ROOT,
                          schema: tuple[str, ...] = SCHEMA_5,
+                         override_path: str | None = None,
                          ) -> tuple[dict[str, str], str, Path | None]:
     """Return (sections_dict, raw_markdown, source_path).
 
     Priority:
+      0. `override_path` if given (from --prompt-file) -- load that exact file,
+         erroring if it does not exist. Lets one dataset be run with an
+         alternative seed prompt (e.g. a deliberately vague prompt to test
+         whether the optimizer can bootstrap structure).
       1. `prompts/<dataset>.md` if it exists (source_path set).
       2. Fallback: serialize `seed_sections(dataset, schema)` to markdown
          (source_path is None — no file was loaded).
     """
+    if override_path:
+        p = Path(override_path)
+        if not p.exists():
+            raise FileNotFoundError(f"--prompt-file not found: {p}")
+        md = p.read_text(encoding="utf-8")
+        try:
+            return parse_markdown(md), md, p
+        except ValueError:
+            # Headerless ONE-LINER seed (no `## Section` headers): put the whole
+            # text into task_details and leave every other section empty, so the
+            # optimizer must BUILD the section structure itself. Mirrors the
+            # minimal seed instructions used by OPRO/APE-style methods.
+            sections = {name: "" for name in schema}
+            key = "task_details" if "task_details" in schema else schema[0]
+            sections[key] = md.strip()
+            return sections, md, p
     md_path = Path(prompts_root) / f"{dataset}.md"
     if md_path.exists():
         md = md_path.read_text(encoding="utf-8")

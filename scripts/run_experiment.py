@@ -64,7 +64,8 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
     # editable prompts/<dataset>.md as the true baseline.
     md_source = None
     if cfg.method == "simple_fdpo":
-        md_source = bootstrap_registry_from_markdown(cfg.dataset, run_dir, registry)
+        md_source = bootstrap_registry_from_markdown(
+            cfg.dataset, run_dir, registry, prompt_file=cfg.prompt_file or None)
         logger.info("simple_fdpo: prompt source = %s", md_source)
 
     eval_log = CsvAppender(run_dir / "eval_log.csv", EVAL_LOG_FIELDS)

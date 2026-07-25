@@ -9,7 +9,7 @@ from dataclasses import asdict, dataclass, field
 from dotenv import load_dotenv
 
 METHODS = ("zeroshot_cot", "fewshot_cot", "monolithic", "fdpo", "simple_fdpo")
-DATASETS = ("gsm8k", "arc", "mmlu", "legalbench_hearsay")
+DATASETS = ("gsm8k", "arc", "mmlu", "legalbench_hearsay", "legalbench_contract_nli")
 ROLES = ("solver", "judge", "optimizer")
 
 
@@ -91,6 +91,10 @@ class ExperimentConfig:
     pool_cap: int = 200        # FIFO cap on the gold-example correct pool
     stagnation_limit: int = 3  # rounds with no committed bundle before best-snapshot restore
     history_window: int = 3    # how many past round outcomes the optimizer sees in context
+    prompt_file: str = ""      # simple_fdpo: override the seed prompt path. Empty = use
+                                # prompts/<dataset>.md. Set to run one dataset with an
+                                # alternative seed (e.g. a deliberately vague prompt, to
+                                # test whether the optimizer can bootstrap structure).
 
     # bookkeeping
     phase: str = "smoke"       # results/<phase>/<run_id>/. Default `smoke` is for
@@ -179,6 +183,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--stagnation-limit", type=int, default=d.stagnation_limit)
     p.add_argument("--history-window", type=int, default=d.history_window,
                    help="past round outcomes shown to the optimizer")
+    p.add_argument("--prompt-file", default=d.prompt_file,
+                   help="simple_fdpo: override seed prompt path (default "
+                        "prompts/<dataset>.md). Use to run a dataset with an "
+                        "alternative seed, e.g. a deliberately vague prompt.")
     p.add_argument("--no-early-stop", action="store_true")
     p.add_argument("--verdict-mode", choices=("programmatic", "llm"),
                    default=d.verdict_mode)
@@ -228,6 +236,7 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         pool_cap=args.pool_cap,
         stagnation_limit=args.stagnation_limit,
         history_window=args.history_window,
+        prompt_file=args.prompt_file,
         early_stop=not args.no_early_stop,
         verdict_mode=args.verdict_mode,
         solver_max_tokens=args.solver_max_tokens,

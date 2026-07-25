@@ -1,0 +1,99 @@
+{
+  "run_id": "legalbench_contract_nli_simple_fdpo_gpt-4o-mini_s0_20260725-223900",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "legalbench_contract_nli",
+  "solver_model": "gpt-4o-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.8714285714285714,
+    "n_examples": 70,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.8857142857142857,
+    "n_examples": 70,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "not_triggered",
+    "triggered": false,
+    "tau": 5,
+    "simple_max_rounds": 3,
+    "n_failures_triggering": 4,
+    "optimizer_calls": 0,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "below_tau",
+        "n_failures_before": 4
+      }
+    ],
+    "baseline_train": {
+      "accuracy": 0.9,
+      "n_correct": 36,
+      "n_wrong": 4
+    },
+    "current_train": {
+      "accuracy": 0.9,
+      "n_correct": 36,
+      "n_wrong": 4
+    },
+    "train_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "contract_nli_test_11",
+        "contract_nli_test_33",
+        "contract_nli_test_34",
+        "contract_nli_test_44"
+      ],
+      "still_right_count": 36,
+      "net_gain": 0
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 0,
+      "rejects": 0
+    },
+    "rounds_run": 0,
+    "train_acc_per_round": [
+      0.9
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "contract_nli_test_31"
+      ],
+      "regressions": [],
+      "still_wrong": [
+        "contract_nli_test_14",
+        "contract_nli_test_23",
+        "contract_nli_test_27",
+        "contract_nli_test_36",
+        "contract_nli_test_37",
+        "contract_nli_test_39",
+        "contract_nli_test_9",
+        "contract_nli_train_5"
+      ],
+      "still_right_count": 61,
+      "net_gain": 1
+    },
+    "markdown_source": "prompts\\legalbench_contract_nli.md"
+  },
+  "wall_clock_s": 31.5,
+  "cost": {
+    "total_calls": 180,
+    "total_cost_usd": 0.012361,
+    "by_role": {
+      "solver": {
+        "calls": 180,
+        "prompt_tokens": 43444,
+        "completion_tokens": 9740,
+        "cost_usd": 0.012361
+      }
+    }
+  }
+}

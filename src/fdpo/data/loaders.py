@@ -22,6 +22,7 @@ DATASET_DIRS = {
     "arc": "arc_challenge",
     "mmlu": "mmlu",
     "legalbench_hearsay": "legalbench_hearsay",
+    "legalbench_contract_nli": "legalbench_contract_nli",
 }
 
 DEFAULT_DATASET_ROOT = "Dataset"
@@ -62,7 +63,7 @@ def synthetic_splits(dataset: str, n_train: int,
                     id=f"syn_{split}_{i}",
                     question=f"Problem {i}: what is the total?",
                     gold=gold, reference=f"Reasoning...\n#### {gold}"))
-            elif dataset == "legalbench_hearsay":
+            elif dataset in ("legalbench_hearsay", "legalbench_contract_nli"):
                 gold = "Yes" if i % 2 == 0 else "No"
                 out.append(Example(
                     id=f"syn_{split}_{i}",
