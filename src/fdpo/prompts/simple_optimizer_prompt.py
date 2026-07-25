@@ -53,7 +53,7 @@ You will see:
   - a batch of FAILURES — questions the solver got wrong, with the
     solver's answer and the correct answer alongside,
   - a small batch of CORRECTLY-SOLVED examples the current prompt
-    already handles.
+    already handles. 
 
 Your job is to rewrite the markdown so the solver reasons more reliably
 on future unseen cases from the same task distribution. A good rewrite:
