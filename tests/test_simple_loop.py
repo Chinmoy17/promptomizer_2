@@ -148,3 +148,43 @@ def test_simple_fdpo_registry_no_rejects_multi_round(tmp_path):
         for v in section["versions"][1:]:
             assert v["status"] != "rejected", \
                 f"simple_fdpo (multi-round) should never reject: found {v['status']}"
+
+
+def test_simple_fdpo_lenient_gate_ships_structured_prompt(tmp_path):
+    """Default lenient gate (accept_margin=1.0): when the optimizer produces a
+    structured prompt it is SHIPPED (not reverted to the bare seed), so its
+    test-set behavior is observable. Regression guard for the empty-section
+    revert seen on noisy seeds."""
+    run_dir = run(make_cfg(tmp_path, tau=1, simple_max_rounds=3))
+    m = read_json(run_dir / "metrics.json")
+    opt = m["optimization"]
+    # New gate fields are surfaced in metrics.
+    assert "accept_margin" in opt
+    assert "shipped_structured" in opt
+    # Held-out validation split is wired in and reported.
+    assert "val_split" in opt
+    assert opt["val_split"]["enabled"] is True
+    assert opt["val_split"]["n_mining"] >= 1
+    assert opt["val_split"]["n_validation"] >= 1
+    assert "baseline_val_acc" in opt
+    # The mock optimizer edits the hearsay seed ("Be careful."), so a
+    # structured round exists and the lenient gate ships it rather than
+    # reverting to the seed.
+    committed = [r for r in opt["rounds_log"]
+                 if r["status"].startswith("committed")]
+    assert committed, "expected at least one committed structured round"
+    # Committed rounds carry a held-out validation score.
+    assert all("val_acc_after" in r for r in committed)
+    assert opt["shipped_structured"] is True
+    baseline_md = (run_dir / "prompt_baseline.md").read_text(encoding="utf-8")
+    shipped_md = (run_dir / "prompt_current.md").read_text(encoding="utf-8")
+    assert shipped_md != baseline_md, \
+        "lenient gate should ship the structured prompt, not the bare seed"
+
+
+def test_simple_fdpo_accept_margin_flows_to_metrics(tmp_path):
+    """A custom --accept-margin is echoed into metrics for auditability."""
+    run_dir = run(make_cfg(tmp_path, tau=1, simple_max_rounds=2,
+                           accept_margin=0.0))
+    m = read_json(run_dir / "metrics.json")
+    assert m["optimization"]["accept_margin"] == 0.0

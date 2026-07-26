@@ -84,6 +84,19 @@ class ExperimentConfig:
                                 # loop with best-snapshot rescue: a round is committed only
                                 # if it reduces the train failure count; a regressing round
                                 # stops the loop and reverts to the best snapshot seen.
+    accept_margin: float = 1.0 # simple_fdpo: leniency of the accept gate. After the rounds,
+                                # ship the best STRUCTURED round if its train accuracy is
+                                # >= baseline_acc - accept_margin, else revert to the seed.
+                                # Default 1.0 = always ship the optimizer's best structured
+                                # prompt (so you see it on the test set) rather than reverting
+                                # to a bare seed. Set 0.0 for strict no-regression (ship only
+                                # if the structured prompt beats/ties baseline on train).
+    simple_val_frac: float = 0.35 # simple_fdpo: fraction of the train pool held out as a
+                                # VALIDATION set. The optimizer mines failures from the mining
+                                # set (1-frac); each candidate prompt is scored on the held-out
+                                # validation set and the accept gate uses that validation
+                                # accuracy. 0 disables the split (score in-sample on the mining
+                                # set). The sealed TEST set is never touched here.
     val_size: int = 20         # size of the FIXED held-out validation slice, carved once
                                 # from train at run start; used for every gate check and
                                 # for full-prompt accuracy tracking (v2 mechanism -- replaces
@@ -177,6 +190,16 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         "single-pass (default). >1 enables best-snapshot rescue: "
                         "a round is committed only if it reduces the train failure "
                         "count; a regressing round reverts to the best snapshot.")
+    p.add_argument("--accept-margin", type=float, default=d.accept_margin,
+                   help="simple_fdpo: gate leniency. Ship the best structured round "
+                        "if its train acc >= baseline - margin. Default 1.0 = always "
+                        "ship the optimizer's structured prompt; 0.0 = strict "
+                        "no-regression (revert to seed unless structured beats baseline).")
+    p.add_argument("--simple-val-frac", type=float, default=d.simple_val_frac,
+                   help="simple_fdpo: fraction of train held out as a stratified "
+                        "validation set for scoring candidate prompts and driving "
+                        "the accept gate. Default 0.35. 0 disables the split (score "
+                        "in-sample on the mining set).")
     p.add_argument("--val-size", type=int, default=d.val_size,
                    help="fixed held-out validation slice size (carved once from train)")
     p.add_argument("--pool-cap", type=int, default=d.pool_cap)
@@ -232,6 +255,8 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         n_gold=args.n_gold,
         tau=args.tau,
         simple_max_rounds=args.simple_max_rounds,
+        accept_margin=args.accept_margin,
+        simple_val_frac=args.simple_val_frac,
         val_size=args.val_size,
         pool_cap=args.pool_cap,
         stagnation_limit=args.stagnation_limit,

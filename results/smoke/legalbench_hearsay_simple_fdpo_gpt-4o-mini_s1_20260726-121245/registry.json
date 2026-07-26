@@ -1,0 +1,278 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.7857142857142857,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a legal reasoning assistant specializing in the classification of statements as hearsay or not under U.S. Federal Rule of Evidence 801.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7692307692307692,
+            "acc_new": 0.6538461538461539,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "You are a legal reasoning assistant specializing in classifying statements as hearsay or not hearsay under U.S. Federal Rule of Evidence 801.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.6153846153846154,
+            "acc_new": 0.6538461538461539,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 3,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay is a specific legal concept. Under Federal Rule of Evidence 801, hearsay is an out-of-court statement offered to prove the truth of the matter asserted in the statement. Not all statements mentioned in court are hearsay; it depends on why the statement is being offered as evidence.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7692307692307692,
+            "acc_new": 0.6538461538461539,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "Hearsay is a specific legal concept. Under Federal Rule of Evidence 801, hearsay is an out-of-court statement offered to prove the truth of the matter asserted in the statement. The key to correct classification is not just whether a statement is made out of court, but **why** it is being introduced in court. Many statements are only hearsay if they are introduced to prove the truth of what they say, not if they are offered for another relevant purpose.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.6538461538461539,
+            "acc_new": 0.6153846153846154,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 9,
+            "recovered_failures": 2,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "Hearsay is narrowly defined in Federal Rule of Evidence 801: it is an out-of-court statement that is offered in evidence to prove the truth of the matter asserted in the statement. Not every out-of-court statement is hearsay; the reason the statement is introduced in court is crucial. Some statements are only hearsay if they are being used to show what they assert is true. Others, even if made outside court, are not hearsay if used for another purpose.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.6153846153846154,
+            "acc_new": 0.6538461538461539,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 3,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "This is a legal hearsay task. For each statement, decide whether it is hearsay and answer Yes or No.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "For each statement, decide whether it is hearsay by applying the following principles:\n\n1. **Definition of Hearsay**:  \n   - A statement is hearsay if it is:  \n     (a) made outside the current court proceeding,  \n     (b) introduced in court, and  \n     (c) offered to prove the truth of what the statement asserts.\n\n2. **Purpose of the Statement**:  \n   - Ask: Is the statement being offered to prove that what it says is actually true?  \n     - If **yes**, and made out of court, it is usually hearsay.  \n     - If **no** (e.g., offered to show something else like the speaker's state of mind, that something was said, or the effect on the listener), it is not hearsay.\n\n3. **Statements Showing Knowledge, Belief, or Effect**:  \n   - If a statement is introduced to show what someone knew, believed, or how someone reacted (not to prove the actual truth of the words), it is typically **not** hearsay.\n\n4. **Statements as Evidence of Conduct or Circumstances**:  \n   - If a statement or report is introduced merely as evidence that some event happened or to show behavior, and not for the truth of the words in the statement, it is not hearsay.\n\n5. **Documents and Reports**:  \n   - Written statements, reports, or emails are hearsay if introduced to prove the truth of what they assert, unless they are made in court or fall within an exception.\n\n6. **Checklist for Every Statement**:  \n   - Was the statement made outside of court?\n   - Is it now being offered to prove the truth of its content?\n   - If both are “yes,” answer Yes (it is hearsay).\n   - If it is offered for another reason (e.g., effect on listener, speaker’s state of mind), answer No (not hearsay).\n\n**Invented Example 1:**  \nStatement: \"To show that Bob was afraid, the fact that he said, 'I think the building will collapse.'\"  \n- This is **not** hearsay if used to show Bob's fear, not to prove the building would actually collapse.\n\n**Invented Example 2:**  \nStatement: \"To prove that the car was red, a witness testifies that Dan said, 'The car is red.'\"  \n- This **is** hearsay if introduced to show the car was red, because it’s an out-of-court statement offered for its truth.\n\n**Invented Example 3:**  \nStatement: \"To show that Alice was aware of the risk, the fact that she said, 'I know this is dangerous.'\"  \n- This is **not** hearsay if used to show Alice’s awareness, not to prove the situation was dangerous.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7692307692307692,
+            "acc_new": 0.6538461538461539,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "For each statement, classify whether it is hearsay by carefully following this structured reasoning process:\n\n1. **Is the statement an assertion made outside the current courtroom proceeding?**  \n   - This includes spoken words, writings, reports, emails, or nonverbal conduct intended as an assertion.\n\n2. **What is the purpose for which the statement is offered?**  \n   - Identify the **specific issue** the statement is being used to prove.  \n   - Ask: Is the statement being introduced to show that what it says is true, or simply that the statement was made (regardless of its truth), or to show someone’s mental state, knowledge, effect on listener, or some other fact?\n\n3. **Apply the core rule:**  \n   - If the statement was made out of court **and** is being offered to prove the truth of what it asserts, it is hearsay.  \n   - If the statement is offered for any other reason—such as proving the statement was made, showing knowledge, notice, effect on listener, state of mind, or to explain subsequent actions—then it is **not** hearsay.\n\n4. **Special Considerations and Common Traps:**  \n   - **Written reports and documents**: If introduced to prove the truth of their contents (e.g., a DNA report to prove presence), they are hearsay.  \n   - **Statements of intent or plan**: If offered to show someone’s state of mind (“I plan to go to the mall” to show intent), not hearsay.  \n   - **Statements showing notice, knowledge, or belief**: If offered to prove someone was aware or believed something, not hearsay—even if the statement asserts a fact.  \n   - **Effect on the listener**: If the statement is introduced to show how a listener reacted or what they believed or did in response, not hearsay.\n\n5. **Checklist for Every Statement:**  \n   - Was the statement made outside of the current court proceeding?\n   - Is it being offered to prove the truth of what it says?\n   - Is it instead offered to show knowledge, state of mind, notice, effect on listener, or simply that it was said?\n   - For each, answer:\n     - **Yes** (hearsay) if both out-of-court and offered for truth.\n     - **No** (not hearsay) if offered for any other reason.\n\n**Invented Example 1:**  \nStatement: \"To prove that the defendant was present at the scene, the prosecution introduces a surveillance report stating the defendant's name.\"  \n- If the report is introduced to show the defendant was present (truth of the report), it is **hearsay**.\n\n**Invented Example 2:**  \nStatement: \"To show that Sarah was aware of the risk, the fact that she said, 'I know it's dangerous.'\"  \n- If used to show Sarah's awareness, **not hearsay**.\n\n**Invented Example 3:**  \nStatement: \"To prove that a rumor about Tom hurt his reputation, a witness testifies that many people were repeating the rumor.\"  \n- If the statement is introduced to show the **effect** on Tom's reputation, **not hearsay**; but if to prove the rumor itself was true, **hearsay**.\n\n**Invented Example 4:**  \nStatement: \"To prove that Mark had notice of the policy, evidence is introduced that Mark told a friend he knew about the new policy.\"  \n- If introduced to show Mark's knowledge or notice, **not hearsay**.\n\n**Invented Example 5:**  \nStatement: \"To prove that a contract existed, a letter from one party describing the contract terms is introduced.\"  \n- If offered to prove the contract terms existed as stated, **hearsay**.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.6538461538461539,
+            "acc_new": 0.6153846153846154,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 9,
+            "recovered_failures": 2,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "To accurately classify whether a statement is hearsay, follow this step-by-step reasoning process and checklist:\n\n### 1. Identify the Statement and Its Purpose\n- **Is the statement being introduced to prove the truth of what it says?**  \n  - If the statement is being used to show that the facts it asserts are true, this is the key indicator of hearsay.\n  - If the statement is being used to show something else—such as the fact that it was said, or its impact on someone's state of mind, notice, knowledge, or subsequent actions—then it is not hearsay.\n\n### 2. Ask: Does the Statement Itself Assert a Fact Relevant to the Issue?\n- **Is the statement an assertion of fact or belief made outside the current court proceeding?**\n  - Includes spoken words, writings, or conduct intended as an assertion.\n  - If the statement is not an assertion (e.g., a question, command, or conduct not intended as an assertion), it is not hearsay.\n\n### 3. Carefully Analyze the Use of the Statement\n- **If the statement is introduced to prove the truth of what is said:**  \n  - The statement is hearsay.\n- **If the statement is offered for another purpose:**  \n  - Not hearsay if offered to show the effect on the listener, the declarant’s state of mind, notice, knowledge, motive, or simply that the statement was made (not its truth).\n\n### 4. Avoid Common Pitfalls and Misapplications\n- **Statements of intent, plan, or mental state:**  \n  - If offered to show what the speaker believed, knew, or intended, usually not hearsay.\n- **Statements showing someone’s knowledge or notice:**  \n  - If used to show a person was aware of information (not that the information is true), not hearsay.\n- **Statements about someone else’s actions or events:**  \n  - If offered to prove those actions/events happened, likely hearsay.\n- **Indirect statements (\"He told me what happened\")**  \n  - If offered for the truth of the account, hearsay.\n- **Statements as circumstantial evidence of effect or reaction:**  \n  - If used to show someone’s reaction, belief, or subsequent conduct, not hearsay.\n\n### 5. Decision Checklist\nFor each statement, go through this checklist:\n- Was the statement made outside the current court proceeding?\n- Is it an assertion (not a question or command)?\n- Is it being offered to prove the truth of what it says?\n  - If **yes** to all: **hearsay**.\n  - If offered solely to show effect on listener, mental state, notice, knowledge, or merely that the statement was made (regardless of truth): **not hearsay**.\n\n### 6. Illustrative Invented Examples\n\n- **Example A:**  \n  Statement: \"To prove that the brakes failed, a mechanic's out-of-court report stating 'the brakes do not work' is introduced.\"  \n  - If used to prove the brakes failed (truth of statement), **hearsay**.\n\n- **Example B:**  \n  Statement: \"To show that Lisa was scared, the fact that someone shouted 'Fire!' and Lisa ran.\"  \n  - If the statement is used to show Lisa’s reaction (effect on listener), **not hearsay**.\n\n- **Example C:**  \n  Statement: \"To prove that John knew about the new policy, evidence that John told a coworker 'I saw the new policy memo.'\"  \n  - If used to show John’s knowledge (not if the memo exists), **not hearsay**.\n\n- **Example D:**  \n  Statement: \"To prove that a rumor existed, a witness testifies that people were saying, 'Tom is dishonest.'\"  \n  - If used to show the existence of the rumor (not that Tom is dishonest), **not hearsay**.\n\n- **Example E:**  \n  Statement: \"To prove that the defendant committed theft, a witness testifies that the defendant said, 'I took the money.'\"  \n  - If used to show the defendant took the money (truth of the statement), **hearsay**.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.6153846153846154,
+            "acc_new": 0.6538461538461539,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 3,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Do not rely on the speaker’s or declarant’s credibility unless the statement is offered for the truth of its content.\n- Do not assume that all out-of-court statements are hearsay; focus on the purpose for which the statement is introduced.\n- Do not apply exceptions or exclusions; simply answer whether it is hearsay.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7692307692307692,
+            "acc_new": 0.6538461538461539,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Do not consider the credibility of the speaker or declarant unless the statement is offered for its truth.\n- Do not assume all out-of-court statements are hearsay; always analyze the purpose for which the statement is offered.\n- Do not apply hearsay exceptions or exclusions; answer only whether it is hearsay under the main rule.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.6538461538461539,
+            "acc_new": 0.6153846153846154,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 9,
+            "recovered_failures": 2,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "- Do not consider the credibility or reliability of the speaker unless the statement is offered for its truth.\n- Do not assume all out-of-court statements are hearsay; always analyze the purpose for which the statement is offered.\n- Do not apply hearsay exceptions or exclusions; classify solely under the main rule.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.6153846153846154,
+            "acc_new": 0.6538461538461539,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 3,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Yes or No",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7692307692307692,
+            "acc_new": 0.6538461538461539,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 5
+          }
+        }
+      ]
+    }
+  }
+}
