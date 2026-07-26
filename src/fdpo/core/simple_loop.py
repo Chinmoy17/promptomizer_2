@@ -230,6 +230,13 @@ def run_simple_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
             for k in missing:
                 new_sections[k] = registry.active_prompt()[k]
 
+        # Pinned sections (e.g. output_format) are protected: force them back to
+        # the current (seed) value so the optimizer can never rewrite the output
+        # contract and suppress chain-of-thought reasoning.
+        for k in cfg.pin_sections:
+            if k in registry.schema:
+                new_sections[k] = registry.active_prompt()[k]
+
         changed = {name: new_sections[name] for name in registry.schema
                    if new_sections.get(name, "") != registry.active_prompt()[name]}
         if not changed:

@@ -21,11 +21,22 @@ SECTION_TITLES = {
 
 
 def render_system(sections: dict[str, str]) -> str:
-    """Join active section texts into one system message, headed per section."""
+    """Join active section texts into one system message, headed per section.
+
+    Empty sections are skipped. A prompt with a single non-empty section (a
+    vague one-liner baseline, before FDPO enriches it) renders as RAW TEXT with
+    no `## header` scaffolding, so the baseline is a true headerless one-liner.
+    Multi-section prompts -- the enriched FDPO output and full seed prompts --
+    keep their `## Section` headers unchanged.
+    """
+    nonempty = [(name, text.strip()) for name, text in sections.items()
+                if text.strip()]
+    if len(nonempty) == 1:
+        return nonempty[0][1]
     parts = []
-    for name, text in sections.items():
+    for name, body in nonempty:
         title = SECTION_TITLES.get(name, name.replace("_", " ").title())
-        parts.append(f"## {title}\n{text.strip()}")
+        parts.append(f"## {title}\n{body}")
     return "\n\n".join(parts)
 
 

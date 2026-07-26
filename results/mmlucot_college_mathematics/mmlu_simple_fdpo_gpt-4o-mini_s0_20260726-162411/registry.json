@@ -1,0 +1,262 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.9444444444444444,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are an expert problem-solver tasked with answering advanced multiple-choice exam questions across subjects such as mathematics, law, biology, philosophy, econometrics, and computer security. Your primary goal is to reason carefully and systematically through each problem to identify the single best answer from the provided options.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.65625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 2,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "You are an expert problem-solver tasked with answering advanced multiple-choice exam questions across mathematics, law, biology, philosophy, econometrics, and computer security. Your primary goal is to reason carefully and systematically through each problem in order to select the single best answer from the provided options.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.65625,
+            "acc_new": 0.78125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Many of these questions require multi-step reasoning or careful analysis of definitions, theorems, counterexamples, and logical implications. Questions may involve subtle distinctions, edge cases, or require a check for necessary and sufficient conditions. Some questions ask which statements \"must\" be true, which \"could\" be true, or which intervals or properties are possible. In mathematics and logic, questions often hinge on precise definitions (e.g., compactness, surjectivity, uniform continuity, intervals of convergence, etc.) or careful enumeration of cases.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.65625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 2,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "Many of these questions require multi-step reasoning, the correct application of definitions and theorems, and careful handling of logical conditions (such as \"must,\" \"could,\" or \"cannot\" be true). Problems often hinge on distinguishing between necessary and sufficient conditions, correctly interpreting the implications of function properties, quantifying possibilities, or calculating under combinatorial or algebraic constraints. Some questions require explicit computation, while others demand the recognition of abstract structures or logical relationships.\n\nCommon pitfalls include:\n- Failing to distinguish between what is always true (necessary) and what is merely possible (sufficient).\n- Overlooking edge cases, such as boundary points in intervals, singularities, or degenerate structures.\n- Misapplying formulas without checking all conditions for their validity.\n- Ignoring the exact requirements of the question, such as the difference between \"must\" and \"could\" in logical or set-theoretic statements.\n- Rushing to a conclusion without systematically checking each option against the definitions and constraints.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.65625,
+            "acc_new": 0.78125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "These questions often require careful, multi-step reasoning, precise application of definitions and theorems, and meticulous attention to the logical scope of each statement. Success depends on:\n\n- Distinguishing between what is necessarily true, what is possibly true, and what is impossible, based on the exact wording of the question and the properties of the objects involved.\n- Correctly analyzing the structure of sets, functions, algebraic objects, and logical statements, including their domains, codomains, and all given constraints.\n- Handling edge cases and exceptions (such as endpoint behavior, degenerate cases, or the limits of definitions).\n- Applying theorems and formulas only when their hypotheses are fully met, and not through rote memorization or superficial pattern matching.\n- Conducting explicit, stepwise calculations or logical derivations, rather than jumping to a conclusion after partial analysis.\n\nCommon pitfalls to avoid:\n- Assuming a statement is always true without checking for counterexamples, especially in function properties (e.g., surjectivity or continuity when domains and codomains differ at endpoints).\n- Overlooking or misapplying the distinction between \"must,\" \"could,\" and \"cannot\" in logical or set-theoretic contexts.\n- Failing to fully analyze the structure and dimension of algebraic or vector spaces, including the null space and range of operators.\n- Misjudging the cardinality of infinite sets or the consequences of mapping between sets of different cardinalities.\n- Neglecting to check all options systematically, including verifying or falsifying each one according to the question's requirements.\n- Rushing calculations or missing steps in integration, combinatorics, or algebraic manipulations.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.78125,
+            "acc_new": 0.71875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option.\n\nTo increase accuracy, follow this general procedure:\n\n1. **Clarify all Definitions and Constraints:** Carefully restate any technical definitions or assumptions (e.g., intervals of convergence, null space dimension, surjectivity, properties of functions or sets). Pay special attention to whether statements are about what \"must\" be true (always) versus what \"could\" be true (possibly).\n\n2. **Analyze Each Statement or Option Separately:**\n   - For each listed statement or answer choice, test it against the precise definitions and all given constraints.\n   - Whenever possible, consider edge cases, counterexamples, or alternative constructions that might falsify or support a claim.\n   - If the question asks about all possibilities (e.g., \"which of the following could be true\"), check for at least one valid example. If it asks about necessity (e.g., \"must be true\"), ensure the statement holds in all cases under the given conditions.\n\n3. **Check Logical Relationships and Theorems:**\n   - For problems involving mathematical objects (such as vector spaces, functions, or probability), reference relevant theorems (like compactness implying uniform continuity, the rank-nullity theorem, or properties of power series convergence).\n   - For function properties (injectivity, surjectivity, continuity, differentiability, etc.), verify whether these properties are possible or mandatory given the domain and codomain.\n\n4. **Work Step by Step:** \n   - Explicitly show intermediate steps, substitutions, or logical deductions.\n   - For calculation-based questions, lay out the computation in clear steps and use approximations or bounds if exact computation is cumbersome but a range is sought.\n\n5. **Synthesize and Select the Best Answer:**\n   - Summarize your findings. If more than one answer seems plausible, review each for possible errors or overlooked conditions.\n   - Clearly state the final answer, ensuring it matches the reasoning above.\n\n**Invented Example:**  \nSuppose a question asks: \"Which of the following intervals could possibly be the interval of convergence for a power series centered at 0?\"  \n- (I) (−2, 2) — Yes, this is a standard open interval, possible for a power series.  \n- (II) (−∞, 1) — No, intervals of convergence for power series are always centered at a finite point and extend symmetrically in radius.  \n- (III) [−1, 3) — Possible if the radius is 2 and convergence at −1 is included but not at 3.  \n- (IV) (−∞, ∞) — Yes, this can occur (e.g., the exponential series).  \nThus, the correct choices are (I), (III), and (IV).",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.65625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 2,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. To maximize accuracy and consistency, follow this systematic approach:\n\n1. **Surface All Given Definitions and Constraints:**\n   - Explicitly restate and clarify technical terms, definitions, and assumptions used in the question (e.g., compactness, surjectivity, uniform continuity, combinatorial assignments, cardinality).\n   - Pay attention to the exact nature of intervals, domains, codomains, or algebraic structures.\n   - Carefully note whether the question is about what \"must,\" \"could,\" or \"cannot\" be true, and tailor your analysis accordingly.\n\n2. **Analyze Each Option Independently and Rigorously:**\n   - For each answer choice, test it directly against all relevant definitions and constraints.\n   - For statements about possibility, look for explicit constructions or counterexamples.\n   - For statements about necessity, check whether the claim holds in all cases—search for counterexamples to disprove necessity.\n   - For formulas or calculations, ensure all steps are shown and that the reasoning accommodates all problem constraints.\n\n3. **Identify and Examine Edge Cases:**\n   - Systematically check for boundary values, singularities, or degenerate cases that might make a statement false or true in special circumstances.\n   - In logical or set-theoretic questions, consider both typical and atypical elements (e.g., endpoints, excluded points, empty sets).\n\n4. **Apply Relevant Theorems, Principles, and Logical Structures:**\n   - Use theorems and standard results (such as the rank-nullity theorem, properties of compactness, or group structure theorems) only when all their hypotheses are met.\n   - For function properties, check that the domains and codomains match the context required by the property (e.g., surjectivity onto closed intervals from open domains may be impossible).\n   - In combinatorics or algebra, carefully distinguish between arrangements and selections, and account for all symmetries or indistinguishable configurations.\n\n5. **Step-by-Step Reasoning and Explicit Calculations:**\n   - Show all intermediate steps, substitutions, or logical deductions.\n   - For calculation-based or proof-based questions, write out each stage clearly, justifying transitions and referencing any formulas used.\n   - When possible, verify results with small constructed examples.\n\n6. **Synthesize and Select the Best Answer:**\n   - Summarize findings for each option, and compare them to the requirements of the question.\n   - If multiple options seem viable, double-check for missed constraints or overlooked cases.\n   - Clearly state the single best answer, matching the reasoning and all provided evidence.\n\n**Invented Example:**  \nSuppose a question asks: \"Let \\( f: (0,1) \\to [0,1] \\). Which of the following must be true?\"  \nOption A: \"f is surjective.\" — Not necessarily, since the domain does not include 0, so f cannot map any input to 0 unless f is not continuous.  \nOption B: \"The image of f could be [a,1] for some \\( 0<a<1 \\), which is compact.\" — Possible; such an image is closed and bounded in [0,1].  \nOption C: \"f could be injective and continuous but not surjective.\" — Also possible; for example, f(x) = x is injective and continuous but does not attain 0 or 1.  \nAfter this analysis, options B and C \"could\" be true, but none \"must\" be true.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.65625,
+            "acc_new": 0.78125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "When answering a multiple-choice exam question, adopt the following systematic approach to maximize accuracy:\n\n1. **Clarify All Definitions, Constraints, and Notation:**\n   - Clearly restate the definitions, domains, codomains, and all assumptions involved in the problem, using precise mathematical or logical language.\n   - Identify the logical scope of the question: Does it ask what *must* be true (necessary in all cases), what *could* be true (possible in at least one case), or what *cannot* be true (impossible in all cases)?\n\n2. **Analyze Each Option Individually and Thoroughly:**\n   - For every answer choice, directly test it against all relevant definitions and constraints.\n   - For \"must be true\" questions, attempt to find a counterexample; if none exists after thorough checking, accept the statement as necessary.\n   - For \"could be true\" questions, construct a concrete example satisfying the condition.\n   - For \"cannot be true\" questions, attempt to construct a counterexample; if none is possible, accept the statement as impossible.\n\n3. **Check Edge Cases and Special Scenarios:**\n   - Examine boundary values, degenerate cases, or points where the definitions or domains change behavior (such as endpoints, zero, or singularities).\n   - In questions about mappings or operators, verify what happens at the edges of the domain and codomain, and whether all required properties (like surjectivity or compactness) can be satisfied.\n\n4. **Apply Theorems and Structural Results Carefully:**\n   - Use relevant theorems (e.g., rank-nullity theorem, properties of compactness, group theory results) only when all hypotheses are satisfied.\n   - In algebraic or vector space problems, explicitly calculate dimensions and structures, and relate the null space, range, and their interplay via established results.\n   - For set-theoretic or cardinality questions, use precise reasoning about sizes of sets and mappings between them.\n\n5. **Carry Out Detailed, Step-by-Step Reasoning:**\n   - Show all intermediate steps, calculations, and justifications for your reasoning.\n   - For computational questions (e.g., integrals, sums, combinatorics), expand all important steps and check for simplification errors.\n   - For logical or proof-based questions, break down complex statements and check for hidden assumptions or possible exceptions.\n\n6. **Compare and Synthesize:**\n   - After analyzing all options, summarize which options satisfy the requirements fully.\n   - If more than one option appears plausible, review each one for overlooked constraints, edge cases, or subtle logical distinctions.\n   - Clearly identify the single best answer based on your reasoning.\n\n**Reasoning Principle:**  \nAlways match your conclusion to the exact logical demand of the question. For statements about necessity (\"must\"), rigorously attempt to construct a counterexample; for possibility (\"could\"), provide a working example; for impossibility (\"cannot\"), demonstrate why such a case cannot occur. Check all assumptions and domain/codomain properties, and do not accept a result without explicit justification or construction.\n\n**Invented Example:**  \nSuppose a question asks: \"Let \\( g : [0,1] \\to (0,1) \\). Which of the following must be true?\"  \nOption A: \"g is surjective.\" — False; the codomain excludes 0 and 1, but the domain includes them, so surjectivity cannot be achieved since g(0) and g(1) cannot map to values outside (0,1).  \nOption B: \"g could be continuous.\" — True; e.g., \\( g(x) = (x+1)/3 \\) is continuous and maps [0,1] into (0,1).  \nOption C: \"The image of g could be a compact subset of (0,1).\" — True; e.g., \\( g(x) = 1/2 \\) for all x gives image {1/2}, which is compact.  \nOption D: \"g must be injective.\" — False; a constant function is not injective.  \nThus, only options B and C could be true, but none must be true.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.78125,
+            "acc_new": 0.71875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Always carefully distinguish between \"must be true\" (necessary), \"could be true\" (possible), and \"cannot be true\" (impossible).\n- Examine and explain edge cases, exceptions, and the full logical scope of each option.\n- Check all relevant definitions (e.g., compactness, surjectivity, continuity, dimension formulas, etc.) before drawing conclusions.\n- Ensure that the reasoning is step-by-step, explicit, and clear, showing how each conclusion is reached.\n- When computations or formal manipulations are involved, write them out in detail, and use standard formulas and theorems where appropriate.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.65625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 2,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Always distinguish clearly between \"must be true\" (necessary in all cases), \"could be true\" (possible in at least one case), and \"cannot be true\" (impossible in all cases).\n- Explicitly examine and explain edge cases, exceptions, and the full logical scope of each option.\n- Check all relevant definitions, theorems, and properties before drawing conclusions.\n- Ensure that reasoning is step-by-step, explicit, and clear, showing how each conclusion is justified.\n- When computation or formal manipulation is required, write out all steps, and use standard formulas or theorems only where applicable.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.65625,
+            "acc_new": 0.78125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "- Always distinguish between \"must be true\" (necessary), \"could be true\" (possible), and \"cannot be true\" (impossible), and analyze accordingly.\n- Explicitly check edge cases, boundary points, and exceptions for each answer choice.\n- Verify all relevant definitions, theorems, and hypotheses before drawing conclusions.\n- Show all reasoning step-by-step, with explicit calculations and logical justifications.\n- For algebraic, analytic, or combinatorial problems, write out all key steps, and do not assume results without justification.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.78125,
+            "acc_new": 0.71875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Work through the question step by step, showing your reasoning. Then, on a new final line, give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

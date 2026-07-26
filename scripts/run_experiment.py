@@ -52,7 +52,7 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
     else:
         train, test = load_splits(cfg.dataset, cfg.n_train, cfg.n_test, cfg.seed,
                                   dataset_root=cfg.dataset_root,
-                                  split_mode=cfg.split_mode)
+                                  split_mode=cfg.split_mode, subjects=cfg.subjects)
     logger.info("data: %d train / %d test", len(train), len(test))
 
     schema = SCHEMA_MONOLITHIC if cfg.method == "monolithic" else SCHEMA_5

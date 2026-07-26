@@ -118,6 +118,12 @@ class ExperimentConfig:
                                 #   test fixed across seeds) | "balanced" (per-subject:
                                 #   --n-train/--n-test are PER-SUBJECT counts, equal per
                                 #   subject; MMLU macro-average, no dominant subject).
+    subjects: tuple[str, ...] = ()   # optional subject filter (e.g. per-subject MMLU
+                                     # runs). Empty = all. Restricts the loaded pool to
+                                     # examples whose meta['subject'] is in this list.
+    pin_sections: tuple[str, ...] = ()  # schema sections the optimizer may NOT rewrite
+                                        # (kept at the seed value), e.g. output_format so
+                                        # it cannot suppress chain-of-thought reasoning.
                                  # Stratified: test set FIXED across seeds, stratified
                                  # by meta['slice'] (or gold as fallback). Strongly
                                  # recommended for legalbench_hearsay (5 semantic slices).
@@ -234,6 +240,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         "by meta['slice'] (or gold). Recommended for legalbench. "
                         "'balanced': --n-train/--n-test are PER-SUBJECT counts, "
                         "equal per subject (MMLU macro-average, no dominant subject).")
+    p.add_argument("--subjects", default="",
+                   help="comma-separated subject filter (e.g. 'college_mathematics'); "
+                        "restricts the loaded pool to those meta['subject'] values. "
+                        "Empty = all subjects. Use for per-subject MMLU runs.")
+    p.add_argument("--pin-sections", default="",
+                   help="comma-separated schema sections the optimizer may NOT edit "
+                        "(kept at the seed value), e.g. 'output_format' to protect the "
+                        "chain-of-thought output contract from being overwritten.")
     p.add_argument("--results-root", default=d.results_root)
     p.add_argument("--dataset-root", default=d.dataset_root,
                    help="folder holding committed Dataset/<name>/{train,test}.jsonl")
@@ -279,6 +293,8 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         results_root=args.results_root,
         dataset_root=args.dataset_root,
         split_mode=args.split_mode,
+        subjects=tuple(x.strip() for x in args.subjects.split(",") if x.strip()),
+        pin_sections=tuple(x.strip() for x in args.pin_sections.split(",") if x.strip()),
         dry_run=args.dry_run,
         max_workers=args.max_workers,
     )

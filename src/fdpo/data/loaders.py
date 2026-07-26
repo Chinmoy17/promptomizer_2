@@ -41,14 +41,18 @@ class Example:
 
 
 def _load_local(dataset: str, split: str,
-                dataset_root: str) -> list[Example]:
+                dataset_root: str,
+                subjects: tuple[str, ...] = ()) -> list[Example]:
     path = Path(dataset_root) / DATASET_DIRS[dataset] / f"{split}.jsonl"
     if not path.exists():
         raise FileNotFoundError(
             f"{path} not found. Fetch datasets first:\n"
             f"    uv run python -m scripts.download_datasets --dataset {dataset}"
         )
-    return [Example(**row) for row in read_jsonl(path)]
+    rows = [Example(**row) for row in read_jsonl(path)]
+    if subjects:
+        rows = [e for e in rows if (e.meta or {}).get("subject") in subjects]
+    return rows
 
 
 def synthetic_splits(dataset: str, n_train: int,
@@ -151,6 +155,7 @@ def _stratified_take(pool: list[Example], n: int, rng: random.Random,
 def load_splits(dataset: str, n_train: int, n_test: int, seed: int,
                 dataset_root: str = DEFAULT_DATASET_ROOT,
                 split_mode: str = "seeded",
+                subjects: tuple[str, ...] = (),
                 ) -> tuple[list[Example], list[Example]]:
     """Deterministic (train, test) subsamples read from the committed
     Dataset/ folder.
@@ -168,17 +173,17 @@ def load_splits(dataset: str, n_train: int, n_test: int, seed: int,
         the standard MMLU macro-average. Test is fixed across seeds.
     """
     if split_mode == "stratified":
-        return _load_splits_stratified(dataset, n_train, n_test, seed, dataset_root)
+        return _load_splits_stratified(dataset, n_train, n_test, seed, dataset_root, subjects)
     if split_mode == "balanced":
-        return _load_splits_balanced(dataset, n_train, n_test, seed, dataset_root)
+        return _load_splits_balanced(dataset, n_train, n_test, seed, dataset_root, subjects)
     if split_mode != "seeded":
         raise ValueError(f"unknown split_mode: {split_mode!r} "
                          "(expected 'seeded', 'stratified', or 'balanced')")
-    return _load_splits_seeded(dataset, n_train, n_test, seed, dataset_root)
+    return _load_splits_seeded(dataset, n_train, n_test, seed, dataset_root, subjects)
 
 
 def _load_splits_seeded(dataset: str, n_train: int, n_test: int, seed: int,
-                        dataset_root: str,
+                        dataset_root: str, subjects: tuple[str, ...] = (),
                         ) -> tuple[list[Example], list[Example]]:
     """Original seeded split (unchanged behavior).
 
@@ -186,8 +191,8 @@ def _load_splits_seeded(dataset: str, n_train: int, n_test: int, seed: int,
     examples), the shortfall is carved from the shuffled test pool BEFORE the
     test subsample is taken, so train and test never overlap.
     """
-    train_pool = _load_local(dataset, "train", dataset_root)
-    test_pool = _load_local(dataset, "test", dataset_root)
+    train_pool = _load_local(dataset, "train", dataset_root, subjects)
+    test_pool = _load_local(dataset, "test", dataset_root, subjects)
     train = subsample(train_pool, n_train, seed)
 
     rng = random.Random(seed + 1)
@@ -205,13 +210,13 @@ def _load_splits_seeded(dataset: str, n_train: int, n_test: int, seed: int,
 
 
 def _load_splits_stratified(dataset: str, n_train: int, n_test: int, seed: int,
-                            dataset_root: str,
+                            dataset_root: str, subjects: tuple[str, ...] = (),
                             ) -> tuple[list[Example], list[Example]]:
     """Pool official train + test, then take a FIXED stratified test set
     (rng seeded to 0 -- identical across user seeds) and a seed-dependent
     stratified train set from the remainder."""
-    pool = (_load_local(dataset, "train", dataset_root)
-            + _load_local(dataset, "test", dataset_root))
+    pool = (_load_local(dataset, "train", dataset_root, subjects)
+            + _load_local(dataset, "test", dataset_root, subjects))
     if n_test + n_train > len(pool):
         # Trim train silently; test is the deterministic anchor and gets priority.
         n_train = max(0, len(pool) - n_test)
@@ -225,7 +230,7 @@ def _load_splits_stratified(dataset: str, n_train: int, n_test: int, seed: int,
 
 
 def _load_splits_balanced(dataset: str, n_train: int, n_test: int, seed: int,
-                          dataset_root: str,
+                          dataset_root: str, subjects: tuple[str, ...] = (),
                           ) -> tuple[list[Example], list[Example]]:
     """Balanced per-subject split. `n_train` and `n_test` are PER-STRATUM
     (per-subject for MMLU) counts, NOT totals. Pools official train + test,
@@ -236,8 +241,8 @@ def _load_splits_balanced(dataset: str, n_train: int, n_test: int, seed: int,
     the standard MMLU macro-average. Strata with too few pooled examples are
     capped with a warning so the run degrades gracefully instead of crashing.
     """
-    pool = (_load_local(dataset, "train", dataset_root)
-            + _load_local(dataset, "test", dataset_root))
+    pool = (_load_local(dataset, "train", dataset_root, subjects)
+            + _load_local(dataset, "test", dataset_root, subjects))
     strata: dict[str, list[Example]] = {}
     for e in pool:
         strata.setdefault(_stratum_key(e), []).append(e)

@@ -39,7 +39,10 @@ _TASK_DESCRIPTIONS = {
         "a 4-way multiple-choice exam question (options A, B, C, D) that "
         "may come from any of several academic subjects (law, biology, "
         "philosophy, econometrics, computer security, mathematics). The "
-        "output is a single letter A, B, C, or D."
+        "solver should reason step by step and then give its final answer as "
+        "a single letter A, B, C, or D on an 'Answer:' line -- many of these "
+        "questions (especially mathematics and econometrics) need multi-step "
+        "working to get right."
     ),
     "arc_challenge": (
         "an ARC-Challenge science multiple-choice question (options A, B, "
@@ -83,6 +86,13 @@ on future unseen cases from the same task distribution. A good rewrite:
 
   - Preserves the Output Format exactly. Changing it breaks the answer
     extractor, and every answer scores wrong regardless of correctness.
+
+  - NEVER adds a rule that forbids reasoning or forces answer-only output
+    (e.g. "output only the letter", "do not explain"). The solver MUST be
+    allowed to think step by step BEFORE giving its final answer --
+    suppressing reasoning collapses accuracy on multi-step questions
+    (e.g. mathematics, econometrics). Any brevity guidance must serve a
+    clear final-answer line, never replace the reasoning that precedes it.
 
 Return only the full rewritten markdown, starting with the first
 `## Section` header. No prose, no fences, no commentary before or after."""

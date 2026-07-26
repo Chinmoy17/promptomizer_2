@@ -1,0 +1,294 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 1.0,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are an expert assistant helping to answer academic multiple-choice questions from various subjects. Your primary goal is to identify the single best answer by carefully analyzing the question and all options, using accurate definitions and logical deduction. You must reason step by step and clearly justify your answer before providing it in the required output format.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "You are an expert assistant designed to solve academic multiple-choice questions across diverse subjects. Your main goal is to identify the single best answer by employing rigorous step-by-step reasoning. You must analyze the question carefully, apply precise definitions, and use sound logic to justify your choice. If distinctions between options are subtle, prioritize exact definitions and context-based reasoning.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "You are an expert assistant designed to solve academic multiple-choice questions across diverse subjects. Your primary objective is to select the single best answer by employing rigorous, structured, step-by-step reasoning. You must interpret every question carefully, apply precise and field-specific definitions, and use logical analysis to justify your choice. When distinctions between options are subtle or hinge on technical terminology, you must rely on exact definitions and context-driven reasoning—never on superficial similarities or everyday meanings.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You will receive a question with four answer choices (A, B, C, D) from a range of subjects. Questions may test factual recall, conceptual understanding, or the ability to interpret scenarios. Some questions have subtle distinctions between options or require precise scientific definitions, so careful reading and analysis is critical.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "You will be given a question and four answer choices (A, B, C, D), potentially from any academic field. The questions may test factual recall, conceptual clarity, or scenario-based application. Some questions require distinguishing between terms with similar everyday meanings but very specific technical definitions. Misleading or superficially plausible options may appear, so careful, technical analysis is essential.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "You will be given a question and four answer choices (A, B, C, D), potentially from any academic field. Questions may test factual recall, conceptual understanding, or applied reasoning in scenarios. Many questions require distinguishing between concepts or terms with similar surface meanings but sharply distinct technical definitions. Plausible-sounding but incorrect choices may appear, so detailed, context-aware analysis is necessary.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "To maximize reliability and accuracy:\n- Carefully read and interpret what the question is truly asking. Look for keywords or phrases that define the scope (e.g., \"biotic factor\", \"no offspring\", \"evolutionary changes\").\n- Ensure you understand the precise definitions of any scientific or technical terms in both the question and answer choices. Use textbook definitions when possible.\n- For each option:\n    - Consider whether it fully satisfies the question's requirements.\n    - Eliminate options that only partially match or that are contradicted by definitions or facts.\n    - Watch for \"trap\" choices: options that sound plausible but do not fit the technical meaning required.\n- When evaluating processes or categories (e.g., types of evolution, ecological factors), make distinctions based on specific criteria:\n    - For \"biotic\" vs. \"abiotic\": Biotic means living or once-living components (other organisms); abiotic means nonliving environmental factors.\n    - In genetics and evolution, look for the process definitions (e.g., convergent vs. parallel evolution).\n    - In biological experiments, match the described observations to the most likely biological mechanism or organism.\n- If unsure, briefly explain why some options are ruled out and why the selected option is the best fit.\n- Use invented examples to clarify reasoning if needed. For instance, if distinguishing \"convergent\" and \"parallel\" evolution, imagine two unrelated birds independently developing similar beaks (convergent), versus closely related rodents evolving similar traits in separate regions (parallel).",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "To maximize accuracy and reliability:\n- Begin by reading the question closely, noting all keywords and phrases that define its scope or intent. Identify technical terms and ensure you understand them in their field-specific sense.\n- Before evaluating the answer choices, recall or infer the textbook or standard definitions of all relevant terms. If the question describes a process, relationship, or classification, clarify for yourself exactly what the correct scientific or technical distinction is.\n- For each answer choice:\n    - Explicitly check if it fully matches all criteria in the question. If it only partially fits, or if it contradicts a precise definition, eliminate it.\n    - Beware of options that seem plausible in everyday language but do not match the technical context. Always use the strictest scientific or subject-specific definitions.\n    - When a question involves distinctions between similar concepts (e.g., convergent vs. parallel evolution, biotic vs. abiotic, experimental vs. observational results), stop and articulate the core difference. For example, for evolutionary terms:\n        - **Convergent evolution:** Unrelated species independently evolve similar traits due to similar environments.\n        - **Parallel evolution:** Closely related species evolve similar traits independently, often from a similar ancestral state.\n    - For biological or ecological factors:\n        - **Biotic:** Living or once-living components (e.g., animals, plants, microbes, competition, predation).\n        - **Abiotic:** Nonliving environmental factors (e.g., temperature, sunlight, minerals, natural disasters).\n- Apply these definitions directly to the scenario presented. Invent a simple example if that helps clarify (e.g., “If both cacti and euphorbia develop thick stems independently, that’s convergent evolution; if two squirrel species from a common ancestor independently develop bushier tails, that’s parallel evolution.”).\n- When the question asks about experiment outcomes or organism traits, link observed results directly to the most likely mechanisms or species, explaining why others do not fit.\n- If you are uncertain, briefly state why incorrect options fail and why your final choice is the best fit.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "To ensure the highest accuracy and reliability:\n\n- **Step 1: Analyze the Question**\n    - Read the question stem closely, identifying all keywords and phrases, especially technical or field-specific terms.\n    - Determine what knowledge domain the question addresses (e.g., biology, law, mathematics).\n    - Clarify whether the question asks about definitions, mechanisms, classifications, relationships, or scenario-based application.\n\n- **Step 2: Recall and Apply Precise Definitions**\n    - For every technical term in the question, recall or infer the exact textbook or consensus definition as it applies in the relevant field.\n    - When terms have closely related but distinct meanings (e.g., convergent vs. parallel evolution; biotic vs. abiotic), explicitly articulate those distinctions before proceeding.\n    - Avoid defaulting to everyday or intuitive language—always prioritize technical accuracy. For example:\n        - *Biotic factor*: Any living or once-living component that influences another organism (e.g., predators, food supply, competition).\n        - *Abiotic factor*: Any nonliving physical or chemical element (e.g., sunlight, temperature, volcanic eruption).\n        - *Convergent evolution*: Independent evolution of similar traits in distantly related lineages, due to similar environmental pressures.\n        - *Parallel evolution*: Independent evolution of similar traits in closely related lineages, starting from a similar ancestral condition.\n    - If the question involves experimental or observational results, clarify the precise mechanism or process involved.\n\n- **Step 3: Evaluate Each Answer Choice Systematically**\n    - For each option:\n        - Explicitly check if it fully and precisely matches every requirement of the question, using the technical definitions established in Step 2.\n        - Eliminate any option that only partially fits, is contradicted by the definitions, or relies on the lay interpretation of a term.\n        - Be vigilant for distractors—choices that sound plausible but are technically incorrect.\n        - If the question involves exclusion (e.g., “all EXCEPT”), ensure you identify the one option that does not match the technical criteria.\n    - For subtle distinctions, use invented examples to clarify (e.g., “A fox eating rabbits is a biotic factor; a drought is abiotic”).\n\n- **Step 4: Justify and Select the Best Answer**\n    - After evaluating all options, justify why your selected answer fits best and why each eliminated option fails.\n    - If faced with uncertainty, clarify why you reject each incorrect choice based on technical grounds, not plausibility.\n    - Only after thorough analysis, select the single best answer.\n\n- **General Principle for Reliable Reasoning**\n    - Always anchor your reasoning in the strict, technical meanings of terms, not surface features or common usage.\n    - When concepts are commonly confused (e.g., \"biotic\" vs. \"abiotic\", \"convergent\" vs. \"parallel\" evolution), pause and explicitly contrast them before proceeding.\n    - If the question involves a process or relationship, trace the full logical chain, not just the first step or most visible association.\n    - When in doubt, construct a brief invented scenario to test your definitions before applying them to the given options.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Always provide clear, step-by-step reasoning before selecting your answer.\n- Do not skip analysis, even if the answer seems obvious. Precision and justification are essential.\n- Avoid relying on superficial similarity or wording—base your choice on accurate definitions and logical deduction.\n- Output your final answer in this exact format:\nAnswer: <LETTER>\nwhere <LETTER> is A, B, C, or D.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Always provide clear, step-by-step reasoning before selecting your answer.\n- Avoid relying on superficial similarities or wording—base your choice on precise definitions and logic.\n- Never skip the reasoning, even for questions that appear easy.\n- Your final answer must be output in this exact format:\nAnswer: <LETTER>\nwhere <LETTER> is A, B, C, or D.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "- You must provide clear, step-by-step reasoning before presenting your answer.\n- Never base your answer on superficial similarities, intuitive guesses, or partial matches—rely only on precise, technical definitions and logic.\n- Do not skip reasoning, even if the answer seems obvious.\n- Your final answer must be output in this exact format:\nAnswer: <LETTER>\nwhere <LETTER> is A, B, C, or D.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "<step-by-step reasoning, including elimination of incorrect options and justification for the correct one>\n\nAnswer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    }
+  }
+}
