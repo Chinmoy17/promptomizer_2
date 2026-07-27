@@ -1,0 +1,261 @@
+{
+  "run_id": "mmlu_simple_fdpo_gpt-4o-mini_s0_20260726-214040",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "mmlu",
+  "solver_model": "gpt-4o-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.7727272727272727,
+    "n_examples": 66,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.7878787878787878,
+    "n_examples": 66,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 3,
+    "simple_max_rounds": 3,
+    "accept_margin": 1.0,
+    "shipped_structured": true,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.35,
+      "n_mining": 32,
+      "n_validation": 18
+    },
+    "baseline_val_acc": 0.8333333333333334,
+    "best_structured_val_acc": 0.8888888888888888,
+    "n_failures_triggering": 8,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed_best",
+        "n_failures_before": 8,
+        "n_failures_after": 6,
+        "train_acc_after": 0.8125,
+        "val_acc_after": 0.8333333333333334,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "output_format",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_philosophy_test_105",
+          "mmlu_philosophy_test_11",
+          "mmlu_philosophy_test_134",
+          "mmlu_philosophy_test_209",
+          "mmlu_philosophy_test_280",
+          "mmlu_philosophy_test_303",
+          "mmlu_philosophy_test_42",
+          "mmlu_philosophy_test_94"
+        ],
+        "failing_ids_after": [
+          "mmlu_philosophy_test_105",
+          "mmlu_philosophy_test_134",
+          "mmlu_philosophy_test_257",
+          "mmlu_philosophy_test_280",
+          "mmlu_philosophy_test_303",
+          "mmlu_philosophy_test_94"
+        ],
+        "recovered_this_round": [
+          "mmlu_philosophy_test_11",
+          "mmlu_philosophy_test_209",
+          "mmlu_philosophy_test_42"
+        ],
+        "regressed_this_round": [
+          "mmlu_philosophy_test_257"
+        ]
+      },
+      {
+        "round": 2,
+        "status": "committed",
+        "n_failures_before": 6,
+        "n_failures_after": 8,
+        "train_acc_after": 0.75,
+        "val_acc_after": 0.7777777777777778,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_philosophy_test_105",
+          "mmlu_philosophy_test_134",
+          "mmlu_philosophy_test_257",
+          "mmlu_philosophy_test_280",
+          "mmlu_philosophy_test_303",
+          "mmlu_philosophy_test_94"
+        ],
+        "failing_ids_after": [
+          "mmlu_philosophy_test_105",
+          "mmlu_philosophy_test_134",
+          "mmlu_philosophy_test_209",
+          "mmlu_philosophy_test_257",
+          "mmlu_philosophy_test_270",
+          "mmlu_philosophy_test_280",
+          "mmlu_philosophy_test_303",
+          "mmlu_philosophy_test_42"
+        ],
+        "recovered_this_round": [
+          "mmlu_philosophy_test_94"
+        ],
+        "regressed_this_round": [
+          "mmlu_philosophy_test_209",
+          "mmlu_philosophy_test_270",
+          "mmlu_philosophy_test_42"
+        ]
+      },
+      {
+        "round": 3,
+        "status": "committed_best",
+        "n_failures_before": 8,
+        "n_failures_after": 7,
+        "train_acc_after": 0.78125,
+        "val_acc_after": 0.8888888888888888,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_philosophy_test_105",
+          "mmlu_philosophy_test_134",
+          "mmlu_philosophy_test_209",
+          "mmlu_philosophy_test_257",
+          "mmlu_philosophy_test_270",
+          "mmlu_philosophy_test_280",
+          "mmlu_philosophy_test_303",
+          "mmlu_philosophy_test_42"
+        ],
+        "failing_ids_after": [
+          "mmlu_philosophy_test_105",
+          "mmlu_philosophy_test_134",
+          "mmlu_philosophy_test_257",
+          "mmlu_philosophy_test_270",
+          "mmlu_philosophy_test_280",
+          "mmlu_philosophy_test_303",
+          "mmlu_philosophy_test_42"
+        ],
+        "recovered_this_round": [
+          "mmlu_philosophy_test_209"
+        ],
+        "regressed_this_round": []
+      }
+    ],
+    "baseline_failing_ids": [
+      "mmlu_philosophy_test_105",
+      "mmlu_philosophy_test_11",
+      "mmlu_philosophy_test_134",
+      "mmlu_philosophy_test_209",
+      "mmlu_philosophy_test_280",
+      "mmlu_philosophy_test_303",
+      "mmlu_philosophy_test_42",
+      "mmlu_philosophy_test_94"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.75,
+      "n_correct": 24,
+      "n_wrong": 8
+    },
+    "current_train": {
+      "accuracy": 0.78125,
+      "n_correct": 25,
+      "n_wrong": 7
+    },
+    "train_confusion": {
+      "recoveries": [
+        "mmlu_philosophy_test_11",
+        "mmlu_philosophy_test_209",
+        "mmlu_philosophy_test_94"
+      ],
+      "regressions": [
+        "mmlu_philosophy_test_257",
+        "mmlu_philosophy_test_270"
+      ],
+      "still_wrong": [
+        "mmlu_philosophy_test_105",
+        "mmlu_philosophy_test_134",
+        "mmlu_philosophy_test_280",
+        "mmlu_philosophy_test_303",
+        "mmlu_philosophy_test_42"
+      ],
+      "still_right_count": 22,
+      "net_gain": 1
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 13,
+      "rejects": 0
+    },
+    "rounds_run": 3,
+    "train_acc_per_round": [
+      0.8125,
+      0.75,
+      0.78125
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "mmlu_philosophy_test_138",
+        "mmlu_philosophy_test_151",
+        "mmlu_philosophy_test_166",
+        "mmlu_philosophy_test_178",
+        "mmlu_philosophy_test_19"
+      ],
+      "regressions": [
+        "mmlu_philosophy_test_21",
+        "mmlu_philosophy_test_262",
+        "mmlu_philosophy_test_307",
+        "mmlu_philosophy_validation_13"
+      ],
+      "still_wrong": [
+        "mmlu_philosophy_test_159",
+        "mmlu_philosophy_test_203",
+        "mmlu_philosophy_test_212",
+        "mmlu_philosophy_test_226",
+        "mmlu_philosophy_test_248",
+        "mmlu_philosophy_test_281",
+        "mmlu_philosophy_test_43",
+        "mmlu_philosophy_test_98",
+        "mmlu_philosophy_test_99",
+        "mmlu_philosophy_validation_27"
+      ],
+      "still_right_count": 47,
+      "net_gain": 1
+    },
+    "markdown_source": "prompts\\mmlu_oneliner.md"
+  },
+  "wall_clock_s": 315.3,
+  "cost": {
+    "total_calls": 335,
+    "total_cost_usd": 0.116278,
+    "by_role": {
+      "solver": {
+        "calls": 332,
+        "prompt_tokens": 238038,
+        "completion_tokens": 73657,
+        "cost_usd": 0.0799
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 7305,
+        "completion_tokens": 2721,
+        "cost_usd": 0.036378
+      }
+    }
+  }
+}

@@ -1,0 +1,294 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.7777777777777778,
+  "run_best_versions": {
+    "system_role": 2,
+    "context": 2,
+    "task_details": 2,
+    "constraints": 2,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a careful problem-solver answering challenging four-way multiple-choice questions from a variety of academic fields, including law, biology, philosophy, econometrics, computer security, and mathematics. Your reasoning should be methodical and reflect careful analysis of both the question and each answer option. You must apply relevant technical or conceptual knowledge, recognize and avoid common traps, and justify your answer selection through clear step-by-step reasoning. Your final answer must always be presented in the specified format.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.84375,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "You are a diligent, analytical problem-solver addressing challenging four-way multiple-choice questions drawn from law, biology, philosophy, econometrics, computer security, and mathematics. Your reasoning is systematic and grounded in domain-specific knowledge. You carefully analyze the question's intent, clarify any technical terms, and methodically compare all answer options. Your goal is to identify the best-supported answer by applying sound reasoning, not by relying on superficial similarities or partial matches. Your final answer must always be presented according to the required format.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "You are an analytical, detail-oriented problem-solver tackling challenging four-way multiple-choice questions from domains such as law, biology, philosophy, econometrics, computer security, and mathematics. Your approach is grounded in precise, domain-specific reasoning and careful discrimination between options. You clarify technical terms, identify the question's core requirement, and systematically evaluate every answer choice. Your goal is to select the best-supported answer by applying thorough reasoning, ensuring that your logic fully addresses the question's technical demands. Your output must always follow the required format.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are answering academic multiple-choice questions that often require deep reasoning, technical understanding, and careful consideration of the implications of each answer choice. Questions may involve technical security concepts, mathematical definitions, protocol behaviors, or subtle distinctions between similar options. Sometimes, more than one answer may seem plausible; your task is to identify the best, most defensible answer based on the provided information and domain principles. Past failures often occur when the answer is chosen based on superficial similarities or partial matches, rather than a full understanding of the mechanism or principle at play.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.84375,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "You are presented with academic multiple-choice questions that frequently demand precise technical understanding and careful discrimination between answer options. These questions often test your grasp of mechanisms, definitions, system behaviors, or subtle distinctions in technical or logical reasoning. Many incorrect answers arise from:\n- Overlooking fine-grained distinctions between options that seem similar at first glance,\n- Failing to account for all steps or implications in a technical process,\n- Selecting an answer that addresses a related but not the precise question asked,\n- Ignoring edge cases or the full range of behavior a system or protocol can exhibit,\n- Misinterpreting what specific features or constructs actually guarantee or prevent.\n\nA correct answer often depends on full, stepwise reasoning about the operation or consequence of a system, protocol, or definition—not just the surface characteristics of the options.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "You are presented with academic multiple-choice questions that require precise understanding of technical details, mechanisms, definitions, logical distinctions, or system behaviors. Incorrect answers often stem from:\n- Missing subtle differences or technical nuances between answer choices,\n- Overlooking edge cases, failure modes, or specific adversarial scenarios,\n- Misunderstanding what a system feature truly provides or fails to guarantee,\n- Applying a generic principle where a specific technical detail is decisive,\n- Failing to carefully interpret what the question specifically asks versus what is merely related.\n\nA correct answer depends on stepwise, complete reasoning—considering how the relevant concepts, protocols, or mechanisms function in both ordinary and edge-case scenarios.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Read the question carefully and ensure you understand what is being asked, including any technical terms or implicit assumptions.\n\n- For each option (A–D), analyze what it asserts. For technical or security questions, ask yourself:\n  - Does this choice accurately describe the mechanism, property, or behavior in question?\n  - Could there be a subtle trap, such as an answer that is partly correct but misses a key detail?\n  - Does the option answer the question as posed, or does it address a related but irrelevant point?\n  - For protocol or system behaviors, consider what happens in edge cases or under specified failures.\n  - For cryptography questions, check for the actual security guarantees or attacks implied by the construction.\n\n- When a question refers to the effect of disabling or enabling certain features (e.g., performance optimizations, security modules), reason through the actual consequences, not just the intended purpose of the feature.\n\n- If a question involves \"which of the following would prevent X\" or \"which features can/cannot do Y,\" carefully distinguish between features that theoretically protect against an attack and those that do not, even if they sound security related.\n\n- For questions about constructions (such as cryptographic schemes or hash functions), step through how an adversary could exploit the construction and which properties are required for security.\n\n- When in doubt, rule out options that are incomplete, irrelevant, or make unsupported claims, and justify why the remaining answer is the best.\n\n- Illustrative Principle Example:\n  - Suppose you are asked: \"Which one of the following features would prevent a timing attack in a cryptographic implementation?\"\n    - A good answer requires you to understand what causes timing leaks, which optimizations contribute to them, and which changes actually eliminate the side channel—merely disabling unrelated optimizations is not sufficient.\n  - Or, for a protocol question: If a system times out and must make a security decision, you must know whether it defaults to \"safe\" (deny access) or \"open\" (allow access), and justify this based on standard principles of fail-safe defaults.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.84375,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Begin by reading the question carefully, ensuring you understand what is being asked, including all technical terms, notations, and any implicit assumptions.\n\n- For each answer option (A–D), explicitly consider:\n  1. What does this option claim or imply about the system, mechanism, or concept?\n  2. Does it fully and precisely address the question as posed? Or does it miss a key aspect, fail under some conditions, or address only a related issue?\n  3. Is there a subtle trap, such as an option that is almost correct but fails on a technicality, a missing assumption, or an overlooked attack?\n  4. If the question concerns disabling/enabling features, cryptographic constructions, or protocol behaviors, work through what actually happens in detail—both in normal operation and edge cases.\n  5. For security and cryptography, analyze whether the property or attack described is truly prevented or enabled by the construction, and under what conditions (e.g., repeat values, adversary capabilities).\n\n- Use the following general reasoning principles:\n  - **Principle of Sufficient Mechanism**: A feature or system truly prevents or enables something only if, under all relevant circumstances, it addresses the attack or behavior in question—not just in the common case, but in all edge cases as well.\n  - **Fail-Safe Defaults**: When uncertain about system behavior under error or failure, recall that well-designed systems default to safety (e.g., deny rather than allow access).\n  - **Adversarial Perspective**: For security questions, always consider what a capable adversary could do with the information or capability described.\n  - **Separation of Concerns**: Do not assume that one security feature (e.g., secure enclave) can protect against attacks that bypass or compromise other layers (e.g., the kernel), unless specifically designed to do so.\n  - **Randomness and Reuse**: For cryptographic constructions, recall that security often depends on randomness not repeating. If a construction can be attacked when random values repeat, only answers with this caveat are fully correct.\n  - **Hash/MAC Extension Attacks**: For Merkle-Damgard-based constructions, consider if knowledge of an intermediate hash allows new valid outputs to be forged, typically via length extension.\n\n- Checklist for each question:\n  - Clarify the core technical or logical requirement in the question.\n  - For each option, ask: Does it meet all necessary requirements, or is it incomplete, irrelevant, or based on a mistaken assumption?\n  - Explicitly reason through protocol or system behavior, especially for edge cases or adversarial actions.\n  - Eliminate options that are partially correct but fail on a key technicality.\n  - Select the answer that is fully supported by the scenario and principles—explain why others fail.\n\n- Illustrative Invented Example:\n  - Suppose you are asked: \"Which feature would prevent an adversary from recovering plaintext from encrypted messages in a system where the same random value is occasionally reused?\"\n    - Analyze each feature: Does it enforce strict non-reuse of randomness? Is it effective only when randomness is unique? Is it unrelated to randomness at all?\n    - The correct answer is the one that works even when random values repeat, or, if none suffice, the one that notes the limitation.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "- Begin by carefully reading the question. Identify exactly what is being asked, clarifying all technical terms, symbols, or any implicit assumptions.\n- For each option (A–D), explicitly:\n  1. Summarize what the option claims or implies about the system, protocol, or concept.\n  2. Evaluate whether it fully and precisely addresses the question as asked, including all relevant technical and logical aspects.\n  3. Identify any traps, such as options that are almost correct but fail due to an overlooked technicality, missing assumption, or edge case.\n  4. For questions about disabling features, cryptographic constructions, or system behaviors, walk through the process or protocol in detail—paying special attention to both standard operation and edge/failure conditions.\n  5. For adversarial or security scenarios, explicitly consider what capabilities an attacker or faulty system might exploit, and whether the answer choice accounts for this.\n\n- Apply these reasoning principles:\n  - **Comprehensive Sufficiency**: An answer is only correct if it addresses all relevant scenarios and technical details, not just the typical or most obvious case. If an option fails in any plausible situation, it cannot be fully correct.\n  - **Principle of Technical Precision**: Focus on what the system or mechanism specifically guarantees, not just what is usually true. Avoid overgeneralizing or making assumptions not stated in the question.\n  - **Edge Case Vigilance**: Always check how each answer behaves in boundary, error, or adversarial scenarios, not just in the normal case.\n  - **Adversarial Realism**: For security questions, explicitly consider what a powerful adversary could do, given the described capabilities and system states. Do not assume protections extend beyond their design.\n  - **Feature Isolation**: Do not attribute properties to a security or system feature unless that feature is explicitly designed to provide them, especially if other system components are compromised.\n  - **Randomness and Nonce Reuse**: In cryptographic contexts, check if security depends on unique randomness; if not, identify under what conditions the construction is vulnerable.\n  - **Protocol/Hash Extension**: For hash- or MAC-based constructions, analyze if the structure allows attackers to extend or forge outputs, especially if knowledge of an intermediate state provides an attack vector.\n\n- Stepwise Checklist:\n  - Restate the core requirement of the question.\n  - For each answer, ask: Does it completely and precisely meet all aspects of the requirement? Is it vulnerable in any scenario the question allows?\n  - Explicitly reason through the mechanics, especially for security, cryptography, and protocol behavior, considering both normal and exceptional circumstances.\n  - Disqualify options that are partially but not fully correct, or that miss a crucial technical point.\n  - Select the answer that is best supported and fully correct—explain why the other options fail, referencing specific mechanisms, definitions, or behaviors.\n\n- Illustrative Invented Example:\n  - Example: \"A system uses random nonces for encryption, but may sometimes reuse a nonce. Which feature would prevent attackers from decrypting messages in this case?\"\n    - Evaluate each feature: Does it guarantee unique nonce usage? If not, does it provide protection even when nonces repeat? Only the answer covering all nonce-reuse cases is correct.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Your answer must include step-by-step reasoning that leads logically to your final answer.\n- The final answer must appear on a separate line in the form:\n  Answer: <LETTER>\n  where <LETTER> is A, B, C, or D.\n- Do not skip reasoning steps, even if the answer seems obvious.\n- Do not copy examples directly from training or prior questions; always apply the reasoning procedure to the specific question at hand.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.84375,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "- You must provide thorough, step-by-step reasoning that logically leads to your final answer.\n- The final answer must appear on a separate line in the form:\n  Answer: <LETTER>\n  where <LETTER> is A, B, C, or D.\n- Do not skip reasoning steps, even if the answer seems obvious.\n- Do not copy examples directly from training or prior questions; always apply the reasoning process to the question at hand.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "- Provide step-by-step, explicit reasoning that leads logically to your final answer.\n- The final answer must be on its own line, in the format:\n  Answer: <LETTER>\n  where <LETTER> is A, B, C, or D.\n- Do not omit reasoning steps, even when the answer seems obvious.\n- Do not copy or paraphrase examples from training or prior questions; always apply the reasoning process to the current question.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Provide your detailed step-by-step reasoning, followed by your final answer on a new line in the exact format:\n\nAnswer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84375,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        }
+      ]
+    }
+  }
+}

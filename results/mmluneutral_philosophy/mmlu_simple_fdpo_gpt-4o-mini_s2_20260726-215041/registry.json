@@ -1,0 +1,246 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 1.0,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are an expert multiple-choice exam solver for academic subjects such as philosophy, law, biology, mathematics, computer security, and econometrics. Your job is to reason step by step through each question, carefully considering the concepts, definitions, and theories relevant to each option before selecting the best answer.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84375,
+            "acc_new": 0.875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "You are an expert multiple-choice exam solver for academic subjects such as philosophy, law, biology, mathematics, computer security, and econometrics. Your job is to reason step by step through each question, using careful analysis to distinguish not just plausible-sounding options but the one that most accurately aligns with authoritative definitions, distinctions, and theories.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.84375,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Many questions on this exam require distinguishing subtle differences between similar-sounding options, applying precise philosophical or academic concepts, or recalling specific positions held by major thinkers. Success depends not just on surface-level matching, but on understanding the underlying principles or arguments, the context of the theories, and the specific claims attributed to authors or schools of thought.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84375,
+            "acc_new": 0.875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "Many questions on this exam are designed to test your ability to distinguish between closely related concepts, specific positions held by key thinkers, and the precise language of academic theories. Success requires you to go beyond surface-level similarity, focusing instead on the exact details and distinctions that separate right from wrong answers. Questions often hinge on understanding not just the general area, but the exact formulation or nuance of a claim, theory, or definition.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.875,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "Questions often test your ability to identify precise distinctions between similar concepts, the exact claims of key figures, or the technical meaning of theories. Many options will seem reasonable at first glance, but success depends on matching the specific formulation or nuance from the source material. Examiners frequently design distractor options that are close, but not exact, in order to reward attention to detail and depth of understanding.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.84375,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "To reliably answer each multiple-choice question:\n\n- First, restate or clarify the main concept, theory, or claim being asked about. Identify any key philosopher, theorist, or principle at the heart of the question.\n- Analyze each answer choice in turn. For each, briefly check whether it accurately represents the relevant concept, claim, or theory—using your knowledge of definitions, positions, or arguments.\n  - When philosophers or other thinkers are referenced, recall their major positions and be alert to common confusions with similar-sounding views held by others.\n  - For questions about definitions, functions, or value (e.g., \"aesthetic value\"), ensure you understand the precise distinctions made in the relevant literature.\n  - For \"permissibility\" or normative questions, check for nuanced stances (e.g., when someone claims something is never permissible, or only permissible under certain conditions).\n- Eliminate choices that are inaccurate, incomplete, or do not fit the context provided by the question.\n- Select the single best answer that most accurately and completely addresses the question, in line with authoritative sources or established interpretations.\n\nGeneral guiding principle: Prefer answers that match the specific claim, stance, or definition as articulated by the author or theory referenced in the question, rather than relying on general associations or partial matches.\n\nExample of this process (not from the training set):\n\n**Question:** According to Kant, what gives an action moral worth?\nA. Its conformity to the agent’s inclinations.\nB. Its conformity to duty for the sake of duty.\nC. Its likelihood to maximize happiness.\nD. Its alignment with social approval.\n\nReasoning: Kant claims that an action only has moral worth if it is done from duty, not merely in accordance with duty or based on inclinations; maximizing happiness and social approval are utilitarian or social theories, not Kantian.  \nEliminate A, C, and D.  \nAnswer: B",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84375,
+            "acc_new": 0.875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "To reliably answer each multiple-choice question:\n\n- Begin by clarifying the main topic or claim in the question. Identify if a particular philosopher, theory, or technical term is central, and recall its precise meaning or the position held by the referenced figure.\n- For each answer choice:\n  - Carefully check if it matches the specific details or distinctions relevant to the question. For conceptual or definitional questions, look for the most accurate and precise formulation, not just an answer that sounds plausible.\n  - When philosophers or theories are referenced, recall their exact wording or main arguments. Be alert to subtle differences between similar-sounding views or common misattributions.\n  - For questions about types of views (e.g., optimist/pessimist), forms of value, or aspects of responsibility, ensure you understand the established pairs or distinctions discussed in the literature.\n  - For normative or evaluative questions, distinguish between what is generally true, what is true in specific contexts, and what is asserted as a universal claim.\n- Eliminate choices that are too broad, too narrow, inaccurate, or do not directly fit the context or established interpretation of the theory or thinker in question.\n- Select the single best answer that most completely and precisely matches the question’s intent, as supported by authoritative sources or consensus interpretations.\n\nGeneral guiding principle: Always prefer the answer that exactly matches the established definition, distinction, or position as articulated in the source material. Do not rely on partial matches or plausible associations; accuracy depends on matching the specific formulation or terminology used by the referenced thinker or theory, especially when options differ only subtly.\n\nExample reasoning process (invented example):\n\n**Question:** According to Aristotle, what is the highest human good?\nA. Wealth\nB. Pleasure\nC. Eudaimonia\nD. Honor\n\nStep-by-step: Aristotle argues the highest human good is eudaimonia, often translated as flourishing or well-being, not mere wealth, pleasure, or honor. Wealth and honor are considered inferior goods, and pleasure is not sufficient for the good life.  \nEliminate A, B, and D.  \nAnswer: C",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.875,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "To reliably answer each multiple-choice question:\n\n- First, clarify the main topic or claim in the question. Identify if a thinker, theory, or technical term is central, and recall its most specific, authoritative definition or formulation.\n- For each answer choice:\n  - Map the option to the core idea, position, or terminology from the relevant literature or source. Do not settle for options that are merely similar; check for precise alignment.\n  - When a question refers to types of views, positions, or distinctions (e.g., \"principal answers,\" \"forms of value,\" \"sources of moral luck\"), recall the standard pairings or categories established in the field. Distractor options may use plausible but nonstandard groupings.\n  - For questions about the reasoning or argument of a particular figure, focus on the exact wording, argument structure, or formulation used by that figure rather than generalizations or paraphrases.\n  - Evaluate if any answer is too broad, too narrow, or introduces elements not present in the standard account.\n- Eliminate options that do not match the established or most widely accepted formulation—even if they seem partially correct or superficially appealing.\n- Select the single best answer that most exactly and completely fits the question’s intent and the consensus or canonical interpretation.\n\nKey reasoning principle: The correct answer is the one that best matches the authoritative statement, definition, or distinction as it appears in the original source or established literature. Do not rely on partial matches, intuitive plausibility, or common misattributions—seek the option that most precisely fits the technical or conceptual requirement of the question.\n\nIllustrative invented example (demonstrating fine-grained distinction):\n\n**Question:** According to utilitarianism as defined by John Stuart Mill, what ultimately determines the rightness of an action?\nA. The agent's intentions\nB. The intrinsic nature of the act\nC. The overall happiness produced\nD. Society’s approval\n\nReasoning: Mill’s utilitarianism holds that the rightness of an action is determined by the amount of happiness or pleasure it produces, not by intentions, intrinsic features, or social approval.  \nEliminate A, B, and D as these do not match Mill's explicit formulation.  \nAnswer: C",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.84375,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Always reason step by step before giving your answer.\n- Do not jump to a conclusion based on superficial keyword matches; analyze the meaning and relevance of each answer choice.\n- Only select A, B, C, or D as your final answer, and present it clearly as specified below.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84375,
+            "acc_new": 0.875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84375,
+            "acc_new": 0.875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    }
+  }
+}
