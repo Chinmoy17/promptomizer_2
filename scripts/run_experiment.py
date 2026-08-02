@@ -121,10 +121,10 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
                                  "gold": row.gold})
             logger.info("final test accuracy: %.3f", final_result.accuracy)
             # Test-set confusion matrix: which examples flipped vs the seed_test?
-            seed_correct = {r.example_id for r in seed_result.rows if r.correct}
-            final_correct = {r.example_id for r in final_result.rows if r.correct}
-            seed_wrong = {r.example_id for r in seed_result.rows if not r.correct}
-            final_wrong = {r.example_id for r in final_result.rows if not r.correct}
+            seed_correct = seed_result.correct_ids()
+            final_correct = final_result.correct_ids()
+            seed_wrong = seed_result.wrong_ids()
+            final_wrong = final_result.wrong_ids()
             opt_summary["test_confusion"] = {
                 "recoveries": sorted(seed_wrong & final_correct),
                 "regressions": sorted(seed_correct & final_wrong),

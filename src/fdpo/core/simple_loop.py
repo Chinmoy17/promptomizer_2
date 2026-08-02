@@ -117,8 +117,8 @@ def run_simple_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
                         temperature=cfg.solver_temperature,
                         max_tokens=cfg.solver_max_tokens, purpose="simple:baseline",
                         max_workers=cfg.max_workers)
-    baseline_correct = {r.example_id for r in baseline.rows if r.correct}
-    baseline_wrong = {r.example_id for r in baseline.rows if not r.correct}
+    baseline_correct = baseline.correct_ids()
+    baseline_wrong = baseline.wrong_ids()
     logger.info("simple: baseline mining accuracy %.3f (%d correct, %d wrong)",
                 baseline.accuracy, len(baseline_correct), len(baseline_wrong))
 
@@ -262,8 +262,8 @@ def run_simple_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
                             max_tokens=cfg.solver_max_tokens,
                             purpose=f"simple:round{round_num}",
                             max_workers=cfg.max_workers)
-        new_wrong = {r.example_id for r in new_eval.rows if not r.correct}
-        new_correct = {r.example_id for r in new_eval.rows if r.correct}
+        new_wrong = new_eval.wrong_ids()
+        new_correct = new_eval.correct_ids()
         if has_val_split:
             val_eval = evaluate(solver, candidate_prompt, validation, dataset,
                                 temperature=cfg.solver_temperature,

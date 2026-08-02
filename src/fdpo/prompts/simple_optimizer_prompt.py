@@ -36,13 +36,12 @@ _TASK_DESCRIPTIONS = {
         "final numeric answer."
     ),
     "mmlu": (
-        "a 4-way multiple-choice exam question (options A, B, C, D) that "
-        "may come from any of several academic subjects (law, biology, "
-        "philosophy, econometrics, computer security, mathematics). The "
-        "solver should reason step by step and then give its final answer as "
-        "a single letter A, B, C, or D on an 'Answer:' line -- many of these "
-        "questions (especially mathematics and econometrics) need multi-step "
-        "working to get right."
+        "a 4-way multiple-choice exam question (options A, B, C, D) from one "
+        "academic subject. Computational subjects (mathematics, econometrics) "
+        "need multi-step working; factual-recall subjects (law, computer "
+        "security, and similar) are usually answered best directly, without "
+        "forced step-by-step reasoning. The final answer is a single letter "
+        "A, B, C, or D on an 'Answer:' line."
     ),
     "arc_challenge": (
         "an ARC-Challenge science multiple-choice question (options A, B, "
@@ -87,12 +86,20 @@ on future unseen cases from the same task distribution. A good rewrite:
   - Preserves the Output Format exactly. Changing it breaks the answer
     extractor, and every answer scores wrong regardless of correctness.
 
-  - NEVER adds a rule that forbids reasoning or forces answer-only output
-    (e.g. "output only the letter", "do not explain"). The solver MUST be
-    allowed to think step by step BEFORE giving its final answer --
-    suppressing reasoning collapses accuracy on multi-step questions
-    (e.g. mathematics, econometrics). Any brevity guidance must serve a
-    clear final-answer line, never replace the reasoning that precedes it.
+  - MATCHES the reasoning style to the task type, which you infer from the
+    failures you are shown:
+      * Computational / multi-step tasks (calculation, derivation, formal
+        logic -- e.g. mathematics, econometrics): INSTRUCT the solver to work
+        step by step before the final answer. It needs a scratchpad; a bare
+        answer starves it.
+      * Factual-recall / knowledge tasks where an answer is either known or
+        not (e.g. law, computer security, factual trivia): prefer a DIRECT
+        answer. Do NOT force elaborate step-by-step reasoning here -- it makes
+        the solver over-think and second-guess answers it already recalls
+        correctly, LOWERING accuracy. Sharpen definitions and framing instead,
+        and keep the output concise.
+    When unsure, keep reasoning brief and tied to a clear final-answer line.
+    The objective is accuracy, never verbosity for its own sake.
 
 Return only the full rewritten markdown, starting with the first
 `## Section` header. No prose, no fences, no commentary before or after."""

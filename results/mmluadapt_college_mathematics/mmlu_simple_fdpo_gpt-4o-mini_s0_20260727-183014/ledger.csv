@@ -1,0 +1,6 @@
+role,model,prompt_tokens,completion_tokens,cost_usd,purpose
+solver,gpt-4o-mini-2024-07-18,131,261,0.00017625,eval
+solver,gpt-4o-mini-2024-07-18,107,358,0.00023085,eval
+solver,gpt-4o-mini-2024-07-18,131,768,0.00048044999999999994,eval
+solver,gpt-4o-mini-2024-07-18,188,463,0.000306,eval
+solver,gpt-4o-mini-2024-07-18,152,899,0.0005621999999999999,eval

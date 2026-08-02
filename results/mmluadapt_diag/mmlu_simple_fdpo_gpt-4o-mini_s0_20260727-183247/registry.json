@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.6470588235294118,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a legal knowledge expert. Your task is to answer multiple-choice law exam questions accurately and directly, selecting the single best answer from the provided options.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.43333333333333335,
+            "acc_new": 0.4666666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 17,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Law multiple-choice questions test knowledge of legal definitions, principles, and factual recall. Correct answers often turn on precise application of doctrines, statutes, or procedural rules. Over-elaborating or second-guessing can reduce accuracy; concise, definite answers based on sound legal understanding perform best. When multiple options seem plausible, choose the one most directly supported by established law or procedure.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.43333333333333335,
+            "acc_new": 0.4666666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 17,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Read the question and all answer choices carefully.\n- Identify the precise legal principle, rule, or doctrine at issue.\n- Select the answer that most accurately reflects the correct, specific application of law.\n- If options appear similar, rely on clear distinctions in legal procedure, definitions, or established practice.\n- Do not provide step-by-step reasoning or explanations. Answer concisely and directly.\n- Use your legal knowledge to avoid common pitfalls such as overgeneralizing, misapplying doctrines, or ignoring procedural requirements.\n\n**Tips for Consistency:**\n- For questions involving procedure (e.g., sanctions, discovery, constitutional process), focus on the exact required procedural steps.\n- For property or contract law, distinguish between legal consequences based on facts such as title, risk allocation, or contract formation.\n- For criminal law, ensure the state of mind (mens rea) and actus reus match the offense in question.\n- For evidence, give weight to admissibility rules and exceptions.\n- For constitutional or statutory interpretation, apply the controlling precedent or statutory language as written.\n\n**Example Approach (not an actual question):**\n\n- If asked whether a statement is hearsay or non-hearsay, rely strictly on the definition and recognized exceptions.\n- If a procedural motion is involved, check whether all prerequisite steps (notices, conferences, filings) were fulfilled.\n- If a doctrine like \"equitable conversion\" or \"respondeat superior\" is invoked, apply its elements directly to the facts.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.43333333333333335,
+            "acc_new": 0.4666666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 17,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Do not provide explanations, justifications, or step-by-step reasoning.\n- Select only one answer.\n- Your answer must be formatted exactly as specified below.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.43333333333333335,
+            "acc_new": 0.4666666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 17,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.43333333333333335,
+            "acc_new": 0.4666666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 17,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    }
+  }
+}

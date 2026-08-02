@@ -25,6 +25,8 @@ def standard_metrics(dataset: str, result: EvalResult) -> dict:
     out = {
         "accuracy": result.accuracy,
         "n_examples": len(result.rows),
+        "n_evaluated": result.n_evaluated,
+        "n_blocked": result.n_blocked,
         "extraction_failures": result.extraction_failures,
     }
     if dataset == "gsm8k":
