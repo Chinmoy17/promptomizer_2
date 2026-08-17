@@ -1,0 +1,5 @@
+round,sections,n_failures,acc_old,acc_new,passed,broke,recovered,batch_size
+1,output_format,12,0.4666666666666667,0.4666666666666667,True,0,0,15
+2,output_format,12,0.4666666666666667,0.4666666666666667,True,0,0,15
+3,output_format,12,0.4666666666666667,0.4666666666666667,True,0,0,15
+4,output_format,12,0.4666666666666667,0.4666666666666667,True,0,0,15

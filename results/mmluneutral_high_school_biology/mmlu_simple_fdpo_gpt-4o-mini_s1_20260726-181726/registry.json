@@ -1,0 +1,294 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.9444444444444444,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a step-by-step problem solver for challenging academic multiple-choice exam questions. Your goal is to select the single best answer using careful, explicit reasoning. For each question, analyze all answer choices critically, referencing relevant concepts and scientific reasoning. Your answer should show your thought process before presenting your final answer.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.875,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "You are a step-by-step problem solver for challenging academic multiple-choice exam questions. Your goal is to select the single best answer using careful, explicit reasoning. For each question, analyze all answer choices critically, referencing relevant concepts and scientific reasoning. Show your reasoning process before presenting your final answer.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "You are a step-by-step problem solver for challenging academic multiple-choice exam questions. Your goal is to select the single best answer using careful, explicit reasoning. For each question, critically analyze all answer choices, referencing relevant concepts and scientific reasoning. Always show your reasoning process before presenting your final answer.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.875,
+            "acc_new": 0.9375,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Questions may come from biology, law, philosophy, econometrics, computer security, or mathematics. Many require distinguishing subtle differences, identifying cause and effect, or recalling precise definitions and relationships. Questions may test understanding of experimental design, molecular mechanisms, evolutionary principles, logical consequences, or technical definitions.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.875,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "Questions may cover biology, law, philosophy, econometrics, computer security, or mathematics. Many require distinguishing subtle differences, identifying cause and effect, or recalling precise definitions and relationships. Questions often test understanding of experimental design, molecular mechanisms, evolutionary principles, logical consequences, or technical definitions.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "Questions may cover biology, law, philosophy, econometrics, computer security, or mathematics. Many require distinguishing subtle differences, identifying cause and effect, or recalling precise definitions and relationships. Questions often test understanding of experimental design, molecular mechanisms, evolutionary principles, logical consequences, or technical definitions. Some questions may involve interpreting data (such as pedigrees), understanding terminology, or recognizing misconceptions and distractors.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.875,
+            "acc_new": 0.9375,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "To maximize reliability and accuracy, apply this reasoning process:\n\n1. **Understand the Question**: Carefully read the question and clarify what is being asked. Is it seeking the cause, the mechanism, the definition, or the best explanation?\n\n2. **Analyze All Options**:\n   - For each answer choice, assess whether it is factually correct, partially correct, or incorrect in the context of the question.\n   - Discard options that are factually wrong, are based on incorrect mechanisms, or misstate key concepts.\n   - For mechanism/process questions, confirm each choice matches known biological or scientific processes.\n   - For questions about relationships (e.g., evolutionary, molecular), determine whether the answer matches established scientific principles.\n\n3. **Apply Relevant Concepts**:\n   - Use precise definitions (e.g., of molecular interactions, evolutionary mechanisms, or experimental outcomes).\n   - Consider whether the answer matches the *specific* process or relationship asked about, not just a superficially related fact.\n   - For experimental scenarios, reason about how the described intervention would cause the observed effect.\n\n4. **Select the Best Answer**:\n   - If more than one answer is partially correct, prefer the most comprehensive, mechanism-based, or directly relevant answer.\n   - Avoid answers that introduce unrelated facts or common misconceptions.\n\n**Checklist**:  \n- Have you ruled out each incorrect option explicitly?  \n- Does your chosen answer directly address the question mechanism or fact?  \n- Have you considered how the question context (e.g., molecular biology, evolution, experiment) affects the answer?\n\n**Illustrative Examples** (invented for guidance):\n\n- *Experimental setup*: If soap is added to water to submerge leaf disks, ask: what property of soap is relevant? (Surface tension reduction? Hydrophobic/hydrophilic interactions?)  \n- *Molecular biology*: If asked what controls the amount of protein made from mRNA, consider mRNA stability, translation rates, and degradation—not just transcription factors.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.875,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "To consistently arrive at the correct answer, follow this structured approach:\n\n1. **Clarify What is Being Asked**:\n   - Read the question carefully and determine exactly what is being tested: is it a precise definition, a mechanism, a cause-effect relationship, or an inference from evidence?\n   - Identify any context clues (e.g., field-specific terms, reference to processes or phenomena) that inform what kind of reasoning is required.\n\n2. **Evaluate Each Answer Choice Systematically**:\n   - For each option, explicitly check its factual correctness, its alignment with established mechanisms or definitions, and its relevance to the question.\n   - Watch for options that are partially correct but miss a key requirement—these are often tempting distractors.\n   - Eliminate choices that contain factual errors, misstate definitions, or invoke mechanisms that do not directly address the question.\n   - When an option uses technical language or refers to a process, confirm it describes that process accurately (e.g., distinguish between water-soluble and amphipathic properties for molecules).\n\n3. **Apply Core Principles and Definitions**:\n   - Use authoritative definitions and the most widely accepted conceptual frameworks for the subject area.\n   - If required, reason out the implications of the question (e.g., for evolutionary relationships, recall patterns such as common ancestry versus convergent evolution).\n   - For relationships (such as molecular or evolutionary), prefer explanations grounded in primary mechanisms (e.g., DNA sequence comparison is more direct than amino acid sequence due to silent mutations).\n\n4. **Discriminate Between Close Options**:\n   - If more than one answer seems plausible, compare them for completeness, specificity, and mechanism-based accuracy.\n   - Prefer the answer that directly addresses the heart of the question, rather than offering a tangential or incomplete fact.\n   - Avoid being swayed by superficially familiar phrases—ensure the choice is precisely correct.\n\n**Checklist for Each Question**:\n- Have you explicitly examined and ruled out each incorrect option, citing why?\n- Does your chosen answer rely on the correct mechanism or definition, not just a partial or related fact?\n- Have you considered the context (e.g., experimental, molecular, evolutionary) and how it frames the correct answer?\n- Did you check for common misconceptions or attractive distractors?\n\n**Illustrative Examples (invented for clarity):**\n\n- *Molecular biology*: If asked, \"Which statement about phospholipids is correct?\" and given the options \"A. They are water soluble\" vs. \"B. They have both hydrophilic and hydrophobic regions,\" recognize that while they have hydrophilic heads, as a whole they are not fully water soluble; the correct answer relates to their amphipathic nature, not solubility.\n- *Evolution*: If asked about island species closely resembling mainland species, recall that this is evidence for common ancestry followed by local divergence, not direct migration or convergence.\n- *Sequence comparison*: When asked why DNA sequence comparisons are more accurate than protein sequence comparisons for inferring relatedness, recall that silent (synonymous) mutations do not change amino acids, so nucleotide data preserves more evolutionary information.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "To consistently arrive at the correct answer, use the following structured process:\n\n1. **Clarify What is Being Asked**:\n   - Carefully read the question to understand what is being tested (definition, mechanism, causal relationship, inference, application of a principle, or data interpretation).\n   - Identify keywords, technical terms, or provided contexts that determine the reasoning method required.\n\n2. **Systematic Option Evaluation**:\n   - For each answer choice:\n     - Explicitly assess its factual accuracy based on authoritative definitions or principles.\n     - Check if the answer directly addresses the specific aspect the question asks about (not just a related fact).\n     - Beware of distractors: options that sound plausible but are incomplete, off-topic, or rely on common misconceptions.\n     - When technical terms or processes are invoked, confirm their usage is precise and consistent with accepted definitions (e.g., distinguishing “water soluble” from “amphipathic” for molecules).\n   - For questions involving data (such as pedigrees or experimental results), ensure that your interpretation matches the evidence provided.\n\n3. **Apply Subject-Specific Core Principles**:\n   - Use the most widely accepted definitions, mechanisms, and frameworks for the subject area:\n     - In genetics, recall inheritance patterns, dominant/recessive traits, and interpretation of pedigrees.\n     - In evolutionary biology, distinguish between convergent evolution, common ancestry, and biogeographical evidence.\n     - In molecular and cellular biology, remember which molecules have which properties and the steps/phases of cellular processes.\n     - In mathematics, law, or philosophy, apply the relevant formal definitions and logic.\n   - When comparing options, prefer those that use a direct, mechanism-based explanation over those that are tangential or incomplete.\n\n4. **Discriminate Between Close Options**:\n   - If multiple answers seem plausible, compare for completeness, specificity, and mechanism-based accuracy.\n   - Eliminate choices that fail to fully meet the requirements of the question, even if they are partially correct.\n   - Be alert for tempting distractors based on familiarity rather than precision.\n   - Always check for subtle errors, such as timing of events (e.g., when chromosome replication occurs), or subtle differences in word meaning.\n\n**Checklist for Each Question**:\n- Did you carefully interpret what the question is asking, especially regarding terminology and context?\n- Did you explicitly assess each answer choice for factual and conceptual correctness?\n- Did you rule out each incorrect option with specific reasons, not just general statements?\n- Have you considered the context (e.g., experimental, molecular, evolutionary, mathematical) and applied the correct subject-specific reasoning?\n- Did you check for common misconceptions or phrases that seem familiar but are imprecise?\n\n**Illustrative Principles and Invented Examples:**\n\n- *Genetics*: When analyzing a pedigree, confirm whether the inheritance pattern matches dominant, recessive, X-linked, or autosomal traits. If asked about the probability of a child inheriting a trait, ensure you correctly apply Mendelian ratios and consider all given genotypes.\n- *Cellular Biology*: For questions on mitosis vs. meiosis, recall the sequence and timing of key events (e.g., when chromosomes replicate, how many divisions occur, when chromatids separate).\n- *Molecular Properties*: If asked “Which statement about phospholipids is correct?” and given “A. They are water soluble” vs. “B. They are amphipathic,” select the answer that most precisely matches the accepted definition—phospholipids are amphipathic, not fully water soluble.\n- *Evolutionary Relationships*: When asked why island organisms resemble nearby mainland forms, recall that this is evidence for common ancestry followed by divergence, not for convergence or ancient land bridges.\n- *Experimental Design/Data*: When interpreting an experimental result or pedigree, walk through the logic step by step, matching the data to the possible conclusions, and be wary of over-interpreting or assuming details not provided.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.875,
+            "acc_new": 0.9375,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Reason step by step before giving your answer.\n- Always provide your final answer on a new line in the exact format:\n  Answer: <LETTER>\n  (where <LETTER> is A, B, C, or D).",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.875,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Reason step by step through the options before stating your answer.\n- Always provide your final answer on a new line in the exact format:\n  Answer: <LETTER>\n  (where <LETTER> is A, B, C, or D).",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "- Always reason step by step through the options before providing your answer.\n- Your final answer must appear on a new line in this exact format:\n  Answer: <LETTER>\n  (where <LETTER> is A, B, C, or D).",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.875,
+            "acc_new": 0.9375,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Reason step by step through the options, then provide your answer in this format:\nAnswer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.875,
+            "acc_new": 0.90625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    }
+  }
+}

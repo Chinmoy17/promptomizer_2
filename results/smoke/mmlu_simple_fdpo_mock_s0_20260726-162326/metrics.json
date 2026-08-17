@@ -1,0 +1,118 @@
+{
+  "run_id": "mmlu_simple_fdpo_mock_s0_20260726-162326",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "mmlu",
+  "solver_model": "mock",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.5,
+    "n_examples": 6,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.5,
+    "n_examples": 6,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "not_triggered",
+    "triggered": true,
+    "tau": 1,
+    "simple_max_rounds": 2,
+    "accept_margin": 1.0,
+    "shipped_structured": false,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.35,
+      "n_mining": 5,
+      "n_validation": 3
+    },
+    "baseline_val_acc": 0.3333333333333333,
+    "best_structured_val_acc": null,
+    "n_failures_triggering": 2,
+    "optimizer_calls": 2,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "no_change",
+        "n_failures_before": 2
+      },
+      {
+        "round": 2,
+        "status": "no_change",
+        "n_failures_before": 2
+      }
+    ],
+    "baseline_failing_ids": [
+      "syn_train_1",
+      "syn_train_3"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.6,
+      "n_correct": 3,
+      "n_wrong": 2
+    },
+    "current_train": {
+      "accuracy": 0.6,
+      "n_correct": 3,
+      "n_wrong": 2
+    },
+    "train_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "syn_train_1",
+        "syn_train_3"
+      ],
+      "still_right_count": 3,
+      "net_gain": 0
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 0,
+      "rejects": 0
+    },
+    "rounds_run": 0,
+    "train_acc_per_round": [
+      0.6,
+      0.6
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "syn_test_1",
+        "syn_test_3",
+        "syn_test_5"
+      ],
+      "still_right_count": 3,
+      "net_gain": 0
+    },
+    "markdown_source": "prompts\\mmlu_cot_oneliner.md"
+  },
+  "wall_clock_s": 0.0,
+  "cost": {
+    "total_calls": 22,
+    "total_cost_usd": 0.0,
+    "by_role": {
+      "solver": {
+        "calls": 20,
+        "prompt_tokens": 1960,
+        "completion_tokens": 280,
+        "cost_usd": 0.0
+      },
+      "optimizer": {
+        "calls": 2,
+        "prompt_tokens": 1826,
+        "completion_tokens": 176,
+        "cost_usd": 0.0
+      }
+    }
+  }
+}

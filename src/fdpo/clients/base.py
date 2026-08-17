@@ -14,6 +14,9 @@ class ChatResult:
     prompt_tokens: int
     completion_tokens: int
     model: str
+    blocked: bool = False   # True if the provider refused the call (e.g. Azure
+                            # content filter). Such calls are NOT evaluable and
+                            # are excluded from accuracy denominators.
 
 
 class ModelClient(ABC):

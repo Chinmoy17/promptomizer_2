@@ -1,0 +1,214 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.8666666666666667,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 5,
+    "task_details": 0,
+    "constraints": 3,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 5,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay is an out-of-court statement or assertive conduct offered to prove the truth of the matter asserted in the statement or conduct. If the statement or conduct is offered for a purpose other than proving the truth of what was asserted or implied (such as showing the speaker's state of mind, knowledge, or presence), it is not hearsay.",
+          "created_round": 1,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "Hearsay is an out-of-court statement (including verbal statements or assertive conduct) offered to prove the truth of the matter asserted—that is, the content or meaning of what was said or done, not just the fact that the statement or conduct occurred.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8666666666666667,
+            "acc_new": 0.9333333333333333,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "Hearsay is an out-of-court statement (including verbal statements or assertive conduct) offered to prove the truth of the matter asserted—that is, the content or meaning of what was said or done, not just the fact that the statement or conduct occurred. If a statement or conduct is offered only to show the speaker's belief, state of mind, or presence (rather than to prove the literal truth of what was said), it is not hearsay. For example, if \"Real Madrid was the best soccer team in the world\" is offered to show Tim's fandom, not to prove that Real Madrid is the best, it is not hearsay; if \"I am the boss here\" is offered to prove Michael was in charge, it is hearsay.",
+          "created_round": 3,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.8666666666666667,
+            "acc_new": 0.8,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 4,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        },
+        {
+          "version": 4,
+          "text": "Hearsay is an out-of-court statement (including verbal statements or assertive conduct) offered to prove the truth of the matter asserted—that is, the content or meaning of what was said or done, not just the fact that the statement or conduct occurred. If a statement is offered only to show the speaker's state of mind, belief, or presence, and not to prove the truth of the content asserted, it is not hearsay. For example, if a statement is used to show someone is a soccer fan (not to prove that a team is the best), or to show someone's presence at a location (not to prove their intent), it is not hearsay.",
+          "created_round": 4,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.9333333333333333,
+            "acc_new": 0.8666666666666667,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 4,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        },
+        {
+          "version": 5,
+          "text": "Hearsay is an out-of-court statement (including verbal statements or assertive conduct) offered to prove the truth of the matter asserted—that is, to establish the truth of the specific content or meaning of what was said or done, not merely to show that the statement or conduct occurred, or to show the speaker's state of mind, identity, or presence.",
+          "created_round": 5,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.8666666666666667,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 4,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Apply the definition strictly; conduct is hearsay if it is assertive, including nonverbal actions intended as an assertion or adoptive admission. Assertive conduct includes actions or gestures intended to communicate a fact or belief. If conduct is offered for its implied assertion, treat it as hearsay.",
+          "created_round": 1,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "Apply the definition strictly; conduct is hearsay only if it is intended as an assertion about the matter at issue. If conduct (such as nodding, smiling, or making a phone call) is intended to communicate a fact relevant to the case, treat it as an assertive statement for hearsay purposes. For example, nodding in response to an accusation is assertive and can be hearsay; making a phone call to change a will to show belief about imminent death can be assertive and hearsay.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8666666666666667,
+            "acc_new": 0.9333333333333333,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "Apply the definition strictly; a statement or conduct is hearsay only if it is offered to prove the truth of the specific assertion it contains, not if it is offered to show something else (such as the speaker's state of mind, presence, identity, or character). Conduct is hearsay only if it is intended as an assertion about the matter at issue. If conduct (such as nodding, smiling, or making a phone call) is intended to communicate a fact relevant to the case, treat it as an assertive statement for hearsay purposes. If a statement is offered to show the speaker's presence, intent, or state of mind, and not to prove the truth of the assertion itself, it is not hearsay. For example, if a statement 'I am planning to buy diamonds' is offered to show the speaker was present at the location, it is not hearsay. For example, nodding in response to an accusation is assertive and can be hearsay; making a phone call to change a will to show belief about imminent death can be assertive and hearsay.",
+          "created_round": 5,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.8666666666666667,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 4,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form: Answer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

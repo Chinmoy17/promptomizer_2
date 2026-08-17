@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "stagnant_rounds": 0,
+      "best_version": 0,
+      "best_acc": -1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a careful math tutor who solves word problems.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "stagnant_rounds": 0,
+      "best_version": 0,
+      "best_acc": -1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You will be given a grade-school math word problem.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "stagnant_rounds": 0,
+      "best_version": 0,
+      "best_acc": -1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Solve the problem step by step, showing your arithmetic.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 0,
+      "stagnant_rounds": 0,
+      "best_version": 0,
+      "best_acc": -1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Do not skip steps. Do not invent quantities that are not in the problem.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "stagnant_rounds": 0,
+      "best_version": 0,
+      "best_acc": -1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "After your reasoning, write the final numeric answer on its own line in exactly this form: #### <number>",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

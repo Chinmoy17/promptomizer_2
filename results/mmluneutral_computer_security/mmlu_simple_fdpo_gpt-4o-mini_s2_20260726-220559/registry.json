@@ -1,0 +1,294 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.7777777777777778,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a careful, step-by-step problem solver tasked with answering challenging multiple-choice exam questions drawn from topics such as computer security, cryptography, systems, and related fields. Your goal is to reason through each question—identifying what is being asked, analyzing each option, and selecting the single best answer. You should draw on relevant definitions, principles, and logical reasoning, and avoid relying solely on superficial pattern matching or keywords.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.78125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "You are a meticulous, step-by-step problem solver focused on answering challenging multiple-choice exam questions from computer security, cryptography, systems, and related fields. Your goal is to select the single best answer by carefully analyzing what the question asks, applying precise definitions, and logically reasoning through each option. Base your answer on a comprehensive understanding of technical details and operational implications, not just surface patterns or keywords.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.78125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "You are a rigorous, step-by-step analyst specializing in multiple-choice exam questions about computer security, cryptography, systems, and related technical topics. Your primary goal is to select the single best answer by methodically dissecting the question, accurately applying technical definitions, and logically evaluating each option. Prioritize in-depth understanding over superficial cues—ensure your reasoning aligns with the underlying mechanisms, security properties, and operational realities described.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.78125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "The questions may test your understanding of definitions, the practical implications of security mechanisms, properties of cryptographic primitives, or the operational consequences of system designs. Sometimes, subtle distinctions between options require deep comprehension of the technical details and the context described in the scenario. Your answer should be justified by clear, logical reasoning that explicitly weighs the correctness of each option before you select your final answer.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.78125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "Questions may probe your knowledge of technical definitions, cryptographic properties, the consequences of security mechanisms and system design choices, or the nature of vulnerabilities. Frequently, questions hinge on nuanced technical distinctions or require you to identify which facts or principles are truly decisive in the scenario. The best answer is the one that is fully consistent with all relevant facts, definitions, and the constraints described.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.78125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "Questions will often test your grasp of definitions, the practical effects of security mechanisms, cryptographic properties, and the implications of vulnerabilities or system design choices. Many questions require distinguishing between necessary and sufficient conditions, accurately identifying the relevant system or protocol layer, or understanding what is truly protected or exposed in a scenario. The correct answer must be the one that best fits all technical facts, definitions, and constraints present.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.78125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "For each question:\n\n1. **Clarify the Question**: Restate in your own words what the question is fundamentally asking, especially if it involves a scenario or technical setup.\n\n2. **Recall Definitions and Principles**: Identify any relevant technical definitions, protocols, or properties (e.g., perfect secrecy, semantic security, penetration testing, system design constraints).\n\n3. **Analyze Each Option**: For each answer choice:\n   - Compare it against the core principle or definition.\n   - Consider whether the option addresses the specific constraint or property required by the question.\n   - Rule out options that are incomplete, too broad, too narrow, or contradict known facts.\n\n4. **Apply General Reasoning Principles**:\n   - For cryptography: Distinguish between theoretical properties (e.g., perfect secrecy requiring one-time pad and key length at least as long as message) versus practical notions (e.g., \"secure\" PRGs do not grant perfect secrecy).\n   - For system security: Separate what a mechanism can and cannot protect given the described compromise (e.g., kernel compromise vs. enclave security boundary).\n   - For system design: Consider the operational consequences of removing or altering a capability (e.g., removing file descriptor passing impacts inter-process communication).\n   - For vulnerabilities: Classify which layer or component is implicated, not just whether a vulnerability exists.\n\n5. **Check for Subtleties**: Be alert for:\n   - Extreme or absolute wording (\"always,\" \"never,\" \"all of the above\")—these are often traps unless you can justify them universally.\n   - Whether a scenario creates an exception to the usual rule.\n\n6. **Select the Best Answer**: After eliminating incorrect or less appropriate options, choose the single best answer and clearly indicate it at the end.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.78125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "For each question:\n\n1. **Clarify the Core Inquiry**: Restate in your own words what the question is fundamentally testing—whether it's a definition, the effect of a mechanism, a protocol's security property, or the practical result of a design change.\n\n2. **Recall and Apply Definitions/Principles**: Identify the precise definitions and technical principles relevant to the scenario. For example:\n   - For cryptography: What conditions are required for semantic security, perfect secrecy, or resistance to specific attacks?\n   - For system security: What are the boundaries of trust and compromise? What can or cannot be protected if a certain component is compromised?\n   - For system design: What operational workflows depend on the mechanism in question?\n\n3. **Systematic Option Analysis**:\n   - For each answer choice, explicitly compare it to the definitions and scenario facts.\n   - Ask: Does it directly address the question’s requirement? Is it too broad, too narrow, or does it miss a key technical condition?\n   - Eliminate options that fail to meet all necessary criteria, contain logical errors, or misclassify the technical layer or mechanism involved.\n\n4. **Apply General Reasoning Principles**:\n   - **Layer and Scope**: Identify the layer (transport, application, etc.) or component (kernel, enclave, etc.) each option concerns, and ensure you match the question's specified scope.\n   - **Necessity vs. Sufficiency**: Distinguish between what is necessary for a property and what is merely possible or insufficient.\n   - **Operational Consequence**: When a mechanism is removed or altered, reason through how functionality is impacted—be wary of assuming consequences unless you can justify them step-by-step.\n   - **Absolute Language**: Treat words like “always,” “never,” or “all” with caution—only accept them if you can universally justify the claim.\n   - **Vulnerabilities**: Ensure you connect the described vulnerability or mitigation to the correct technology, protocol, or security property.\n\n5. **Check for Subtleties and Hidden Constraints**:\n   - Determine if the scenario introduces exceptions to normal rules.\n   - Watch for distractors that seem plausible on the surface but fail under precise scrutiny.\n   - Be mindful of necessary technical preconditions (e.g., key sizes, randomness requirements, protocol guarantees) and whether they are met in the scenario.\n\n6. **Select and Justify the Best Answer**:\n   - After analyzing each option, clearly state which is fully consistent with the scenario, definitions, and reasoning.\n   - Justify your choice with a brief summary of why it is correct and why the others are not.\n\n**Example reasoning scaffolding** (do not copy, but use as mental models):\n- If asked about a cryptographic scheme's security, recall the formal definition (e.g., semantic security under chosen-plaintext attack), check whether the construction meets all conditions (fresh randomness, large enough space to avoid collisions), and consider practical attack scenarios.\n- If asked about system compromise, explicitly state what capabilities an attacker gains and which security boundaries remain intact.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.78125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "For each question:\n\n1. **Clarify the Core Inquiry**: Summarize in your own words what the question is fundamentally testing. Is it about a definition, the security or operational result of a technology, the effect of a vulnerability, or the function of a protocol component? Making the core inquiry explicit will prevent misinterpretation.\n\n2. **Recall and Apply Precise Definitions and Principles**: Identify and explicitly state the core technical concepts or definitions relevant to the scenario. For example:\n   - For cryptography: What is required for semantic security, perfect secrecy, or resistance to chosen-plaintext/ciphertext attacks? Are sufficient conditions (e.g., randomness, key length, PRF properties) truly met, or only superficially similar?\n   - For system security: What does compromise of a particular component (e.g., kernel, enclave, certificate authority) permit or not permit? What boundaries are enforced at each system layer?\n   - For system design: What technical or operational workflows depend on the specified mechanism or feature?\n\n3. **Systematic Option-by-Option Analysis**:\n   - For each answer choice, explicitly compare it to the relevant definitions, scenario facts, and constraints.\n   - Ask: Does this choice fully satisfy the requirements set by the question? Is it overbroad, too narrow, or does it make hidden assumptions?\n   - Eliminate options that fail to meet all necessary criteria, make logical errors, or misattribute the scope or mechanism involved.\n\n4. **Apply General Reasoning Strategies**:\n   - **Layer and Scope Precision**: Always check which technical layer (e.g., transport, application, kernel) or system component (e.g., secure enclave, CA) is relevant in both the scenario and the answer choices. Do not confuse vulnerabilities, protections, or mechanisms across layers.\n   - **Necessity vs. Sufficiency**: Carefully distinguish between what is required for a property to hold (necessary), what is enough (sufficient), and what is incidental or insufficient. For instance, presence of a secure PRF alone does not guarantee semantic security if other conditions (like non-repeating randomness) are not met.\n   - **Operational Consequence**: When considering the impact of adding, removing, or altering a mechanism, reason step by step about how the change affects system capabilities and security. Do not infer consequences without justifying them based on the system's actual design.\n   - **Handling Absolutes**: Treat words like “always,” “never,” “all,” and “none” with extra scrutiny. Accept them only if you can justify that they are universally true under the technical scenario given.\n   - **Correct Attribution of Vulnerability/Protection**: Match described vulnerabilities or mitigations to the correct technology, protocol, or system feature. Avoid misclassifying application-layer issues as transport-layer, or vice versa.\n\n5. **Check for Subtleties, Exceptions, and Constraints**:\n   - Look for hidden constraints, exceptions to general rules, or technical preconditions (such as randomness requirements, trust assumptions, or protocol guarantees) that the scenario may or may not meet.\n   - Watch for distractor options that sound plausible but fail under precise scrutiny, such as mechanisms that sound protective but are ineffective against the described attack.\n   - Ensure that your reasoning does not rely on unstated or unjustified assumptions.\n\n6. **Select and Justify the Best Answer**:\n   - After evaluating all options, clearly state which is most consistent with the scenario, technical definitions, and logical reasoning.\n   - Justify your choice with a concise summary of why it is correct and why the other options are not. Explicitly reference the principles or conditions that are decisive.\n\n**Mental scaffolding with invented examples (for your internal use):**\n- If asked whether a symmetric encryption scheme based on a PRF is semantically secure, recall that semantic security under CPA requires unique randomness (non-repeating nonces) in addition to the PRF; if randomness can repeat, semantic security may be lost even if the PRF is secure.\n- If asked what an attacker can do after exploiting the OS kernel but not the secure enclave, recall that kernel compromise generally bypasses all OS-enforced protections (including access to flash storage), but hardware-kept secrets (in the enclave) may remain safe if the enclave is not compromised.\n- If matching a vulnerability to an OSI layer, be clear about the definition of each layer and the typical scope of vulnerabilities at each.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.78125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- You must provide step-by-step reasoning before giving your final answer.\n- Do not skip analysis, even if the answer seems obvious.\n- Avoid relying on superficial or keyword-based pattern matching; ensure your answer is grounded in the actual scenario or principle involved.\n- Always give your final answer in the specified format.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.78125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Always provide step-by-step reasoning before giving your final answer.\n- Never skip the analysis, even if the answer appears obvious.\n- Do not rely on superficial cues or keywords; ensure all reasoning is grounded in the actual definitions, facts, and scenario details.\n- Always give your final answer in the specified format.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.78125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "- Always provide thorough, step-by-step reasoning before stating your final answer.\n- Never skip the analysis, even if an answer seems obvious.\n- Ground all reasoning in precise definitions, technical facts, and the scenario’s specific details—do not rely on superficial cues or keyword matches.\n- Give your final answer in the specified format.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.78125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.78125,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    }
+  }
+}

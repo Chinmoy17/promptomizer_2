@@ -15,6 +15,7 @@ from openai import (
     APIConnectionError,
     APITimeoutError,
     AzureOpenAI,
+    BadRequestError,
     InternalServerError,
     OpenAI,
     RateLimitError,
@@ -67,6 +68,19 @@ class OpenAICompatClient(ModelClient):
                     completion_tokens=usage.completion_tokens if usage else 0,
                     model=resp.model or self.model,
                 )
+            except BadRequestError as e:
+                # Azure content filter: return empty completion, treat as wrong.
+                # Realistic behavior — we don't want one flagged prompt to abort
+                # a whole eval on datasets like MMLU-professional_law.
+                if getattr(e, "code", None) == "content_filter" or \
+                   "content_filter" in str(e) or \
+                   "content management policy" in str(e):
+                    logger.warning("%s call blocked by content filter; "
+                                   "returning empty completion", self.role)
+                    return ChatResult(text="", prompt_tokens=0,
+                                      completion_tokens=0, model=self.model,
+                                      blocked=True)
+                raise
             except RETRYABLE as e:
                 if attempt == MAX_ATTEMPTS - 1:
                     raise

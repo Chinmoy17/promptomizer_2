@@ -1,0 +1,230 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.6666666666666666,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 1,
+    "task_details": 2,
+    "constraints": 5,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted in the statement itself, not to prove something else (such as the speaker's presence, state of mind, or ability to speak). If the statement is offered for a purpose other than proving the truth of what it asserts, it is not hearsay.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "Hearsay is an out-of-court statement or conduct offered to prove the truth of the matter asserted in the statement or conduct itself, not to prove something else (such as the speaker's presence, state of mind, or ability to speak). If the statement or conduct is offered for a purpose other than proving the truth of what it asserts, it is not hearsay. Only out-of-court statements or conduct can be hearsay; statements or conduct made in court are not hearsay.",
+          "created_round": 2,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 8,
+            "recovered_failures": 3,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Decide whether the given statement, or conduct, is hearsay under the definition: an out-of-court statement offered to prove the truth of the matter asserted in the statement itself.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "Decide whether the given statement or conduct is hearsay under the definition: an out-of-court statement or conduct (not made during the current testimony) offered to prove the truth of the matter asserted in the statement or conduct itself.",
+          "created_round": 5,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 6,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 5,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Apply the definition strictly. Conduct is not hearsay unless it is intended as an assertion. If a statement or conduct is offered to show something other than the truth of what it asserts (such as the speaker's knowledge, presence, or state of mind), it is not hearsay. For example: If a statement 'I was attacked by Kathryn' is offered to show the speaker was alive, not to prove Kathryn attacked him, it is not hearsay. If conduct (like pointing at a car) is intended to assert responsibility, it is hearsay.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "Apply the definition strictly. Conduct is not hearsay unless it is intended as an assertion. If a statement or conduct is offered to show something other than the truth of what it asserts (such as the speaker's knowledge, presence, or state of mind), it is not hearsay. If a statement is offered to show the speaker's knowledge, presence, or state of mind, it is not hearsay even if it contains factual assertions. If conduct (like pointing at a car) is intended as an assertion of responsibility and is made out of court, it is hearsay. For example: If a statement 'I was attacked by Kathryn' is offered to show the speaker was alive, not to prove Kathryn attacked him, it is not hearsay. If conduct (like pointing at a car) is intended to assert responsibility and is made out of court, it is hearsay. If a statement is offered to show presence (such as 'I was at the mall'), it is not hearsay unless it is offered to prove the truth of the assertion itself. If a statement is offered to show someone's state of mind (such as 'Real Madrid was the best soccer team in the world' to show the speaker is a soccer fan), it is not hearsay.",
+          "created_round": 2,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 8,
+            "recovered_failures": 3,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "Apply the definition strictly. Conduct is not hearsay unless it is intended as an assertion. If a statement or conduct is offered to show something other than the truth of what it asserts (such as the speaker's knowledge, presence, or state of mind), it is not hearsay. If the statement is offered to show the effect on the listener, or to prove the listener's knowledge or state of mind, it is not hearsay. If the statement is offered to prove the truth of the factual assertion in the statement itself, it is hearsay. For example: If a statement 'I was attacked by Kathryn' is offered to show the speaker was alive, not to prove Kathryn attacked him, it is not hearsay. If conduct (like pointing at a car) is intended to assert responsibility and is offered to prove which car was responsible, it is hearsay. If a statement 'Real Madrid was the best soccer team in the world' is offered to show the speaker is a soccer fan, not to prove Real Madrid is the best, it is not hearsay. If a report is offered to prove the truth of its assertion (such as DNA found at a scene), it is hearsay.",
+          "created_round": 3,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.6,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 7,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        },
+        {
+          "version": 4,
+          "text": "Apply the definition strictly. Conduct is not hearsay unless it is intended as an assertion. If a statement or conduct is offered to show something other than the truth of what it asserts (such as the speaker's knowledge, presence, or state of mind), it is not hearsay. For example: If a statement 'I was attacked by Kathryn' is offered to show the speaker was alive, not to prove Kathryn attacked him, it is not hearsay. If conduct (like pointing at a car) is intended to assert responsibility, it is hearsay. If a statement is offered to prove the truth of what it asserts (such as that an event occurred, a fact is true, or a person was present), it is hearsay. If a statement is offered only to show the speaker's knowledge, state of mind, or presence, and not to prove the truth of the assertion itself, it is not hearsay. For example: If a statement 'I am planning to buy diamonds' is offered to show the speaker was present at the location, not to prove the plan, it is not hearsay. If a report asserts a fact (such as DNA found at a scene) and is offered to prove that fact, it is hearsay. If a statement 'Real Madrid was the best soccer team in the world' is offered to show the speaker is a soccer fan, not to prove the truth of the assertion, it is not hearsay. If a statement is offered to show another person's knowledge or state of mind, not to prove the truth of the assertion, it is not hearsay.",
+          "created_round": 4,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7333333333333333,
+            "acc_new": 0.7333333333333333,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 7,
+            "recovered_failures": 4,
+            "broke": 1
+          }
+        },
+        {
+          "version": 5,
+          "text": "Apply the definition strictly. Only out-of-court statements or conduct can be hearsay; statements or conduct made in court during testimony are not hearsay. Conduct is not hearsay unless it is intended as an assertion. If a statement or conduct is offered to show something other than the truth of what it asserts (such as the speaker's knowledge, presence, or state of mind), it is not hearsay. For example: If a statement 'I was attacked by Kathryn' is offered to show the speaker was alive, not to prove Kathryn attacked him, it is not hearsay. If conduct (like pointing at a car) is intended to assert responsibility and was made out-of-court, it is hearsay. In-court conduct (such as a witness pointing during testimony) is not hearsay. If a statement is offered to prove the truth of what it asserts (such as that an event occurred, a fact is true, or a person was present), and it was made out-of-court, it is hearsay. If a statement is offered only to show the speaker's knowledge, state of mind, or presence, and not to prove the truth of the assertion itself, it is not hearsay. For example: If a statement is offered to show a person's lack of opportunity or awareness (such as 'I was on vacation'), it is not hearsay. For example: If a statement 'I am planning to buy diamonds' is offered to show the speaker was present at the location, not to prove the plan, it is not hearsay. If a report asserts a fact (such as DNA found at a scene) and is offered to prove that fact, it is hearsay. If a statement 'Real Madrid was the best soccer team in the world' is offered to show the speaker is a soccer fan, not to prove the truth of the assertion, it is not hearsay. If a statement is offered to show another person's knowledge or state of mind, not to prove the truth of the assertion, it is not hearsay. For example: If Bob tells Jane he suspects Arthur was up to something, and this is offered to show Jane's knowledge, not to prove Arthur was actually up to something, it is not hearsay.",
+          "created_round": 5,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 6,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form: Answer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

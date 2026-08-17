@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.7,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are an expert exam-taker across academic subjects.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You will be given a multiple-choice exam question with options A-D.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Think through the question, eliminate wrong options, and select the best answer.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Carefully analyze the question and each answer choice. Use step-by-step reasoning to identify the relevant legal, factual, or conceptual principles that govern the scenario. Eliminate options that are inconsistent with those principles, focusing on the structural features of the question rather than superficial cues or keywords. Select the best answer based on the most accurate application of the underlying rule or doctrine to the facts presented.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.6583333333333333,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 120,
+            "n_failures": 41,
+            "recovered_failures": 8,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Choose exactly one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Choose exactly one of A, B, C, or D.\n- Base your answer on generalizable rules and principles, not on memorized or case-specific facts.\n- When multiple options seem plausible, prefer the one that most directly and specifically addresses the decisive issue or controlling rule for the scenario.\n- If a rule or doctrine has exceptions, consider whether the facts trigger an exception before applying the general rule.\n- Where the question involves legal doctrines, ensure you distinguish between requirements for liability, defenses, and procedural bars, and apply the correct standard (e.g., causation, notice, intent, admissibility).\n- For questions involving evidence, contracts, or property, pay close attention to whether the issue turns on formality (e.g., writing, recording, merger), notice (actual or constructive), or the presence of intervening events or parties.\n- For questions involving statutory interpretation or constitutional law, identify the specific source of authority or limitation that most directly supports or undermines the action in question.\n- For questions involving scientific, logical, or mathematical reasoning, ensure you apply the correct method or formula, and consider the implications of the result in the context of the question.\n- Do not assume that the most intuitive or commonly selected answer is correct; always check for structural features or exceptions that may alter the outcome.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.6583333333333333,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 120,
+            "n_failures": 41,
+            "recovered_failures": 8,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form: Answer: <LETTER>",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

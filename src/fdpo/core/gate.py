@@ -49,7 +49,8 @@ def evaluate_candidate(solver: ModelClient, dataset: str,
                        failures: list[Example], *,
                        rho: float, min_pool: int = 5,
                        solver_temperature: float = 0.0,
-                       solver_max_tokens: int = 1024) -> GateResult:
+                       solver_max_tokens: int = 1024,
+                       max_workers: int = 1) -> GateResult:
     """Compare old vs new prompt. Gate decision uses only the correct-pool
     batch; failure recovery is measured but never blocks a commit.
 
@@ -60,7 +61,8 @@ def evaluate_candidate(solver: ModelClient, dataset: str,
     if failures:
         rec = evaluate(solver, new_sections, failures, dataset,
                        temperature=solver_temperature,
-                       max_tokens=solver_max_tokens, purpose="gate:recovery")
+                       max_tokens=solver_max_tokens, purpose="gate:recovery",
+                       max_workers=max_workers)
         recovered = sum(r.correct for r in rec.rows)
 
     if len(gate_batch) < min_pool:
@@ -70,10 +72,12 @@ def evaluate_candidate(solver: ModelClient, dataset: str,
 
     old = evaluate(solver, old_sections, gate_batch, dataset,
                    temperature=solver_temperature,
-                   max_tokens=solver_max_tokens, purpose="gate:old")
+                   max_tokens=solver_max_tokens, purpose="gate:old",
+                   max_workers=max_workers)
     new = evaluate(solver, new_sections, gate_batch, dataset,
                    temperature=solver_temperature,
-                   max_tokens=solver_max_tokens, purpose="gate:new")
+                   max_tokens=solver_max_tokens, purpose="gate:new",
+                   max_workers=max_workers)
 
     old_correct = old.correct_ids()
     new_correct = new.correct_ids()

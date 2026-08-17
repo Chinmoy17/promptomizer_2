@@ -1,0 +1,262 @@
+{
+  "run_id": "mmlu_simple_fdpo_gpt-4o-mini_s2_20260726-180642",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "mmlu",
+  "solver_model": "gpt-4o-mini",
+  "seed": 2,
+  "seed_test": {
+    "accuracy": 0.7878787878787878,
+    "n_examples": 66,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.8333333333333334,
+    "n_examples": 66,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 3,
+    "simple_max_rounds": 3,
+    "accept_margin": 1.0,
+    "shipped_structured": true,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.35,
+      "n_mining": 32,
+      "n_validation": 18
+    },
+    "baseline_val_acc": 0.7777777777777778,
+    "best_structured_val_acc": 0.6111111111111112,
+    "n_failures_triggering": 7,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed_best",
+        "n_failures_before": 7,
+        "n_failures_after": 4,
+        "train_acc_after": 0.875,
+        "val_acc_after": 0.6111111111111112,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "output_format",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_college_mathematics_test_16",
+          "mmlu_college_mathematics_test_24",
+          "mmlu_college_mathematics_test_26",
+          "mmlu_college_mathematics_test_39",
+          "mmlu_college_mathematics_test_79",
+          "mmlu_college_mathematics_test_80",
+          "mmlu_college_mathematics_test_83"
+        ],
+        "failing_ids_after": [
+          "mmlu_college_mathematics_test_16",
+          "mmlu_college_mathematics_test_24",
+          "mmlu_college_mathematics_test_33",
+          "mmlu_college_mathematics_test_35"
+        ],
+        "recovered_this_round": [
+          "mmlu_college_mathematics_test_26",
+          "mmlu_college_mathematics_test_39",
+          "mmlu_college_mathematics_test_79",
+          "mmlu_college_mathematics_test_80",
+          "mmlu_college_mathematics_test_83"
+        ],
+        "regressed_this_round": [
+          "mmlu_college_mathematics_test_33",
+          "mmlu_college_mathematics_test_35"
+        ]
+      },
+      {
+        "round": 2,
+        "status": "committed",
+        "n_failures_before": 4,
+        "n_failures_after": 8,
+        "train_acc_after": 0.75,
+        "val_acc_after": 0.6111111111111112,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_college_mathematics_test_16",
+          "mmlu_college_mathematics_test_24",
+          "mmlu_college_mathematics_test_33",
+          "mmlu_college_mathematics_test_35"
+        ],
+        "failing_ids_after": [
+          "mmlu_college_mathematics_test_16",
+          "mmlu_college_mathematics_test_24",
+          "mmlu_college_mathematics_test_26",
+          "mmlu_college_mathematics_test_33",
+          "mmlu_college_mathematics_test_39",
+          "mmlu_college_mathematics_test_74",
+          "mmlu_college_mathematics_test_83",
+          "mmlu_college_mathematics_test_88"
+        ],
+        "recovered_this_round": [
+          "mmlu_college_mathematics_test_35"
+        ],
+        "regressed_this_round": [
+          "mmlu_college_mathematics_test_26",
+          "mmlu_college_mathematics_test_39",
+          "mmlu_college_mathematics_test_74",
+          "mmlu_college_mathematics_test_83",
+          "mmlu_college_mathematics_test_88"
+        ]
+      },
+      {
+        "round": 3,
+        "status": "committed",
+        "n_failures_before": 8,
+        "n_failures_after": 5,
+        "train_acc_after": 0.84375,
+        "val_acc_after": 0.6111111111111112,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_college_mathematics_test_16",
+          "mmlu_college_mathematics_test_24",
+          "mmlu_college_mathematics_test_26",
+          "mmlu_college_mathematics_test_33",
+          "mmlu_college_mathematics_test_39",
+          "mmlu_college_mathematics_test_74",
+          "mmlu_college_mathematics_test_83",
+          "mmlu_college_mathematics_test_88"
+        ],
+        "failing_ids_after": [
+          "mmlu_college_mathematics_test_16",
+          "mmlu_college_mathematics_test_24",
+          "mmlu_college_mathematics_test_26",
+          "mmlu_college_mathematics_test_35",
+          "mmlu_college_mathematics_validation_5"
+        ],
+        "recovered_this_round": [
+          "mmlu_college_mathematics_test_33",
+          "mmlu_college_mathematics_test_39",
+          "mmlu_college_mathematics_test_74",
+          "mmlu_college_mathematics_test_83",
+          "mmlu_college_mathematics_test_88"
+        ],
+        "regressed_this_round": [
+          "mmlu_college_mathematics_test_35",
+          "mmlu_college_mathematics_validation_5"
+        ]
+      }
+    ],
+    "baseline_failing_ids": [
+      "mmlu_college_mathematics_test_16",
+      "mmlu_college_mathematics_test_24",
+      "mmlu_college_mathematics_test_26",
+      "mmlu_college_mathematics_test_39",
+      "mmlu_college_mathematics_test_79",
+      "mmlu_college_mathematics_test_80",
+      "mmlu_college_mathematics_test_83"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.78125,
+      "n_correct": 25,
+      "n_wrong": 7
+    },
+    "current_train": {
+      "accuracy": 0.875,
+      "n_correct": 28,
+      "n_wrong": 4
+    },
+    "train_confusion": {
+      "recoveries": [
+        "mmlu_college_mathematics_test_26",
+        "mmlu_college_mathematics_test_39",
+        "mmlu_college_mathematics_test_79",
+        "mmlu_college_mathematics_test_80",
+        "mmlu_college_mathematics_test_83"
+      ],
+      "regressions": [
+        "mmlu_college_mathematics_test_33",
+        "mmlu_college_mathematics_test_35"
+      ],
+      "still_wrong": [
+        "mmlu_college_mathematics_test_16",
+        "mmlu_college_mathematics_test_24"
+      ],
+      "still_right_count": 23,
+      "net_gain": 3
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 13,
+      "rejects": 0
+    },
+    "rounds_run": 3,
+    "train_acc_per_round": [
+      0.875,
+      0.75,
+      0.84375
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "mmlu_college_mathematics_test_27",
+        "mmlu_college_mathematics_test_66",
+        "mmlu_college_mathematics_test_7",
+        "mmlu_college_mathematics_test_75",
+        "mmlu_college_mathematics_test_76",
+        "mmlu_college_mathematics_validation_6"
+      ],
+      "regressions": [
+        "mmlu_college_mathematics_test_14",
+        "mmlu_college_mathematics_test_43",
+        "mmlu_college_mathematics_test_97"
+      ],
+      "still_wrong": [
+        "mmlu_college_mathematics_test_13",
+        "mmlu_college_mathematics_test_15",
+        "mmlu_college_mathematics_test_18",
+        "mmlu_college_mathematics_test_28",
+        "mmlu_college_mathematics_test_30",
+        "mmlu_college_mathematics_test_85",
+        "mmlu_college_mathematics_test_89",
+        "mmlu_college_mathematics_test_9"
+      ],
+      "still_right_count": 49,
+      "net_gain": 3
+    },
+    "markdown_source": "prompts\\mmlu_oneliner.md"
+  },
+  "wall_clock_s": 583.0,
+  "cost": {
+    "total_calls": 335,
+    "total_cost_usd": 0.205938,
+    "by_role": {
+      "solver": {
+        "calls": 332,
+        "prompt_tokens": 245358,
+        "completion_tokens": 188331,
+        "cost_usd": 0.149802
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 15692,
+        "completion_tokens": 3094,
+        "cost_usd": 0.056136
+      }
+    }
+  }
+}

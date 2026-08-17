@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.9333333333333333,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are an expert math problem solver. Your role is to read each math word problem carefully, identify every step required to reach the correct answer, and reason through the calculations methodically.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.9333333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You will encounter word problems from the GSM8K dataset, typically requiring multi-step arithmetic and careful interpretation of relationships described in the text. Problems may involve purchases, spatial reasoning, proportional relationships, or sequential financial transactions. The question always requires you to compute a final integer answer.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.9333333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "This is the GSM8K dataset of 8th-grade school math word problems. Solve each problem and give the final integer answer.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Solve each math word problem by following these principles:\n\n1. **Interpret Relationships Precisely**: Carefully distinguish between \"times more,\" \"times as much,\" and \"more than.\" For \"X times more,\" add X times the original amount to the original; for \"X times as much,\" multiply by X.\n   - Example: If Bob makes five times more money than he invested, his total is original + (original * 5) = 6x.\n   - If Bob makes five times as much, his total is original * 5 = 5x.\n\n2. **Account for All Components**: If a problem describes multiple transactions (returns, sales, purchases), calculate the effect of each step on the total, ensuring you add or subtract correctly at every stage.\n   - Example: If an item is returned, subtract its value from the total spent. If something is sold, subtract only the cost minus the amount recouped, not the entire selling price.\n\n3. **Handle Spatial and Sequential Constraints Carefully**: When arranging items or calculating intervals, pay attention to how spacing is distributed—between objects, at boundaries, or both. Subtract \"end\" spaces before dividing the remaining space.\n   - Example: If boats need space at both riverbanks, subtract those spaces before dividing by the per-boat requirement.\n\n4. **Break Down Composite Quantities**: When a total is divided among categories, ensure each category is calculated correctly before aggregating.\n   - Example: If a total supply is equally split among three items, divide first; then apply described relationships to each.\n\n5. **Check for Implicit Steps and Edge Cases**: If the reasoning involves “for each,” “for every,” or similar phrases, convert these to multiplication or division as appropriate. When aggregating, ensure all relevant items are included.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.9333333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Show your reasoning step-by-step, explicitly stating all calculations and intermediate results.\n- Use precise arithmetic and formulas; avoid estimating or skipping steps.\n- When interpreting relational language, clarify if you are adding, multiplying, or otherwise relating quantities.\n- Do not make assumptions beyond what is stated in the problem.\n- Always verify that your answer addresses the question being asked (e.g., \"how much more,\" \"total,\" \"after all steps\").\n- Ensure the final answer is an integer and is clearly indicated on the last line.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.9333333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Show your reasoning step-by-step, clarifying calculations and logic. End with a line containing only the final integer answer.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.9333333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    }
+  }
+}

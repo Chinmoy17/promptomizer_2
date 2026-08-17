@@ -1,0 +1,123 @@
+{
+  "run_id": "gsm8k_simple_fdpo_gpt-4o-mini_s0_20260706-164005",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "gsm8k",
+  "solver_model": "gpt-4o-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.9366666666666666,
+    "n_examples": 300,
+    "extraction_failures": 0,
+    "exact_match": 0.9366666666666666
+  },
+  "final_test": {
+    "accuracy": 0.9366666666666666,
+    "n_examples": 300,
+    "extraction_failures": 0,
+    "exact_match": 0.9366666666666666
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 5,
+    "n_failures_triggering": 9,
+    "optimizer_calls": 1,
+    "baseline_train": {
+      "accuracy": 0.94,
+      "n_correct": 141,
+      "n_wrong": 9
+    },
+    "current_train": {
+      "accuracy": 0.94,
+      "n_correct": 141,
+      "n_wrong": 9
+    },
+    "train_confusion": {
+      "recoveries": [
+        "gsm8k_train_1699",
+        "gsm8k_train_6995"
+      ],
+      "regressions": [
+        "gsm8k_test_734",
+        "gsm8k_train_1060"
+      ],
+      "still_wrong": [
+        "gsm8k_test_951",
+        "gsm8k_train_2364",
+        "gsm8k_train_3727",
+        "gsm8k_train_5259",
+        "gsm8k_train_5476",
+        "gsm8k_train_5621",
+        "gsm8k_train_6737"
+      ],
+      "still_right_count": 139,
+      "net_gain": 0
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 2,
+      "rejects": 0
+    },
+    "rounds_run": 1,
+    "train_acc_per_round": [
+      0.94
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "gsm8k_train_1249",
+        "gsm8k_train_2085",
+        "gsm8k_train_4047",
+        "gsm8k_train_4451"
+      ],
+      "regressions": [
+        "gsm8k_train_1463",
+        "gsm8k_train_3316",
+        "gsm8k_train_4789",
+        "gsm8k_train_6575"
+      ],
+      "still_wrong": [
+        "gsm8k_test_1031",
+        "gsm8k_test_298",
+        "gsm8k_test_306",
+        "gsm8k_train_289",
+        "gsm8k_train_3001",
+        "gsm8k_train_3489",
+        "gsm8k_train_4117",
+        "gsm8k_train_4121",
+        "gsm8k_train_4167",
+        "gsm8k_train_4381",
+        "gsm8k_train_4448",
+        "gsm8k_train_6282",
+        "gsm8k_train_6768",
+        "gsm8k_train_7072",
+        "gsm8k_train_7455"
+      ],
+      "still_right_count": 277,
+      "net_gain": 0
+    },
+    "markdown_source": "prompts\\gsm8k.md"
+  },
+  "wall_clock_s": 603.7,
+  "cost": {
+    "total_calls": 901,
+    "total_cost_usd": 0.219485,
+    "by_role": {
+      "solver": {
+        "calls": 900,
+        "prompt_tokens": 232140,
+        "completion_tokens": 288914,
+        "cost_usd": 0.208169
+      },
+      "optimizer": {
+        "calls": 1,
+        "prompt_tokens": 4474,
+        "completion_tokens": 296,
+        "cost_usd": 0.011316
+      }
+    }
+  }
+}

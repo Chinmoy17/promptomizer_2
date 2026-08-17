@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "stagnant_rounds": 0,
+      "best_version": 0,
+      "best_acc": -1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a careful math tutor who solves word problems.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "stagnant_rounds": 0,
+      "best_version": 0,
+      "best_acc": -1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You will be given a grade-school math word problem.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 5,
+      "stagnant_rounds": 1,
+      "best_version": 1,
+      "best_acc": 1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Solve the problem step by step, showing your arithmetic.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Solve the problem step by step, carefully interpreting each phrase and quantity given. Write all calculations explicitly, clarifying how you apply the details from the problem statement.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 1.0,
+            "acc_new": 1.0,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "Solve the problem step by step, paying close attention to the exact wording and relationships described. For each phrase, clarify its meaning before calculation to avoid misinterpretation. Explicitly show all calculations, demonstrating how each detail from the problem influences your solution.",
+          "created_round": 2,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 1.0,
+            "acc_new": 0.95,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "Solve the problem step by step, explicitly interpreting every phrase and relationship in the wording. For each calculation, restate the relevant details and clarify how quantities interact—especially when ambiguous phrases or comparisons are present. Carefully analyze exactly what each statement means numerically before proceeding, and show all intermediary steps.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 1.0,
+            "acc_new": 1.0,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        },
+        {
+          "version": 4,
+          "text": "Solve the problem step by step. For each phrase or relationship, restate it in your own words and identify exactly which quantities are being compared or described. If a phrase can be interpreted in more than one way, consider all plausible meanings and select the one most consistent with the wording and context. When performing calculations, always clarify the source and role of each number, particularly for phrases involving comparisons, differences, ratios, or 'more than' relationships. Show all intermediary steps and explain your reasoning before calculating and combining quantities.",
+          "created_round": 4,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 1.0,
+            "acc_new": 0.95,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        },
+        {
+          "version": 5,
+          "text": "Solve the problem step by step, ensuring all phrases and quantities are interpreted precisely as stated. Explicitly clarify the meaning of each descriptive phrase before applying it in calculations. Write all computations clearly and show how each detail from the problem is used.",
+          "created_round": 5,
+          "status": "active",
+          "gate": {
+            "acc_old": 1.0,
+            "acc_new": 1.0,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 2,
+      "stagnant_rounds": 2,
+      "best_version": 1,
+      "best_acc": 1.0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Do not skip steps. Do not invent quantities that are not in the problem.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use all information provided in the problem. Apply every detail and condition mentioned, unless explicitly told otherwise. Do not skip steps. Do not invent quantities not present in the problem.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 1.0,
+            "acc_new": 1.0,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 1,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use every detail and condition given in the problem exactly as stated. Do not ignore, assume away, or add information beyond what is explicitly provided. Show every step, applying all quantities and context mentioned, unless the problem instructs otherwise.",
+          "created_round": 4,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.95,
+            "acc_new": 0.95,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 2,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "Use every detail and condition from the problem exactly as given—do not assume, infer, ignore, or add to what is stated. When information is missing or ambiguous, do not fill in gaps; base all reasoning only on what is specified. Show step-by-step how every provided quantity and context is applied, even if the wording seems redundant or unclear, unless the problem explicitly directs otherwise.",
+          "created_round": 5,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 1.0,
+            "acc_new": 0.95,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "stagnant_rounds": 0,
+      "best_version": 1,
+      "best_acc": 0.95,
+      "versions": [
+        {
+          "version": 0,
+          "text": "After your reasoning, write the final numeric answer on its own line in exactly this form: #### <number>",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "After your reasoning, give the final numeric answer on its own line in exactly this form: #### <number> — ensuring the unit or item matches what the question specifically asks for.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9,
+            "acc_new": 0.95,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 1,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    }
+  }
+}

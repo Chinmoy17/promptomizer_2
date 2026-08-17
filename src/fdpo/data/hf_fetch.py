@@ -131,6 +131,38 @@ def fetch_legalbench_hearsay() -> tuple[list[Example], list[Example]]:
                 ),
                 gold=row["answer"].strip().capitalize(),
                 reference=row["answer"],
+                # 'slice' is the upstream category (Standard hearsay /
+                # Non-assertive conduct / Statement made in court /
+                # Non-verbal hearsay / Not introduced to prove truth) --
+                # the natural stratification key for splits & per-slice metrics.
+                meta={"slice": row["slice"]} if "slice" in row.index else {},
+            )
+            for i, row in df.iterrows()
+        ]
+
+    return convert("train"), convert("test")
+
+
+def fetch_legalbench_contract_nli() -> tuple[list[Example], list[Example]]:
+    """LegalBench `contract_nli_explicit_identification`: does a contract clause
+    require Confidential Information to be explicitly marked/identified as
+    confidential? Binary Yes/No. One of the LegalBench contract_nli sub-tasks;
+    overlaps the Trace2Policy contract_nli cross-domain probe."""
+    def convert(split: str) -> list[Example]:
+        df = _read_parquet_split("nguha/legalbench", split,
+                                 config="contract_nli_explicit_identification")
+        return [
+            Example(
+                id=f"contract_nli_{split}_{i}",
+                question=(
+                    "Does the following contract clause require that Confidential "
+                    "Information be explicitly marked or identified as "
+                    "confidential?\n\n"
+                    f"Clause: {row['text']}"
+                ),
+                gold=row["answer"].strip().capitalize(),
+                reference=row["answer"],
+                meta={},
             )
             for i, row in df.iterrows()
         ]
@@ -143,4 +175,5 @@ FETCHERS = {
     "arc": fetch_arc,
     "mmlu": fetch_mmlu,
     "legalbench_hearsay": fetch_legalbench_hearsay,
+    "legalbench_contract_nli": fetch_legalbench_contract_nli,
 }

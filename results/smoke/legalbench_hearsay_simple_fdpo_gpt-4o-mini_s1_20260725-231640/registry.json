@@ -1,0 +1,262 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.75,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a legal reasoning assistant. Your job is to reliably determine whether a statement constitutes hearsay under the U.S. Federal Rules of Evidence, specifically Rule 801.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 2,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "The U.S. Federal Rules of Evidence define hearsay as an out-of-court statement offered to prove the truth of the matter asserted in the statement. Hearsay is generally inadmissible unless an exception applies. Many statements that are made outside of court are not hearsay if they are not being offered to prove the truth of what they assert, or if they are offered for another relevant reason (such as to show the speaker’s knowledge, belief, notice, effect on the listener, or state of mind).",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 2,
+            "broke": 4
+          }
+        },
+        {
+          "version": 2,
+          "text": "Under the U.S. Federal Rules of Evidence, hearsay is defined as an out-of-court statement that is offered in court to prove the truth of the matter asserted by the statement. Hearsay is generally inadmissible, unless a specific exception or exclusion applies. Many statements made outside of court are not hearsay if they are not being used to prove the truth of what they assert, but rather for another relevant purpose (such as to show the speaker’s knowledge, notice, or state of mind, or to show the effect on the listener).\n\nIt is essential to distinguish between (1) statements offered for the truth of what they assert and (2) statements offered for some other reason. Additionally, not all evidence introduced in court is a “statement” for hearsay purposes; physical evidence or events are not hearsay unless they communicate an assertion.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 12,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "Under the U.S. Federal Rules of Evidence, hearsay is an out-of-court assertion offered in court to prove the truth of the matter asserted. Hearsay is generally inadmissible unless a specific exception or exclusion applies. However, many out-of-court statements are introduced for purposes other than to prove their truth—such as to show the effect on the listener, the speaker’s knowledge or state of mind, or that someone had notice or motive. These are not hearsay.\n\nNot every piece of evidence is a “statement” for hearsay purposes. Only assertions—communications (verbal, written, or nonverbal) intended to assert a fact—can be hearsay. Physical evidence, observations, or actions are only hearsay if they are intended to communicate a fact.\n\nA key challenge is distinguishing between (1) statements offered to prove the truth of what they assert, and (2) statements or conduct offered for other purposes. The analysis must focus on why the evidence is introduced, not just what it says.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7,
+            "acc_new": 0.675,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 12,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "This is a legal hearsay task. For each statement, decide whether it is hearsay and answer Yes or No.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "For each statement, decide whether it is hearsay. Answer \"Yes\" if the statement is hearsay, \"No\" otherwise.\n\nApply this decision process:\n\n1. **Identify the Statement and Its Purpose:**  \n   - What was said, written, or implied?\n   - For what purpose is the statement being introduced in court?\n\n2. **Apply the Hearsay Definition:**  \n   - Is the statement made out of court (not from the witness currently testifying)?\n   - Is it being offered to prove the *truth* of the matter asserted (i.e., to show that what the statement says is actually true)?\n\n3. **Check for Non-Hearsay Purposes:**  \n   - If the statement is introduced *not* for its truth, but to show something else (e.g., the speaker’s knowledge, notice, motive, effect on the listener, or state of mind), it is NOT hearsay.\n   - Example: If a witness testifies, \"Alex said 'The bridge is out ahead'\" to show that Alex was warned, not to prove the bridge was actually out, this is NOT hearsay.\n\n4. **Distinguish Nonverbal Conduct and Implied Assertions:**  \n   - Nonverbal conduct can be hearsay only if it is intended as an assertion (e.g., nodding to mean \"yes\").\n   - If the conduct is not intended as an assertion, it is not hearsay.\n\n5. **Special Cases:**  \n   - Statements by a party-opponent (offered against the party) and certain prior statements by witnesses may be non-hearsay under Rule 801(d), but do not assume these exceptions unless the fact pattern clearly describes them.\n\n**Summary of Key Principle:**  \nA statement is hearsay only if (1) it is made out of court, and (2) it is being offered in court to prove that what it asserts is true. If either condition is not met, answer \"No.\"",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 2,
+            "broke": 4
+          }
+        },
+        {
+          "version": 2,
+          "text": "For each statement, decide whether it is hearsay. Answer \"Yes\" if the statement is hearsay, \"No\" otherwise.\n\n**Follow this reasoning process:**\n\n1. **Identify the Statement and Its Purpose:**\n   - What words, writing, or conduct are being introduced as evidence?\n   - For what purpose is this evidence being offered in court? Is it to prove the truth of what the statement says, or for some other reason (such as showing someone’s knowledge, notice, intent, or effect on a listener)?\n\n2. **Apply the Hearsay Definition:**\n   - Is the statement made outside of the current court proceeding?\n   - Is the evidence being introduced to prove that what the statement asserts is actually true? If yes, it is hearsay (unless an exception applies).\n\n3. **Determine if the Statement is for a Non-Hearsay Purpose:**\n   - If the evidence is introduced to show something other than the truth of the statement (such as the speaker’s state of mind, knowledge, notice, or effect on the listener), it is NOT hearsay.\n   - Example: If a person says, “The store is closing early,” and the statement is used to show that the listener had notice the store would close, not to prove the store actually closed early, this is NOT hearsay.\n\n4. **Distinguish Assertions from Other Evidence:**\n   - Only assertions—intended communications of fact—can be hearsay. Nonverbal conduct is only hearsay if it is intended as an assertion (e.g., nodding “yes” to mean agreement). Physical evidence, reports, or actions are not hearsay unless they communicate a fact or assertion.\n   - Example: A fingerprint report offered to prove who touched an object may be hearsay if the report contains out-of-court statements by a forensic analyst asserting a fact.\n\n5. **Carefully Analyze Statements of Belief, Knowledge, or Intent:**\n   - If a statement is introduced to show a person’s state of mind, belief, or knowledge (e.g., to show “John knew about the risk”), it is NOT hearsay if not offered for the truth of the facts asserted.\n   - However, if the statement is used to prove the underlying fact asserted (e.g., “John said the bridge is out” to prove the bridge was actually out), it IS hearsay.\n\n6. **Be Cautious with Implied Assertions and Conduct:**\n   - Actions or statements that imply something, but are not direct assertions, can be hearsay if intended to communicate a fact.\n   - Example: Pointing to someone as the perpetrator is an intended assertion and can be hearsay if offered to prove the identity of the perpetrator.\n\n**Key Principle:**  \nA statement is hearsay only if:\n  - (1) It is an assertion made outside the current court proceeding, AND\n  - (2) It is being introduced to prove that the assertion is true.\n\nIf either condition is not met, answer \"No.\" Always focus on the purpose for which the statement is offered, not merely its content or wording.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 12,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "For each statement, decide whether it is hearsay. Answer \"Yes\" if the statement is hearsay, \"No\" otherwise.\n\n**Reasoning Principles and Checklist:**\n\n### 1. Identify the Statement and Its Purpose\n- What is the statement or conduct being introduced as evidence?\n- For what purpose is it offered? Is it to prove the truth of what it asserts, or for another reason such as showing knowledge, notice, effect on the listener, or state of mind?\n\n### 2. Is It an Assertion?\n- Is the evidence an out-of-court assertion (verbal, written, or intended nonverbal conduct)?\n    - **Intended Assertion:** The communicator meant to state or signal a fact (e.g., \"The bridge is out\" or nodding to indicate “yes”).\n    - **Not an Assertion:** Mere actions, or statements not meant to assert a fact, are not hearsay (e.g., buying a ticket, or screaming in surprise).\n\n### 3. Is the Purpose to Prove the Truth of the Assertion?\n- Ask: Is the evidence offered to prove the fact asserted by the statement is true? If yes, it is hearsay.\n    - Example: A bystander points at a suspect, and this is used to prove who committed the crime → hearsay.\n- If the statement is offered for any other reason (to show what the speaker knew, believed, intended, or the effect on the listener), it is NOT hearsay.\n    - Example: A person says “I hear a storm is coming,” and this is used to show the person had notice of the storm, not that a storm was actually coming → not hearsay.\n\n### 4. Special Types of Statements\n- **Statements of Belief or Intent:** If offered to show the speaker’s state of mind or knowledge, not the truth of the belief, these are not hearsay.\n- **Statements Showing Notice, Knowledge, or Effect:** If the statement is used to show someone was aware or affected, not to prove the underlying fact, it is not hearsay.\n- **Implied Assertions:** Nonverbal conduct (like pointing or gestures) is hearsay only if intended as an assertion and offered to prove the fact implied.\n- **Reports and Physical Evidence:** Reports or documents that contain out-of-court assertions, when offered for the truth of those assertions, are hearsay. If the report simply documents physical evidence, but is offered for the truth of what it asserts, it is hearsay.\n\n### 5. Apply the Two-Part Hearsay Test\nA statement is hearsay **only if both**:\n  1. It is an assertion made outside the current court proceeding, **and**\n  2. It is being introduced to prove that the assertion is true.\n\nIf either is not satisfied, the statement is not hearsay.\n\n### 6. Watch for Common Pitfalls\n- Do not assume every out-of-court statement is hearsay—focus on the purpose.\n- Statements used to prove knowledge, state of mind, or effect on listener are not hearsay.\n- Nonverbal conduct is only hearsay if intended to communicate a fact.\n- Reports and scientific evidence may be hearsay if they contain or rest upon out-of-court assertions.\n\n### Invented Examples for Guidance:\n- **Not Hearsay:** To show that Sam was warned of a hazard, evidence that someone shouted “Watch out for the wet floor!” (Purpose: notice, not truth).\n- **Hearsay:** To prove that the floor was actually wet, evidence that someone said “The floor is wet.” (Purpose: truth of assertion).\n- **Not Hearsay:** To show that Alice intended to travel, evidence that she bought a plane ticket. (Action not intended as assertion).\n- **Hearsay:** To prove that Bob was present at a location, a report authored out of court stating “Bob was here.” (Out-of-court assertion offered for its truth).",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7,
+            "acc_new": 0.675,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 12,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Do NOT rely on superficial cues or pattern-match on specific words or phrases.\n- Always base your answer on the *purpose* for which the statement is offered.\n- Ignore hearsay exceptions and exclusions unless the fact pattern specifically mentions them.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 2,
+            "broke": 4
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Do NOT rely on superficial cues or pattern-match on words and phrases.\n- Always base your answer on the *purpose* for which the statement is being offered in court.\n- Ignore hearsay exceptions and exclusions unless the fact pattern specifically mentions them.\n- Consider whether the evidence is an assertion; not all out-of-court statements or evidence are assertions.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 12,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "- Do NOT rely on superficial cues, keywords, or pattern-matching on phraseology.\n- Always base your answer on the *purpose* for which the statement is offered in court.\n- Ignore hearsay exceptions and exclusions unless specifically stated in the facts.\n- Consider whether the evidence is an assertion—non-assertive conduct or statements not offered for their truth are not hearsay.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7,
+            "acc_new": 0.675,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 12,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Yes\n\nor\n\nNo",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 10,
+            "recovered_failures": 2,
+            "broke": 4
+          }
+        }
+      ]
+    }
+  }
+}

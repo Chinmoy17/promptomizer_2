@@ -64,7 +64,7 @@ def extract_pred(dataset: str, text: str) -> str | None:
         return extract_gsm8k(text)
     if dataset in ("arc", "mmlu"):
         return extract_mc_letter(text)
-    if dataset == "legalbench_hearsay":
+    if dataset in ("legalbench_hearsay", "legalbench_contract_nli"):
         return extract_yes_no(text)
     raise ValueError(f"unknown dataset: {dataset}")
 

@@ -1,0 +1,214 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.6666666666666666,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 5,
+    "task_details": 0,
+    "constraints": 3,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 5,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay is an out-of-court statement (including verbal or nonverbal conduct intended as an assertion) offered to prove the truth of the matter asserted. A statement made while testifying in court is not hearsay. If the statement is offered to prove something other than the truth of the assertion (such as knowledge, notice, or effect on listener), it is not hearsay.",
+          "created_round": 1,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.4666666666666667,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 7,
+            "recovered_failures": 6,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "Hearsay is an out-of-court statement or assertive conduct offered to prove the truth of the matter asserted. A statement made during the current trial or hearing is not hearsay. Statements made by a party and offered against that party may not be hearsay under certain rules.",
+          "created_round": 2,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.5333333333333333,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 6,
+            "recovered_failures": 4,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "Hearsay is an out-of-court statement or assertive conduct offered to prove the truth of the matter asserted. A statement is hearsay only if it was made outside the current trial or hearing. If a statement is offered to prove something other than the truth of what was asserted, it is not hearsay.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 7,
+            "recovered_failures": 4,
+            "broke": 0
+          }
+        },
+        {
+          "version": 4,
+          "text": "Hearsay is an out-of-court statement or assertive conduct by a person, offered to prove the truth of the matter asserted. A statement is hearsay only if it was made outside the current trial or hearing. Statements made during the current trial or hearing are not hearsay. If a statement or conduct is offered to prove something other than the truth of what was asserted, such as to show knowledge, notice, or that a conversation occurred, it is not hearsay.",
+          "created_round": 4,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.5333333333333333,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 7,
+            "recovered_failures": 4,
+            "broke": 2
+          }
+        },
+        {
+          "version": 5,
+          "text": "Hearsay is an out-of-court statement or assertive conduct offered to prove the truth of the matter asserted. Facts, events, or actions that are not intended as assertions are not hearsay. A statement or conduct is hearsay only if it was made outside the current trial or hearing. Statements or conduct made during the current trial or hearing are not hearsay. If a statement or conduct is offered to prove something other than the truth of what was asserted (such as to show knowledge, notice, effect on listener, or that a conversation occurred), it is not hearsay.",
+          "created_round": 5,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 7,
+            "recovered_failures": 4,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Apply the definition strictly. Conduct is hearsay if it is intended as an assertion (such as nodding or shaking head in response to a question). Do not consider hearsay exceptions; only determine if the statement meets the definition.",
+          "created_round": 1,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.4666666666666667,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 7,
+            "recovered_failures": 6,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "Apply the definition strictly; conduct is hearsay if it is assertive (intended as a substitute for words to communicate a fact). Nonverbal responses intended to communicate an answer are assertive.",
+          "created_round": 2,
+          "status": "rejected",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.5333333333333333,
+            "rho": 0.02,
+            "passed": false,
+            "batch_size": 15,
+            "n_failures": 6,
+            "recovered_failures": 4,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "Apply the definition strictly: conduct is hearsay if it is intended as an assertion. Consider nonverbal responses to direct questions as assertive conduct. Do not consider hearsay exceptions; classify only by the definition.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.6666666666666666,
+            "acc_new": 0.6666666666666666,
+            "rho": 0.02,
+            "passed": true,
+            "batch_size": 15,
+            "n_failures": 7,
+            "recovered_failures": 4,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form: Answer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

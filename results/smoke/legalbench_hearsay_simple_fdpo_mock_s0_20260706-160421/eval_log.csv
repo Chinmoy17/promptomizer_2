@@ -1,0 +1,13 @@
+phase,example_id,correct,pred,gold
+seed,syn_test_0,True,Yes,Yes
+seed,syn_test_1,False,Yes,No
+seed,syn_test_2,True,Yes,Yes
+seed,syn_test_3,False,Yes,No
+seed,syn_test_4,True,Yes,Yes
+seed,syn_test_5,False,Yes,No
+final,syn_test_0,True,Yes,Yes
+final,syn_test_1,False,Yes,No
+final,syn_test_2,True,Yes,Yes
+final,syn_test_3,False,Yes,No
+final,syn_test_4,True,Yes,Yes
+final,syn_test_5,False,Yes,No

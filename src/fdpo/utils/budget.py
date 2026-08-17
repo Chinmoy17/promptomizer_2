@@ -8,6 +8,7 @@ partial results, and exit cleanly.
 
 from __future__ import annotations
 
+import threading
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -18,6 +19,9 @@ from fdpo.utils.io import CsvAppender
 PRICE_TABLE: dict[str, tuple[float, float]] = {
     "gpt-4o-mini": (0.15, 0.60),
     "gpt-4o": (2.50, 10.00),
+    "gpt-4.1-nano": (0.10, 0.40),
+    "gpt-4.1-mini": (0.40, 1.60),
+    "gpt-4.1": (2.00, 8.00),
     "deepseek": (0.27, 1.10),
     "llama": (0.10, 0.10),
     "qwen": (0.10, 0.10),
@@ -52,12 +56,18 @@ class LedgerEntry:
 
 @dataclass
 class TokenLedger:
-    """In-memory + CSV record of every API call's tokens and cost."""
+    """In-memory + CSV record of every API call's tokens and cost.
+
+    record() is called concurrently once evaluate() parallelizes solver
+    calls across worker threads, so the append-to-list + append-to-CSV
+    sequence is guarded by a lock to keep both consistent under concurrency.
+    """
 
     fallback_price: tuple[float, float] = (0.0, 0.0)
     csv_path: Path | None = None
     entries: list[LedgerEntry] = field(default_factory=list)
     _csv: CsvAppender | None = field(default=None, repr=False)
+    _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
 
     _FIELDS = ["role", "model", "prompt_tokens", "completion_tokens", "cost_usd", "purpose"]
 
@@ -66,11 +76,12 @@ class TokenLedger:
         p_in, p_out = price_for(model, self.fallback_price)
         cost = (prompt_tokens * p_in + completion_tokens * p_out) / 1_000_000
         entry = LedgerEntry(role, model, prompt_tokens, completion_tokens, cost, purpose)
-        self.entries.append(entry)
-        if self.csv_path is not None:
-            if self._csv is None:
-                self._csv = CsvAppender(self.csv_path, self._FIELDS)
-            self._csv.append(vars(entry))
+        with self._lock:
+            self.entries.append(entry)
+            if self.csv_path is not None:
+                if self._csv is None:
+                    self._csv = CsvAppender(self.csv_path, self._FIELDS)
+                self._csv.append(vars(entry))
         return cost
 
     @property

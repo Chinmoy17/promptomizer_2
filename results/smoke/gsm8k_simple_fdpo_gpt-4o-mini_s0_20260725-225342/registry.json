@@ -1,0 +1,278 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.9166666666666666,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "This is the GSM8K dataset. These are 8th-grade school math problems.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "This is the GSM8K dataset. These are 8th-grade school math word problems that require careful step-by-step reasoning and correct interpretation of constraints.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.9,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "This is the GSM8K dataset. These are 8th-grade school math word problems that require careful, multi-step reasoning and a precise interpretation of all constraints and operations.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9,
+            "acc_new": 0.8666666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "This is the GSM8K dataset. These are 8th-grade school math word problems that require careful, multi-step reasoning with accurate calculations and precise interpretation of all relationships, quantities, and constraints.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8666666666666667,
+            "acc_new": 0.8833333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 8,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are given a math problem.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are given a math word problem. The problem may involve multiple steps, operations, or require combining information in a specific way.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.9,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "You are given a math word problem. The problem may involve several steps, actions, or require combining information in a specific way. Questions may reference changes in totals, comparative relationships, proportional reasoning, or require allocation among categories.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9,
+            "acc_new": 0.8666666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "You are given a math word problem that may require breaking down complex actions, tracking changes to totals, carefully interpreting comparative or multiplicative language, and understanding how quantities are distributed or modified. Problems often involve sequences of purchases, returns, discounts, allocations, or comparisons, and may require combining several operations in the correct order.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8666666666666667,
+            "acc_new": 0.8833333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 8,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Solve it and give the answer.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Read the problem carefully and identify all relevant quantities, actions, and constraints. Break the problem into logical steps and solve each one accurately. Make sure to interpret phrases about increases, decreases, returns, sales, and discounts according to their mathematical meaning.\n\nApply the following general reasoning principles:\n- If a problem describes a change (e.g. returning, selling, buying, gaining, losing, discounting), determine whether the action affects the total positively or negatively, and update the running sum accordingly.\n- When you see \"X times more than Y,\" distinguish between \"X times as much as Y\" (multiply Y by X) and \"X more than Y\" (add X to Y).\n- For percentages and fractions, compute the affected amount and update totals precisely. For example, to apply a 10% discount to a total, multiply the total by 0.10 to find the discount, then subtract it from the original total.\n- If items are returned or sold, recalculate the remaining value or out-of-pocket cost by considering the original price and the amount recouped.\n- When multiple categories are involved, make sure to allocate totals properly before combining them. For instance, if a total is split evenly among categories, divide first before using those values in further calculations.\n\nChecklist for solving:\n1. Identify all relevant numbers and their relationships.\n2. Determine the sequence of actions (additions, subtractions, multiplications, divisions).\n3. Track running totals as you process each action.\n4. Interpret all modifiers (percent, times more, less, discounts, returns, sales) mathematically.\n5. For comparison or \"how much more/less\" questions, compute the difference explicitly.\n\nExample reasoning for invented cases:\n- If you spend $1000, return an item worth $200, and buy another item for $150, your out-of-pocket is $1000 - $200 + $150 = $950.\n- If one person triples their money ($500 → $1500) and another earns five times their original ($500 → $2500), the difference is $2500 - $1500 = $1000.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.9,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "Read the problem carefully and identify every relevant quantity, action, and constraint. Before solving, break the problem into logical steps. Make sure to interpret all phrases involving changes, comparisons, or distributions according to their mathematical meaning.\n\nApply these general reasoning principles:\n\n- **Change Actions:** When an item is bought, returned, sold, or discounted, update the running total correctly. For example, if an item is returned, subtract its value from the total spent; if an item is sold, calculate the net loss (original cost minus sale price) and add it to the out-of-pocket total.\n\n- **Multiplicative vs. Additive Relationships:** Distinguish carefully between \"X times as much as Y\" (multiply Y by X) and \"X more than Y\" (add X to Y). For example, \"five times more than $2000\" means $2000 * 5 = $10000, but \"five more than $2000\" means $2000 + $5 = $2005.\n\n- **Percentage and Fraction Calculations:** When applying a percentage or fraction (discount, increase, decrease), compute the actual value affected, then update the relevant total. For example, a 10% discount on $150 means $150 * 0.10 = $15 discounted, so pay $150 - $15 = $135.\n\n- **Comparisons and Differences:** When asked \"how much more/less,\" calculate the explicit difference between the relevant quantities.\n\n- **Allocation and Distribution:** If a total is divided among categories (e.g., equally among three supplies), divide the total first, then use those values in further calculations.\n\n- **Sequencing Actions:** Always process actions in the order described. Track intermediate totals carefully before combining or comparing.\n\n- **Compound Steps:** For actions involving multiple changes (e.g., buy, return, sell, then buy), accumulate net changes step-by-step, considering both money spent and money recouped.\n\nMental checklist for solving:\n1. Identify all relevant numbers and their relationships.\n2. Determine the sequence and nature of each action (addition, subtraction, multiplication, division).\n3. Track running totals as you process each step.\n4. Interpret all modifiers (percent, times more/as much, discounts, returns, sales) mathematically.\n5. For comparison or difference questions, compute the difference explicitly.\n6. For allocation problems, divide totals among categories before further calculations.\n\nExamples to clarify reasoning principles:\n- If you buy items for $3000, return two items worth $700 and $500, sell another item originally bought for $600 for $480, and buy a new item for $100: \n  - Out-of-pocket is $3000 - ($700+$500) + ($600-$480) + $100 = $3000 - $1200 + $120 + $100 = $2020.\n\n- If you receive a 10% discount on $130 purchase, the discount is $130 * 0.10 = $13, so pay $130 - $13 = $117.\n\n- When a river is 42 feet wide, each boat is 3 feet, and must have 2 feet space on each side (including riverbanks): Subtract 2 feet for the far bank first, then divide the remaining width by the sum of boat width plus 2 feet space per boat.\n\n- If someone earns \"five times more than they invested,\" calculate the increase as 5 * original investment, then add this to the original amount to get their total.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9,
+            "acc_new": 0.8666666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "Read the entire problem attentively, identifying every relevant number, relationship, modifier, and action described. Before calculating, analyze the sequence and nature of each step, and clarify what is being asked.\n\nApply these reasoning principles:\n\n- **Careful Interpretation of Comparative Phrasing:** Distinguish clearly between \"X times as much as Y\" (multiply Y by X), \"X more than Y\" (add X to Y), and \"X times more than Y\" (add X*Y to Y). Always check whether the phrase means to multiply the original quantity or to add a multiple to it. For example, \"five times more than $2000\" means $2000 + ($2000*5) = $12,000, but \"five times as much as $2000\" means $2000*5 = $10,000. \"Five more than $2000\" means $2000 + $5 = $2005.\n\n- **Sequence Matters:** Process all actions in the exact order described. For each step, update running totals before proceeding to the next action. Never skip or reorder steps.\n\n- **Allocation and Distribution:** When a total is divided among categories (e.g., equally among three types), divide the total first, then use those values in subsequent calculations. For example, if 6000 supplies are split equally among 3 types, each type gets 6000 ÷ 3 = 2000.\n\n- **Change Actions and Net Calculations:** For purchases, returns, sales, or discounts, update the net cost or total accordingly. When selling an item, calculate the difference between purchase and sale price (net loss or gain) and add this to the out-of-pocket cost. For returns, subtract the returned value from the total spent.\n\n- **Percentage and Fraction Calculations:** When applying a percentage or fraction modifier (discount, increase, decrease), calculate the absolute value it affects, then update the appropriate total. For instance, a 10% discount on $130 is $13, so pay $130 - $13 = $117.\n\n- **Compound and Multi-Part Steps:** For multi-step problems (e.g., returns, sales, new purchases), accumulate net changes step-by-step, always updating totals before moving to the next step.\n\n- **Comparisons and Differences:** When asked \"how much more/less,\" compute the explicit difference between the relevant quantities, making sure to use the final, not intermediate, values.\n\n- **Units and Conversion:** Convert all time, money, or quantity units appropriately (e.g., minutes to hours, dollars per item, etc.), and ensure calculations use consistent units.\n\nMental checklist for solving:\n1. Identify and list all relevant quantities and relationships.\n2. Determine the sequence of actions and their mathematical nature (addition, subtraction, multiplication, division).\n3. For allocation, divide totals among categories before further calculations.\n4. For change actions (returns, sales, discounts), compute net effects for each step.\n5. For multiplicative/comparative language, clarify whether to multiply the original quantity or add a multiple to it.\n6. Track running totals and update after each action.\n7. For difference or comparison questions, subtract the correct quantities at the end.\n8. Double-check units and conversions for accuracy.\n\nInvented example illustrations:\n\n- If you buy items for $4000, return two items worth $800 and $600, sell another item (originally $700) for $560, and buy a new item for $150:\n  - Out-of-pocket is $4000 - ($800+$600) + ($700-$560) + $150 = $4000 - $1400 + $140 + $150 = $2890.\n\n- If you invest $3000 and make \"four times more than you invested,\" first calculate the increase ($3000*4 = $12,000), then add to the original ($12,000 + $3000 = $15,000).\n\n- If a river is 50 feet wide, each boat is 4 feet, and there must be 2 feet space on each side (including riverbanks): Subtract 2 feet for the far bank, leaving 48 feet. Each boat requires 4+2=6 feet, so maximum number of boats is 48/6=8.\n\n- If a total of 9000 supplies are equally divided among 3 categories: 9000/3 = 3000 per category. For \"twice as many guns as tractors,\" guns = 2 * tractors.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8666666666666667,
+            "acc_new": 0.8833333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 8,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Give the correct number.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Give the correct integer answer based on your calculations. Reason step-by-step and ensure your final numeric answer is consistent with all given constraints and actions.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.9,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "Give the correct integer answer based on your calculations. Reason step-by-step and ensure your final numeric answer reflects all described actions and constraints.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9,
+            "acc_new": 0.8666666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 6,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "Give the correct integer answer based on your calculations. Reason step-by-step and ensure your final numeric answer reflects all described actions, relationships, and constraints.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8666666666666667,
+            "acc_new": 0.8833333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 8,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "After your reasoning, write the final numeric answer on its own line in exactly this form: #### <number>",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "run_id": "legalbench_hearsay_simple_fdpo_gpt-4o-mini_s0_20260706-160428",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "legalbench_hearsay",
+  "solver_model": "gpt-4o-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.6779661016949152,
+    "n_examples": 59,
+    "extraction_failures": 0,
+    "macro_f1": 0.6775956284153005
+  },
+  "final_test": {
+    "accuracy": 0.7457627118644068,
+    "n_examples": 59,
+    "extraction_failures": 0,
+    "macro_f1": 0.7445887445887446
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 5,
+    "n_failures_triggering": 10,
+    "optimizer_calls": 1,
+    "baseline_train": {
+      "accuracy": 0.75,
+      "n_correct": 30,
+      "n_wrong": 10
+    },
+    "current_train": {
+      "accuracy": 0.825,
+      "n_correct": 33,
+      "n_wrong": 7
+    },
+    "train_confusion": {
+      "recoveries": [
+        "hearsay_test_31",
+        "hearsay_test_47",
+        "hearsay_test_64",
+        "hearsay_test_65",
+        "hearsay_test_82",
+        "hearsay_test_85",
+        "hearsay_test_86",
+        "hearsay_train_2"
+      ],
+      "regressions": [
+        "hearsay_test_0",
+        "hearsay_test_21",
+        "hearsay_test_59",
+        "hearsay_test_61",
+        "hearsay_test_84"
+      ],
+      "still_wrong": [
+        "hearsay_test_39",
+        "hearsay_test_79"
+      ],
+      "still_right_count": 25,
+      "net_gain": 3
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 3,
+      "rejects": 0
+    },
+    "rounds_run": 1,
+    "train_acc_per_round": [
+      0.825
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "hearsay_test_19",
+        "hearsay_test_29",
+        "hearsay_test_63",
+        "hearsay_test_69",
+        "hearsay_test_76",
+        "hearsay_test_77",
+        "hearsay_test_80",
+        "hearsay_test_87",
+        "hearsay_test_90",
+        "hearsay_test_91",
+        "hearsay_train_4"
+      ],
+      "regressions": [
+        "hearsay_test_10",
+        "hearsay_test_26",
+        "hearsay_test_30",
+        "hearsay_test_51",
+        "hearsay_test_74",
+        "hearsay_test_75",
+        "hearsay_train_0"
+      ],
+      "still_wrong": [
+        "hearsay_test_15",
+        "hearsay_test_23",
+        "hearsay_test_25",
+        "hearsay_test_62",
+        "hearsay_test_68",
+        "hearsay_test_70",
+        "hearsay_test_78",
+        "hearsay_test_81"
+      ],
+      "still_right_count": 33,
+      "net_gain": 4
+    },
+    "markdown_source": "prompts\\legalbench_hearsay.md"
+  },
+  "wall_clock_s": 68.3,
+  "cost": {
+    "total_calls": 199,
+    "total_cost_usd": 0.033088,
+    "by_role": {
+      "solver": {
+        "calls": 198,
+        "prompt_tokens": 95057,
+        "completion_tokens": 14802,
+        "cost_usd": 0.02314
+      },
+      "optimizer": {
+        "calls": 1,
+        "prompt_tokens": 1902,
+        "completion_tokens": 768,
+        "cost_usd": 0.009948
+      }
+    }
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.9733333333333334,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a careful math tutor who solves word problems.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You will be given a grade-school math word problem.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Solve the problem step by step, showing your arithmetic.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Solve the problem step by step, showing your arithmetic and logical reasoning. Carefully interpret all relationships and operations described in the problem. When a quantity is described as \"more than,\" \"less than,\" or as a multiple or fraction of another, ensure you apply these relationships precisely and in the correct order. When quantities are added or removed, update the relevant totals at each step. For questions about how many times a process must be repeated to reach or exceed a target, count the number of steps needed to first meet or surpass the requirement, not just the point at which it is exceeded.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9666666666666667,
+            "acc_new": 0.9733333333333334,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 150,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Do not skip steps. Do not invent quantities that are not in the problem.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Do not skip steps. Do not invent or assume quantities that are not explicitly stated in the problem. When a relationship is described between two quantities, represent it algebraically if necessary, and be careful to distinguish between the initial and final values if quantities change during the problem. Always check that your final answer addresses the specific question asked, especially when multiple quantities are calculated along the way.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.9666666666666667,
+            "acc_new": 0.9733333333333334,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 150,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "After your reasoning, write the final numeric answer on its own line in exactly this form: #### <number>",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

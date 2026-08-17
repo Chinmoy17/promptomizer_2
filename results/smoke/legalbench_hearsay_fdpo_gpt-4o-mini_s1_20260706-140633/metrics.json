@@ -1,0 +1,71 @@
+{
+  "run_id": "legalbench_hearsay_fdpo_gpt-4o-mini_s1_20260706-140633",
+  "status": "completed",
+  "method": "fdpo",
+  "dataset": "legalbench_hearsay",
+  "solver_model": "gpt-4o-mini",
+  "seed": 1,
+  "seed_test": {
+    "accuracy": 0.6779661016949152,
+    "n_examples": 59,
+    "extraction_failures": 0,
+    "macro_f1": 0.6746008708272859
+  },
+  "final_test": {
+    "accuracy": 0.6779661016949152,
+    "n_examples": 59,
+    "extraction_failures": 0,
+    "macro_f1": 0.6779661016949152
+  },
+  "optimization": {
+    "rounds_run": 5,
+    "train_acc_per_round": [
+      0.84,
+      0.8,
+      0.8,
+      0.8,
+      0.84
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "registry_counts": {
+      "commits": 4,
+      "rejects": 7
+    }
+  },
+  "wall_clock_s": 232.3,
+  "cost": {
+    "total_calls": 459,
+    "total_cost_usd": 0.104815,
+    "by_role": {
+      "solver": {
+        "calls": 431,
+        "prompt_tokens": 97871,
+        "completion_tokens": 32491,
+        "cost_usd": 0.034175
+      },
+      "judge": {
+        "calls": 23,
+        "prompt_tokens": 12590,
+        "completion_tokens": 1810,
+        "cost_usd": 0.03966
+      },
+      "optimizer": {
+        "calls": 5,
+        "prompt_tokens": 9706,
+        "completion_tokens": 1446,
+        "cost_usd": 0.03098
+      }
+    }
+  },
+  "fdpo_metrics": {
+    "regression_rate": 0.03333333333333333,
+    "section_attribution_accuracy": 0.5555555555555556,
+    "cost_per_accuracy_point_usd": null,
+    "optimization_cost_usd": 0.084927,
+    "n_rewrites_attempted": 5,
+    "n_commits": 2,
+    "n_rollbacks": 3,
+    "time_to_stabilization": null
+  }
+}
