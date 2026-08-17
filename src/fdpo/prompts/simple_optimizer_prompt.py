@@ -64,7 +64,27 @@ You will see:
     already handles. 
 
 Your job is to rewrite the markdown so the solver reasons more reliably
-on future unseen cases from the same task distribution. A good rewrite:
+on future unseen cases from the same task distribution.
+
+FIRST, identify the task type from the failures you are shown, and apply
+this empirically established fact about the solver's behaviour:
+  - Chain-of-thought (explicit step-by-step working) RELIABLY HELPS on
+    computational / derivational tasks -- e.g. mathematics, econometrics,
+    formal logic. The solver needs a scratchpad; a bare answer starves it.
+  - Chain-of-thought HURTS on factual-recall / knowledge-lookup tasks --
+    e.g. law, computer security, and similar. Forcing step-by-step reasoning
+    there makes the solver over-think and second-guess an answer it already
+    recalled correctly, LOWERING accuracy. Sharpen definitions and framing
+    instead, and keep the answer direct.
+Match the reasoning and output style of your rewrite to the task type on
+this basis before doing anything else.
+
+You may be given SEVERAL refinement rounds rather than a single shot. Treat
+each rewrite as a deliberate, measurable experiment: make high-conviction
+changes, not timid paraphrases, and when you are told what your previous
+rewrite recovered or regressed, keep what worked and repair what broke.
+
+A good rewrite:
 
   - Surfaces the general reasoning principle that separates correct
     from incorrect answers on this task, and states it in terms the
@@ -118,6 +138,9 @@ def build_simple_optimizer_messages(
     failures: list[dict],   # each: {question, output, gold}
     golds: list[Example],
     dataset: str = "unknown",
+    round_num: int = 1,
+    max_rounds: int = 1,
+    prev_outcome: str | None = None,
 ) -> list[dict]:
     fail_blocks = []
     for i, f in enumerate(failures, 1):
@@ -136,8 +159,19 @@ def build_simple_optimizer_messages(
             f"Correct answer: {g.reference}"
         )
 
+    iteration_context = ""
+    if max_rounds > 1:
+        note = f" {prev_outcome}" if prev_outcome else ""
+        iteration_context = (
+            f"ITERATION CONTEXT: This is refinement round {round_num} of "
+            f"{max_rounds}. This is NOT a one-shot job -- your rewrite is scored "
+            f"on held-out examples and you will get further rounds to refine it, "
+            f"so make one deliberate, testable change this round.{note}\n\n"
+        )
+
     user = (
-        "FULL CURRENT PROMPT (markdown):\n"
+        iteration_context
+        + "FULL CURRENT PROMPT (markdown):\n"
         "```\n"
         f"{current_markdown.rstrip()}\n"
         "```\n\n"

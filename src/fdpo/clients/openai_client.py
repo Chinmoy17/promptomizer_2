@@ -31,6 +31,15 @@ RETRYABLE = (RateLimitError, APITimeoutError, APIConnectionError, InternalServer
 MAX_ATTEMPTS = 5
 
 
+# Reasoning models (OpenAI o-series and gpt-5) reject `temperature` (only the
+# default is allowed) and require `max_completion_tokens` in place of the now
+# unsupported `max_tokens`. Detect them by model/deployment name so ordinary
+# models (e.g. gpt-4o-mini) keep the classic parameters unchanged.
+def _is_reasoning_model(model: str) -> bool:
+    name = model.lower()
+    return "gpt-5" in name or name.startswith(("o1", "o3", "o4"))
+
+
 class OpenAICompatClient(ModelClient):
     def __init__(self, role_cfg: RoleConfig,
                  ledger: TokenLedger | None = None,
@@ -49,12 +58,15 @@ class OpenAICompatClient(ModelClient):
 
     def _complete(self, messages: list[dict], *, json_mode: bool,
                   temperature: float, max_tokens: int) -> ChatResult:
-        kwargs: dict = {
-            "model": self.model,
-            "messages": messages,
-            "temperature": temperature,
-            "max_tokens": max_tokens,
-        }
+        kwargs: dict = {"model": self.model, "messages": messages}
+        if _is_reasoning_model(self.model):
+            # o-series / gpt-5: temperature must stay default (omit it), and the
+            # token cap moves to max_completion_tokens (shared with hidden
+            # reasoning tokens).
+            kwargs["max_completion_tokens"] = max_tokens
+        else:
+            kwargs["temperature"] = temperature
+            kwargs["max_tokens"] = max_tokens
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
 

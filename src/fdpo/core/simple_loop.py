@@ -122,9 +122,21 @@ def run_simple_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
     logger.info("simple: baseline mining accuracy %.3f (%d correct, %d wrong)",
                 baseline.accuracy, len(baseline_correct), len(baseline_wrong))
 
+    # Near-ceiling guard: if the baseline is already very accurate, forced
+    # rewriting is downside-only (it breaks more than it fixes -- see the
+    # computer_security regression), so skip optimization and keep the seed.
+    # This overrides the failure-count trigger (tau) for high-baseline
+    # subjects. cfg.skip_above_acc == 0.0 disables it (backward compatible).
+    skip_high = cfg.skip_above_acc > 0.0 and baseline.accuracy >= cfg.skip_above_acc
+    if skip_high:
+        logger.info("simple: baseline mining accuracy %.3f >= skip_above_acc %.3f "
+                    "-- skipping optimization (near-ceiling); keeping seed prompt",
+                    baseline.accuracy, cfg.skip_above_acc)
+
     # Baseline eval on the held-out VALIDATION set -- the reference the accept
-    # gate compares candidate prompts against.
-    if has_val_split:
+    # gate compares candidate prompts against. Skipped when skip_high (no
+    # optimization will run, so the validation reference is never used).
+    if has_val_split and not skip_high:
         baseline_val = evaluate(solver, registry.active_prompt(), validation, dataset,
                                 temperature=cfg.solver_temperature,
                                 max_tokens=cfg.solver_max_tokens,
@@ -165,16 +177,24 @@ def run_simple_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
     optimizer_calls = 0
     rounds_log: list[dict] = []
     triggered = False
-    final_edit_status = "not_triggered"
+    final_edit_status = "skipped_high_baseline" if skip_high else "not_triggered"
 
-    for round_num in range(1, max_rounds + 1):
-        # Failure evidence for THIS round: for each currently-wrong example
-        # we show the *baseline* model output (proxy — accepting some
-        # staleness in later rounds rather than caching per-round outputs).
+    # Per-round feedback so a later round can see what its OWN previous rewrite
+    # did: current_outputs holds the current prompt's outputs (baseline in
+    # round 1, the prior round's thereafter), and prev_outcome summarises the
+    # last round's recovered/regressed counts.
+    current_outputs = baseline_outputs
+    prev_outcome: str | None = None
+
+    effective_rounds = 0 if skip_high else max_rounds
+    for round_num in range(1, effective_rounds + 1):
+        # Failure evidence for THIS round: each currently-wrong example is shown
+        # with the CURRENT prompt's own output, so later rounds react to what
+        # their last rewrite actually produced rather than stale baseline text.
         failures = [
             {
                 "question": train_by_id[eid].question,
-                "output": baseline_outputs.get(eid, "(wrong)"),
+                "output": current_outputs.get(eid, "(wrong)"),
                 "gold": train_by_id[eid].reference,
                 "example_id": eid,
             }
@@ -200,10 +220,15 @@ def run_simple_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
                     round_num, len(failures), len(e_fail), len(e_gold))
 
         current_md = to_markdown(registry.active_prompt(), schema=registry.schema)
-        messages = build_simple_optimizer_messages(current_md, e_fail, e_gold,
-                                                    dataset=dataset)
+        messages = build_simple_optimizer_messages(
+            current_md, e_fail, e_gold, dataset=dataset,
+            round_num=round_num, max_rounds=effective_rounds,
+            prev_outcome=prev_outcome)
+        # max_tokens doubles as max_completion_tokens for reasoning optimizers
+        # (o-series / gpt-5), whose hidden reasoning shares this budget with the
+        # visible markdown -- keep it generous so the rewrite is never truncated.
         result = optimizer.complete(messages, temperature=cfg.optimizer_temperature,
-                                    max_tokens=2000,
+                                    max_tokens=8000,
                                     purpose=f"simple:rewrite-r{round_num}")
         optimizer_calls += 1
 
@@ -327,6 +352,17 @@ def run_simple_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
             " (new best)" if is_new_best else " (not best, continuing)",
         )
 
+        # Record what THIS round did so the NEXT round's optimizer call sees
+        # its own effect (recovered vs regressed) and the current prompt's
+        # actual outputs -- turning the multi-round loop into real feedback.
+        prev_outcome = (
+            f"Your previous rewrite (round {round_num}) recovered "
+            f"{len(current_wrong - new_wrong)} and regressed "
+            f"{len(new_wrong - current_wrong)} working example(s); mining "
+            f"accuracy {gate.acc_old:.3f} -> {new_eval.accuracy:.3f}."
+        )
+        current_outputs = {r.example_id: r.output for r in new_eval.rows}
+
         # ALWAYS continue — the next round starts from this round's output.
         current_wrong = new_wrong
         current_correct = new_correct
@@ -356,7 +392,8 @@ def run_simple_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
                       f"baseline val {baseline_val_acc:.3f} - margin "
                       f"{cfg.accept_margin:.2f}")
         else:
-            reason = "no structured round was produced"
+            reason = ("baseline at/above skip_above_acc; optimization skipped"
+                      if skip_high else "no structured round was produced")
         logger.info("simple: REVERT to baseline seed (%s)", reason)
         registry.run_best_versions = {name: 0 for name in registry.schema}
         registry.restore_best_snapshot()
@@ -388,6 +425,8 @@ def run_simple_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
         "edit_status": final_edit_status,
         "triggered": triggered,
         "tau": cfg.tau,
+        "skip_above_acc": cfg.skip_above_acc,
+        "skipped_high_baseline": skip_high,
         "simple_max_rounds": max_rounds,
         "accept_margin": cfg.accept_margin,
         "shipped_structured": ship_structured,

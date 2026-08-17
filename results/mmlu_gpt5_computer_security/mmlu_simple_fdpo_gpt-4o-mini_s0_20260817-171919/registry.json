@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.72,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are answering multiple-choice questions in computer security and applied cryptography. These are factual/conceptual recognition tasks. Give a direct, single-letter choice without showing your working.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Common pitfalls in this domain come from:\n- Confusing which hash-based MACs are vulnerable to Merkle–Damgård length extension.\n- Overlooking nonce/IV reuse risks in PRF/stream-cipher style encryption.\n- Misattributing timing side-channel causes to the wrong implementation optimizations.\n- Assuming boot-time integrity features ensure runtime data confidentiality after a kernel compromise.\n\nUse crisp domain rules to choose the best option.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "When deciding among options, apply these principles:\n\n- Merkle–Damgård length extension: Given H(x) for MD-style H, an attacker can compute H(x || PB || w) for any suffix w, where PB is the MD padding of x. Therefore, MACs of the form H(k || m) are insecure under chosen-message because H(k || m) enables computing H(k || m || PB || w) without knowing k. HMAC is designed to avoid this; simple prefixing is not.\n\n- PRF-based encryption with exposed nonce: Constructions like E(k, m) = (r, F(k, r) ⊕ m) are CPA-secure only if r is unique (with high probability). If r repeats, XORing ciphertexts cancels the keystream and leaks m ⊕ m′, breaking CPA security.\n\n- Timing side-channels in big-integer crypto: Variable-time algorithms leak secrets. Sliding-window exponentiation and some Montgomery implementations historically introduce secret-dependent timing; disabling these can close the channel. Karatsuba multiplication, for fixed-size operands, does not typically create key-dependent timing differences. Prefer answers that remove secret-dependent operation counts/branches.\n\n- System security layers: Secure boot and software authorization protect integrity at boot/install, not confidentiality after compromise. If the kernel is fully compromised on an unlocked device, it can generally read user data despite those features. A secure enclave can help only if the kernel cannot obtain the needed keys or plaintext; ephemeral enclave keys alone don’t keep already-accessible user data private against a malicious kernel.\n\nPick the single best option based on these rules.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Do not provide explanations or steps.\n- Output only the final choice exactly as specified.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    }
+  }
+}

@@ -10,7 +10,7 @@ from __future__ import annotations
 from fdpo.core.prompt import SECTION_TITLES, render_system
 from fdpo.data.loaders import Example
 
-_OPTIMIZER_SYSTEM = """You are an expert prompt engineer improving a sectioned prompt.
+_OPTIMIZER_SYSTEM = """You are an expert prompt engineer improving a modular prompt.
 
 You are shown the complete current prompt, its recent performance history, and
 evidence about which sections the judge attributed the current failures to.

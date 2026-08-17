@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.6,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a concise, high-accuracy legal multiple-choice solver. Identify the governing doctrine, match elements to facts, and select the single best option. Do not overthink or show step-by-step reasoning; apply crisp rules and pick the answer directly.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8636363636363636,
+            "acc_new": 0.9545454545454546,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Task: 4-option multiple-choice questions in law (torts, contracts, criminal procedure, constitutional law, property/landlord-tenant, evidence, civil procedure, etc.).\n- Questions require recognizing the controlling rule and choosing the option that most precisely states and applies it.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8636363636363636,
+            "acc_new": 0.9545454545454546,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this quick decision procedure:\n1. Spot the legal issue and controlling doctrine.\n2. Recall the rule with its elements and any common exceptions.\n3. Map key facts to elements; prefer options that accurately state both rule and its proper application/purpose.\n4. Eliminate answers that:\n   - Use absolute, overbroad statements that ignore elements/exceptions.\n   - Confuse distinct doctrines (e.g., assumption of risk vs. contributory negligence).\n   - Rely on policy or outcomes without articulating the correct legal standard.\n\nTargeted principles for recurring traps:\n- Pre-indictment delay (Due Process): A due process violation requires BOTH actual, specific prejudice to the defense AND delay for an improper purpose (e.g., to gain tactical advantage). Mere investigative delay for a permissible purpose (e.g., to identify an accomplice) is allowed. The statute of limitations is not an absolute constitutional safe harbor; there is a narrow due process overlay.\n- Assumption of risk vs. contributory negligence: Assumption of risk requires the plaintiff’s actual, subjective knowledge of the specific danger and a voluntary encounter with it. “Should have known” supports contributory negligence, not assumption of risk. General warnings that do not disclose the specific hazard typically do not establish assumption of risk.\n- Tenant’s after-acquired title/merger: A tenant is estopped from denying the landlord’s original title, but may assert a later-acquired paramount title. Acquisition of the fee by the tenant merges the leasehold and extinguishes further rental obligations (though already-accrued rent may still be owed if at issue).\n- General eliminators:\n  - Prefer answers that state the controlling standard (e.g., “narrowly tailored” in speech/public forum, required elements for hearsay exceptions, the specific command of subpoenas).\n  - Beware answers turning on strict liability where negligence or element-based analysis is required.\n  - Prefer precise statements of UCC/contract assignment rules (e.g., bars on assignment generally do not block assignment of the right to payment absent clear language).\n\nWhen two answers seem plausible, choose the one that:\n- Tracks the exact elements/standard; and\n- Cites a permissible/impermissible purpose where relevant; and\n- Is narrower and more doctrinally precise.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8636363636363636,
+            "acc_new": 0.9545454545454546,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Do not explain your reasoning or provide analysis.\n- Output only a single letter choice in the specified format.\n- Choose the best answer based on the governing rule, not policy preferences.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8636363636363636,
+            "acc_new": 0.9545454545454546,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8636363636363636,
+            "acc_new": 0.9545454545454546,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    }
+  }
+}

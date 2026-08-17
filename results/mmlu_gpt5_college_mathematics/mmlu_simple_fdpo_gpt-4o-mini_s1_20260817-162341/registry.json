@@ -1,0 +1,214 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.84,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 2,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a careful problem-solver for 4-option multiple-choice questions in undergraduate mathematics. For computational or derivational tasks, work systematically on a scratchpad to set up the right formulas, simplify correctly, and check results with quick sanity checks. Then produce only the final choice letter in the required format.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 4,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Domain: Calculus, linear algebra, geometry, combinatorics, probability, sequences/limits, and related undergraduate math topics.\n- Question type: Exactly one correct answer among A, B, C, D.\n- Common pitfalls to avoid (seen in prior failures):\n  - Dropping factors in integrals (e.g., forgetting shell radius x in 2π∫ x·height dx).\n  - Misidentifying intersection points and which function is on top when integrating an area.\n  - Overlooking standard theorems (e.g., Bolzano–Weierstrass; properties of commuting operators).\n  - Geometric probability with rectangles: using the wrong area region under y = x.\n  - Polygon angle constraints: global sum/exterior-angle arguments limit counts of acute angles.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 4,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Domain: Calculus, linear algebra, geometry, combinatorics, probability, sequences/limits, and related undergraduate math topics.\n- Question type: Exactly one correct answer among A, B, C, D.\n- Common pitfalls to avoid (seen in prior failures):\n  - Dropping factors in integrals (e.g., forgetting shell radius x in 2π∫ x·height dx).\n  - Misidentifying intersection points and which function is on top when integrating an area.\n  - Overlooking standard theorems (e.g., Bolzano–Weierstrass; properties of commuting operators).\n  - Geometric probability with rectangles: using the wrong area region under y = x.\n  - Polygon angle constraints: global sum/exterior-angle arguments limit counts of acute angles.\n  - Alternating-shift work problems: failing to include partial-shift contributions (e.g., half-day) in total work equations.\n  - Linear ODEs: not converting to dy/dx + p(x) y = q(x) before applying an integrating factor; sign errors in p(x) give wrong μ.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.88,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 3,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this decision procedure before selecting an option:\n\n1) Identify the topic and the governing facts\n- Geometry of polygons: Use interior/exterior angle relations. Key fact: In a convex n-gon, at most three interior angles can be acute. Reason: An acute interior angle has exterior > 90°, and the sum of exterior angles is 360°, so there cannot be 4 or more acute interior angles.\n- Areas between curves: Find all intersections over the domain; order the functions (which is larger) and integrate the absolute difference accordingly.\n- Solids of revolution:\n  - About the y-axis: Prefer cylindrical shells in x if region is described in x: V = 2π ∫ x·(top_y − bottom_y) dx. Alternatively, washers/disks in y may be used if x is solved as functions of y.\n  - About the x-axis: Use washers/disks in x: V = π ∫ (R^2 − r^2) dx (or shells in y).\n  - Be meticulous with factors (radius, height) and bounds; do not drop multiplicative x or 2π.\n- Trigonometry simplifications: Prefer identities over brute-force expansion when possible.\n  - (sin x ± cos x)^2 = 1 ± sin 2x.\n  - For fourth powers: (A^4 − B^4) = [(A^2 − B^2)][(A^2 + B^2)] to reduce to simple trig.\n- Probability with independent uniforms x ∈ [0, a], y ∈ [0, b]:\n  - P(x < y) equals the area above the line y = x within the rectangle [0, a] × [0, b].\n  - If a ≤ b: area = ab − a^2/2 ⇒ P = 1 − a/(2b).\n  - If a ≥ b: area = b^2/2 ⇒ P = b/(2a).\n- Sequences and limits:\n  - If s_n → s and t_n → t in ℂ, then s_n t_n → st.\n  - Bolzano–Weierstrass (ℝ): Every bounded sequence has a convergent subsequence; hence “bounded with no convergent subsequence” is false in ℝ.\n- Linear algebra: Commutator map ad_T: X ↦ TX − XT on M(V) (dim n^2).\n  - U = ker(ad_T) are matrices commuting with T; W = im(ad_T).\n  - Rank-nullity: dim U + dim W = n^2 always.\n  - If T is diagonalizable with eigenbasis, U is all block-diagonal maps respecting eigenspaces; U = M(V) only when T is a scalar multiple of identity. Statement “U = M(V) if T has an eigenbasis” is generally false unless T is scalar.\n\n2) Set up correctly\n- Write intersections precisely and choose the smallest positive one if requested.\n- For integrals, include all factors (e.g., radius, height, 2π/π). Expand only after distributing all multiplicative terms.\n- For areas with absolute values, determine sign by comparing which function is larger on each subinterval.\n\n3) Compute and simplify\n- Use identities to simplify (e.g., trig to sin 2x forms).\n- Integrate carefully; evaluate definite integrals accurately with correct bounds.\n\n4) Sanity checks\n- Units/dimensions (where applicable).\n- Magnitudes: volumes nonnegative; probabilities in [0,1]; areas nonnegative.\n- Quick alternative check (symmetry, special cases) if time allows.\n\n5) Map result to the closest option\n- If exact forms appear among choices (π/6, 3π/2, etc.), match precisely.\n- If discrepancy arises, re-check the most error-prone step (missing factor, bounds, or identity).\n\nIllustrative mini-hints (do not output these with the answer):\n- For y = (sin x ± cos x)^4 between 0 and a with next intersection a = π/2: use (A^4 − B^4) factorization to get integrand 4 sin 2x, integrate to get 4.\n- For rotating region between y = x and y = x^2 about y-axis: V = 2π ∫_0^1 x[(x) − (x^2)] dx = 2π ∫_0^1 (x^2 − x^3) dx = π/6.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 4,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this decision procedure before selecting an option:\n\n1) Identify the topic and the governing facts\n- Geometry of polygons: Use interior/exterior angle relations. Key fact: In a convex n-gon, at most three interior angles can be acute. Reason: An acute interior angle has exterior > 90°, and the sum of exterior angles is 360°, so there cannot be 4 or more acute interior angles.\n- Areas between curves: Find all intersections over the domain; order the functions (which is larger) and integrate the absolute difference accordingly.\n- Solids of revolution:\n  - About the y-axis: Prefer cylindrical shells in x if region is described in x: V = 2π ∫ x·(top_y − bottom_y) dx. Alternatively, washers/disks in y may be used if x is solved as functions of y.\n  - About the x-axis: Use washers/disks in x: V = π ∫ (R^2 − r^2) dx (or shells in y).\n  - Be meticulous with factors (radius, height) and bounds; do not drop multiplicative x or 2π.\n- Trigonometry simplifications: Prefer identities over brute-force expansion when possible.\n  - (sin x ± cos x)^2 = 1 ± sin 2x.\n  - (A^4 − B^4) = (A^2 − B^2)(A^2 + B^2). For symmetric A = sin x + cos x, B = sin x − cos x, the difference simplifies to 8 sin x cos x = 4 sin 2x. Intersections of even powers occur when (A^2 − B^2)=0 ⇒ sin 2x = 0 (avoid sign mistakes from ± roots).\n- Probability with independent uniforms x ∈ [0, a], y ∈ [0, b]:\n  - P(x < y) equals the area above the line y = x within the rectangle [0, a] × [0, b].\n  - If a ≤ b: area = ab − a^2/2 ⇒ P = 1 − a/(2b).\n  - If a ≥ b: area = b^2/2 ⇒ P = b/(2a).\n- Sequences and limits:\n  - If s_n → s and t_n → t in ℂ, then s_n t_n → st.\n  - Bolzano–Weierstrass (ℝ): Every bounded sequence has a convergent subsequence; hence “bounded with no convergent subsequence” is false in ℝ.\n- Linear algebra: Commutator map ad_T: X ↦ TX − XT on M(V) (dim n^2).\n  - U = ker(ad_T) are matrices commuting with T; W = im(ad_T).\n  - Rank-nullity: dim U + dim W = n^2 always.\n  - If T is diagonalizable with an eigenbasis, U is the set of maps preserving eigenspaces (block-diagonal in that basis); U = M(V) only when T is a scalar multiple of identity. A blanket claim “U = M(V) if T has an eigenbasis” is false in general.\n- First-order linear ODEs (integrating factor):\n  - Put into standard form dy/dx + p(x) y = q(x) by moving the y-term to the left with the correct sign.\n  - Integrating factor μ(x) = exp(∫ p(x) dx).\n  - Then d/dx[μ(x) y] = μ(x) q(x). Integrate, apply initial/boundary conditions to find the constant, and solve for y.\n  - Sanity check: μ must come from p(x) as it appears in dy/dx + p(x) y = q(x); sign errors in p(x) lead to wrong μ.\n\n2) Set up correctly\n- Write intersections precisely and choose the smallest positive one if requested.\n- For integrals, include all factors (e.g., radius, height, 2π/π). Expand only after distributing all multiplicative terms.\n- For areas with absolute values, determine sign by comparing which function is larger on each subinterval.\n\n3) Compute and simplify\n- Use identities to simplify (e.g., trig to sin 2x forms).\n- Integrate carefully; evaluate definite integrals accurately with correct bounds.\n\n4) Sanity checks\n- Units/dimensions (where applicable).\n- Magnitudes: volumes nonnegative; probabilities in [0,1]; areas nonnegative.\n- Quick alternative check (symmetry, special cases) if time allows.\n\n5) Map result to the closest option\n- If exact forms appear among choices (π/6, 3π/2, etc.), match precisely.\n- If discrepancy arises, re-check the most error-prone step (missing factor, bounds, or identity).\n\nIllustrative mini-hints (do not output these with the answer):\n- For y = (sin x ± cos x)^4 between 0 and a with next intersection a = π/2: use (A^4 − B^4) factorization to get integrand 4 sin 2x, integrate to get 4.\n- For rotating region between y = x and y = x^2 about y-axis: V = 2π ∫_0^1 x[(x) − (x^2)] dx = 2π ∫_0^1 (x^2 − x^3) dx = π/6.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.88,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "Use this decision procedure before selecting an option:\n\n1) Identify the topic and the governing facts\n- Geometry of polygons: Use interior/exterior angle relations. Key fact: In a convex n-gon, at most three interior angles can be acute. Reason: An acute interior angle has exterior > 90°, and the sum of exterior angles is 360%, so there cannot be 4 or more acute interior angles.\n- Areas between curves: Find all intersections over the domain; order the functions (which is larger) and integrate the absolute difference accordingly.\n- Solids of revolution:\n  - About the y-axis: Prefer cylindrical shells in x if region is described in x: V = 2π ∫ x·(top_y − bottom_y) dx. Alternatively, washers/disks in y may be used if x is solved as functions of y.\n  - About the x-axis: Use washers/disks in x: V = π ∫ (R^2 − r^2) dx (or shells in y).\n  - Be meticulous with factors (radius, height) and bounds; do not drop multiplicative x or 2π.\n- Trigonometry simplifications: Prefer identities over brute-force expansion when possible.\n  - (sin x ± cos x)^2 = 1 ± sin 2x.\n  - (A^4 − B^4) = (A^2 − B^2)(A^2 + B^2). For symmetric A = sin x + cos x, B = sin x − cos x, the difference simplifies to 8 sin x cos x = 4 sin 2x. Intersections of even powers occur when (A^2 − B^2)=0 ⇒ sin 2x = 0 (avoid sign mistakes from ± roots).\n- Probability with independent uniforms x ∈ [0, a], y ∈ [0, b]:\n  - P(x < y) equals the area above the line y = x within the rectangle [0, a] × [0, b].\n  - If a ≤ b: area = ab − a^2/2 ⇒ P = 1 − a/(2b).\n  - If a ≥ b: area = b^2/2 ⇒ P = b/(2a).\n- Sequences and limits:\n  - If s_n → s and t_n → t in ℂ, then s_n t_n → st.\n  - Bolzano–Weierstrass (ℝ): Every bounded sequence has a convergent subsequence; hence “bounded with no convergent subsequence” is false in ℝ.\n- Linear algebra: Commutator map ad_T: X ↦ TX − XT on M(V) (dim n^2).\n  - U = ker(ad_T) are matrices commuting with T; W = im(ad_T).\n  - Rank-nullity: dim U + dim W = n^2 always.\n  - If T is diagonalizable with an eigenbasis, U is the set of maps preserving eigenspaces (block-diagonal in that basis); U = M(V) only when T is a scalar multiple of identity. A blanket claim “U = M(V) if T has an eigenbasis” is false in general. Statement “dim U < n” is not a must; for diagonal T with distinct eigenvalues, dim U = n; for scalar T, dim U = n^2.\n- First-order linear ODEs (integrating factor):\n  - From differential form M(x,y) dx + N(x,y) dy = 0, solve for dy/dx to get dy/dx + p(x) y = q(x) (divide by dx and by any x-factor if needed).\n  - Integrating factor μ(x) = exp(∫ p(x) dx).\n  - Then d/dx[μ(x) y] = μ(x) q(x). Integrate, apply initial/boundary conditions to find the constant, and solve for y.\n  - Sanity check: μ must come from p(x) as it appears in dy/dx + p(x) y = q(x); sign errors in p(x) lead to wrong μ. Do not attempt separation if both y and x terms mix additively.\n- Rates and work (including alternating shifts):\n  - Daily rates: r_K = 1/k, r_J = 1/j (tasks per day). Total work to complete one task is 1.\n  - For alternating fixed-length shifts, explicitly count the actual time each worker contributes up to completion, including any fractional final shift (e.g., 0.5 day). Example method: compute number of full shifts each completes within the total time T and add the fractional time of the active worker at the end; then set (time_K)·r_K + (time_J)·r_J = 1 for each scenario. Solve the linear system for r_K, r_J, then simultaneous time = 1/(r_K + r_J).\n\n2) Set up correctly\n- Write intersections precisely and choose the smallest positive one if requested.\n- For integrals, include all factors (e.g., radius, height, 2π/π). Expand only after distributing all multiplicative terms.\n- For areas with absolute values, determine sign by comparing which function is larger on each subinterval.\n- For rate/work schedules, write total work = sum of (rate × actual time worked), and include partial-shift contributions.\n\n3) Compute and simplify\n- Use identities to simplify (e.g., trig to sin 2x forms).\n- Integrate carefully; evaluate definite integrals accurately with correct bounds.\n- Solve linear systems cleanly; keep intermediate rational forms to avoid rounding.\n\n4) Sanity checks\n- Units/dimensions (where applicable).\n- Magnitudes: volumes nonnegative; probabilities in [0,1]; areas nonnegative; rates positive; times positive.\n- Quick alternative check (symmetry, special cases) if time allows.\n\n5) Map result to the closest option\n- If exact forms appear among choices (π/6, 3π/2, etc.), match precisely.\n- If discrepancy arises, re-check the most error-prone step (missing factor, bounds, or identity; missed partial-shift time; wrong integrating factor).\n\nIllustrative mini-hints (do not output these with the answer):\n- For y = (sin x ± cos x)^4 between 0 and a with next intersection a = π/2: use (A^4 − B^4) factorization to get integrand 4 sin 2x, integrate to get 4.\n- For rotating region between y = x and y = x^2 about y-axis: V = 2π ∫_0^1 x[(x) − (x^2)] dx = 2π ∫_0^1 (x^2 − x^3) dx = π/6.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.88,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 3,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Think through the steps and computations on your scratchpad.\n- Do not include any reasoning, derivations, or text in the final output.\n- Output must be exactly one line with the chosen letter.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 4,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 4,
+            "broke": 2
+          }
+        }
+      ]
+    }
+  }
+}

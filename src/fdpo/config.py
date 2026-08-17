@@ -91,6 +91,10 @@ class ExperimentConfig:
                                 # prompt (so you see it on the test set) rather than reverting
                                 # to a bare seed. Set 0.0 for strict no-regression (ship only
                                 # if the structured prompt beats/ties baseline on train).
+    skip_above_acc: float = 0.0 # simple_fdpo: if baseline MINING accuracy >= this, skip
+                                # optimization entirely and keep the seed. Near-ceiling
+                                # subjects are downside-only (forced reasoning breaks more
+                                # than it fixes). 0.0 = disabled; overrides tau when > 0.
     simple_val_frac: float = 0.35 # simple_fdpo: fraction of the train pool held out as a
                                 # VALIDATION set. The optimizer mines failures from the mining
                                 # set (1-frac); each candidate prompt is scored on the held-out
@@ -204,6 +208,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         "if its train acc >= baseline - margin. Default 1.0 = always "
                         "ship the optimizer's structured prompt; 0.0 = strict "
                         "no-regression (revert to seed unless structured beats baseline).")
+    p.add_argument("--skip-above-acc", type=float, default=d.skip_above_acc,
+                   help="simple_fdpo: skip optimization (keep the seed) when baseline "
+                        "mining accuracy >= this value. Guards near-ceiling subjects where "
+                        "forced reasoning regresses. 0 = disabled (use tau only).")
     p.add_argument("--simple-val-frac", type=float, default=d.simple_val_frac,
                    help="simple_fdpo: fraction of train held out as a stratified "
                         "validation set for scoring candidate prompts and driving "
@@ -275,6 +283,7 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         tau=args.tau,
         simple_max_rounds=args.simple_max_rounds,
         accept_margin=args.accept_margin,
+        skip_above_acc=args.skip_above_acc,
         simple_val_frac=args.simple_val_frac,
         val_size=args.val_size,
         pool_cap=args.pool_cap,

@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.84,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You answer four-option multiple-choice questions in computer security and systems. Provide a single best-choice letter only, with no explanations.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 4,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "The questions are predominantly factual recall and concept-definition within security (network layers, OS security, program analysis tools, penetration testing, trusted execution, etc.). Accuracy improves when you apply crisp definitions, recognize security design principles, and eliminate options that are overly broad, off-layer, or inapplicable post-compromise.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 4,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this quick decision process:\n- Identify the question type: definition, “which is NOT,” layer classification, security default behavior, or detection/mitigation technique.\n- Eliminate distractors: options that are generic, belong to the wrong OSI layer, or are pre-boot measures irrelevant to a post-boot compromise.\n- Prefer the most specific and standard definition over broad or marketing-like phrasing.\n- Only choose “All of the above” if every listed option is clearly correct.\n\nCore heuristics to apply:\n- Negative questions: For “which is NOT,” find the single exception; do not pick items that can plausibly fit.\n- Fail-closed principle: When a system faces uncertainty (timeouts, ambiguous authorization), the secure design is to deny/stop rather than allow/continue.\n- OSI layer mapping: Transport-layer issues are about end-to-end transport (e.g., TCP/UDP behavior, port exhaustion, SYN handling). “Unauthorized access” is a broad outcome, not a transport-layer vulnerability itself.\n- Penetration testing: Adversarial, whole-system testing for security flaws; it is not unit testing or library-only testing, so do not conflate with development-time tests.\n- IP spoofing detection: Recognize technical indicators like TTL/path inconsistencies or source validation; merely “having an IDS” or “a firewall” is not itself a detection method.\n- Capability without descriptor-passing: In Unix-like designs, pre-opened file descriptors inherited across fork/exec can still enable communication to logs or proxies even if runtime descriptor passing is unavailable.\n- Post-compromise scope: If the kernel is compromised on an unlocked device, pre-boot assurances (secure boot, code signing) and enclave-internal ephemeral keys typically do not prevent reading user data that the OS can already access.\n\nAnswer succinctly and directly. Do not show your reasoning.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 4,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Output only the final choice as a single line in the exact format below.\n- Do not include explanations, steps, or any extra text.\n- If unsure, prefer the conservative/security-accurate option that aligns with standard definitions and fail-closed behavior.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 4,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 4,
+            "broke": 0
+          }
+        }
+      ]
+    }
+  }
+}
