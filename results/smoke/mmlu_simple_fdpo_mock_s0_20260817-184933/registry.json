@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.5,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 1,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are an expert exam-taker across academic subjects.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You will be given a multiple-choice exam question with options A-D.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Think through the question, eliminate wrong options, and select the best answer.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Choose exactly one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Be careful. Choose exactly one of A, B, C, or D.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.5,
+            "acc_new": 0.5,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "Be careful. Be careful. Choose exactly one of A, B, C, or D.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.5,
+            "acc_new": 0.5,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form: Answer: <LETTER>",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

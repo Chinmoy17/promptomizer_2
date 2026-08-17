@@ -1,0 +1,214 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.7,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a careful legal reasoner applying Federal Rule of Evidence 801 to classify whether a described courtroom statement is hearsay. For each scenario, visibly apply the rule step by step and then give a single final line: Answer: Yes/No.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.75,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 4,
+            "recovered_failures": 4,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- FRE 801(c): Hearsay is an out-of-court statement by a person offered to prove the truth of the matter asserted in that statement.\n- Statement (FRE 801(a)) includes oral/written assertions and nonverbal conduct intended as an assertion. Pure actions/events not intended to assert facts are not statements.\n- The task is classification under the hearsay definition only. Do not decide admissibility or apply hearsay exceptions/exclusions; focus on whether it meets 801’s definition.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.75,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 4,
+            "recovered_failures": 4,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "- FRE 801(c): Hearsay is an out-of-court statement by a person offered to prove the truth of the matter asserted in that statement.\n- Statement (FRE 801(a)) includes oral/written assertions and nonverbal conduct intended as an assertion. Pure actions/events not intended to assert facts are not statements.\n- Questions, commands, requests, greetings, and other utterances that do not assert a factual proposition are not “statements” under 801.\n- The task is classification under the hearsay definition only. Do not decide admissibility or apply hearsay exceptions/exclusions; focus on whether it meets 801’s definition.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.65,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "This is a legal hearsay task. For each statement, decide whether it is hearsay and answer Yes or No.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this decision procedure on each scenario:\n\n1) Identify the proffered item and the purpose:\n   - Is there a statement by a person made outside the current testimony? If the item is in-court testimony or something created on the stand, it is not hearsay.\n   - If it is a report, email, or other writing produced outside court, treat it as an out-of-court statement by its author.\n\n2) Is the item a “statement”?\n   - Statement: words or nonverbal conduct intended to assert something (e.g., “X happened,” nodding to assert “yes,” a written report stating a result).\n   - Not a statement: mere conduct or events with no intent to assert (e.g., leaving a scene, playing a role in a play, being diagnosed as an act of treatment rather than introducing a doctor’s out-of-court assertion).\n\n3) What fact is it offered to prove, and does that require the truth of the assertion?\n   - If offered to prove the truth of the matter asserted in the statement, classify as hearsay (Answer: Yes).\n   - If offered for a non-truth purpose, classify as non-hearsay (Answer: No). Common non-truth purposes:\n     • Effect on the listener or to explain conduct.\n     • Verbal acts with independent legal significance (offers, acceptances, defamation words).\n     • Circumstantial evidence of the declarant’s attitude/belief when the truth of the asserted content is irrelevant (e.g., praising someone to show support).\n\n4) Special note on state of mind:\n   - If the out-of-court statement is offered to prove the declarant’s then-existing state of mind as asserted in the statement (e.g., “I’m afraid,” “I plan to change my will”), it is hearsay under 801 (even though there may be an exception). Answer: Yes.\n   - If the statement is used only as circumstantial evidence of a different fact or relationship without relying on the truth of the asserted content (e.g., complaining to someone to show you believed they worked there; praising someone to show support), Answer: No.\n\n5) Apply and conclude:\n   - Write a brief step-by-step analysis using the above checks.\n   - Then give the final line exactly: Answer: Yes or Answer: No.\n\nIllustrative contrasts (not tied to any training question):\n- “Lab report stating the sample contains X to prove it contains X” → out-of-court written assertion offered for its truth → hearsay (Yes).\n- “She said ‘John is honest’ to prove she supports John” → offered to show attitude, not the truth that John is honest → non-hearsay (No).\n- “He texted ‘I plan to flee tomorrow’ to prove he planned to flee” → offered for the truth of his asserted plan/state of mind → hearsay (Yes).\n- “Witness drew a diagram while testifying” → in-court, not hearsay (No).\n- “He left immediately after the crash” → non-assertive conduct → not hearsay (No).",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.75,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 4,
+            "recovered_failures": 4,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this decision procedure on each scenario. Stop at the first decisive step.\n\n1) Is the item current in-court testimony or something created on the stand?\n   - If yes, it is not an out-of-court statement. Classify as non-hearsay. Answer: No.\n\n2) Is there a human declarant and an assertion?\n   - Identify the proffered item and its source. If it is a report, email, or other writing produced outside court, treat it as an out-of-court statement by its author.\n   - Determine whether the item asserts a proposition. Not statements:\n     • Non-assertive conduct/events (e.g., leaving a scene, speaking to show the speaker was alive).\n     • Questions/commands/requests (e.g., “Do you sell duffel bags?”) — these do not assert facts.\n     • Facts proved by occurrence/condition rather than by someone’s assertion (e.g., the fact a diagnosis occurred as part of treatment; the fact someone was mistaken/confused) unless an out-of-court declarant’s asserted content is introduced.\n   - If there is no assertion by a person, classify as non-hearsay. Answer: No.\n\n3) What fact is it offered to prove, and does that require the truth of an asserted proposition?\n   - If offered to prove the truth of the matter asserted in an out-of-court statement, classify as hearsay. Answer: Yes.\n   - If offered for a non-truth purpose, classify as non-hearsay. Answer: No. Common non-truth purposes:\n     • Effect on the listener or to explain conduct.\n     • Verbal acts with independent legal significance (offers, acceptances, words of defamation).\n     • Circumstantial evidence where the truth of the statement’s content is irrelevant (e.g., a person spoke to show they were alive; a request shows interest/ownership tendencies; praise shows support).\n\n4) Special note on state of mind:\n   - Out-of-court statements offered to prove the declarant’s then-existing state of mind as asserted (e.g., “I’m afraid,” “I plan to change my will”) are hearsay under 801. Answer: Yes.\n   - Using speech or conduct only as circumstantial evidence of a different fact without relying on the asserted content (e.g., the fact the person spoke to show they were alive; confusion/mistake to show no meeting of the minds) is non-hearsay. Answer: No.\n   - In-court statements about state of mind are not out-of-court and therefore are not hearsay. Answer: No.\n\n5) Apply and conclude:\n   - Write a brief step-by-step analysis using the above checks.\n   - Then give the final line exactly: Answer: Yes or Answer: No.\n\nIllustrative contrasts (not tied to any training question):\n- “Lab report stating the sample contains X to prove it contains X” → out-of-court written assertion offered for its truth → hearsay (Yes).\n- “On-stand testimony ‘I regret my actions’” → in-court, not out-of-court → non-hearsay (No).\n- “Customer asks ‘Do you sell duffel bags?’ to show he owned one” → question (not an assertion) used circumstantially → non-hearsay (No).\n- “He said ‘I was attacked’ to show he was alive at that time” → offered for the fact of speaking, not the truth of the attack → non-hearsay (No).\n- “He texted ‘I plan to change my will’ to prove he planned to change his will” → out-of-court assertion offered for its truth/state of mind → hearsay (Yes).\n- “The fact a party was mistaken about the other’s identity to show no agreement” → fact of mistake/condition, not an introduced assertion → non-hearsay (No).",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.65,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        },
+        {
+          "version": 3,
+          "text": "Use this decision procedure on each scenario. Stop at the first decisive step.\n\n1) Is the item current in-court testimony or something created on the stand?\n   - If yes, it is not an out-of-court statement. Classify as non-hearsay. Answer: No.\n\n2) Is there a human declarant and an assertion?\n   - Identify the proffered item and its source. If it is a report, email, or other writing produced outside court, treat it as an out-of-court statement by its author.\n   - Testimony that repeats or describes an out-of-court speaker’s words is evaluated as the out-of-court statement of that original speaker (the witness being in-court does not convert the underlying out-of-court assertion into in-court content).\n   - Determine whether the item asserts a proposition. Not statements:\n     • Non-assertive conduct/events (e.g., leaving a scene, speaking to show the speaker was alive).\n     • Questions/commands/requests (e.g., “Do you sell duffel bags?”) — these do not assert facts.\n     • Facts proved by occurrence/condition rather than by someone’s assertion (e.g., the fact a diagnosis occurred as part of treatment; the fact someone was mistaken/confused) unless an out-of-court declarant’s asserted content is introduced.\n   - If there is no assertion by a person, classify as non-hearsay. Answer: No.\n\n3) What fact is it offered to prove, and does that require the truth of an asserted proposition?\n   - Identify the specific proposition asserted in the out-of-court words, and the specific fact the proponent wants to prove. Ask: must the asserted proposition be true for the evidence to help prove that fact?\n   - If offered to prove the truth of the matter asserted in an out-of-court statement, classify as hearsay. Answer: Yes.\n   - If offered for a non-truth purpose, classify as non-hearsay. Answer: No. Common non-truth purposes:\n     • Effect on the listener or to explain conduct.\n     • Verbal acts with independent legal significance (offers, acceptances, words of defamation).\n     • Circumstantial evidence where the truth of the statement’s content is irrelevant (e.g., a person spoke to show they were alive; a request shows interest/ownership tendencies; praise shows support).\n\n4) Special note on state of mind and attitude:\n   - Distinguish two uses of out-of-court words:\n     • Circumstantial use to show attitude/bias/support or the speaker’s belief about someone/something, where the content need not be true (e.g., praise used to show support; addressing someone as if they held a role to show the speaker believed they held that role) → non-hearsay. Answer: No.\n     • Use of words that assert a particular mental state (intent, plan, knowledge, desire) to prove that very state, which requires the asserted proposition to be true (e.g., “I plan to do X,” “I want to change my will,” “I know Y”) → hearsay under 801. Answer: Yes.\n   - Using speech only as circumstantial evidence of a different fact without relying on the asserted content (e.g., the fact the person spoke to show they were alive; confusion/mistake to show no meeting of the minds) is non-hearsay. Answer: No.\n   - In-court statements about state of mind are not out-of-court and therefore are not hearsay. Answer: No.\n\n5) Apply and conclude:\n   - Write a brief step-by-step analysis using the above checks.\n   - Then give the final line exactly: Answer: Yes or Answer: No.\n\nIllustrative contrasts (not tied to any training question):\n- “Lab report stating the sample contains X to prove it contains X” → out-of-court written assertion offered for its truth → hearsay (Yes).\n- “On-stand testimony ‘I regret my actions’” → in-court, not out-of-court → non-hearsay (No).\n- “Customer asks ‘Do you sell duffel bags?’ to show he owned one” → question (not an assertion) used circumstantially → non-hearsay (No).\n- “He said ‘I was attacked’ to show he was alive at that time” → offered for the fact of speaking, not the truth of the attack → non-hearsay (No).\n- “Text: ‘I plan to change my will’ to prove he planned to change his will” → out-of-court assertion of intent offered for that intent → hearsay (Yes).\n- “Statement ‘She’s the greatest supervisor’ used to show the speaker supported her” → attitude shown circumstantially; truth of ‘greatest’ irrelevant → non-hearsay (No).\n- “Witness recounts ‘He called saying he wanted to revise his will’ to prove he anticipated imminent death” → relies on the out-of-court asserted desire/plan to establish knowledge → hearsay (Yes).\n- “The fact a party was mistaken about the other’s identity to show no agreement” → fact of mistake/condition, not an introduced assertion → non-hearsay (No).",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.65,
+            "acc_new": 0.7,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 7,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Do not analyze admissibility, exceptions, or exclusions; only classify under FRE 801’s hearsay definition.\n- Keep reasoning concise but explicit. Show steps before the final answer line.\n- The final line must be exactly: Answer: Yes/No.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.75,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 4,
+            "recovered_failures": 4,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Step-by-step reasoning applying the checklist.\n- Final line: Answer: Yes or Answer: No.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.75,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 4,
+            "recovered_failures": 4,
+            "broke": 5
+          }
+        }
+      ]
+    }
+  }
+}

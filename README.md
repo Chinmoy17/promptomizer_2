@@ -176,6 +176,47 @@ uv run python -m scripts.run_experiment --method simple_fdpo \
 > If FDPO runs on a Windows laptop but Ollama is on a Linux node, tunnel the
 > port: `ssh -L 11434:localhost:11434 you@node`, then use `localhost:11434`.
 
+### Recommended handoff run (MMLU-6, regression-safe)
+
+For the final open-model handoff, run the six MMLU subjects with the
+**regression-safe** settings below — the worst any subject can do is match its
+own baseline, so the sweep is safe to run unsupervised:
+
+```bash
+bash scripts/run_mmlu_handoff.sh
+# override defaults if needed:
+SEEDS="0 1 2" MAXWORKERS=32 bash scripts/run_mmlu_handoff.sh
+```
+
+**Model roles (`.env`) — the one decision that matters:**
+
+| Role | Use | Why |
+|---|---|---|
+| `SOLVER_MODEL` | the ~7B under test (e.g. `Qwen2.5-7B-Instruct`, `Llama-3.1-8B-Instruct`) | weak solver = more headroom = larger, cleaner deltas |
+| `OPTIMIZER_MODEL` | the **strongest** model you can serve (32B–72B ideal) | a stronger optimizer writes better prompts; a same-7B optimizer works but gains are muted. A *too-strong* optimizer (e.g. gpt-5) overfits — mid-strong is the sweet spot. |
+
+**Why these flags (baked into the script):**
+
+- `--accept-margin 0.0` — **regression-safe gate**: ships a rewrite only if it
+  beats/ties the seed on held-out validation, else reverts to the seed. Worst
+  case per subject = its baseline. This is the key safety property when no one
+  is watching the run.
+- `--simple-val-frac 0.5` — a 25/25 mining/validation split so the gate's
+  decision is reliable (a tiny validation slice is what shipped regressors on
+  Azure).
+- `--solver-temperature 0.0` — open weights are deterministic, which removes the
+  ~5 pp non-determinism and makes both the gate and the deltas trustworthy.
+- **neutral seed** (`prompts/mmlu_oneliner.md`) — honest baseline; the optimizer
+  discovers reasoning itself. Its system prompt already knows the solver has
+  **no hidden scratchpad** (so it must write *visible* step-by-step working) and
+  **when to reason vs answer directly** (reasoning for math/econ, direct for
+  recall subjects like law/security).
+
+Expect **larger, cleaner per-subject deltas than the gpt-4o-mini runs** (more
+headroom + determinism): the compute/reasoning subjects gaining, the
+near-ceiling recall subjects flat, and — with the regression-safe gate — no
+subject dropping below its baseline.
+
 ### Performance & concurrency on Ollama
 
 `evaluate()` fans solver calls across a `ThreadPoolExecutor` of size

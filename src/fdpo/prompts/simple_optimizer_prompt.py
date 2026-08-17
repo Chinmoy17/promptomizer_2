@@ -66,18 +66,28 @@ You will see:
 Your job is to rewrite the markdown so the solver reasons more reliably
 on future unseen cases from the same task distribution.
 
-FIRST, identify the task type from the failures you are shown, and apply
-this empirically established fact about the solver's behaviour:
-  - Chain-of-thought (explicit step-by-step working) RELIABLY HELPS on
-    computational / derivational tasks -- e.g. mathematics, econometrics,
-    formal logic. The solver needs a scratchpad; a bare answer starves it.
-  - Chain-of-thought HURTS on factual-recall / knowledge-lookup tasks --
-    e.g. law, computer security, and similar. Forcing step-by-step reasoning
-    there makes the solver over-think and second-guess an answer it already
-    recalled correctly, LOWERING accuracy. Sharpen definitions and framing
-    instead, and keep the answer direct.
-Match the reasoning and output style of your rewrite to the task type on
-this basis before doing anything else.
+CRITICAL FACT ABOUT THE SOLVER: it has NO hidden scratchpad. Its ONLY
+reasoning space is the text it actually writes out. So "think step by step"
+works only if the solver WRITES the steps in its output, before the final
+answer line. Instructions like "reason internally", "use a scratchpad but do
+not show it", or "output only the answer" DESTROY the reasoning entirely --
+for this model they are identical to "do not reason". Never put them on a
+task that benefits from reasoning.
+
+FIRST, identify the task type from the failures you are shown:
+  - Reasoning tasks -- anything needing calculation, derivation, formal
+    logic, OR applying a rule/definition to a specific scenario (e.g.
+    mathematics, econometrics, and hearsay / most legal analysis): the
+    solver RELIABLY does better when it WRITES OUT its working step by step
+    before the final answer line. A bare answer starves it.
+  - Pure factual-recall / lookup tasks -- where the answer is simply known
+    or not, with no intermediate steps (e.g. a memorised definition or
+    fact): forced step-by-step reasoning can make the solver over-think and
+    second-guess a fact it already recalled, LOWERING accuracy. Sharpen the
+    definitions and framing instead, and keep the answer direct.
+When unsure which it is, ALLOW visible reasoning -- it helps more often than
+it hurts, and the final answer line is extracted either way. Match your
+rewrite to the task type before doing anything else.
 
 You may be given SEVERAL refinement rounds rather than a single shot. Treat
 each rewrite as a deliberate, measurable experiment: make high-conviction
@@ -103,23 +113,20 @@ A good rewrite:
     Details, Constraints, Output Format). You may edit any section but
     must not add or remove headers.
 
-  - Preserves the Output Format exactly. Changing it breaks the answer
-    extractor, and every answer scores wrong regardless of correctness.
+  - Keeps the FINAL answer line's format exactly (e.g. a line
+    "Answer: <LETTER>" or "Answer: Yes/No"). That final line is ALL the
+    scorer reads, and it is searched for anywhere in the output -- so you
+    MAY, and for reasoning tasks SHOULD, let the solver write visible
+    step-by-step working BEFORE it. NEVER add "output only the answer",
+    "do not show your working", or "reason internally": those suppress the
+    reasoning and score reasoning tasks worse.
 
-  - MATCHES the reasoning style to the task type, which you infer from the
-    failures you are shown:
-      * Computational / multi-step tasks (calculation, derivation, formal
-        logic -- e.g. mathematics, econometrics): INSTRUCT the solver to work
-        step by step before the final answer. It needs a scratchpad; a bare
-        answer starves it.
-      * Factual-recall / knowledge tasks where an answer is either known or
-        not (e.g. law, computer security, factual trivia): prefer a DIRECT
-        answer. Do NOT force elaborate step-by-step reasoning here -- it makes
-        the solver over-think and second-guess answers it already recalls
-        correctly, LOWERING accuracy. Sharpen definitions and framing instead,
-        and keep the output concise.
-    When unsure, keep reasoning brief and tied to a clear final-answer line.
-    The objective is accuracy, never verbosity for its own sake.
+  - MATCHES the reasoning style to the task type (see the CRITICAL FACT at
+    the top): for reasoning / rule-application tasks, INSTRUCT the solver to
+    write its working step by step BEFORE the final answer line; for pure
+    fact-recall tasks, keep it direct and sharpen definitions instead. The
+    final answer line stays in the fixed format either way. The objective is
+    accuracy, never verbosity for its own sake.
 
 Return only the full rewritten markdown, starting with the first
 `## Section` header. No prose, no fences, no commentary before or after."""

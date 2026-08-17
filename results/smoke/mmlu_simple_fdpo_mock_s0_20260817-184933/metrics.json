@@ -1,0 +1,178 @@
+{
+  "run_id": "mmlu_simple_fdpo_mock_s0_20260817-184933",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "mmlu",
+  "solver_model": "mock",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.5,
+    "n_examples": 12,
+    "n_evaluated": 12,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.5,
+    "n_examples": 12,
+    "n_evaluated": 12,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 3,
+    "skip_above_acc": 0.9,
+    "skipped_high_baseline": false,
+    "simple_max_rounds": 2,
+    "accept_margin": 0.0,
+    "shipped_structured": true,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.5,
+      "n_mining": 10,
+      "n_validation": 10
+    },
+    "baseline_val_acc": 0.5,
+    "best_structured_val_acc": 0.5,
+    "n_failures_triggering": 5,
+    "optimizer_calls": 2,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed_best",
+        "n_failures_before": 5,
+        "n_failures_after": 5,
+        "train_acc_after": 0.5,
+        "val_acc_after": 0.5,
+        "sections_changed": [
+          "constraints"
+        ],
+        "failing_ids_before": [
+          "syn_train_1",
+          "syn_train_13",
+          "syn_train_17",
+          "syn_train_19",
+          "syn_train_9"
+        ],
+        "failing_ids_after": [
+          "syn_train_1",
+          "syn_train_13",
+          "syn_train_17",
+          "syn_train_19",
+          "syn_train_9"
+        ],
+        "recovered_this_round": [],
+        "regressed_this_round": []
+      },
+      {
+        "round": 2,
+        "status": "committed",
+        "n_failures_before": 5,
+        "n_failures_after": 5,
+        "train_acc_after": 0.5,
+        "val_acc_after": 0.5,
+        "sections_changed": [
+          "constraints"
+        ],
+        "failing_ids_before": [
+          "syn_train_1",
+          "syn_train_13",
+          "syn_train_17",
+          "syn_train_19",
+          "syn_train_9"
+        ],
+        "failing_ids_after": [
+          "syn_train_1",
+          "syn_train_13",
+          "syn_train_17",
+          "syn_train_19",
+          "syn_train_9"
+        ],
+        "recovered_this_round": [],
+        "regressed_this_round": []
+      }
+    ],
+    "baseline_failing_ids": [
+      "syn_train_1",
+      "syn_train_13",
+      "syn_train_17",
+      "syn_train_19",
+      "syn_train_9"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.5,
+      "n_correct": 5,
+      "n_wrong": 5
+    },
+    "current_train": {
+      "accuracy": 0.5,
+      "n_correct": 5,
+      "n_wrong": 5
+    },
+    "train_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "syn_train_1",
+        "syn_train_13",
+        "syn_train_17",
+        "syn_train_19",
+        "syn_train_9"
+      ],
+      "still_right_count": 5,
+      "net_gain": 0
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 2,
+      "rejects": 0
+    },
+    "rounds_run": 2,
+    "train_acc_per_round": [
+      0.5,
+      0.5
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "syn_test_1",
+        "syn_test_11",
+        "syn_test_3",
+        "syn_test_5",
+        "syn_test_7",
+        "syn_test_9"
+      ],
+      "still_right_count": 6,
+      "net_gain": 0
+    },
+    "markdown_source": "prompts\\mmlu.md"
+  },
+  "content_filter": null,
+  "wall_clock_s": 0.1,
+  "cost": {
+    "total_calls": 86,
+    "total_cost_usd": 0.0,
+    "by_role": {
+      "solver": {
+        "calls": 84,
+        "prompt_tokens": 9154,
+        "completion_tokens": 1176,
+        "cost_usd": 0.0
+      },
+      "optimizer": {
+        "calls": 2,
+        "prompt_tokens": 3331,
+        "completion_tokens": 201,
+        "cost_usd": 0.0
+      }
+    }
+  }
+}

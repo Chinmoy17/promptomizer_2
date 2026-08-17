@@ -1,5 +1,5 @@
 {
-  "n_runs": 92,
+  "n_runs": 94,
   "runs": [
     {
       "phase": "chained",
@@ -76,6 +76,44 @@
       "n_rollbacks": null,
       "cost_usd": 0.118617,
       "wall_clock_s": 298.1
+    },
+    {
+      "phase": "hearsay_gpt5",
+      "run_id": "legalbench_hearsay_simple_fdpo_gpt-4o-mini_s0_20260817-174921",
+      "status": "completed",
+      "dataset": "legalbench_hearsay",
+      "method": "simple_fdpo",
+      "solver_model": "gpt-4o-mini",
+      "seed": 0,
+      "seed_accuracy": 0.6610169491525424,
+      "final_accuracy": 0.5423728813559322,
+      "macro_f1": 0.5402597402597402,
+      "regression_rate": null,
+      "section_attribution_accuracy": null,
+      "time_to_stabilization": null,
+      "n_commits": null,
+      "n_rollbacks": null,
+      "cost_usd": 0.19918,
+      "wall_clock_s": 337.7
+    },
+    {
+      "phase": "hearsay_gpt5",
+      "run_id": "legalbench_hearsay_simple_fdpo_gpt-4o-mini_s1_20260817-175501",
+      "status": "completed",
+      "dataset": "legalbench_hearsay",
+      "method": "simple_fdpo",
+      "solver_model": "gpt-4o-mini",
+      "seed": 1,
+      "seed_accuracy": 0.6610169491525424,
+      "final_accuracy": 0.576271186440678,
+      "macro_f1": 0.5637385388938183,
+      "regression_rate": null,
+      "section_attribution_accuracy": null,
+      "time_to_stabilization": null,
+      "n_commits": null,
+      "n_rollbacks": null,
+      "cost_usd": 0.222359,
+      "wall_clock_s": 373.3
     },
     {
       "phase": "mmlu_gpt5_college_mathematics",
