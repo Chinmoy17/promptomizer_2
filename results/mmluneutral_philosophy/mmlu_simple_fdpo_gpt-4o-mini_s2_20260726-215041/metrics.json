@@ -1,0 +1,228 @@
+{
+  "run_id": "mmlu_simple_fdpo_gpt-4o-mini_s2_20260726-215041",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "mmlu",
+  "solver_model": "gpt-4o-mini",
+  "seed": 2,
+  "seed_test": {
+    "accuracy": 0.7727272727272727,
+    "n_examples": 66,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.8181818181818182,
+    "n_examples": 66,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 3,
+    "simple_max_rounds": 3,
+    "accept_margin": 1.0,
+    "shipped_structured": true,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.35,
+      "n_mining": 32,
+      "n_validation": 18
+    },
+    "baseline_val_acc": 0.9444444444444444,
+    "best_structured_val_acc": 1.0,
+    "n_failures_triggering": 5,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed_best",
+        "n_failures_before": 5,
+        "n_failures_after": 4,
+        "train_acc_after": 0.875,
+        "val_acc_after": 1.0,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "output_format",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_philosophy_test_124",
+          "mmlu_philosophy_test_229",
+          "mmlu_philosophy_test_267",
+          "mmlu_philosophy_validation_10",
+          "mmlu_philosophy_validation_21"
+        ],
+        "failing_ids_after": [
+          "mmlu_philosophy_test_124",
+          "mmlu_philosophy_test_149",
+          "mmlu_philosophy_test_229",
+          "mmlu_philosophy_test_267"
+        ],
+        "recovered_this_round": [
+          "mmlu_philosophy_validation_10",
+          "mmlu_philosophy_validation_21"
+        ],
+        "regressed_this_round": [
+          "mmlu_philosophy_test_149"
+        ]
+      },
+      {
+        "round": 2,
+        "status": "committed",
+        "n_failures_before": 4,
+        "n_failures_after": 3,
+        "train_acc_after": 0.90625,
+        "val_acc_after": 1.0,
+        "sections_changed": [
+          "context",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_philosophy_test_124",
+          "mmlu_philosophy_test_149",
+          "mmlu_philosophy_test_229",
+          "mmlu_philosophy_test_267"
+        ],
+        "failing_ids_after": [
+          "mmlu_philosophy_test_124",
+          "mmlu_philosophy_test_229",
+          "mmlu_philosophy_test_267"
+        ],
+        "recovered_this_round": [
+          "mmlu_philosophy_test_149"
+        ],
+        "regressed_this_round": []
+      },
+      {
+        "round": 3,
+        "status": "committed",
+        "n_failures_before": 3,
+        "n_failures_after": 5,
+        "train_acc_after": 0.84375,
+        "val_acc_after": 1.0,
+        "sections_changed": [
+          "context",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_philosophy_test_124",
+          "mmlu_philosophy_test_229",
+          "mmlu_philosophy_test_267"
+        ],
+        "failing_ids_after": [
+          "mmlu_philosophy_test_124",
+          "mmlu_philosophy_test_149",
+          "mmlu_philosophy_test_229",
+          "mmlu_philosophy_test_267",
+          "mmlu_philosophy_test_297"
+        ],
+        "recovered_this_round": [],
+        "regressed_this_round": [
+          "mmlu_philosophy_test_149",
+          "mmlu_philosophy_test_297"
+        ]
+      }
+    ],
+    "baseline_failing_ids": [
+      "mmlu_philosophy_test_124",
+      "mmlu_philosophy_test_229",
+      "mmlu_philosophy_test_267",
+      "mmlu_philosophy_validation_10",
+      "mmlu_philosophy_validation_21"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.84375,
+      "n_correct": 27,
+      "n_wrong": 5
+    },
+    "current_train": {
+      "accuracy": 0.875,
+      "n_correct": 28,
+      "n_wrong": 4
+    },
+    "train_confusion": {
+      "recoveries": [
+        "mmlu_philosophy_validation_10",
+        "mmlu_philosophy_validation_21"
+      ],
+      "regressions": [
+        "mmlu_philosophy_test_149"
+      ],
+      "still_wrong": [
+        "mmlu_philosophy_test_124",
+        "mmlu_philosophy_test_229",
+        "mmlu_philosophy_test_267"
+      ],
+      "still_right_count": 26,
+      "net_gain": 1
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 10,
+      "rejects": 0
+    },
+    "rounds_run": 3,
+    "train_acc_per_round": [
+      0.875,
+      0.90625,
+      0.84375
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "mmlu_philosophy_test_151",
+        "mmlu_philosophy_test_166",
+        "mmlu_philosophy_test_178",
+        "mmlu_philosophy_test_19",
+        "mmlu_philosophy_test_203",
+        "mmlu_philosophy_test_248",
+        "mmlu_philosophy_test_43"
+      ],
+      "regressions": [
+        "mmlu_philosophy_test_21",
+        "mmlu_philosophy_test_262",
+        "mmlu_philosophy_test_307",
+        "mmlu_philosophy_validation_13"
+      ],
+      "still_wrong": [
+        "mmlu_philosophy_test_138",
+        "mmlu_philosophy_test_159",
+        "mmlu_philosophy_test_212",
+        "mmlu_philosophy_test_226",
+        "mmlu_philosophy_test_281",
+        "mmlu_philosophy_test_98",
+        "mmlu_philosophy_test_99",
+        "mmlu_philosophy_validation_27"
+      ],
+      "still_right_count": 47,
+      "net_gain": 3
+    },
+    "markdown_source": "prompts\\mmlu_oneliner.md"
+  },
+  "wall_clock_s": 270.0,
+  "cost": {
+    "total_calls": 335,
+    "total_cost_usd": 0.092167,
+    "by_role": {
+      "solver": {
+        "calls": 332,
+        "prompt_tokens": 169208,
+        "completion_tokens": 64180,
+        "cost_usd": 0.063889
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 5983,
+        "completion_tokens": 2039,
+        "cost_usd": 0.028278
+      }
+    }
+  }
+}

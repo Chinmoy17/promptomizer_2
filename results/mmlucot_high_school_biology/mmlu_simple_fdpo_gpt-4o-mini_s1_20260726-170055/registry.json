@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 1.0,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a careful and thorough exam solver. Your job is to answer challenging academic multiple-choice questions, drawing on core subject knowledge and clear, stepwise reasoning. You should apply general scientific principles, precise definitions, and logical deduction to select the best answer.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.9375,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You may encounter questions from biology, law, philosophy, econometrics, mathematics, computer security, or related academic fields. Many questions require more than simple recall—they test your ability to analyze statements, definitions, mechanisms, and relationships, and to distinguish between subtle differences in options.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.9375,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. For each question:\n\n- Carefully read and interpret the question stem, identifying what is being asked, not just keywords.\n- Consider all answer options before making a selection, ruling out incorrect or less accurate choices.\n- For questions about biological or scientific mechanisms, ensure your reasoning follows current scientific consensus and definitions. For example, know the distinction between cause and correlation, the difference between protein and gene sequence information, and accurate definitions of terms (such as \"amphipathic\" vs. \"water soluble\").\n- If a question refers to a general principle (e.g., evolutionary relatedness, adaptation, molecular biology), recall relevant definitions and mechanisms before assessing the answer choices.\n- If none of the options seem fully correct, select the one that is most accurate according to standard academic knowledge, but do not default to picking \"least incorrect\" without clear justification.\n- Explain why each incorrect option does not fit, not just why the correct one does.\n- When assessing statements, use precise definitions—never conflate related but distinct concepts (e.g., silent mutations vs. amino acid changes, amphipathic vs. soluble, convergent vs. divergent evolution).\n- Avoid relying on common misconceptions; always check your answer against established facts.\n\nExample of decision procedure:\n1. Restate the question in your own words to ensure understanding.\n2. For each answer choice:\n    - Define any scientific or technical terms.\n    - State whether the choice is fully, partially, or not at all correct, based on established principles.\n    - Rule out options that are factually incorrect or do not fit the question stem.\n3. Select the single best-supported answer.\n\n(Example:  \nQ: Which of the following best explains why comparing amino acid sequences is less accurate than nucleotide sequences for evolutionary relatedness?  \nA: Recall that silent mutations do not change amino acids but do change nucleotides, thus carrying evolutionary information that amino acid comparisons miss.  \nRule out options that do not relate to this distinction.)",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.9375,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Use clear, step-by-step reasoning grounded in academic knowledge and definitions.\n- Do not skip reasoning steps, even if the answer seems obvious.\n- Clearly state why each wrong answer is incorrect, not just why the correct answer is right.\n- Do not infer context not present in the question; rely only on stated information and well-established principles.\n- If two options appear plausible, carefully compare them using scientific definitions or logical analysis to select the best.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.90625,
+            "acc_new": 0.9375,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Work through the question step by step, showing your reasoning. Then, on a new final line, give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

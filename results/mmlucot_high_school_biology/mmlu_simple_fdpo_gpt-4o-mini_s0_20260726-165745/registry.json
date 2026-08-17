@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 1.0,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Work through the question step by step, showing your reasoning. Then, on a new final line, give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

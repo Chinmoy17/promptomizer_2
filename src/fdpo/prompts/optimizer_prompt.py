@@ -1,5 +1,8 @@
 """Optimizer instruction template (v2): one call proposes targeted find/replace
-edits across every implicated section at once -- see Docs/fdpo_mechanism.md.
+edits across ANY section of the whole prompt. The optimizer sees every
+section's verbatim current text; judge-flagged sections are shown with failure
+evidence as *advisory* priorities, not as an edit restriction -- see
+Docs/fdpo_mechanism.md.
 """
 
 from __future__ import annotations
@@ -10,13 +13,22 @@ from fdpo.data.loaders import Example
 _OPTIMIZER_SYSTEM = """You are an expert prompt engineer improving a sectioned prompt.
 
 You are shown the complete current prompt, its recent performance history, and
-evidence about which sections are causing failures right now. Propose a small
-set of TARGETED EDITS -- not full rewrites -- that fix the failure patterns
-while preserving everything that already works.
+evidence about which sections the judge attributed the current failures to.
+Your task is to rewrite the prompt so it fixes the failing examples on this
+dataset while preserving the ones that already work.
+
+You have full-prompt flexibility: read the entire prompt as one artifact and
+propose edits to ANY section (system_role, context, task_details, constraints,
+output_format) if changing that section will help. The judge-flagged sections
+under "PRIORITY EVIDENCE" are where failures were attributed, so start there,
+but do not feel constrained -- if a fix genuinely belongs in a different
+section (e.g. tightening the output_format, adding a clarification to the
+context, or reframing the system_role), edit it.
 
 Rules:
-- You may edit ONLY the sections listed under "SECTIONS TO FIX". Never touch
-  any other section, even if you think it could also be improved.
+- Edit as few or as many sections as needed. Prefer the smallest set of
+  changes that fixes the observed failures without regressing the working
+  examples.
 - Each edit is a (find, replace) pair. "find" must be an EXACT, VERBATIM
   substring of that section's CURRENT text -- copy it character-for-character,
   including punctuation and capitalization. "replace" is the new text for
@@ -35,8 +47,8 @@ Rules:
 - Return ONLY a JSON object of this exact shape, no markdown fences, no
   commentary outside the JSON:
   {"edits": [{"section": "<name>", "find": "<exact substring>", "replace": "<new text>"}, ...]}
-- If a section listed under "SECTIONS TO FIX" genuinely needs no change,
-  omit it from "edits" entirely."""
+  "section" must be one of the schema sections in the current prompt.
+- If no change is genuinely warranted this round, return {"edits": []}."""
 
 
 def _render_full_prompt(sections: dict[str, str]) -> str:
@@ -63,11 +75,19 @@ def build_optimizer_messages(
     history: list[dict],               # past round outcomes, most recent last
     schema: tuple[str, ...],
 ) -> list[dict]:
-    sections_to_fix = ", ".join(f'"{name}"' for name in implicated)
+    schema_list = ", ".join(f'"{name}"' for name in schema)
+    priority_sections = ", ".join(f'"{name}"' for name in implicated) or "(none this round)"
 
     fix_blocks = []
-    for name, data in implicated.items():
+    for name in schema:
         title = SECTION_TITLES.get(name, name)
+        header = f'### {title} ("{name}")\nCurrent text: {current_prompt[name]}'
+        data = implicated.get(name)
+        if not data:
+            # Not flagged this round, but still fully editable -- show its
+            # verbatim text so the optimizer can craft an exact find/replace.
+            fix_blocks.append(header + "\n(no failures attributed to this section)")
+            continue
         fail_blocks = []
         for i, f in enumerate(data["failures"], 1):
             fail_blocks.append(
@@ -77,8 +97,7 @@ def build_optimizer_messages(
                 f"  Judge critique: {f['critique']}"
             )
         fix_blocks.append(
-            f"### {title} (\"{name}\")\n"
-            f"Current text: {current_prompt[name]}\n"
+            header + "\n"
             f"{_render_aggregate(data['aggregate'])}\n"
             + "\n".join(fail_blocks)
         )
@@ -106,7 +125,11 @@ def build_optimizer_messages(
         f"PREVIOUS BEST FULL PROMPT (validation accuracy: {best_acc_text}):\n"
         f"{_render_full_prompt(best_prompt)}\n\n"
         f"THIS RUN'S RECENT HISTORY:\n{history_text}\n\n"
-        f"SECTIONS TO FIX (edit ONLY these: {sections_to_fix}):\n"
+        f"EDITABLE SECTIONS (you may edit ANY of these): {schema_list}\n"
+        f"Sections the judge attributed this round's failures to (advisory -- "
+        f"start here, but edit wherever the real fix belongs): {priority_sections}\n\n"
+        f"ALL PROMPT SECTIONS (verbatim current text; flagged sections also "
+        f"include failure evidence):\n"
         + "\n\n".join(fix_blocks)
         + "\n\nGOLD EXAMPLES (solved correctly / reference answers):\n"
         + "\n\n".join(gold_blocks)

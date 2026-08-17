@@ -1,0 +1,296 @@
+{
+  "run_id": "mmlu_simple_fdpo_gpt-4o-mini_s0_20260726-212116",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "mmlu",
+  "solver_model": "gpt-4o-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.6666666666666666,
+    "n_examples": 66,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.7424242424242424,
+    "n_examples": 66,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 3,
+    "simple_max_rounds": 3,
+    "accept_margin": 1.0,
+    "shipped_structured": true,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.35,
+      "n_mining": 32,
+      "n_validation": 18
+    },
+    "baseline_val_acc": 0.5,
+    "best_structured_val_acc": 0.6111111111111112,
+    "n_failures_triggering": 11,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed_best",
+        "n_failures_before": 11,
+        "n_failures_after": 10,
+        "train_acc_after": 0.6875,
+        "val_acc_after": 0.6111111111111112,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "output_format",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_econometrics_test_100",
+          "mmlu_econometrics_test_109",
+          "mmlu_econometrics_test_15",
+          "mmlu_econometrics_test_19",
+          "mmlu_econometrics_test_22",
+          "mmlu_econometrics_test_23",
+          "mmlu_econometrics_test_39",
+          "mmlu_econometrics_test_46",
+          "mmlu_econometrics_test_7",
+          "mmlu_econometrics_test_78",
+          "mmlu_econometrics_test_84"
+        ],
+        "failing_ids_after": [
+          "mmlu_econometrics_test_109",
+          "mmlu_econometrics_test_19",
+          "mmlu_econometrics_test_22",
+          "mmlu_econometrics_test_23",
+          "mmlu_econometrics_test_39",
+          "mmlu_econometrics_test_46",
+          "mmlu_econometrics_test_7",
+          "mmlu_econometrics_test_78",
+          "mmlu_econometrics_test_83",
+          "mmlu_econometrics_test_84"
+        ],
+        "recovered_this_round": [
+          "mmlu_econometrics_test_100",
+          "mmlu_econometrics_test_15"
+        ],
+        "regressed_this_round": [
+          "mmlu_econometrics_test_83"
+        ]
+      },
+      {
+        "round": 2,
+        "status": "committed",
+        "n_failures_before": 10,
+        "n_failures_after": 12,
+        "train_acc_after": 0.625,
+        "val_acc_after": 0.6111111111111112,
+        "sections_changed": [
+          "context",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_econometrics_test_109",
+          "mmlu_econometrics_test_19",
+          "mmlu_econometrics_test_22",
+          "mmlu_econometrics_test_23",
+          "mmlu_econometrics_test_39",
+          "mmlu_econometrics_test_46",
+          "mmlu_econometrics_test_7",
+          "mmlu_econometrics_test_78",
+          "mmlu_econometrics_test_83",
+          "mmlu_econometrics_test_84"
+        ],
+        "failing_ids_after": [
+          "mmlu_econometrics_test_100",
+          "mmlu_econometrics_test_109",
+          "mmlu_econometrics_test_19",
+          "mmlu_econometrics_test_23",
+          "mmlu_econometrics_test_39",
+          "mmlu_econometrics_test_45",
+          "mmlu_econometrics_test_46",
+          "mmlu_econometrics_test_7",
+          "mmlu_econometrics_test_78",
+          "mmlu_econometrics_test_81",
+          "mmlu_econometrics_test_83",
+          "mmlu_econometrics_test_84"
+        ],
+        "recovered_this_round": [
+          "mmlu_econometrics_test_22"
+        ],
+        "regressed_this_round": [
+          "mmlu_econometrics_test_100",
+          "mmlu_econometrics_test_45",
+          "mmlu_econometrics_test_81"
+        ]
+      },
+      {
+        "round": 3,
+        "status": "committed",
+        "n_failures_before": 12,
+        "n_failures_after": 10,
+        "train_acc_after": 0.6875,
+        "val_acc_after": 0.6111111111111112,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_econometrics_test_100",
+          "mmlu_econometrics_test_109",
+          "mmlu_econometrics_test_19",
+          "mmlu_econometrics_test_23",
+          "mmlu_econometrics_test_39",
+          "mmlu_econometrics_test_45",
+          "mmlu_econometrics_test_46",
+          "mmlu_econometrics_test_7",
+          "mmlu_econometrics_test_78",
+          "mmlu_econometrics_test_81",
+          "mmlu_econometrics_test_83",
+          "mmlu_econometrics_test_84"
+        ],
+        "failing_ids_after": [
+          "mmlu_econometrics_test_109",
+          "mmlu_econometrics_test_19",
+          "mmlu_econometrics_test_22",
+          "mmlu_econometrics_test_23",
+          "mmlu_econometrics_test_39",
+          "mmlu_econometrics_test_46",
+          "mmlu_econometrics_test_7",
+          "mmlu_econometrics_test_78",
+          "mmlu_econometrics_test_81",
+          "mmlu_econometrics_test_83"
+        ],
+        "recovered_this_round": [
+          "mmlu_econometrics_test_100",
+          "mmlu_econometrics_test_45",
+          "mmlu_econometrics_test_84"
+        ],
+        "regressed_this_round": [
+          "mmlu_econometrics_test_22"
+        ]
+      }
+    ],
+    "baseline_failing_ids": [
+      "mmlu_econometrics_test_100",
+      "mmlu_econometrics_test_109",
+      "mmlu_econometrics_test_15",
+      "mmlu_econometrics_test_19",
+      "mmlu_econometrics_test_22",
+      "mmlu_econometrics_test_23",
+      "mmlu_econometrics_test_39",
+      "mmlu_econometrics_test_46",
+      "mmlu_econometrics_test_7",
+      "mmlu_econometrics_test_78",
+      "mmlu_econometrics_test_84"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.65625,
+      "n_correct": 21,
+      "n_wrong": 11
+    },
+    "current_train": {
+      "accuracy": 0.6875,
+      "n_correct": 22,
+      "n_wrong": 10
+    },
+    "train_confusion": {
+      "recoveries": [
+        "mmlu_econometrics_test_100",
+        "mmlu_econometrics_test_15"
+      ],
+      "regressions": [
+        "mmlu_econometrics_test_83"
+      ],
+      "still_wrong": [
+        "mmlu_econometrics_test_109",
+        "mmlu_econometrics_test_19",
+        "mmlu_econometrics_test_22",
+        "mmlu_econometrics_test_23",
+        "mmlu_econometrics_test_39",
+        "mmlu_econometrics_test_46",
+        "mmlu_econometrics_test_7",
+        "mmlu_econometrics_test_78",
+        "mmlu_econometrics_test_84"
+      ],
+      "still_right_count": 20,
+      "net_gain": 1
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 11,
+      "rejects": 0
+    },
+    "rounds_run": 3,
+    "train_acc_per_round": [
+      0.6875,
+      0.625,
+      0.6875
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "mmlu_econometrics_dev_2",
+        "mmlu_econometrics_test_102",
+        "mmlu_econometrics_test_103",
+        "mmlu_econometrics_test_104",
+        "mmlu_econometrics_test_12",
+        "mmlu_econometrics_test_35",
+        "mmlu_econometrics_test_65",
+        "mmlu_econometrics_test_72",
+        "mmlu_econometrics_test_8"
+      ],
+      "regressions": [
+        "mmlu_econometrics_test_52",
+        "mmlu_econometrics_test_58",
+        "mmlu_econometrics_test_96",
+        "mmlu_econometrics_validation_3"
+      ],
+      "still_wrong": [
+        "mmlu_econometrics_dev_4",
+        "mmlu_econometrics_test_107",
+        "mmlu_econometrics_test_111",
+        "mmlu_econometrics_test_113",
+        "mmlu_econometrics_test_30",
+        "mmlu_econometrics_test_36",
+        "mmlu_econometrics_test_41",
+        "mmlu_econometrics_test_6",
+        "mmlu_econometrics_test_66",
+        "mmlu_econometrics_test_71",
+        "mmlu_econometrics_test_87",
+        "mmlu_econometrics_test_92",
+        "mmlu_econometrics_test_98"
+      ],
+      "still_right_count": 40,
+      "net_gain": 5
+    },
+    "markdown_source": "prompts\\mmlu_oneliner.md"
+  },
+  "wall_clock_s": 326.1,
+  "cost": {
+    "total_calls": 335,
+    "total_cost_usd": 0.141361,
+    "by_role": {
+      "solver": {
+        "calls": 332,
+        "prompt_tokens": 259714,
+        "completion_tokens": 78047,
+        "cost_usd": 0.085785
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 15256,
+        "completion_tokens": 3133,
+        "cost_usd": 0.055576
+      }
+    }
+  }
+}

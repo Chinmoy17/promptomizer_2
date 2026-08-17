@@ -50,6 +50,20 @@ _SEEDS: dict[str, dict[str, str]] = {
         "output_format": "End your response with a line in exactly this form: "
                          "Answer: Yes  (or)  Answer: No",
     },
+    "legalbench_contract_nli": {
+        "system_role": "You are a contract-law expert.",
+        "context": "A confidentiality clause may or may not require that "
+                   "Confidential Information be explicitly marked or identified "
+                   "as confidential in order to be protected.",
+        "task_details": "Decide whether the given clause requires Confidential "
+                        "Information to be explicitly marked or identified as "
+                        "confidential.",
+        "constraints": "Answer Yes only if the clause conditions protection on "
+                       "explicit marking/identification; answer No if it "
+                       "protects information regardless of marking.",
+        "output_format": "End your response with a line in exactly this form: "
+                         "Answer: Yes  (or)  Answer: No",
+    },
 }
 
 

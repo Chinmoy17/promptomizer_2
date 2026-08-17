@@ -1,0 +1,222 @@
+{
+  "run_id": "gsm8k_simple_fdpo_gpt-4o-mini_s2_20260725-232411",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "gsm8k",
+  "solver_model": "gpt-4o-mini",
+  "seed": 2,
+  "seed_test": {
+    "accuracy": 0.94,
+    "n_examples": 100,
+    "extraction_failures": 1,
+    "exact_match": 0.94
+  },
+  "final_test": {
+    "accuracy": 0.95,
+    "n_examples": 100,
+    "extraction_failures": 1,
+    "exact_match": 0.95
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 5,
+    "simple_max_rounds": 3,
+    "n_failures_triggering": 5,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed_no_best_update",
+        "n_failures_before": 5,
+        "n_failures_after": 7,
+        "train_acc_after": 0.8833333333333333,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "output_format",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "gsm8k_train_1327",
+          "gsm8k_train_2673",
+          "gsm8k_train_4668",
+          "gsm8k_train_5285",
+          "gsm8k_train_927"
+        ],
+        "failing_ids_after": [
+          "gsm8k_train_1327",
+          "gsm8k_train_2195",
+          "gsm8k_train_2673",
+          "gsm8k_train_3953",
+          "gsm8k_train_4668",
+          "gsm8k_train_7075",
+          "gsm8k_train_927"
+        ],
+        "recovered_this_round": [
+          "gsm8k_train_5285"
+        ],
+        "regressed_this_round": [
+          "gsm8k_train_2195",
+          "gsm8k_train_3953",
+          "gsm8k_train_7075"
+        ]
+      },
+      {
+        "round": 2,
+        "status": "committed_no_best_update",
+        "n_failures_before": 7,
+        "n_failures_after": 7,
+        "train_acc_after": 0.8833333333333333,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "gsm8k_train_1327",
+          "gsm8k_train_2195",
+          "gsm8k_train_2673",
+          "gsm8k_train_3953",
+          "gsm8k_train_4668",
+          "gsm8k_train_7075",
+          "gsm8k_train_927"
+        ],
+        "failing_ids_after": [
+          "gsm8k_train_1327",
+          "gsm8k_train_2195",
+          "gsm8k_train_2312",
+          "gsm8k_train_2673",
+          "gsm8k_train_3953",
+          "gsm8k_train_4668",
+          "gsm8k_train_7075"
+        ],
+        "recovered_this_round": [
+          "gsm8k_train_927"
+        ],
+        "regressed_this_round": [
+          "gsm8k_train_2312"
+        ]
+      },
+      {
+        "round": 3,
+        "status": "committed_no_best_update",
+        "n_failures_before": 7,
+        "n_failures_after": 6,
+        "train_acc_after": 0.9,
+        "sections_changed": [
+          "context",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "gsm8k_train_1327",
+          "gsm8k_train_2195",
+          "gsm8k_train_2312",
+          "gsm8k_train_2673",
+          "gsm8k_train_3953",
+          "gsm8k_train_4668",
+          "gsm8k_train_7075"
+        ],
+        "failing_ids_after": [
+          "gsm8k_train_1327",
+          "gsm8k_train_2195",
+          "gsm8k_train_2673",
+          "gsm8k_train_3953",
+          "gsm8k_train_4668",
+          "gsm8k_train_927"
+        ],
+        "recovered_this_round": [
+          "gsm8k_train_2312",
+          "gsm8k_train_7075"
+        ],
+        "regressed_this_round": [
+          "gsm8k_train_927"
+        ]
+      }
+    ],
+    "baseline_failing_ids": [
+      "gsm8k_train_1327",
+      "gsm8k_train_2673",
+      "gsm8k_train_4668",
+      "gsm8k_train_5285",
+      "gsm8k_train_927"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.9166666666666666,
+      "n_correct": 55,
+      "n_wrong": 5
+    },
+    "current_train": {
+      "accuracy": 0.9166666666666666,
+      "n_correct": 55,
+      "n_wrong": 5
+    },
+    "train_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "gsm8k_train_1327",
+        "gsm8k_train_2673",
+        "gsm8k_train_4668",
+        "gsm8k_train_5285",
+        "gsm8k_train_927"
+      ],
+      "still_right_count": 55,
+      "net_gain": 0
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 12,
+      "rejects": 0
+    },
+    "rounds_run": 0,
+    "train_acc_per_round": [
+      0.8833333333333333,
+      0.8833333333333333,
+      0.9
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "gsm8k_test_439"
+      ],
+      "regressions": [],
+      "still_wrong": [
+        "gsm8k_test_1244",
+        "gsm8k_test_285",
+        "gsm8k_test_590",
+        "gsm8k_test_984",
+        "gsm8k_test_997"
+      ],
+      "still_right_count": 94,
+      "net_gain": 1
+    },
+    "markdown_source": "prompts\\gsm8k_oneliner.md"
+  },
+  "wall_clock_s": 183.0,
+  "cost": {
+    "total_calls": 443,
+    "total_cost_usd": 0.142336,
+    "by_role": {
+      "solver": {
+        "calls": 440,
+        "prompt_tokens": 187812,
+        "completion_tokens": 110681,
+        "cost_usd": 0.09458
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 14042,
+        "completion_tokens": 2459,
+        "cost_usd": 0.047756
+      }
+    }
+  }
+}

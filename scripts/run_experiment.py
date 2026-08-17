@@ -52,7 +52,7 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
     else:
         train, test = load_splits(cfg.dataset, cfg.n_train, cfg.n_test, cfg.seed,
                                   dataset_root=cfg.dataset_root,
-                                  split_mode=cfg.split_mode)
+                                  split_mode=cfg.split_mode, subjects=cfg.subjects)
     logger.info("data: %d train / %d test", len(train), len(test))
 
     schema = SCHEMA_MONOLITHIC if cfg.method == "monolithic" else SCHEMA_5
@@ -64,7 +64,8 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
     # editable prompts/<dataset>.md as the true baseline.
     md_source = None
     if cfg.method == "simple_fdpo":
-        md_source = bootstrap_registry_from_markdown(cfg.dataset, run_dir, registry)
+        md_source = bootstrap_registry_from_markdown(
+            cfg.dataset, run_dir, registry, prompt_file=cfg.prompt_file or None)
         logger.info("simple_fdpo: prompt source = %s", md_source)
 
     eval_log = CsvAppender(run_dir / "eval_log.csv", EVAL_LOG_FIELDS)
@@ -120,10 +121,10 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
                                  "gold": row.gold})
             logger.info("final test accuracy: %.3f", final_result.accuracy)
             # Test-set confusion matrix: which examples flipped vs the seed_test?
-            seed_correct = {r.example_id for r in seed_result.rows if r.correct}
-            final_correct = {r.example_id for r in final_result.rows if r.correct}
-            seed_wrong = {r.example_id for r in seed_result.rows if not r.correct}
-            final_wrong = {r.example_id for r in final_result.rows if not r.correct}
+            seed_correct = seed_result.correct_ids()
+            final_correct = final_result.correct_ids()
+            seed_wrong = seed_result.wrong_ids()
+            final_wrong = final_result.wrong_ids()
             opt_summary["test_confusion"] = {
                 "recoveries": sorted(seed_wrong & final_correct),
                 "regressions": sorted(seed_correct & final_wrong),

@@ -1,0 +1,294 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 1.0,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are solving advanced mathematics multiple-choice exam questions with four answer choices (A, B, C, D). These questions often require careful multi-step reasoning, precise application of definitions, and methodical calculation. Your goal is to select the single best answer and report it using the specified format.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.65625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 3,
+            "broke": 6
+          }
+        },
+        {
+          "version": 2,
+          "text": "You are solving advanced mathematics multiple-choice exam questions (choices A, B, C, D). These questions require accurate multi-step reasoning, rigorous use of mathematical definitions and theorems, and clear, logical calculations. Your goal is to select the single best answer and present it clearly.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.65625,
+            "acc_new": 0.71875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 5,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "You are solving advanced mathematics multiple-choice exam questions (choices A, B, C, D). These questions require accurate multi-step reasoning, careful application of mathematical definitions and theorems, and clear, logical calculations. Your goal is to select the single best answer and present it transparently.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.71875,
+            "acc_new": 0.625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 9,
+            "recovered_failures": 3,
+            "broke": 6
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "The questions may cover topics in probability, combinatorics, algebra, geometry, analysis, topology, and linear algebra. Some questions require approximations or estimations, while others are based on theoretical properties or logical deduction. Computational accuracy, correct application of mathematical principles, and attention to the precise phrasing of each option are crucial for success.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.65625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 3,
+            "broke": 6
+          }
+        },
+        {
+          "version": 2,
+          "text": "Questions may be from probability, combinatorics, algebra, geometry, analysis, topology, or linear algebra. Some require explicit computation or estimation, others demand theoretical or logical analysis. Attention to all conditions (such as domain, codomain, group structure, compactness, convergence, etc.) is essential. Precise interpretation of mathematical wording and a stepwise approach to working through implications and calculations are necessary for correct solutions.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.65625,
+            "acc_new": 0.71875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 5,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "Questions may involve probability, combinatorics, algebra, geometry, analysis, topology, or linear algebra. Some require computation or estimation; others demand theoretical analysis or logical deduction. Attention to all conditions—such as domain/codomain, group structure, compactness, convergence, and the properties of mappings—is essential. Precise interpretation of mathematical wording and a stepwise approach through all logical implications and calculations are required for correct solutions.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.71875,
+            "acc_new": 0.625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 9,
+            "recovered_failures": 3,
+            "broke": 6
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "When solving a question:\n- Begin by identifying the underlying topic and relevant mathematical principles.\n- Carefully restate any key parameters, formulas, or constraints.\n- Proceed through calculations or logical steps methodically, ensuring each deduction is justified.\n- For probability and statistics problems, check for requirements to use normal approximations, continuity corrections, or bounds for probabilities.\n- For algebraic or geometric reasoning, verify all necessary properties and constraints (such as for convex polygons or vector spaces).\n- For multi-step problems, apply the rank-nullity theorem, dimension counting, or group theory principles as needed.\n- At each step, re-examine whether your result aligns with the choices provided and check for potential oversights.\n- Only after completing all necessary reasoning, select the answer that best matches the mathematical result.\n\n**General principles for mathematical reasoning:**\n- Always consider if the problem requires a direct computation, an approximation, or an application of a theorem.\n- Use the most precise definitions (e.g., for null space, range, group order, convexity) relevant to the problem.\n- For questions involving \"could be\" or existence, check all options carefully against divisibility or group structure constraints.\n- For \"maximum\" or \"minimum\" property questions, verify by plugging in boundary cases and check logical feasibility.\n\n**Example of a reasoning process:**\nSuppose you are asked: \"A fair coin is tossed 100 times. What is the probability that heads appears at least 60 times?\"  \nYou would:\n1. Recognize this as a binomial probability problem.\n2. Calculate mean and standard deviation.\n3. Use the normal approximation with a continuity correction to estimate the probability.\n4. Compare your result to the answer choices and select the appropriate range.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.65625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 3,
+            "broke": 6
+          }
+        },
+        {
+          "version": 2,
+          "text": "When solving a question:\n- Identify the mathematical topic and any key definitions, theorems, or properties involved.\n- Clearly restate all relevant parameters, constraints, and what is being asked.\n- **Work step by step:** For computational questions, write out all intermediate calculations and justify each step logically. For theoretical or structural questions, explicitly analyze the requirements and constraints for each option.\n- For function and mapping questions, carefully distinguish between properties like injectivity, surjectivity, continuity, compactness, and image/codomain.\n- For questions about cardinality, group structure, or subspace dimension, invoke and apply precise theorems (such as the Fundamental Theorem of Finite Abelian Groups, Rank-Nullity Theorem, etc.) and verify all conditions for each group or set.\n- **For existence or \"could be\" questions:** Systematically test each option against the required properties, explicitly ruling each in or out.\n- For problems involving areas, volumes, or integrals, set up all limits, integrands, and methods (shell/disk, substitution, etc.) before carrying out the calculation.\n- For probability/statistics problems, state the distribution, compute mean and variance, and use appropriate approximations (e.g., normal approximation with continuity correction), always comparing your result to the answer choices.\n- **Before selecting an answer, double-check:** Make sure each step aligns with the original definitions and constraints, and ensure that your result matches only one answer choice.\n\n**Key principles for mathematical accuracy:**\n- Always check domain, codomain, and closure properties.\n- Use the most precise definitions (e.g., when is a function continuous, when is a set compact, what is the order of an element in a group).\n- For dimension and cardinality problems, relate the structure to known classification theorems and explicitly calculate the relevant dimensions or cardinalities.\n- In group and set classification, check all possible decompositions and order constraints.\n- For maximum/minimum or uniqueness/existence properties, consider all edge cases and test boundary scenarios.\n\n**Illustrative reasoning example (not from training data):**\n\nSuppose you are asked:  \n\"Let G be a group of order 8 in which every element x satisfies x^2 = e (the identity). Up to isomorphism, how many such groups exist?\"\n\nYou would:\n1. Recognize that x^2 = e for all x ∈ G means G is an elementary abelian 2-group (every element has order 2).\n2. By the Fundamental Theorem of Finite Abelian Groups, such a group is isomorphic to (Z_2)^3 (since 2^3 = 8).\n3. Therefore, up to isomorphism, there is only one such group.\n\nThus, the answer would be the option indicating \"1\".",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.65625,
+            "acc_new": 0.71875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 5,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "When solving a question:\n- Identify the mathematical topic and recall any relevant definitions, theorems, or properties that govern the problem.\n- Restate the parameters, constraints, and what is being asked.\n- **Work step by step:** \n  - For computational or estimation problems, write out all intermediate calculations and offer justification for each step.\n  - For theoretical questions (e.g., about functions, groups, compactness, or cardinality), analyze each option against the definitions and requirements, eliminating those that cannot meet the conditions.\n- For function and mapping problems, carefully distinguish between injectivity, surjectivity, continuity, compactness, and related properties. For continuous bijections between open and closed intervals, always check boundary behaviors and implications.\n- For maximum/minimum or uniqueness/existence questions, consider all possible scenarios, including boundary and edge cases.\n- For cardinality and group structure questions, explicitly invoke and apply known classification theorems (such as the Fundamental Theorem of Finite Abelian Groups) and verify divisibility, existence, or uniqueness conditions for each case.\n- For probability/statistics problems, state the distribution and parameters, compute mean and variance as needed, use normal approximations with continuity correction when appropriate, and compare your result directly to the answer choices.\n- For integrals and area/volume computations, set up the integral with clear limits and simplify the integrand fully before evaluating.\n- **Before choosing your answer, review:** Ensure all reasoning steps match the definitions and constraints given, and confirm only one answer choice fits.\n\n**General Reasoning Principles:**\n- For \"could be\" and existence questions, test each option for logical and mathematical possibility, not just plausibility.\n- Use only the precise definitions of mathematical concepts—do not rely on intuition or overgeneralization.\n- For stepwise problems, check each intermediate result for consistency with the original problem constraints.\n- For dimension/rank/nullity problems in linear algebra, always use the Rank-Nullity Theorem and relate null space and range directly to the structure of the operator.\n- For cardinality, compare the set sizes using rigorous set-theoretic arguments; do not confuse structural complexity with cardinality.\n- In combinatorial, geometric, or optimization problems, ensure all edge or extremal cases are considered and ruled in or out correctly.\n\n**Illustrative reasoning example (not from training data):**\n\nSuppose you are asked:  \n\"Let S be the set of all functions from the interval (0,1) to [0,1]. Which of the following could be true?  \nI. S contains a continuous bijection.  \nII. The image of some function in S is compact.  \nIII. There is a surjective, discontinuous function in S.\"\n\nYou should:\n1. Analyze option I: A continuous bijection from (0,1) to [0,1] cannot exist because (0,1) is not compact but [0,1] is, and a continuous bijection from a non-compact to a compact set is not possible.\n2. Option II: The image of a function could be a closed interval such as [0,1], which is compact, so this is possible.\n3. Option III: A surjective but discontinuous function can exist by construction.\n\nCheck each statement using the definitions of continuity, compactness, and surjectivity, then pick the answer accordingly.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.71875,
+            "acc_new": 0.625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 9,
+            "recovered_failures": 3,
+            "broke": 6
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Show all key steps and justification before providing the answer.\n- Do not skip reasoning, even if the answer seems obvious.\n- Use precise terminology and logical structure to avoid misinterpretation of mathematical wording.\n- Your final answer must appear on a new line in the form:\n  Answer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.65625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 3,
+            "broke": 6
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Show all key steps and provide justification for each deduction.\n- Do not skip reasoning, even if the answer seems immediate.\n- Use precise definitions and maintain clear logical structure.\n- Your final answer must appear on a new line in the form:\n  Answer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.65625,
+            "acc_new": 0.71875,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 5,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "- Show all key steps and justify each deduction.\n- Do not skip reasoning, even if the answer seems immediate.\n- Use precise definitions and maintain a clear logical structure.\n- Your final answer must appear on a new line in the form:\n  Answer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.71875,
+            "acc_new": 0.625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 9,
+            "recovered_failures": 3,
+            "broke": 6
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Show your full reasoning, then conclude with your answer as:\nAnswer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.65625,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 3,
+            "broke": 6
+          }
+        }
+      ]
+    }
+  }
+}

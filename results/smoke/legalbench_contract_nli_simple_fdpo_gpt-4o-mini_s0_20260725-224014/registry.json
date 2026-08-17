@@ -1,0 +1,230 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.9166666666666666,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a contract-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "A confidentiality clause may or may not require that Confidential Information be explicitly marked or identified as confidential in order to be protected under the agreement.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Certain confidentiality clauses protect information only if it is explicitly marked or identified as confidential, while others protect information based on its nature or the surrounding circumstances, regardless of marking. Your job is to determine, for a given clause, whether the protection of Confidential Information is contingent on explicit marking or identification.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.9166666666666666,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "Confidentiality clauses differ in how they define and protect \"Confidential Information.\" Some require that information be explicitly marked or identified as confidential in order to be protected; others protect information based on its nature, context, or the recipient’s knowledge, even if it is unmarked. Your task is to determine whether a given clause makes explicit marking or identification the sole requirement for protection of Confidential Information.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.8666666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "Confidentiality clauses vary in how they define and protect \"Confidential Information.\" Some require that information be explicitly marked or identified as confidential for protection; others protect information based on its nature, context, or the recipient’s knowledge, even if unmarked. Your task is to determine whether a given clause requires explicit marking or identification as the sole way information qualifies for protection.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8666666666666667,
+            "acc_new": 0.85,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 8,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given contract clause requires Confidential Information to be explicitly marked or identified as confidential.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Carefully analyze the provided contract clause to decide if it requires Confidential Information to be explicitly marked or identified as confidential to be protected. Your answer must be based on the clause's language and not on assumptions or general practices.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.9166666666666666,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "Analyze the provided contract clause to determine if it requires Confidential Information to be explicitly marked or identified as confidential in order to be protected. Base your answer strictly on the clause’s actual language, not on assumptions, typical industry practice, or what is commonly understood.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.8666666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "Analyze the provided contract clause to decide if it requires that Confidential Information be explicitly marked or identified as confidential in order to be protected. Focus strictly on the clause’s language—do not rely on assumptions, common practice, or general industry interpretation.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8666666666666667,
+            "acc_new": 0.85,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 8,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer Yes only if the clause conditions protection on explicit marking or identification. Answer No if the clause protects information regardless of whether it is marked.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- **Answer Yes** only if the clause states that information is protected *exclusively* when it is explicitly marked or identified as confidential (e.g., “must be marked ‘confidential’,” “only information so designated”).\n- **Answer No** if the clause protects information based on other criteria, such as:\n    - Information that is confidential by its nature or context, even if unmarked.\n    - Information the recipient knows or should reasonably know is confidential, regardless of marking.\n    - Clauses that protect both marked and unmarked information, or provide multiple alternative ways information may be protected (e.g., “marked confidential, or otherwise reasonably understood to be confidential”).\n\n**Checklist for Decision:**\n1. **Does the Clause Require Explicit Marking or Identification?**\n   - Look for language such as “must be marked,” “only information designated as confidential,” or “protection applies solely to information so labeled.”\n   - If *all* protection depends on such language, answer Yes.\n\n2. **Are There Alternative Bases for Protection?**\n   - If the clause protects information that is not marked but is confidential by nature, context, or reasonable understanding, answer No.\n   - If the clause lists marking as one of several possible ways information can qualify as confidential, answer No.\n\n3. **Partial Coverage:**\n   - If the clause protects *some* information only if marked, but also protects other information without marking, answer No.\n\n**Principle:**  \nOnly answer Yes if explicit marking or identification is the *sole* condition for information to be protected. If there is *any* path to protection for unmarked information, answer No.\n\n**Illustrative Examples:**\n- Example 1: “Information must be labeled ‘Confidential’ to be protected.” → Answer: Yes\n- Example 2: “Information marked ‘Confidential’ or otherwise reasonably understood to be confidential is protected.” → Answer: No\n- Example 3: “Confidential Information includes all non-public business information, whether or not marked.” → Answer: No\n- Example 4: “Only documents bearing a ‘Confidential’ stamp shall be protected.” → Answer: Yes\n- Example 5: “Information that is marked or that the recipient knows or should know is confidential.” → Answer: No\n\nBe especially careful with clauses that mention both marking and other circumstances; if *any* unmarked information can be protected, the answer must be No.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.9166666666666666,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "- **Only answer Yes** if the clause *explicitly* states that protection applies *exclusively* to information that is marked or identified as confidential (e.g., “must be marked ‘confidential’,” “only information so designated”).\n    - If the clause defines Confidential Information by a list of types or examples, and does not mention marking or identification, but refers to specific categories or proprietary lists, consider whether the clause’s overall structure leaves no alternative to explicit identification for protection.\n    - If *any* part of the clause allows for protection of unmarked or unidentified information—even as an alternative or in addition to marking—answer No.\n\n- **Answer No** if the clause protects information under *any* of the following conditions:\n    - The information is confidential by its nature, context, or circumstances, regardless of marking.\n    - The recipient knows or should reasonably know the information is confidential, regardless of whether it is marked or identified.\n    - The clause gives multiple, alternative ways information may qualify as confidential (e.g., “marked confidential, or otherwise reasonably understood to be confidential;” “marked confidential or known to be confidential”).\n    - The clause defines categories of information (e.g., customer lists, pricing, financial data) as confidential without requiring explicit marking or identification for these categories.\n\n**Reasoning Principle:**\n- Only answer Yes if explicit marking or identification is the *only path* to protection under the clause—meaning protection does not extend to unmarked or unidentified information under any other criterion.\n- If the clause defines Confidential Information solely by explicit identification, or by a list of categories that are confidential only if so identified or marked, answer Yes.\n- If the clause extends protection to information by its nature, by implication, or by reasonable understanding (even if marking is one possible method), answer No.\n\n**Checklist for Decision:**\n1. **Does the clause require explicit marking or identification for all protection?**\n   - Look for language that makes marking or designation the sole gateway to protection (e.g., “Only information marked as confidential shall be protected”).\n   - If so, answer Yes.\n\n2. **Does the clause provide for other bases of protection?**\n   - Does it protect information that is confidential by its nature, by the context of disclosure, or by the recipient’s knowledge, regardless of marking?\n   - Does it protect categories of information (e.g., pricing, customer lists) without requiring marking?\n   - Does it mention alternatives to marking (e.g., “marked or otherwise understood to be confidential”)?\n   - If any of these apply, answer No.\n\n3. **Does the clause partially require marking for some information, but not all?**\n   - If any information is protected without marking, answer No.\n\n4. **Is “designation” or “identification” required for some, but not all, information?**\n   - If the clause protects information only if “designated” as confidential, consider if this designation is the only way information can be protected. If so, answer Yes. If not, answer No.\n\n**Invented Illustrative Examples:**\n\n- Example A: “Confidential Information must be labeled ‘Confidential’ or ‘Proprietary’ to be subject to protection under this Agreement.”  \n  → Answer: Yes\n\n- Example B: “Confidential Information includes all non-public financial data, customer lists, and technical documents, whether or not such information is marked or identified as confidential.”  \n  → Answer: No\n\n- Example C: “Information is protected if marked as confidential, if the recipient knows it is confidential, or if it is confidential by its nature.”  \n  → Answer: No\n\n- Example D: “Only documents bearing a ‘Confidential’ stamp are subject to this obligation.”  \n  → Answer: Yes\n\n- Example E: “Confidential Information means information that is either designated in writing as confidential or, if disclosed orally, is confirmed in writing as confidential within 30 days.”  \n  → Answer: Yes\n\n- Example F: “Confidential Information means information which the recipient knows, or ought reasonably to know, is confidential, regardless of whether it is marked.”  \n  → Answer: No\n\n- Example G: “Confidential Information includes proprietary data, pricing, and customer lists, unless such information is publicly known.”  \n  → Answer: No\n\n**Special Cautions:**\n- If the clause defines Confidential Information by listing specific types (e.g., “Confidential Information means customer lists, pricing, and contracts of the Discloser”), and does not require explicit marking or identification, answer No.\n- If the clause references both marking and other criteria (such as nature, context, or recipient’s awareness), answer No—unless marking is the sole path to protection.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.8666666666666667,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "- **Answer Yes only if the clause’s language makes explicit marking or identification the *only* way information is protected.** This means:\n    - The clause must require marking, labeling, stamping, written confirmation, or explicit designation for *all* information to be protected.\n    - If the clause allows *any* other route to protection—such as information being confidential by nature, by the recipient’s knowledge, or by being listed as a category—answer No.\n\n- **Answer No if the clause provides for any alternative or additional way information may qualify as confidential, including:**\n    - Information protected by its nature, context, or the circumstances of disclosure, regardless of marking.\n    - Information that the recipient knows or reasonably should know is confidential.\n    - Information identified by category (e.g., pricing, customer lists, business plans) without requiring those categories to also be marked or identified as confidential.\n    - Clauses that offer multiple alternative ways to qualify as confidential (e.g., “marked as confidential or otherwise reasonably understood to be confidential”).\n\n- **If the clause is ambiguous or silent about marking or identification, and does not expressly require it for all protection, answer No.**\n\n**General Reasoning Principle:**  \n- The core distinction: Does the clause *require* explicit marking or identification as the sole condition for information to be protected? If there is any path to protection other than explicit marking/identification, answer No.\n\n**Decision Process Checklist:**\n1. **Is explicit marking/identification the only stated way to protection?**\n    - Look for phrases like “only information marked as confidential is protected,” “must be labeled,” “must be designated in writing.”\n    - If yes, answer Yes.\n\n2. **Are there alternative ways to protection?**\n    - Does the clause protect information by its nature, or if the recipient knows it’s confidential, or includes categories/types of information without requiring marking?\n    - Does it use “or” to introduce alternatives (e.g., “marked as confidential or otherwise known to be confidential”)?\n    - If yes, answer No.\n\n3. **Does the clause partially require marking or identification?**\n    - If only some types of information require marking, but others do not, answer No.\n    - If the clause allows any unmarked or undesignated information to be protected, answer No.\n\n4. **Is “designation” or “identification” required for only some situations?**\n    - If all protection hinges on explicit designation/identification, answer Yes.\n    - If not, answer No.\n\n**Invented Illustrative Examples:**\n\n- Example 1: “Only documents labeled ‘Confidential’ shall be protected under this Agreement.”  \n  → Answer: Yes\n\n- Example 2: “Confidential Information includes all technical, financial, or commercial information, whether or not marked as confidential.”  \n  → Answer: No\n\n- Example 3: “Information is protected if marked as confidential, or if the recipient knows it is confidential, or if it is confidential by its nature.”  \n  → Answer: No\n\n- Example 4: “Confidential Information means information designated in writing as confidential, or if disclosed orally, confirmed in writing as confidential within 15 days.”  \n  → Answer: Yes\n\n- Example 5: “Confidential Information means any information of a confidential nature, whether marked as confidential or not.”  \n  → Answer: No\n\n- Example 6: “Confidential Information means customer lists, pricing, and business plans. Such information must be marked ‘Confidential’ to be protected.”  \n  → Answer: Yes\n\n- Example 7: “Confidential Information means customer lists, pricing, and business plans of the Discloser.”  \n  → Answer: No\n\n- Example 8: “Information is protected only if identified as confidential in a written notice at the time of disclosure.”  \n  → Answer: Yes\n\n**Special Cautions:**\n- If the clause defines Confidential Information by specific types or categories (e.g., “Confidential Information means customer lists, pricing, and contracts”), and does not *also* require explicit marking or identification for protection, answer No.\n- If the clause mentions both marking and other criteria (such as nature of information or recipient knowledge), answer No—unless marking/identification is clearly the sole path to protection.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8666666666666667,
+            "acc_new": 0.85,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 8,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

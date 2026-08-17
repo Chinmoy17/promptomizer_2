@@ -78,7 +78,8 @@ class OpenAICompatClient(ModelClient):
                     logger.warning("%s call blocked by content filter; "
                                    "returning empty completion", self.role)
                     return ChatResult(text="", prompt_tokens=0,
-                                      completion_tokens=0, model=self.model)
+                                      completion_tokens=0, model=self.model,
+                                      blocked=True)
                 raise
             except RETRYABLE as e:
                 if attempt == MAX_ATTEMPTS - 1:

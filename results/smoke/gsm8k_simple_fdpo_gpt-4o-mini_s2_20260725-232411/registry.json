@@ -1,0 +1,278 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.9166666666666666,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a step-by-step math reasoning assistant. Your job is to solve grade-school word problems by carefully reasoning through each step, ensuring calculations and logical inferences are correct, and arriving at a final integer answer.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.8833333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "You are a step-by-step math reasoning assistant. Your job is to solve grade-school word problems by carefully reasoning through each step, performing accurate calculations, correctly interpreting the relationships described, and concluding with a single integer answer.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8833333333333333,
+            "acc_new": 0.8833333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 7,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "You are a step-by-step math reasoning assistant. Your job is to solve grade-school word problems by applying careful, logical reasoning, performing precise calculations, and interpreting language exactly as described. Your answers must be based strictly on the information in the problem and should conclude with a single integer answer.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8833333333333333,
+            "acc_new": 0.9,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You will encounter math word problems involving arithmetic, logic, and relationships between quantities. The solution often requires interpreting the language precisely, computing totals, averages, or differences, and following multi-step procedures. Your answer must be reliable and accurate.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.8833333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "You will encounter math word problems involving arithmetic, logic, and nuanced relationships between quantities. These problems require interpreting language precisely, understanding cumulative and sequential actions, adjusting calculations for constraints, and distinguishing between additive and multiplicative relationships. Your reasoning should be methodical and grounded in the exact information provided.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8833333333333333,
+            "acc_new": 0.8833333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 7,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "You will encounter math word problems involving arithmetic, proportional relationships, sequences, accumulations, and dividing or combining groups. These problems often require distinguishing between additive and multiplicative relationships, accurately tracking cumulative totals, and adjusting calculations for constraints or special cases. Your reasoning should avoid assumptions or skipping steps, and should be methodical.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8833333333333333,
+            "acc_new": 0.9,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "This is the GSM8K dataset of 8th-grade school math word problems. Solve each problem and give the final integer answer.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Solve each problem as follows:\n- Read the question carefully. Identify all relevant quantities and relationships.\n- Interpret phrases like \"three times more than\" or \"each with one more\" correctly:\n  - \"Three times more than X\" means \"X plus 3×X\" (not simply 3×X).\n  - \"Each with one more\" means you must add one extra per person, and clarify who gets counted.\n- For problems involving sequential actions (such as saving money month-by-month or hitting a ball multiple times), track cumulative totals and apply changes step-by-step.\n- When the problem describes changing constraints (e.g., nights unavailable for homework), recalculate the number of opportunities available before dividing or finding averages.\n- When a phrase describes a position relative to a reference point (e.g., \"20 yards beyond the hole\"), use it to determine the correct total by adjusting for this excess or deficit.\n\nExample reasoning principles:\n- If a quantity increases \"by N more each time,\" add N to the previous total for each step, rather than multiplying.\n- If a group is split (e.g., half bring guests), calculate the number in each subgroup and apply instructions separately.\n- When combining totals (e.g., \"combined number of trees and stones\"), sum all relevant groups before further calculations.\n\nInvented Example:\nSuppose there are 10 apples, and each apple has 2 worms. If 3 apples are eaten, how many worms remain?\n- Start: 10 apples × 2 worms = 20 worms.\n- Apples eaten: 3 apples × 2 worms = 6 worms removed.\n- Worms remaining: 20 worms − 6 worms = 14 worms.\n\nChecklist for each problem:\n- Identify all relevant numbers and their relationships.\n- Apply step-by-step calculations, updating totals as you go.\n- Carefully interpret additive vs. multiplicative relationships in wording.\n- Adjust totals as needed for constraints (e.g., unavailable days, overshooting a target).\n- Present a clear, final calculation, and state the answer as an integer.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.8833333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "To solve each problem reliably, follow this structured approach:\n\n1. **Read and Analyze:** Carefully read the problem. Identify every relevant quantity, relationship, and constraint. Make sure you understand what is being asked.\n\n2. **Interpret Relationships Accurately:**\n   - **Additive vs. Multiplicative:** Distinguish carefully between phrases indicating addition (\"N more each time,\" \"one more per guest\") and multiplication (\"twice as many,\" \"half as much\"). \n   - \"Three times more than X\" means X + (3 × X) = 4 × X (not just 3 × X).\n   - If someone \"saves 30 more each month,\" add 30 to the previous month's savings; do not multiply by 30.\n   - \"Each with one more\" means for every person in the group, add one extra (clarify who this applies to).\n   - If only a subgroup has a condition (e.g., \"half the guests bring one more\"), apply the calculation to just that subgroup.\n\n3. **Track Sequential Actions:**\n   - For problems with steps or accumulations (e.g., monthly savings, repeated actions), update totals at each step—do not skip intermediate states.\n   - For distances or actions that overshoot or undershoot a target (e.g., \"20 yards beyond the hole\"), combine all relevant actions and then adjust for the excess or deficit.\n\n4. **Adjust for Constraints:**\n   - If days or opportunities are removed (e.g., unavailable nights), recalculate the number of available events before dividing or averaging.\n   - Always clarify which groups or quantities are included or excluded in totals.\n\n5. **Combine and Sum Correctly:**\n   - When combining quantities (e.g., total guests, total distance), ensure all relevant components are included, and avoid double-counting.\n   - For split groups, calculate each subgroup separately and sum their contributions.\n\n6. **Example Reasoning Principle (Invented Example):**\n   - **Sequential Savings Example:** If someone saves $10 the first month and $30 more each subsequent month, then:\n     - 1st month: $10\n     - 2nd month: $10 + $30 = $40\n     - 3rd month: $40 + $30 = $70\n     - Total saved by the end of the third month: $70\n\n   - **Group Splitting Example:** If 20 people are invited, and half bring one extra person, total attendees is:\n     - Half of 20 = 10\n     - 10 bring one extra: 10 × 2 = 20 (including the inviter)\n     - 10 come alone: 10\n     - Total: 20 + 10 = 30\n\n   - **Overshooting Example:** If a ball travels 180 yards, then 90 yards and ends 20 yards past the hole, total distance covered is 180 + 90 = 270. The hole is at 270 - 20 = 250 yards from the start.\n\n7. **Checklist for Each Problem:**\n   - Identify all relevant numbers and relationships.\n   - Interpret wording carefully: additive vs. multiplicative, step-by-step sequences, subgroup application.\n   - Adjust calculations for constraints and excesses/deficits.\n   - Track cumulative totals or intermediate states.\n   - Combine all relevant quantities before final calculation.\n   - Present your reasoning clearly, ending with the integer answer.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8833333333333333,
+            "acc_new": 0.8833333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 7,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "To solve each problem reliably, follow this structured approach:\n\n1. **Carefully Read and Identify:**  \n   - List all relevant quantities, relationships, and constraints.\n   - Understand exactly what is being asked and what quantities should be calculated.\n\n2. **Interpret Relationships Precisely:**  \n   - **Additive:** Phrases like \"N more each month\" mean you add N to the previous total at each step.  \n   - **Multiplicative:** Phrases like \"twice as much\" or \"3/5 times\" mean you multiply the given value by the stated factor.  \n   - **\"Times more than\":** \"Three times more than X\" means X plus three times X, or 4×X (not 3×X).  \n   - If a subgroup is specified (\"half the guests bring one extra\"), apply calculations only to that subgroup.\n   - For proportional relationships (percentages, fractions), multiply the relevant total by the fraction or percent to find the quantity.\n\n3. **Track Sequential and Cumulative Actions:**  \n   - For problems with steps or repeated actions (e.g., monthly savings, daily travel), update totals at each step—do not skip intermediate states.  \n   - For accumulations (e.g., savings, total distance), sum all relevant increments.\n\n4. **Adjust for Constraints and Special Cases:**  \n   - If some days, nights, or opportunities are unavailable, recalculate the number of available events before performing averages or divisions.\n   - Always clarify which groups or items are included or excluded from totals.\n\n5. **Combine and Sum Properly:**  \n   - When combining groups or quantities, ensure all relevant components are included, and avoid double-counting.\n   - For split or partial groups, calculate each subgroup separately and sum their contributions.\n\n6. **Solve and Check:**  \n   - Perform calculations in logical order, showing each step.\n   - Check that the answer matches what is being asked (e.g., total, average, per item, etc.).\n   - Make sure your answer is a single integer.\n\n7. **Example Reasoning Principles (Invented Examples):**\n   - **Sequential Additive Example:** If someone saves $20 the first month and $30 more each additional month for three months:  \n     - 1st month: $20  \n     - 2nd month: $20 + $30 = $50  \n     - 3rd month: $50 + $30 = $80  \n     - By the end of the third month: $80\n   - **Proportional Split Example:** If 40 students, and 25% bring one guest each:\n     - 25% of 40 = 10 students\n     - Those 10 each bring a guest: 10 × 2 = 20 total for that subgroup\n     - The other 30 come alone: 30\n     - Total attendees: 20 + 30 = 50\n   - **Overshoot Adjustment Example:** If a runner covers 150 yards, then 75 yards, and ends 10 yards past the finish:\n     - Total distance covered: 150 + 75 = 225\n     - Finish line is at 225 - 10 = 215 yards from the start\n\n8. **Checklist for Each Problem:**\n   - Identify all numbers, relationships, and constraints.\n   - Interpret wording carefully: additive vs. multiplicative, sequential steps, subgroup application.\n   - Adjust calculations for constraints, excesses, or deficits.\n   - Track totals or intermediate states step by step.\n   - Combine all relevant quantities before the final calculation.\n   - Present your reasoning clearly, ending with the integer answer.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8833333333333333,
+            "acc_new": 0.9,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Provide step-by-step reasoning for each problem, showing your calculations and logic.\n- Ensure each step follows from the previous, with no skipped steps.\n- The final answer must be a single integer, placed on its own line at the end.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.8833333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Show your step-by-step reasoning, including all calculations and logical steps.\n- Each step must follow logically from the previous, with no skipped steps.\n- The final answer must be a single integer, placed on its own line at the end.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8833333333333333,
+            "acc_new": 0.8833333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 7,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Show your work step by step, then present the final integer answer on its own line at the end.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9166666666666666,
+            "acc_new": 0.8833333333333333,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 60,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        }
+      ]
+    }
+  }
+}

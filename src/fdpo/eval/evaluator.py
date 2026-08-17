@@ -26,6 +26,7 @@ class EvalRow:
     gold: str
     correct: bool
     output: str
+    blocked: bool = False   # provider refused (content filter) -> not evaluable
 
 
 @dataclass
@@ -33,15 +34,32 @@ class EvalResult:
     rows: list[EvalRow]
 
     @property
+    def n_blocked(self) -> int:
+        return sum(1 for r in self.rows if r.blocked)
+
+    @property
+    def n_evaluated(self) -> int:
+        """Rows that actually produced a scorable answer (total minus blocked)."""
+        return len(self.rows) - self.n_blocked
+
+    @property
     def accuracy(self) -> float:
-        return sum(r.correct for r in self.rows) / len(self.rows) if self.rows else 0.0
+        # Content-filter-blocked calls are NOT counted as wrong -- they are
+        # excluded from the denominator (they were never evaluable).
+        denom = self.n_evaluated
+        return sum(r.correct for r in self.rows) / denom if denom else 0.0
 
     @property
     def extraction_failures(self) -> int:
-        return sum(1 for r in self.rows if r.pred is None)
+        # Genuine unparseable outputs only; a blocked call is not a parse failure.
+        return sum(1 for r in self.rows if r.pred is None and not r.blocked)
 
     def correct_ids(self) -> set[str]:
         return {r.example_id for r in self.rows if r.correct}
+
+    def wrong_ids(self) -> set[str]:
+        # Excludes blocked calls -- they are not failures the optimizer can fix.
+        return {r.example_id for r in self.rows if not r.correct and not r.blocked}
 
 
 def evaluate(solver: ModelClient, sections: dict[str, str],
@@ -62,7 +80,8 @@ def evaluate(solver: ModelClient, sections: dict[str, str],
             temperature=temperature, max_tokens=max_tokens, purpose=purpose)
         pred = extract_pred(dataset, result.text)
         return EvalRow(example_id=ex.id, pred=pred, gold=ex.gold,
-                       correct=is_correct(dataset, pred, ex.gold), output=result.text)
+                       correct=is_correct(dataset, pred, ex.gold),
+                       output=result.text, blocked=result.blocked)
 
     workers = max(1, min(max_workers, len(examples))) if examples else 1
     with ThreadPoolExecutor(max_workers=workers) as pool:

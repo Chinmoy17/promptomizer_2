@@ -66,7 +66,7 @@ def apply_edits(sections: dict[str, str], edits: list[dict]) -> EditResult:
     for e in edits:
         section, find, replace = e.get("section"), e.get("find", ""), e.get("replace", "")
         if section not in working:
-            log.append({**e, "applied": False, "reason": "unknown or unflagged section"})
+            log.append({**e, "applied": False, "reason": "unknown section"})
             continue
         if find not in working[section]:
             log.append({**e, "applied": False, "reason": "find not an exact substring"})
@@ -105,8 +105,8 @@ def rewrite_prompt_bundle(client: ModelClient,
             for e in edits:
                 if not isinstance(e, dict) or not {"section", "find", "replace"} <= set(e):
                     raise ValueError(f"malformed edit entry: {e!r}")
-                if e["section"] not in implicated:
-                    raise ValueError(f"edit targets unflagged section: {e['section']!r}")
+                if e["section"] not in schema:
+                    raise ValueError(f"edit targets unknown section: {e['section']!r}")
             return apply_edits(current_prompt, edits)
         except (json.JSONDecodeError, ValueError) as exc:
             if attempt == MAX_PARSE_RETRIES:

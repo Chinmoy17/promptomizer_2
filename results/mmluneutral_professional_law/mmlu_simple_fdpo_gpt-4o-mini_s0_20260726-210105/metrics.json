@@ -1,0 +1,353 @@
+{
+  "run_id": "mmlu_simple_fdpo_gpt-4o-mini_s0_20260726-210105",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "mmlu",
+  "solver_model": "gpt-4o-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.5303030303030303,
+    "n_examples": 66,
+    "extraction_failures": 2
+  },
+  "final_test": {
+    "accuracy": 0.5151515151515151,
+    "n_examples": 66,
+    "extraction_failures": 2
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 3,
+    "simple_max_rounds": 3,
+    "accept_margin": 1.0,
+    "shipped_structured": true,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.35,
+      "n_mining": 32,
+      "n_validation": 18
+    },
+    "baseline_val_acc": 0.6111111111111112,
+    "best_structured_val_acc": 0.7777777777777778,
+    "n_failures_triggering": 19,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed_best",
+        "n_failures_before": 19,
+        "n_failures_after": 14,
+        "train_acc_after": 0.5625,
+        "val_acc_after": 0.7222222222222222,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "output_format",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_professional_law_test_1086",
+          "mmlu_professional_law_test_1227",
+          "mmlu_professional_law_test_1236",
+          "mmlu_professional_law_test_1336",
+          "mmlu_professional_law_test_1341",
+          "mmlu_professional_law_test_1360",
+          "mmlu_professional_law_test_1380",
+          "mmlu_professional_law_test_1461",
+          "mmlu_professional_law_test_1477",
+          "mmlu_professional_law_test_1526",
+          "mmlu_professional_law_test_180",
+          "mmlu_professional_law_test_205",
+          "mmlu_professional_law_test_219",
+          "mmlu_professional_law_test_37",
+          "mmlu_professional_law_test_753",
+          "mmlu_professional_law_test_777",
+          "mmlu_professional_law_test_787",
+          "mmlu_professional_law_test_94",
+          "mmlu_professional_law_validation_29"
+        ],
+        "failing_ids_after": [
+          "mmlu_professional_law_test_1227",
+          "mmlu_professional_law_test_1236",
+          "mmlu_professional_law_test_1336",
+          "mmlu_professional_law_test_1341",
+          "mmlu_professional_law_test_1360",
+          "mmlu_professional_law_test_1380",
+          "mmlu_professional_law_test_1461",
+          "mmlu_professional_law_test_1526",
+          "mmlu_professional_law_test_205",
+          "mmlu_professional_law_test_219",
+          "mmlu_professional_law_test_753",
+          "mmlu_professional_law_test_777",
+          "mmlu_professional_law_test_807",
+          "mmlu_professional_law_validation_29"
+        ],
+        "recovered_this_round": [
+          "mmlu_professional_law_test_1086",
+          "mmlu_professional_law_test_1477",
+          "mmlu_professional_law_test_180",
+          "mmlu_professional_law_test_37",
+          "mmlu_professional_law_test_787",
+          "mmlu_professional_law_test_94"
+        ],
+        "regressed_this_round": [
+          "mmlu_professional_law_test_807"
+        ]
+      },
+      {
+        "round": 2,
+        "status": "committed_best",
+        "n_failures_before": 14,
+        "n_failures_after": 14,
+        "train_acc_after": 0.5625,
+        "val_acc_after": 0.7777777777777778,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_professional_law_test_1227",
+          "mmlu_professional_law_test_1236",
+          "mmlu_professional_law_test_1336",
+          "mmlu_professional_law_test_1341",
+          "mmlu_professional_law_test_1360",
+          "mmlu_professional_law_test_1380",
+          "mmlu_professional_law_test_1461",
+          "mmlu_professional_law_test_1526",
+          "mmlu_professional_law_test_205",
+          "mmlu_professional_law_test_219",
+          "mmlu_professional_law_test_753",
+          "mmlu_professional_law_test_777",
+          "mmlu_professional_law_test_807",
+          "mmlu_professional_law_validation_29"
+        ],
+        "failing_ids_after": [
+          "mmlu_professional_law_test_1227",
+          "mmlu_professional_law_test_1236",
+          "mmlu_professional_law_test_1336",
+          "mmlu_professional_law_test_1360",
+          "mmlu_professional_law_test_1380",
+          "mmlu_professional_law_test_1461",
+          "mmlu_professional_law_test_1526",
+          "mmlu_professional_law_test_205",
+          "mmlu_professional_law_test_219",
+          "mmlu_professional_law_test_37",
+          "mmlu_professional_law_test_753",
+          "mmlu_professional_law_test_777",
+          "mmlu_professional_law_test_787",
+          "mmlu_professional_law_validation_29"
+        ],
+        "recovered_this_round": [
+          "mmlu_professional_law_test_1341",
+          "mmlu_professional_law_test_807"
+        ],
+        "regressed_this_round": [
+          "mmlu_professional_law_test_37",
+          "mmlu_professional_law_test_787"
+        ]
+      },
+      {
+        "round": 3,
+        "status": "committed",
+        "n_failures_before": 14,
+        "n_failures_after": 15,
+        "train_acc_after": 0.53125,
+        "val_acc_after": 0.6666666666666666,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_professional_law_test_1227",
+          "mmlu_professional_law_test_1236",
+          "mmlu_professional_law_test_1336",
+          "mmlu_professional_law_test_1360",
+          "mmlu_professional_law_test_1380",
+          "mmlu_professional_law_test_1461",
+          "mmlu_professional_law_test_1526",
+          "mmlu_professional_law_test_205",
+          "mmlu_professional_law_test_219",
+          "mmlu_professional_law_test_37",
+          "mmlu_professional_law_test_753",
+          "mmlu_professional_law_test_777",
+          "mmlu_professional_law_test_787",
+          "mmlu_professional_law_validation_29"
+        ],
+        "failing_ids_after": [
+          "mmlu_professional_law_test_1227",
+          "mmlu_professional_law_test_1236",
+          "mmlu_professional_law_test_1336",
+          "mmlu_professional_law_test_1360",
+          "mmlu_professional_law_test_1380",
+          "mmlu_professional_law_test_1461",
+          "mmlu_professional_law_test_1477",
+          "mmlu_professional_law_test_1526",
+          "mmlu_professional_law_test_180",
+          "mmlu_professional_law_test_205",
+          "mmlu_professional_law_test_219",
+          "mmlu_professional_law_test_37",
+          "mmlu_professional_law_test_753",
+          "mmlu_professional_law_test_777",
+          "mmlu_professional_law_validation_29"
+        ],
+        "recovered_this_round": [
+          "mmlu_professional_law_test_787"
+        ],
+        "regressed_this_round": [
+          "mmlu_professional_law_test_1477",
+          "mmlu_professional_law_test_180"
+        ]
+      }
+    ],
+    "baseline_failing_ids": [
+      "mmlu_professional_law_test_1086",
+      "mmlu_professional_law_test_1227",
+      "mmlu_professional_law_test_1236",
+      "mmlu_professional_law_test_1336",
+      "mmlu_professional_law_test_1341",
+      "mmlu_professional_law_test_1360",
+      "mmlu_professional_law_test_1380",
+      "mmlu_professional_law_test_1461",
+      "mmlu_professional_law_test_1477",
+      "mmlu_professional_law_test_1526",
+      "mmlu_professional_law_test_180",
+      "mmlu_professional_law_test_205",
+      "mmlu_professional_law_test_219",
+      "mmlu_professional_law_test_37",
+      "mmlu_professional_law_test_753",
+      "mmlu_professional_law_test_777",
+      "mmlu_professional_law_test_787",
+      "mmlu_professional_law_test_94",
+      "mmlu_professional_law_validation_29"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.40625,
+      "n_correct": 13,
+      "n_wrong": 19
+    },
+    "current_train": {
+      "accuracy": 0.5625,
+      "n_correct": 18,
+      "n_wrong": 14
+    },
+    "train_confusion": {
+      "recoveries": [
+        "mmlu_professional_law_test_1086",
+        "mmlu_professional_law_test_1341",
+        "mmlu_professional_law_test_1477",
+        "mmlu_professional_law_test_180",
+        "mmlu_professional_law_test_94"
+      ],
+      "regressions": [],
+      "still_wrong": [
+        "mmlu_professional_law_test_1227",
+        "mmlu_professional_law_test_1236",
+        "mmlu_professional_law_test_1336",
+        "mmlu_professional_law_test_1360",
+        "mmlu_professional_law_test_1380",
+        "mmlu_professional_law_test_1461",
+        "mmlu_professional_law_test_1526",
+        "mmlu_professional_law_test_205",
+        "mmlu_professional_law_test_219",
+        "mmlu_professional_law_test_37",
+        "mmlu_professional_law_test_753",
+        "mmlu_professional_law_test_777",
+        "mmlu_professional_law_test_787",
+        "mmlu_professional_law_validation_29"
+      ],
+      "still_right_count": 13,
+      "net_gain": 5
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 13,
+      "rejects": 0
+    },
+    "rounds_run": 3,
+    "train_acc_per_round": [
+      0.5625,
+      0.5625,
+      0.53125
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "mmlu_professional_law_test_1214",
+        "mmlu_professional_law_test_1327",
+        "mmlu_professional_law_test_1382",
+        "mmlu_professional_law_test_1492",
+        "mmlu_professional_law_test_1528",
+        "mmlu_professional_law_test_634",
+        "mmlu_professional_law_test_725"
+      ],
+      "regressions": [
+        "mmlu_professional_law_test_1073",
+        "mmlu_professional_law_test_1221",
+        "mmlu_professional_law_test_1329",
+        "mmlu_professional_law_test_1339",
+        "mmlu_professional_law_test_1345",
+        "mmlu_professional_law_test_1402",
+        "mmlu_professional_law_test_1450",
+        "mmlu_professional_law_test_561"
+      ],
+      "still_wrong": [
+        "mmlu_professional_law_test_1013",
+        "mmlu_professional_law_test_1063",
+        "mmlu_professional_law_test_1068",
+        "mmlu_professional_law_test_1084",
+        "mmlu_professional_law_test_1094",
+        "mmlu_professional_law_test_1159",
+        "mmlu_professional_law_test_1165",
+        "mmlu_professional_law_test_1189",
+        "mmlu_professional_law_test_1268",
+        "mmlu_professional_law_test_191",
+        "mmlu_professional_law_test_242",
+        "mmlu_professional_law_test_264",
+        "mmlu_professional_law_test_271",
+        "mmlu_professional_law_test_278",
+        "mmlu_professional_law_test_470",
+        "mmlu_professional_law_test_642",
+        "mmlu_professional_law_test_671",
+        "mmlu_professional_law_test_705",
+        "mmlu_professional_law_test_772",
+        "mmlu_professional_law_test_831",
+        "mmlu_professional_law_test_920",
+        "mmlu_professional_law_validation_108",
+        "mmlu_professional_law_validation_153",
+        "mmlu_professional_law_validation_63"
+      ],
+      "still_right_count": 27,
+      "net_gain": -1
+    },
+    "markdown_source": "prompts\\mmlu_oneliner.md"
+  },
+  "wall_clock_s": 395.2,
+  "cost": {
+    "total_calls": 335,
+    "total_cost_usd": 0.172364,
+    "by_role": {
+      "solver": {
+        "calls": 332,
+        "prompt_tokens": 291466,
+        "completion_tokens": 97240,
+        "cost_usd": 0.102064
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 23174,
+        "completion_tokens": 2994,
+        "cost_usd": 0.0703
+      }
+    }
+  }
+}

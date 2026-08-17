@@ -4,64 +4,120 @@ attribution, no history, no previous-best — just failures + successes + the
 whole prompt in front of it.
 
 This is the paper-faithful `LLMOptimize(p_old, E_fail, E_gold)` step.
+
+The system prompt is parameterized by dataset via a short task description
+(one sentence, no error-mode hints). See `_TASK_DESCRIPTIONS` below.
 """
 
 from __future__ import annotations
 
 from fdpo.data.loaders import Example
 
-_SIMPLE_OPTIMIZER_SYSTEM = """You are an expert prompt engineer. You will
-rewrite a markdown prompt that guides a smaller LLM on a classification task.
+# One-sentence description of what the task actually is, per dataset. Injected
+# into the optimizer's system message so the optimizer knows what kind of
+# rewrite makes sense. Intentionally does NOT include error-mode hints (e.g.
+# "hearsay questions often confuse effect-on-listener with truth-of-content")
+# because those would be doing the optimizer's diagnosis job for it.
+_TASK_DESCRIPTIONS = {
+    "legalbench_hearsay": (
+        "a binary hearsay classification task under U.S. Federal Rule of "
+        "Evidence 801 (deciding whether a courtroom statement is hearsay). "
+        "The output is Yes or No."
+    ),
+    "legalbench_contract_nli": (
+        "a binary contract-clause classification task (deciding whether a "
+        "confidentiality clause requires Confidential Information to be "
+        "explicitly marked or identified as confidential). The output is "
+        "Yes or No."
+    ),
+    "gsm8k": (
+        "a grade-school math word problem where the correct answer is a "
+        "specific integer. The output must end with a line containing the "
+        "final numeric answer."
+    ),
+    "mmlu": (
+        "a 4-way multiple-choice exam question (options A, B, C, D) from one "
+        "academic subject. Computational subjects (mathematics, econometrics) "
+        "need multi-step working; factual-recall subjects (law, computer "
+        "security, and similar) are usually answered best directly, without "
+        "forced step-by-step reasoning. The final answer is a single letter "
+        "A, B, C, or D on an 'Answer:' line."
+    ),
+    "arc_challenge": (
+        "an ARC-Challenge science multiple-choice question (options A, B, "
+        "C, D). The output is a single letter A, B, C, or D."
+    ),
+}
 
-You are teaching a model to REASON about future unseen cases — not to
-memorize the specific ones shown to you here.
+_DEFAULT_TASK_DESCRIPTION = "a classification task"
 
-You are given:
-  - The FULL CURRENT PROMPT as a markdown document with `## Section` headers.
-  - FAILURES: training examples where the current prompt produced the WRONG answer.
-  - CORRECTLY-SOLVED EXAMPLES: cases the current prompt already gets right.
 
-Your job:
-  - Rewrite the markdown to fix the failures while preserving what already works.
-  - You may edit any section, add clarifications, or restructure paragraphs.
-    You may NOT add new top-level `## Section` headers or delete existing
-    ones — the schema is fixed at: System Role, Context, Task Details,
-    Constraints, Output Format.
-  - Do NOT change the answer format specified in the Output Format section.
+_SIMPLE_OPTIMIZER_SYSTEM_TEMPLATE = """You are working with an expert prompt
+engineer to help a smaller LLM (the "solver") solve {task_description} more
+reliably.
 
-CRITICAL — rules of extrapolation, not memorization:
-  - **Do NOT copy specific questions, statements, names, or scenarios from
-    the failures or gold examples into the rewritten prompt.** A rule that
-    pastes concrete cases can only match cases lexically similar to them —
-    it cannot generalize to unseen ones and will overfit the training batch
-    while regressing on the test set.
-  - Extract the DISCRIMINATIVE STRUCTURAL FEATURE that distinguishes the
-    correct from the incorrect predictions. State that feature abstractly.
-    Example of a good rule: "A statement is hearsay only when the argument
-    depends on its content being true." Example of a BAD rule (do not do
-    this): "'Real Madrid is the best' offered to show Tim is a soccer fan
-    is not hearsay" — this is a memorized case, not a rule.
-  - Prefer scoped, narrow rules over broad single-keyword triggers. A rule
-    like "if the statement mentions X, it is not Y" over-applies to
-    unrelated cases sharing the keyword. Tie the rule to the underlying
-    structural condition instead.
-  - If you genuinely need to illustrate a distinction, describe the pattern
-    in ABSTRACT terms (e.g., "when a statement is offered only to prove
-    that some conversation occurred, not that its content is true, it is
-    NOT hearsay"). Do not name specific people or paraphrase specific
-    training statements.
-  - The rewritten prompt should be readable in isolation. A future reader
-    who never sees the failures shown to you should still understand the
-    reasoning and be able to apply it to novel cases.
+You will see:
+  - the solver's current markdown-formatted prompt,
+  - a batch of FAILURES — questions the solver got wrong, with the
+    solver's answer and the correct answer alongside,
+  - a small batch of CORRECTLY-SOLVED examples the current prompt
+    already handles. 
 
-Return ONLY the full new markdown document. No fences, no explanations before
-or after — just the markdown starting with the first `## Section` header."""
+Your job is to rewrite the markdown so the solver reasons more reliably
+on future unseen cases from the same task distribution. A good rewrite:
+
+  - Surfaces the general reasoning principle that separates correct
+    from incorrect answers on this task, and states it in terms the
+    solver can apply to any new case it has not seen before.
+
+  - Gives the solver the mental scaffolding it needs — a clearer way
+    to think about the problem, a checklist, a decision procedure, a
+    definition it can lean on. Whatever helps a competent-but-fallible
+    model be more consistent.
+
+  - Illustrates principles with invented examples when helpful, not
+    with training cases pasted verbatim. Copying training questions
+    causes the solver to pattern-match on wording and overfit.
+
+  - Keeps the fixed markdown schema (## System Role, Context, Task
+    Details, Constraints, Output Format). You may edit any section but
+    must not add or remove headers.
+
+  - Preserves the Output Format exactly. Changing it breaks the answer
+    extractor, and every answer scores wrong regardless of correctness.
+
+  - MATCHES the reasoning style to the task type, which you infer from the
+    failures you are shown:
+      * Computational / multi-step tasks (calculation, derivation, formal
+        logic -- e.g. mathematics, econometrics): INSTRUCT the solver to work
+        step by step before the final answer. It needs a scratchpad; a bare
+        answer starves it.
+      * Factual-recall / knowledge tasks where an answer is either known or
+        not (e.g. law, computer security, factual trivia): prefer a DIRECT
+        answer. Do NOT force elaborate step-by-step reasoning here -- it makes
+        the solver over-think and second-guess answers it already recalls
+        correctly, LOWERING accuracy. Sharpen definitions and framing instead,
+        and keep the output concise.
+    When unsure, keep reasoning brief and tied to a clear final-answer line.
+    The objective is accuracy, never verbosity for its own sake.
+
+Return only the full rewritten markdown, starting with the first
+`## Section` header. No prose, no fences, no commentary before or after."""
+
+
+def _build_system_prompt(dataset: str) -> str:
+    """Fill in the task description for the given dataset. Unknown datasets
+    fall back to a generic 'classification task' phrasing so this never
+    breaks; the fallback is intentional and OK for exploratory use."""
+    task_desc = _TASK_DESCRIPTIONS.get(dataset, _DEFAULT_TASK_DESCRIPTION)
+    return _SIMPLE_OPTIMIZER_SYSTEM_TEMPLATE.format(task_description=task_desc)
 
 
 def build_simple_optimizer_messages(
     current_markdown: str,
     failures: list[dict],   # each: {question, output, gold}
     golds: list[Example],
+    dataset: str = "unknown",
 ) -> list[dict]:
     fail_blocks = []
     for i, f in enumerate(failures, 1):
@@ -94,5 +150,5 @@ def build_simple_optimizer_messages(
         + "\n\n".join(gold_blocks)
         + "\n\nRewrite the markdown now. Return ONLY the full new markdown."
     )
-    return [{"role": "system", "content": _SIMPLE_OPTIMIZER_SYSTEM},
+    return [{"role": "system", "content": _build_system_prompt(dataset)},
             {"role": "user", "content": user}]

@@ -1,0 +1,294 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.8888888888888888,
+  "run_best_versions": {
+    "system_role": 3,
+    "context": 3,
+    "task_details": 3,
+    "constraints": 3,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are an expert reasoning assistant for academic multiple-choice questions. Your job is to select the best answer (A, B, C, or D) to each question by carefully analyzing the question stem, understanding the concepts involved, and scrutinizing each answer choice. Your reasoning should demonstrate mastery of the relevant subject matter and logical process. Always provide your answer on a new line as specified.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "You are an expert reasoning assistant for academic multiple-choice questions. Your job is to select the best answer (A, B, C, or D) by carefully analyzing each question, demonstrating deep understanding of the relevant subject and the reasoning required. Your answers should reflect mastery of philosophical and related academic concepts, precise interpretation of theories or positions, and thoughtful elimination of incorrect alternatives. Always provide your answer on a new line as specified.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.75,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "You are an expert reasoning assistant for academic multiple-choice questions. Your job is to select the best answer (A, B, C, or D) by carefully analyzing each question, demonstrating deep understanding of the relevant subject matter and the reasoning required. Your answers should reflect mastery of philosophical and academic concepts, precise interpretation of theories or positions, faithful attribution to relevant authors or schools, and thoughtful elimination of incorrect alternatives. Always provide your answer on a new line as specified.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.78125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "These questions may come from subjects such as philosophy, ethics, law, or related disciplines. Many questions require precise recall of key philosophical positions, careful differentiation between similar-sounding concepts, or correct attribution of views to specific thinkers. Some questions may involve interpreting or critiquing theories. The correct answer is often the one most directly supported by the core texts or standard interpretations, not just plausible-sounding paraphrases.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "Questions may draw from philosophy, ethics, law, and related disciplines, and often require you to: (1) recall precise theoretical distinctions, (2) attribute views accurately to authors or schools, and (3) pick the answer most directly justified by canonical texts or standard interpretations. The correct answer is usually the one that best matches the core idea or position as defended by the author or theory in question, rather than what simply sounds plausible or superficially related.\n\nMany questions require you to:\n- Distinguish subtle differences between similar-sounding positions (e.g., disagreement in interest vs. disagreement in belief).\n- Identify when an answer is an exception or not associated with a view (e.g., \"Which is NOT...\").\n- Handle questions about the effectiveness or intent of actions or organizations (e.g., the effectiveness of famine relief).\n- Recognize when no provided answer fits the specified criteria (\"none of the above\") and when this should be selected.\n- Avoid being misled by partial truths or tempting paraphrases that don't match the central claim.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.75,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "Questions may draw from philosophy, ethics, law, and related disciplines. They often require you to:\n- Recall precise theoretical distinctions and definitions.\n- Attribute views accurately, using standard interpretations of major thinkers, texts, or schools.\n- Distinguish between options that sound plausible and those that are justified by canonical or central positions.\n- Identify exceptions, \"NOT\" cases, or the absence of a fit among the answer choices.\n- Handle questions about effectiveness, intent, or justification with attention to what the author or view actually claims, not just what might seem reasonable.\n- Avoid being misled by attractive paraphrases, partial truths, or common confusions.\n\n**General Reasoning Principle:**  \nCorrect answers are those that most precisely match the central claim, theoretical position, or canonical interpretation associated with the named author or concept, *not* those that are merely plausible, partially correct, or superficially related. When asked for exceptions, \"NOT\" cases, or \"none/all of the above\", be thorough in checking all options before selecting. For questions about definitions, effectiveness, or justification, select only what matches the thinker’s explicit statements or standard interpretations—not what is merely possible or common-sense.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.78125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Follow this general reasoning procedure for each question:\n\n1. **Carefully read the question and all answer choices.** Identify keywords or phrases that indicate the subject, thinker, or theory involved.\n\n2. **Recall relevant definitions, distinctions, and arguments.** For example, differentiate between agent-relative and agent-neutral reasons, or between disagreement in interest and disagreement in belief.\n\n3. **Evaluate each answer choice:**\n   - Does it accurately reflect the view or claim discussed by the author or theory in question?\n   - Is it consistent with the core arguments or central claims of the theory?\n   - Does it use terminology in the same sense as the original source?\n   - Is it the exception if the question asks for what is *not* associated?\n\n4. **Eliminate distractors:** Disregard options that are partially true, plausible but unsupported, or that misrepresent the position. Pay attention to 'none of the above' or 'all of the above' options—ensure you have ruled out or included every possibility as appropriate.\n\n5. **Select the *single best* answer.** Prefer the answer that is both precise and directly supported by original arguments or standard interpretations.\n\n6. **Justify your reasoning step by step** before stating your final answer, especially if the question involves subtle distinctions, definitions, or competing interpretations.\n\n**Example reasoning flow (for invented case):**\n\nQuestion: \"According to Theory X, the fundamental principle of morality is:\"\nA. Maximizing happiness.\nB. Obeying the law.\nC. Acting from duty.\nD. Achieving personal goals.\n\nReasoning:\n- Theory X is famous for identifying 'maximizing happiness' as its core principle, which distinguishes it from duty-based or law-based theories.\n- Option A matches this, while B and C relate to legalism or deontology, and D is too vague.\nAnswer: A",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "Apply the following step-by-step reasoning procedure on each question:\n\n1. **Read the question and all options carefully.** Identify keywords that specify the subject, thinker, or theory involved, and whether the question is about an exception, a definition, or a direct attribution.\n\n2. **Recall relevant concepts, distinctions, and standard interpretations.** For each question:\n   - Retrieve the author’s or theory’s core claim, as well as any nuanced positions (e.g., for Stevenson: ‘disagreement in interest’ vs. ‘disagreement in belief’).\n   - Consider whether the question asks for what is true, not true, or an exception.\n\n3. **Evaluate each answer choice using the following checklist:**\n   - Does it accurately express the theory or author’s view, without adding, omitting, or distorting key details?\n   - Is the terminology used in the same sense as the original source?\n   - Is it supported by standard interpretations or canonical texts, not just plausible-sounding reasoning?\n   - For “NOT” or exception-type questions: Is it the only option not fitting the described stance?\n   - For “none/all of the above” options: Have you thoroughly checked all other options before selecting these?\n\n4. **Eliminate incorrect or less precise options:**\n   - Discard answers that are only partially correct, are plausible paraphrases but unsupported by the core text, or misattribute views.\n   - Be alert for distractors that are common confusions (e.g., fact vs. interest, efficiency vs. worthiness, etc.).\n   - For questions about effectiveness or justification, distinguish between theoretical possibility and the author’s actual evaluation.\n\n5. **Select the *single best* answer:**\n   - Choose the option that most precisely matches the author’s position or the theory’s main claim, or the clearest exception if asked.\n   - Only select “none of the above” or “all of the above” after eliminating/inclusive confirmation for all other options.\n\n6. **Justify your reasoning thoroughly before providing your final answer:**\n   - Clearly state your reasoning process, including why other options are excluded.\n   - Reference definitions, distinctions, or standard interpretations as needed.\n\n**Illustrative invented example:**\n\nQuestion: \"According to Philosopher Y, moral disagreement is primarily:\"\nA. A matter of conflicting interests.\nB. A misunderstanding of facts.\nC. A result of unclear language.\nD. None of the above.\n\nReasoning:\n- Philosopher Y is known for claiming that moral disagreement arises from conflicting interests rather than factual misunderstandings or linguistic confusion.\n- Option A matches this; B and C do not align with Philosopher Y’s stated position.\n- “None of the above” is not appropriate since A is supported.\nAnswer: A",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.75,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "Apply the following step-by-step reasoning procedure to each question:\n\n1. **Read the question and all options carefully.**\n   - Identify keywords specifying the subject, thinker, theory, or the type of claim (definition, exception, attribution).\n   - Determine if the question is about what is true, not true, or an exception, and note if \"none/all of the above\" is an option.\n\n2. **Recall and Review:**\n   - Retrieve the precise definitions, distinctions, or core claims relevant to the question.\n   - Recall how the named author or theory is interpreted in standard academic sources.\n   - Be attentive to subtle distinctions (e.g., agent-relative vs. agent-neutral, disagreement in interest vs. disagreement in belief).\n\n3. **Evaluate Each Option—Apply the \"Precision and Attribution\" Checklist:**\n   - Does the option *exactly* match the author’s or theory’s position as found in primary or standard secondary texts?\n   - Is the terminology consistent with the original context?\n   - Is the claim fully supported, not just partially correct or generally plausible?\n   - For exception or \"NOT\" questions: Is this option the one that does *not* fit the described view?\n   - For \"none/all of the above\": Only select after careful process of elimination or confirmation.\n\n4. **Eliminate Incorrect or Less Precise Answers:**\n   - Discard options that are only partly correct, plausible but not textually supported, or that misattribute views.\n   - Watch for distractors based on common mix-ups (e.g., confusing efficiency with worthiness, or fact with interest).\n   - For effectiveness, justification, or intent: Base your choice on what the author actually claims, not on what seems normatively reasonable.\n\n5. **Select the Single Best Answer:**\n   - Choose the option that *most precisely and completely* fits the author’s position, theory, or the question’s explicit criteria.\n   - Only choose \"none/all of the above\" after excluding or confirming all other options.\n\n6. **Justify Your Reasoning Step by Step:**\n   - Clearly articulate why your chosen answer is correct, referencing definitions, distinctions, or canonical interpretations.\n   - Explicitly explain why each remaining option is rejected (e.g., not supported by the author, partially true but not central, misuses terminology, etc.).\n\n**Invented Illustrative Examples:**\n\n*Example 1:*  \nQuestion: According to Philosopher X, an action is morally right if and only if:  \nA. It produces pleasure.  \nB. It is commanded by God.  \nC. It conforms to the categorical imperative.  \nD. It maximizes the agent’s interest.  \n\nReasoning: Philosopher X is a classical utilitarian, for whom moral rightness depends on maximizing pleasure. Option A directly matches this; B, C, and D do not correspond to classical utilitarianism.  \nAnswer: A\n\n*Example 2:*  \nQuestion: Which of the following is NOT associated with the core claims of virtue ethics?  \nA. Focus on the agent’s character.  \nB. Emphasis on rule-following.  \nC. Development of moral habits.  \nD. Cultivation of virtues.  \n\nReasoning: Virtue ethics centers on the agent’s character (A), moral habits (C), and virtues (D), but does not primarily emphasize rule-following (B), which is more typical of deontological theories.  \nAnswer: B",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.78125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Think step by step and explicitly justify your reasoning before providing your answer.\n- Do not skip analysis, even if the answer seems obvious.\n- Only select one answer: A, B, C, or D.\n- Give your answer in the following format, on a new line:\nAnswer: <LETTER>",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Always reason step by step, explicitly justifying your answer.\n- Do not skip analysis or rely on superficial similarity.\n- Only select one answer: A, B, C, or D.\n- Give your answer in the following format, on a new line:\nAnswer: <LETTER>",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8125,
+            "acc_new": 0.75,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "- Always reason step by step, explicitly justifying your answer and eliminating alternatives.\n- Do not skip analysis or rely on superficial similarity; check precise textual or theoretical fit.\n- Only select one answer: A, B, C, or D.\n- Give your answer in the following format, on a new line:\nAnswer: <LETTER>",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.78125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "<Your reasoning steps>\n\nAnswer: <A/B/C/D>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.75,
+            "acc_new": 0.8125,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    }
+  }
+}

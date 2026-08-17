@@ -143,9 +143,37 @@ def fetch_legalbench_hearsay() -> tuple[list[Example], list[Example]]:
     return convert("train"), convert("test")
 
 
+def fetch_legalbench_contract_nli() -> tuple[list[Example], list[Example]]:
+    """LegalBench `contract_nli_explicit_identification`: does a contract clause
+    require Confidential Information to be explicitly marked/identified as
+    confidential? Binary Yes/No. One of the LegalBench contract_nli sub-tasks;
+    overlaps the Trace2Policy contract_nli cross-domain probe."""
+    def convert(split: str) -> list[Example]:
+        df = _read_parquet_split("nguha/legalbench", split,
+                                 config="contract_nli_explicit_identification")
+        return [
+            Example(
+                id=f"contract_nli_{split}_{i}",
+                question=(
+                    "Does the following contract clause require that Confidential "
+                    "Information be explicitly marked or identified as "
+                    "confidential?\n\n"
+                    f"Clause: {row['text']}"
+                ),
+                gold=row["answer"].strip().capitalize(),
+                reference=row["answer"],
+                meta={},
+            )
+            for i, row in df.iterrows()
+        ]
+
+    return convert("train"), convert("test")
+
+
 FETCHERS = {
     "gsm8k": fetch_gsm8k,
     "arc": fetch_arc,
     "mmlu": fetch_mmlu,
     "legalbench_hearsay": fetch_legalbench_hearsay,
+    "legalbench_contract_nli": fetch_legalbench_contract_nli,
 }

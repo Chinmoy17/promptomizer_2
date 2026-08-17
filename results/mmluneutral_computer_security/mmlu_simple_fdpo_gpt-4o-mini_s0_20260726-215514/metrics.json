@@ -1,0 +1,235 @@
+{
+  "run_id": "mmlu_simple_fdpo_gpt-4o-mini_s0_20260726-215514",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "mmlu",
+  "solver_model": "gpt-4o-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.9242424242424242,
+    "n_examples": 66,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.8484848484848485,
+    "n_examples": 66,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 3,
+    "simple_max_rounds": 3,
+    "accept_margin": 1.0,
+    "shipped_structured": true,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.35,
+      "n_mining": 32,
+      "n_validation": 18
+    },
+    "baseline_val_acc": 0.6666666666666666,
+    "best_structured_val_acc": 0.7777777777777778,
+    "n_failures_triggering": 5,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed_best",
+        "n_failures_before": 5,
+        "n_failures_after": 6,
+        "train_acc_after": 0.8125,
+        "val_acc_after": 0.7222222222222222,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "output_format",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_computer_security_test_11",
+          "mmlu_computer_security_test_22",
+          "mmlu_computer_security_test_26",
+          "mmlu_computer_security_test_62",
+          "mmlu_computer_security_validation_1"
+        ],
+        "failing_ids_after": [
+          "mmlu_computer_security_test_11",
+          "mmlu_computer_security_test_22",
+          "mmlu_computer_security_test_26",
+          "mmlu_computer_security_test_62",
+          "mmlu_computer_security_validation_1",
+          "mmlu_computer_security_validation_9"
+        ],
+        "recovered_this_round": [],
+        "regressed_this_round": [
+          "mmlu_computer_security_validation_9"
+        ]
+      },
+      {
+        "round": 2,
+        "status": "committed_best",
+        "n_failures_before": 6,
+        "n_failures_after": 6,
+        "train_acc_after": 0.8125,
+        "val_acc_after": 0.7777777777777778,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_computer_security_test_11",
+          "mmlu_computer_security_test_22",
+          "mmlu_computer_security_test_26",
+          "mmlu_computer_security_test_62",
+          "mmlu_computer_security_validation_1",
+          "mmlu_computer_security_validation_9"
+        ],
+        "failing_ids_after": [
+          "mmlu_computer_security_test_11",
+          "mmlu_computer_security_test_22",
+          "mmlu_computer_security_test_26",
+          "mmlu_computer_security_test_44",
+          "mmlu_computer_security_test_55",
+          "mmlu_computer_security_validation_1"
+        ],
+        "recovered_this_round": [
+          "mmlu_computer_security_test_62",
+          "mmlu_computer_security_validation_9"
+        ],
+        "regressed_this_round": [
+          "mmlu_computer_security_test_44",
+          "mmlu_computer_security_test_55"
+        ]
+      },
+      {
+        "round": 3,
+        "status": "committed",
+        "n_failures_before": 6,
+        "n_failures_after": 6,
+        "train_acc_after": 0.8125,
+        "val_acc_after": 0.7222222222222222,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_computer_security_test_11",
+          "mmlu_computer_security_test_22",
+          "mmlu_computer_security_test_26",
+          "mmlu_computer_security_test_44",
+          "mmlu_computer_security_test_55",
+          "mmlu_computer_security_validation_1"
+        ],
+        "failing_ids_after": [
+          "mmlu_computer_security_test_11",
+          "mmlu_computer_security_test_22",
+          "mmlu_computer_security_test_26",
+          "mmlu_computer_security_test_55",
+          "mmlu_computer_security_test_62",
+          "mmlu_computer_security_validation_1"
+        ],
+        "recovered_this_round": [
+          "mmlu_computer_security_test_44"
+        ],
+        "regressed_this_round": [
+          "mmlu_computer_security_test_62"
+        ]
+      }
+    ],
+    "baseline_failing_ids": [
+      "mmlu_computer_security_test_11",
+      "mmlu_computer_security_test_22",
+      "mmlu_computer_security_test_26",
+      "mmlu_computer_security_test_62",
+      "mmlu_computer_security_validation_1"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.84375,
+      "n_correct": 27,
+      "n_wrong": 5
+    },
+    "current_train": {
+      "accuracy": 0.8125,
+      "n_correct": 26,
+      "n_wrong": 6
+    },
+    "train_confusion": {
+      "recoveries": [
+        "mmlu_computer_security_test_62"
+      ],
+      "regressions": [
+        "mmlu_computer_security_test_44",
+        "mmlu_computer_security_test_55"
+      ],
+      "still_wrong": [
+        "mmlu_computer_security_test_11",
+        "mmlu_computer_security_test_22",
+        "mmlu_computer_security_test_26",
+        "mmlu_computer_security_validation_1"
+      ],
+      "still_right_count": 25,
+      "net_gain": -1
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 13,
+      "rejects": 0
+    },
+    "rounds_run": 3,
+    "train_acc_per_round": [
+      0.8125,
+      0.8125,
+      0.8125
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [],
+      "regressions": [
+        "mmlu_computer_security_test_42",
+        "mmlu_computer_security_test_73",
+        "mmlu_computer_security_test_78",
+        "mmlu_computer_security_test_93",
+        "mmlu_computer_security_validation_3"
+      ],
+      "still_wrong": [
+        "mmlu_computer_security_test_51",
+        "mmlu_computer_security_test_53",
+        "mmlu_computer_security_test_65",
+        "mmlu_computer_security_test_70",
+        "mmlu_computer_security_test_99"
+      ],
+      "still_right_count": 56,
+      "net_gain": -5
+    },
+    "markdown_source": "prompts\\mmlu_oneliner.md"
+  },
+  "wall_clock_s": 340.5,
+  "cost": {
+    "total_calls": 335,
+    "total_cost_usd": 0.130679,
+    "by_role": {
+      "solver": {
+        "calls": 332,
+        "prompt_tokens": 245674,
+        "completion_tokens": 88267,
+        "cost_usd": 0.089811
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 8890,
+        "completion_tokens": 2886,
+        "cost_usd": 0.040868
+      }
+    }
+  }
+}
