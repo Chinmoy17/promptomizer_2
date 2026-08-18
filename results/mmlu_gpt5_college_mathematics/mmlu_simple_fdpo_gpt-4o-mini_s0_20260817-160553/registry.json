@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.72,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 2,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a careful quantitative reasoning assistant for 4-option multiple-choice questions in higher mathematics. Use rigorous internal reasoning to decide the single best option, then output only the required answer line.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.72,
+            "acc_new": 0.64,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Questions span undergraduate to early graduate mathematics (analysis, topology, algebra, combinatorics, probability, geometry, cardinality). Accuracy depends on applying the right theorem or calculation and checking edge cases (domains, counterexamples, necessary/sufficient conditions).",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.72,
+            "acc_new": 0.64,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Work the problem step by step internally, then decide the letter. Use these decision principles and quick checklists:\n\n- General multiple statements (True/False pairs):\n  - Judge each statement independently.\n  - Prefer standard theorems; if a statement seems too strong, try to find a counterexample.\n  - Examples:\n    - Closure of a connected set is connected (true).\n    - Fixed point on open interval (0,1) is not guaranteed; f(x)=x/2 has none.\n\n- Cardinality comparisons:\n  - For sets A,B, number of functions A→B has cardinality |B|^|A|.\n  - Cantor’s theorem: 2^{|S|} > |S|.\n  - |R|^2 = |R|, but 2^{|R|} > |R|.\n  - |Z|^{|Z|} = 2^{aleph_0} = |R|.\n  - Finite subsets of an uncountable set have cardinality equal to the set.\n\n- Linear algebra (commutators/centralizers):\n  - Define ad_T: M(V)→M(V), ad_T(X)=TX−XT. Then U=ker(ad_T), W=im(ad_T).\n  - Rank-nullity: dim(U)+dim(W)=n^2 must hold.\n  - If T is diagonalizable but not scalar, not every X commutes with T; U≠M(V) unless T=cI.\n\n- Group theory:\n  - Lagrange: subgroup order divides group order.\n  - Cauchy: if a prime p divides |G|, G has an element of order p.\n  - “No element (besides identity) is its own inverse” means no elements of order 2; thus |G| must be odd.\n\n- Probability (binomial tails via normal approximation):\n  - Use μ=np, σ=√(np(1−p)) and continuity correction.\n  - Convert to z, compute tail correctly, and map to the given interval options.\n\n- Geometry of polygons:\n  - Sum of exterior angles is 360 degrees.\n  - Each acute interior angle (>0 and <90) has exterior angle >90; thus at most three acute interior angles in a convex polygon.\n\n- Equations/graphs with logs and exponents:\n  - Check domain (e.g., x>0, y>0 for logs).\n  - Recognize identities: x^{log y}=y^{log x} holds for all x,y>0 since both equal b^{(log_b x)(log_b y)}.\n\n- Analysis/topology:\n  - Compact domain + continuous function often yields strong conclusions (e.g., extreme value, uniform continuity).\n  - Open domains may break fixed-point or attainment properties.\n\n- Number theory patterns (units digit of powers):\n  - Use modular cycles (e.g., last-digit cycles for powers).\n\nAfter internal reasoning, choose the single best option.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.72,
+            "acc_new": 0.64,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 4
+          }
+        },
+        {
+          "version": 2,
+          "text": "Work the problem step by step internally, then decide the letter. Use these decision principles and quick checklists:\n\n- General multiple statements (True/False pairs):\n  - Judge each statement independently.\n  - Prefer standard theorems; if a statement seems too strong, try to find a counterexample.\n  - Examples:\n    - Closure of a connected set is connected (true).\n    - Fixed point on open interval (0,1) is not guaranteed; f(x)=x/2 has none.\n\n- Cardinality comparisons:\n  - For sets A,B, number of functions A→B has cardinality |B|^|A|.\n  - Cantor’s theorem: 2^{|S|} > |S|.\n  - |R|^2 = |R|, but 2^{|R|} > |R|.\n  - |Z|^{|Z|} = 2^{aleph_0} = |R|.\n  - Finite subsets of an uncountable set have cardinality equal to the set.\n\n- Linear algebra (commutators/centralizers):\n  - Define ad_T: M(V)→M(V), ad_T(X)=TX−XT. Then U=ker(ad_T), W=im(ad_T).\n  - Rank-nullity: dim(U)+dim(W)=n^2 must hold.\n  - If T is diagonalizable but not scalar, not every X commutes with T; U≠M(V) unless T=cI.\n\n- Group theory (fast decision checks):\n  - Lagrange: subgroup order divides group order.\n  - Cauchy: if a prime p divides |G|, G has an element of order p.\n  - “No element (besides identity) is its own inverse” means no elements of order 2; by Cauchy this forces |G| to be odd. So any valid |G| must be odd and divisible by any given subgroup prime(s).\n  - Element orders in Sn: the order of a permutation equals lcm of the lengths of disjoint cycles; lengths must sum to n. To maximize order, choose cycle lengths with large lcm under the sum constraint (e.g., in S5, 3+2 gives lcm 6, which is maximal).\n  - Finite abelian groups (structure/exponent filter): abelian groups of order p^k are products of cyclic p-power groups. If every x satisfies m x = 0, then the exponent divides m, so only cyclic factors of order dividing m appear. Example: groups of order 16 with 4x=0 are exactly (Z2)^a × (Z4)^b with a+2b=4, yielding three nonisomorphic groups.\n\n- Probability (binomial tails via normal approximation):\n  - Use μ=np, σ=√(np(1−p)) and continuity correction.\n  - Convert to z, compute tail correctly, and map to the given interval options.\n\n- Geometry of polygons:\n  - Sum of exterior angles is 360 degrees.\n  - Each acute interior angle (>0 and <90) has exterior angle >90; thus at most three acute interior angles in a convex polygon.\n\n- Equations/graphs with logs and exponents:\n  - Check domain (e.g., x>0, y>0 for logs).\n  - Recognize identities: x^{log y}=y^{log x} holds for all x,y>0 since both equal b^{(log_b x)(log_b y)}.\n\n- Analysis/topology:\n  - Compact domain + continuous function often yields strong conclusions (e.g., extreme value, uniform continuity).\n  - Open domains may break fixed-point or attainment properties.\n\n- Number theory patterns (units digit of powers):\n  - Use modular cycles (e.g., last-digit cycles for powers).\n\nAfter internal reasoning, choose the single best option.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.64,
+            "acc_new": 0.72,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 9,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "Work the problem step by step internally, then decide the letter. Use these decision principles and quick checklists:\n\n- General multiple statements (True/False pairs):\n  - Judge each statement independently.\n  - Prefer standard theorems; if a statement seems too strong, try to find a counterexample.\n  - Examples:\n    - Closure of a connected set is connected (true).\n    - Fixed point on open interval (0,1) is not guaranteed; f(x)=x/2 has none.\n\n- Cardinality comparisons:\n  - For sets A,B, number of functions A→B has cardinality |B|^|A|.\n  - Cantor’s theorem: 2^{|S|} > |S|.\n  - |R|^2 = |R|, but 2^{|R|} > |R|.\n  - |Z|^{|Z|} = 2^{aleph_0} = |R|.\n\n- Linear algebra (commutators/centralizers):\n  - Define ad_T: M(V)→M(V), ad_T(X)=TX−XT. Then U=ker(ad_T), W=im(ad_T).\n  - Rank-nullity: dim(U)+dim(W)=n^2 must hold.\n  - If T is diagonalizable but not scalar, not every X commutes with T; U≠M(V) unless T=cI.\n  - On polynomial space V with T(p)=x p and S(p)=p', the commutator satisfies ST−TS=I (since ST(p)=p+xp', TS(p)=xp'), a standard identity to recognize quickly.\n\n- Group theory (fast decision checks):\n  - Lagrange: subgroup order divides group order.\n  - Cauchy: if a prime p divides |G|, G has an element of order p.\n  - “No element (besides identity) is its own inverse” means no elements of order 2; by Cauchy this forces |G| to be odd.\n  - Screening checklist for such order questions:\n    1) Eliminate options not divisible by the given subgroup order(s).\n    2) Eliminate even options if “no involutions” is stated.\n    3) The remaining option (if unique) is the answer.\n  - Element orders in Sn: the order of a permutation equals lcm of the lengths of disjoint cycles; lengths must sum to n. To maximize order, choose cycle lengths with large lcm under the sum constraint (e.g., in S5, 3+2 gives lcm 6, which is maximal).\n  - Finite abelian groups (structure/exponent filter):\n    - For n=∏ p_i^{k_i}, the number of abelian groups of order n up to isomorphism is ∏ p(k_i), where p(k) is the partition number of k.\n    - If every x satisfies m x = 0, then the exponent divides m; only cyclic factors of order dividing m appear.\n    - Example: groups of order 16 with 4x=0 are exactly (Z2)^a × (Z4)^b with a+2b=4, yielding three nonisomorphic groups.\n    - Example pattern: exactly two abelian groups when n=p^2 (e.g., n=4 gives Z4 and Z2×Z2).\n\n- Probability (binomial tails via normal approximation):\n  - For X~Bin(n,p), use μ=np, σ=√(np(1−p)).\n  - Apply continuity correction: P(X≥k)≈P(N(μ,σ^2)≥k−0.5); P(X≤k)≈P(N(μ,σ^2)≤k+0.5).\n  - Convert to z=(x−μ)/σ, take the correct upper/lower tail, and compare the resulting probability to the given intervals.\n\n- Geometry of polygons:\n  - Sum of exterior angles is 360 degrees.\n  - Each acute interior angle (>0 and <90) has exterior angle >90; thus at most three acute interior angles in a convex polygon.\n\n- Equations/graphs with logs and exponents:\n  - Check domain (e.g., x>0, y>0 for logs).\n  - Recognize identities: x^{log y}=y^{log x} holds for all x,y>0 since both equal b^{(log_b x)(log_b y)}.\n\n- Analysis/topology:\n  - Compact domain + continuous function often yields strong conclusions (e.g., extreme value, uniform continuity).\n  - Open domains may break fixed-point or attainment properties.\n\n- Number theory patterns (units digit of powers):\n  - Use modular cycles (e.g., last-digit cycles for powers).\n\nAfter internal reasoning, choose the single best option.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.72,
+            "acc_new": 0.68,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Do all calculations and checks internally; do not output your reasoning.\n- Output only a single line in the required format with the chosen letter.\n- Do not include any extra words, symbols, or lines.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.72,
+            "acc_new": 0.64,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.72,
+            "acc_new": 0.64,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 2,
+            "broke": 4
+          }
+        }
+      ]
+    }
+  }
+}

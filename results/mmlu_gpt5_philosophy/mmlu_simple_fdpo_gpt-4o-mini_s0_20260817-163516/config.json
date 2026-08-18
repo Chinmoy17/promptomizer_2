@@ -1,0 +1,56 @@
+{
+  "method": "simple_fdpo",
+  "dataset": "mmlu",
+  "seed": 0,
+  "n_train": 50,
+  "n_test": 66,
+  "n_shots": 4,
+  "max_rounds": 5,
+  "rho": 0.02,
+  "eps": 0.01,
+  "n_fail": 100,
+  "n_gold": 10,
+  "tau": 3,
+  "simple_max_rounds": 3,
+  "accept_margin": 1.0,
+  "skip_above_acc": 0.9,
+  "simple_val_frac": 0.5,
+  "val_size": 20,
+  "pool_cap": 200,
+  "stagnation_limit": 3,
+  "history_window": 3,
+  "prompt_file": "prompts/mmlu_oneliner.md",
+  "phase": "mmlu_gpt5_philosophy",
+  "early_stop": true,
+  "split_mode": "balanced",
+  "subjects": [
+    "philosophy"
+  ],
+  "pin_sections": [],
+  "verdict_mode": "programmatic",
+  "solver_max_tokens": 2048,
+  "solver_temperature": 0.0,
+  "optimizer_temperature": 0.7,
+  "budget_usd": 0.0,
+  "price_in": 0.0,
+  "price_out": 0.0,
+  "results_root": "results",
+  "dataset_root": "Dataset",
+  "max_workers": 3,
+  "dry_run": false,
+  "roles": {
+    "solver": {
+      "model": "gpt-4o-mini",
+      "base_url": "https://aifeedbackloop.openai.azure.com/"
+    },
+    "judge": {
+      "model": "gpt-4.1",
+      "base_url": "https://aifeedbackloop.openai.azure.com/"
+    },
+    "optimizer": {
+      "model": "gpt-5",
+      "base_url": "https://aifeedbackloop.openai.azure.com/"
+    }
+  },
+  "run_id": "mmlu_simple_fdpo_gpt-4o-mini_s0_20260817-163516"
+}

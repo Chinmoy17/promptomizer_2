@@ -26,7 +26,7 @@ from fdpo.utils.budget import BudgetExceededError, BudgetGuard, TokenLedger
 from fdpo.utils.io import CsvAppender, atomic_write_json, ensure_run_dir, make_run_id
 from fdpo.utils.log import setup_logging
 
-EVAL_LOG_FIELDS = ["phase", "example_id", "correct", "pred", "gold"]
+EVAL_LOG_FIELDS = ["phase", "example_id", "correct", "pred", "gold", "blocked"]
 
 
 def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
@@ -89,7 +89,7 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
         for row in seed_result.rows:
             eval_log.append({"phase": "seed", "example_id": row.example_id,
                              "correct": row.correct, "pred": row.pred,
-                             "gold": row.gold})
+                             "gold": row.gold, "blocked": row.blocked})
         logger.info("seed test accuracy: %.3f", seed_result.accuracy)
 
         if cfg.method in ("fdpo", "monolithic"):
@@ -118,7 +118,7 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
             for row in final_result.rows:
                 eval_log.append({"phase": "final", "example_id": row.example_id,
                                  "correct": row.correct, "pred": row.pred,
-                                 "gold": row.gold})
+                                 "gold": row.gold, "blocked": row.blocked})
             logger.info("final test accuracy: %.3f", final_result.accuracy)
             # Test-set confusion matrix: which examples flipped vs the seed_test?
             seed_correct = seed_result.correct_ids()
@@ -143,6 +143,29 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
 
     seed_acc = seed_result.accuracy if seed_result else 0.0
     final_acc = final_result.accuracy if final_result else seed_acc
+
+    # Content-filter audit: which specific example IDs Azure refused, and
+    # whether the SAME items are refused at baseline and final (so repeated
+    # rejections can be actioned). None when nothing was blocked.
+    content_filter = None
+    if seed_result is not None:
+        seed_blocked = seed_result.blocked_ids()
+        final_blocked = final_result.blocked_ids() if final_result else set()
+        if seed_blocked or final_blocked:
+            content_filter = {
+                "n_seed_blocked": len(seed_blocked),
+                "n_final_blocked": len(final_blocked),
+                "seed_blocked_ids": sorted(seed_blocked),
+                "final_blocked_ids": sorted(final_blocked),
+                "blocked_in_both": sorted(seed_blocked & final_blocked),
+                "blocked_seed_only": sorted(seed_blocked - final_blocked),
+                "blocked_final_only": sorted(final_blocked - seed_blocked),
+            }
+            logger.warning("content filter: %d blocked at seed, %d at final, "
+                           "%d the SAME item in both: %s",
+                           len(seed_blocked), len(final_blocked),
+                           len(seed_blocked & final_blocked),
+                           sorted(seed_blocked & final_blocked))
     metrics = {
         "run_id": run_id,
         "status": status,
@@ -154,6 +177,7 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
         "final_test": standard_metrics(cfg.dataset, final_result) if final_result
                       else (standard_metrics(cfg.dataset, seed_result) if seed_result else None),
         "optimization": opt_summary or None,
+        "content_filter": content_filter,
         "wall_clock_s": round(time.time() - started, 1),
         "cost": ledger.summary(),
     }

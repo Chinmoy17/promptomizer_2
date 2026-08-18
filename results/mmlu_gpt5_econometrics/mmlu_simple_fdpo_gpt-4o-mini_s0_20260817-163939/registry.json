@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.72,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are an econometrics/time-series multiple-choice solver. For each question:\n- If it needs calculation (e.g., roots, likelihood ratio), do the minimal correct computation before choosing.\n- If it is factual/definition-based, recall the core concept, eliminate wrong options quickly, and answer directly.\nDo not output your working. Output only the final letter choice.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.56,
+            "acc_new": 0.76,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 6,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Questions come from time-series/econometrics/panel topics (ARMA/VAR/GARCH, OLS issues, stationarity, structural breaks, Hausman tests, returns, identification). Some require quick numeric calculation; many rely on precise definitions and standard results.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.56,
+            "acc_new": 0.76,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 6,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this checklist:\n\n1) Identify question type\n- Computational: numeric roots/statistics needed → compute briefly and accurately.\n- Conceptual: definitions/properties/tests → recall the standard result and pick directly.\n\n2) Core principles and quick rules\n- AR(p) stationarity: roots of 1 − φ1 z − ... − φp z^p = 0 must have modulus > 1.\n  - If any root = 1 → unit root process.\n  - If any root has modulus < 1 → explosive (nonstationary).\n  - If all roots > 1 in modulus → stationary.\n- MA(q) “characteristic” roots/invertibility: polynomial Θ(z) = 1 + θ1 z + ... + θq z^q.\n  - Solve Θ(z) = 0 for z. Invertibility requires roots with modulus > 1.\n  - If your computed roots don’t match options, check if options list reciprocals (some texts report 1/root). Pick the set that matches the convention used in the options.\n- VAR lag reduction (LR test): testing VAR(p1) → VAR(p0), p1 > p0 with m variables and T observations:\n  - LR = T * ln(|Σ_restricted| / |Σ_unrestricted|), where Σ are residual covariance determinants from the restricted (smaller lag) and unrestricted models.\n  - df = m^2 * (p1 − p0). Compare magnitude to options; do not divide by df.\n- Structural break (Chow) with sample split: unrestricted RSS = RSS(subsample 1) + RSS(subsample 2).\n- OLS with autocorrelation (classical exogeneity): coefficients remain unbiased/consistent; SEs are wrong; tests can mislead; forecasts are not systematically biased due to autocorrelation alone.\n- Multicollinearity (near, not exact): OLS remains unbiased, consistent, and BLUE under Gauss–Markov; variances may be large.\n- Log-returns: additive over time; not additive across assets in a portfolio; often heavy-tailed; interpret as continuously compounded changes.\n- Random walk with drift b: Δy_t = b + ε_t. Optimal 1-step-ahead forecast of Δy is the drift (estimated by the in-sample mean of Δy).\n- Hausman test: tests consistency difference (e.g., RE vs FE; OLS vs IV) to detect endogeneity; use to decide if a simultaneous/IV framework is needed.\n- EGARCH: variance is log-modeled → avoids non-negativity constraints; captures leverage/asymmetry. It does not introduce feedback from volatility to the mean equation.\n- Identification/estimation in simultaneous equations:\n  - Over-identified equations: use IV/2SLS (ILS is for exactly identified; OLS not valid if endogenous regressors).\n\n3) Option matching\n- After computing or recalling, match exactly to the closest option given the test’s conventions (including possible reciprocals/sign conventions for roots).\n- If two options seem close numerically, prefer the one aligned with the standard formula you used.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.56,
+            "acc_new": 0.76,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 6,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this checklist:\n\n1) Identify question type\n- Computational: numeric roots/statistics needed → compute briefly and accurately.\n- Conceptual: definitions/properties/tests → recall the standard result and pick directly.\n\n2) Core principles and quick rules\n- AR(p) stationarity: roots of 1 − φ1 z − ... − φp z^p = 0 must have modulus > 1.\n  - If any root = 1 → unit root process.\n  - If any root has modulus < 1 → explosive (nonstationary).\n  - If all roots > 1 in modulus → stationary.\n- MA(q) “characteristic” roots/invertibility: polynomial Θ(z) = 1 + θ1 z + ... + θq z^q.\n  - Solve Θ(z) = 0 for z. Invertibility requires roots with modulus > 1.\n  - If your computed roots don’t match options, check if options list reciprocals (some texts report 1/root). Pick the set that matches the convention used in the options.\n- VAR lag reduction (LR test): testing VAR(p1) → VAR(p0), p1 > p0 with m variables and T observations:\n  - LR = T * ln(|Σ_restricted| / |Σ_unrestricted|), where Σ are residual covariance determinants from the restricted (smaller lag) and unrestricted models.\n  - df = m^2 * (p1 − p0). Compare magnitude to options; do not divide by df.\n- t critical values for coefficient tests: for H0: βj = c, use a t distribution with df = n − k (k = number of estimated coefficients including the intercept). For a two-sided 5% test use t_{0.975, df} (not 1.96 unless df is very large). Choose the option closest to the correct finite-sample t critical.\n- Structural break (Chow) with sample split: unrestricted RSS = RSS(subsample 1) + RSS(subsample 2).\n- OLS with autocorrelation (classical exogeneity): coefficients remain unbiased/consistent; SEs are wrong; tests can mislead; forecasts are not systematically biased due to autocorrelation alone.\n- Multicollinearity (near, not exact): OLS remains unbiased, consistent, and BLUE under Gauss–Markov; variances may be large.\n- Log-returns: additive over time; not additive across assets in a portfolio; often heavy-tailed; interpret as continuously compounded changes.\n- Random walk with drift b: Δy_t = b + ε_t. Optimal 1-step-ahead forecast of Δy is the drift (estimated by the in-sample mean of Δy).\n- Hausman test: tests consistency difference (e.g., RE vs FE; OLS vs IV) to detect endogeneity; use to decide if a simultaneous/IV framework is needed.\n- EGARCH: variance is log-modeled → avoids non-negativity constraints; captures leverage/asymmetry. It does not introduce feedback from volatility to the mean equation.\n- Identification/estimation in simultaneous equations:\n  - Over-identified equations: use IV/2SLS (ILS is for exactly identified; OLS not valid if endogenous regressors).\n\n3) Option matching\n- After computing or recalling, match exactly to the closest option given the test’s conventions (including possible reciprocals/sign conventions for roots).\n- If two options seem close numerically, prefer the one aligned with the standard formula you used.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "Use this checklist:\n\n1) Identify question type\n- Computational: numeric roots/statistics needed → compute briefly and accurately.\n- Conceptual: definitions/properties/tests → recall the standard result and pick directly.\n\n2) Core principles and quick rules\n- AR(p) stationarity: roots of 1 − φ1 z − ... − φp z^p = 0 must have modulus > 1.\n  - If any root = 1 → unit root process.\n  - If any root has modulus < 1 → explosive (nonstationary).\n  - If all roots > 1 in modulus → stationary.\n  - AR(2) quick unit-root check: if φ1 + φ2 = 1, there is a unit root at z = 1 (nonstationary).\n- MA(q) “characteristic” roots/invertibility: polynomial Θ(z) = 1 + θ1 z + ... + θq z^q.\n  - Solve Θ(z) = 0 for z. Invertibility requires roots with modulus > 1.\n  - If your computed roots don’t match options, check if options list reciprocals (some texts report 1/root). Pick the set that matches the convention used in the options.\n- VAR lag reduction (LR test): testing VAR(p1) → VAR(p0), p1 > p0 with m variables and T observations:\n  - LR = T * ln(|Σ_restricted| / |Σ_unrestricted|), where Σ are residual covariance determinants from the restricted (smaller lag) and unrestricted models.\n  - df = m^2 * (p1 − p0). Do not divide LR by df.\n- t critical values for coefficient tests: for H0: βj = c, use a t distribution with df = n − k (k = number of estimated coefficients including the intercept). For a two-sided 5% test use t_{0.975, df} (not 1.96 unless df is very large). Choose the option closest to the correct finite-sample t critical.\n- Structural break (Chow) with sample split: unrestricted RSS = RSS(subsample 1) + RSS(subsample 2).\n- OLS with autocorrelation (classical exogeneity): coefficients remain unbiased/consistent; SEs are wrong; tests can mislead; forecasts are not systematically biased due to autocorrelation alone.\n- Multicollinearity (near, not exact): OLS remains unbiased, consistent, and BLUE under Gauss–Markov; variances may be large.\n- Log-returns: additive over time; not additive across assets in a portfolio; often heavy-tailed; interpret as continuously compounded changes.\n- Random walk with drift b: Δy_t = b + ε_t. Optimal 1-step-ahead forecast of Δy is the drift (estimated by the in-sample mean of Δy).\n- Hausman test: tests consistency difference (e.g., RE vs FE; OLS vs IV) to detect endogeneity; use to decide if a simultaneous/IV framework is needed.\n- EGARCH: variance is log-modeled → avoids non-negativity constraints; captures leverage/asymmetry. It does not introduce feedback from volatility to the mean equation.\n- Identification/estimation in simultaneous equations:\n  - Over-identified equations: use IV/2SLS (ILS is for exactly identified; OLS not valid if endogenous regressors).\n\n3) Option matching\n- After computing or recalling, match exactly to the closest option given the test’s conventions (including possible reciprocals/sign conventions for roots).\n- If two options seem close numerically, prefer the one aligned with the standard formula you used.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Do not explain or show steps.\n- Compute carefully; use correct formulas and conventions.\n- Give exactly one choice.\n- No extra text, no justification, no spaces beyond the required format.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.56,
+            "acc_new": 0.76,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 6,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.56,
+            "acc_new": 0.76,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 6,
+            "broke": 1
+          }
+        }
+      ]
+    }
+  }
+}

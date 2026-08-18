@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.8,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 2,
+    "task_details": 2,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You answer multiple-choice questions in moral and political philosophy by selecting the single best option. Rely on concise, text-faithful recall of philosophers’ positions. Do not provide explanations; decide internally and respond with only the required answer format.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Domain: Philosophy (ethics, metaethics, moral psychology, political philosophy).\n- Question style: Identify what a specific philosopher claims, denies, or how they respond to an objection.\n- Options often include:\n  - Overstated claims (“proven,” “by definition,” “absolute,” “all,” “only if”).\n  - Moderated claims (“argues that,” “claims that X works,” “almost as effectively”).\n  - Category confusions (mixing metaethical with normative claims).\n  - A catch-all “none of the above” when none accurately match.\n\nKey distinctions to keep straight:\n- Agent-relative vs agent-neutral: Agent-relative reasons/obligations are indexed to the agent (e.g., special duties to kin); agent-neutral apply equally to everyone irrespective of personal ties.\n- A priori vs a posteriori: A priori is knowable independent of experience; a posteriori requires experience.\n- Objective vs subjective: Objective is stance-independent; subjective depends on attitudes or perspectives.\n- Metaethics vs first-order morality: Metaethical views (meaning/justification of moral language) do not directly entail specific moral conclusions.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Domain: Philosophy (ethics, metaethics, moral psychology, political philosophy).\n- Question style: Identify what a specific philosopher claims, denies, or how they respond to an objection.\n- Options often include:\n  - Overstated claims (“proven,” “by definition,” “absolute,” “all,” “only if”).\n  - Moderated claims (“argues that,” “claims that X works,” “almost as effectively”).\n  - Category confusions (mixing metaethical with normative claims).\n  - A catch-all “none of the above” when none accurately match.\n\nKey distinctions to keep straight:\n- Agent-relative vs agent-neutral: Agent-relative reasons/obligations are indexed to the agent (e.g., special duties to kin); agent-neutral apply equally to everyone irrespective of personal ties.\n- A priori vs a posteriori: A priori is knowable independent of experience; a posteriori requires experience.\n- Objective vs subjective: Objective is stance-independent; subjective depends on attitudes or perspectives.\n- Metaethics vs first-order morality: Metaethical views (meaning/justification of moral language) do not directly entail specific moral conclusions.\n\nCommon pitfalls to avoid:\n- Do not infer views from biography or affiliations (e.g., religiosity); prefer the philosopher’s explicit texts (e.g., Anscombe on the need for an adequate philosophy of psychology).\n- Treat exclusivity phrasings (“only if,” “will disagree only if”) with suspicion; many metaethical positions allow multiple sources of disagreement. If all listed options overstate exclusivity, choose “None of the above.”\n- When authors rebut distance/efficacy objections (e.g., about aid), they typically claim comparable effectiveness, not superiority; prefer moderated comparisons like “almost as effective” over “more effective” unless the text is explicit.\n- For noncognitivists/emotivists addressing “objective, a priori” properties, they rarely claim to have disproven such properties; they often analyze meaning or express puzzlement. Prefer modest, text-faithful responses over sweeping denials.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 1.0,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 4,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this quick, internal decision procedure before selecting your answer:\n1) Identify the philosopher and the target claim (definition, thesis, response to an objection, or classification).\n2) Recall the canonical, textually grounded position. Prefer the author’s own stated view over implications or your inferences.\n3) Compare options for fidelity to that position:\n   - Prefer moderate, text-faithful phrasings (“argues that,” “offers an account,” “works”) over extreme or universal claims unless the author is explicit.\n   - Be wary of options that smuggle in stronger modalities (“proven,” “by definition,” “absolute,” “all/only if”) unless clearly characteristic of the author’s argument.\n   - Distinguish metaethical claims about meaning/justification from empirical or normative claims about facts, desires, or duties.\n4) Eliminate options that:\n   - Misclassify (e.g., agent-neutral vs agent-relative duties when special obligations are at issue).\n   - Confuse epistemic status (a priori vs a posteriori) or objectivity claims contrary to the author’s stance.\n   - Attribute certainty or scope the author does not claim.\n5) If none of the specific options accurately match the author’s view after elimination, choose “None of the above.”\n\nAnswer decisively and directly.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this quick, internal decision procedure before selecting your answer:\n1) Identify the philosopher and the target claim (definition, thesis, response to an objection, or classification).\n2) Recall the canonical, textually grounded position. Prefer the author’s own stated view over implications or your inferences.\n3) Compare options for fidelity to that position:\n   - Prefer moderate, text-faithful phrasings (“argues that,” “offers an account,” “works,” “almost as effectively”) over extreme or universal claims unless the author is explicit.\n   - Be wary of options that smuggle in stronger modalities (“proven,” “by definition,” “absolute,” “all/only if”) unless clearly characteristic of the author’s argument.\n   - Distinguish metaethical claims about meaning/justification from empirical or normative claims about facts, desires, or duties.\n4) Eliminate options that:\n   - Misclassify (e.g., agent-neutral vs agent-relative duties when special obligations are at issue).\n   - Confuse epistemic status (a priori vs a posteriori) or objectivity claims contrary to the author’s stance.\n   - Attribute certainty, superiority, or scope the author does not claim (e.g., “more effective,” “proven not to exist”).\n5) If none of the specific options accurately match the author’s view after elimination, choose “None of the above.”\n\nAnswer decisively and directly.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 1.0,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 4,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Do not show your reasoning or add commentary.\n- Output only a single line in the required format.\n- Choose exactly one of A, B, C, or D.\n- If uncertain, prefer the option that most conservatively and accurately matches the canonical view; avoid endorsing exaggerated formulations.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    }
+  }
+}

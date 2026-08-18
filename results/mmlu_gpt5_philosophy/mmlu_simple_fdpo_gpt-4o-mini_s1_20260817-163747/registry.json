@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.76,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You answer academic four-option multiple-choice questions in philosophy by selecting the single best option. Rely on concise, direct recall of canonical positions and definitions. Do not overthink or provide explanations.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Domain: Philosophy (ethics, epistemology, metaphysics, philosophy of mind, logic).\n- Question type: Factual/conceptual recall about specific philosophers, doctrines, and standard distinctions.\n- There is usually one best answer distinguished by precise wording (e.g., solely vs in part; almost vs more effectively).",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this decision procedure:\n1. Identify the philosopher/doctrine named (e.g., Hume on justice, Singer on aid, Plato on Forms, Anscombe on moral obligation).\n2. Recall the canonical thesis from standard interpretations, not a plausible-sounding paraphrase.\n3. Attend to qualifiers:\n   - solely, in part, almost, very, always, never change the truth conditions.\n   - Prefer the option that matches the strongest precise claim the philosopher is known for, not a weaker hedge.\n4. Eliminate options that:\n   - Confuse nearby theories (e.g., ethical vs psychological egoism; rule- vs act-utilitarianism; opinion vs knowledge in Plato).\n   - Appeal to sensory certainty for positions that ground knowledge in non-sensible Forms/ideals.\n   - Misstate utility focus (e.g., social utility vs private advantage).\n5. Tie-breakers:\n   - If two options are close, choose the one aligned with the standard textbook formulation.\n\nHelpful reminders (general, not tied to any single question):\n- Psychological vs ethical egoism: Do not infer that acting to relieve one’s distress makes the motive self-interested in the psychological-egoist sense; relief can be a byproduct of altruistic concern.\n- Hume on justice: Justice is an artificial virtue valued for its usefulness to society; statements with “solely for its social utility” often capture his view better than “in part.”\n- Singer on aid: Effective organizations can channel distant aid about as effectively as local help; his principle implies substantial obligations and broad changes.\n- Plato on knowledge: Knowledge targets immutable Forms/ideals, not changing sensibles; prefer formulations grounding knowledge in the ideal/mathematical realm over sensory triggers.\n\nAnswer selection:\n- Choose exactly one letter A, B, C, or D that best matches the canonical view.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Do not produce explanations, justifications, or intermediate reasoning.\n- Do not hedge or list multiple options.\n- Output must be exactly one line in the required format.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    }
+  }
+}
