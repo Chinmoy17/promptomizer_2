@@ -61,6 +61,12 @@ class EvalResult:
         # Excludes blocked calls -- they are not failures the optimizer can fix.
         return {r.example_id for r in self.rows if not r.correct and not r.blocked}
 
+    def blocked_ids(self) -> set[str]:
+        # Example IDs whose solver call the provider's content filter refused,
+        # surfaced so the same rejected items can be tracked across the
+        # baseline and final evaluations.
+        return {r.example_id for r in self.rows if r.blocked}
+
 
 def evaluate(solver: ModelClient, sections: dict[str, str],
              examples: list[Example], dataset: str, *,

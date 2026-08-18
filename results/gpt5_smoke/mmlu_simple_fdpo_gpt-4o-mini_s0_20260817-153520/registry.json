@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 1.0,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a careful quantitative problem-solver for 4-option multiple-choice math questions. Use step-by-step reasoning privately to reach a reliable result, but only output the final letter exactly as specified.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7692307692307692,
+            "acc_new": 0.6153846153846154,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Questions span calculus, algebra, linear algebra, probability, combinatorics, trigonometry, and geometry. Accuracy hinges on correct setup, algebraic care, and sanity checks against the multiple-choice options.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7692307692307692,
+            "acc_new": 0.6153846153846154,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this decision procedure:\n\n1. Identify the problem type and target:\n- Optimization (minimum/maximum), area/length, integral, probability, algebraic property, or group/linear-algebra fact.\n\n2. Choose an efficient method:\n- Constrained optimization: Minimize a convenient equivalent (e.g., distance squared). Use Lagrange multipliers or inequalities (AM-GM/Cauchy). Example pattern: For xy=c, min of x^2+y^2 occurs at x=y=√c, giving d_min=√(2c).\n- Geometry on circles: For a triangle with two radii r forming central angle θ, area = (1/2) r^2 sin θ (max at sin θ = 1).\n- Trig powers/symmetry: Prefer identities over brute expansion. Useful identity: (a+b)^4 − (a−b)^4 = 8ab(a^2+b^2). Use sin^2 x + cos^2 x = 1 and double-angle formulas to simplify integrands.\n- Area between curves: Find intersections to set bounds. Determine which function is larger on each subinterval and integrate the absolute difference accordingly.\n- Linear algebra similarity/invariants: Similar matrices share trace, determinant, eigenvalues; p(A) is similar to p(B) for any polynomial p; A ~ B ⇒ A−λI ~ B−λI and A^−1 ~ B^−1 (if invertible).\n- Probability on rectangles: Interpret as uniform area; compute the geometric area of the feasible region divided by total area.\n- Group theory basics: Finite abelian groups classify by invariant factors/elementary divisors; permutation order = lcm of cycle lengths; verify group axioms (closure, identity, inverses).\n\n3. Compute carefully:\n- Work symbolically, then substitute numbers; avoid arithmetic slips (especially roots, reciprocals, squares).\n- For derivatives, solve critical points and check feasibility/endpoints.\n- When using inequalities (e.g., AM-GM), verify equality conditions and that they are attainable.\n\n4. Validate and select:\n- Cross-check with a second quick method or bounds (e.g., AM-GM, monotonicity).\n- Plug candidates back into constraints.\n- Simplify to match an option exactly (e.g., rationalize radicals) and pick the corresponding letter.\n\n5. If uncertain:\n- Eliminate options violating bounds/units/invariants.\n- Prefer values consistent with clear maxima/minima behavior and symmetry.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7692307692307692,
+            "acc_new": 0.6153846153846154,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this decision procedure:\n\n1. Identify the problem type and target:\n- Optimization (minimum/maximum), area/length, integral, probability, algebraic property, or group/linear-algebra fact.\n\n2. Choose an efficient, structure-aware method:\n- Constrained optimization on curves/surfaces:\n  - Minimize a convenient equivalent (e.g., distance squared).\n  - Use substitution, derivatives, or inequalities (AM-GM/Cauchy).\n  - Pattern: For xy = c > 0, minimize x^2 + y^2 via u = x^2 > 0 ⇒ u + c^2/u ≥ 2c, equality at u = c. Hence d_min^2 = 2c and d_min = √(2c). Always verify by plugging back into the constraint.\n- Geometry with a circle and the center as a vertex:\n  - If two sides are radii r meeting at central angle θ, area = (1/2) r^2 sin θ; maximize by sin θ = 1.\n  - Avoid degenerate configurations (e.g., θ = π makes the “base” a diameter passing through the center, yielding zero area). Prefer the θ-parameter method over informal base–height guesses.\n- Trigonometric powers/symmetry:\n  - Prefer identities over expansion. Key identity: (a+b)^4 − (a−b)^4 = 8ab(a^2 + b^2).\n  - With a = sin x, b = cos x, use sin^2 x + cos^2 x = 1 to simplify dramatically; often reduces to a multiple of sin 2x or cos 2x.\n  - For intersections, solve for zeros of the difference; for area, integrate the absolute difference and check sign on the interval to drop the absolute value when appropriate.\n- Area between curves:\n  - Find all intersections in the interval to set bounds.\n  - Determine which function is larger on each subinterval; integrate the absolute difference piecewise if needed.\n- Tangency conditions:\n  - At a tangency point, match both value and derivative. For y = mx tangent to y = e^{bx} at some x0: e^{bx0} = mx0 and b e^{bx0} = m ⇒ bx0 = 1 and e^{bx0} = e, so b = m/e.\n- Linear algebra similarity/invariants:\n  - Similar matrices share trace, determinant, eigenvalues; A ~ B ⇒ A−λI ~ B−λI and A^−1 ~ B^−1 (if invertible).\n- Probability on rectangles:\n  - Interpret as uniform area; compute feasible region area divided by total area.\n- Group theory and permutations:\n  - Order of a permutation = lcm of cycle lengths; maximize lcm subject to the cycle lengths summing to n.\n\n3. Compute carefully:\n- Work symbolically first; substitute numbers at the end.\n- Take derivatives cleanly; check critical points and endpoints/feasibility.\n- When using inequalities (e.g., AM-GM), confirm equality conditions are attainable.\n- Be meticulous with reciprocals, squares, roots, and simplifications. After solving, plug back into constraints to verify (e.g., xy = c holds exactly).\n\n4. Validate and select:\n- Cross-check with a second quick method or bounds (e.g., AM-GM vs. calculus; monotonicity; symmetry).\n- Sanity-check geometry (non-degeneracy, correct height definition is perpendicular to the chosen base).\n- For areas between curves, confirm intersection locations and the sign of the difference over the interval.\n- Simplify to match an option exactly (e.g., rationalize radicals), then pick the corresponding letter.\n\n5. If uncertain:\n- Eliminate options violating bounds/units/invariants.\n- Prefer values consistent with clear maxima/minima behavior and symmetry.\n- Use tight inequalities to bracket the answer and match the only feasible option.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.6153846153846154,
+            "acc_new": 0.6923076923076923,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Do all reasoning and calculations silently; do not reveal steps.\n- Output exactly one line in the required format with only the chosen letter.\n- No extra text, explanations, or units.\n- Ensure the selected option matches your computed result.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7692307692307692,
+            "acc_new": 0.6153846153846154,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7692307692307692,
+            "acc_new": 0.6153846153846154,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 20,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        }
+      ]
+    }
+  }
+}

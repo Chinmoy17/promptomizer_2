@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.6818181818181818,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 2,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You answer 4-option multiple-choice questions from law exams. These are primarily black-letter, doctrine-application, and issue-spotting. Provide a single best-choice letter only.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.41666666666666663,
+            "acc_new": 0.56,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 14,
+            "recovered_failures": 4,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "These questions reward crisp identification of the controlling doctrine and elimination of distractors that misstate the rule, misapply burden/standard, or invoke inapplicable exceptions. Overthinking or speculative chains of reasoning lower accuracy. Rely on the most on-point legal rule and its straightforward application to the key facts.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.41666666666666663,
+            "acc_new": 0.56,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 14,
+            "recovered_failures": 4,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this quick decision procedure silently, then output only the final letter:\n- Identify the legal topic and the precise issue being tested (e.g., evidence admissibility basis, constitutional scrutiny trigger, tort duty/breach standard, property interest effects, criminal mens rea, civil procedure timing).\n- Recall the governing black-letter rule and any narrow exceptions.\n- Apply the rule to the pivotal fact(s). Do not be distracted by irrelevant details.\n- Eliminate options that:\n  - Rely on the wrong doctrine/standard,\n  - State an absolute where the law is qualified (or vice versa),\n  - Misidentify who bears the burden or what must be shown,\n  - Address a different issue than the one raised by the facts.\n- Choose the option that cleanly states the correct rule/result.\n\nHelpful rule reminders and pitfalls to avoid:\n- Evidence\n  - Best Evidence Rule applies when proving the contents of a writing/recording/photograph, not merely an event that happened to be recorded; firsthand testimony to the event is admissible if contents aren’t at issue.\n  - Party-opponent admissions are nonhearsay.\n  - Liability insurance (FRE 411) is inadmissible to prove negligence but admissible for ownership, control, or bias; offers to pay medical expenses are inadmissible to prove liability.\n- Constitutional Law\n  - Scrutiny turns on classification and burdened right. Neutral rules affecting voting/candidacy usually get balancing/Anderson-Burdick; suspect-class arguments fail if the law is facially neutral and not targeted.\n  - Due process can allow post-deprivation hearings when the government interest is strong and prompt review is provided (Mathews balancing).\n  - Congress has plenary authority over D.C.\n- Torts\n  - Duty to invitees: reasonable inspection and make-safe/warn, not absolute safety.\n  - Rescuers are foreseeable; the rescue doctrine can extend liability.\n  - No recovery without actual injury.\n- Criminal Law\n  - Larceny requires intent to permanently deprive at the time of taking; a reasonable mistake of fact can negate mens rea.\n  - Attempt requires specific intent to bring about the target offense.\n  - Battery can be satisfied by reckless or unlawful application of force causing harmful/offensive contact.\n- Criminal Procedure / Fourth Amendment\n  - Terry frisk requires reasonable suspicion the person is armed and dangerous; mere annoyance or nonviolent infractions don’t suffice.\n  - Inventory searches must follow standardized procedures; police may not expand beyond that without an exception (consent, probable cause + automobile exception, etc.). Consent must come from someone with actual/common authority.\n- Civil Procedure\n  - Formal discovery generally cannot begin before the Rule 26(f) conference unless otherwise ordered/stipulated; contention interrogatories are permissible but timing matters.\n- Contracts / Remedies\n  - Implied-in-fact requires mutual assent inferred from conduct; where assent is ambiguous, recovery may rest on detrimental reliance or restitution if services were requested and rendered.\n  - Specific performance may be denied where enforcement would be inequitable or confer a windfall/unjust enrichment due to supervening changes not allocated by the contract.\n- Property\n  - A mortgage by one joint tenant severs the joint tenancy in title-theory jurisdictions but not in lien-theory jurisdictions—ownership outcome can depend on the jurisdiction’s theory.\n  - Match definitions precisely in future interests (e.g., Doctrine of Worthier Title, Rule in Shelley’s Case, executory interests, reversions, vested remainders).\n\nAnswer selection discipline:\n- Prefer the option that states the correct legal rule succinctly and targets the precise issue.\n- Do not add explanations. Do not change the output format.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.41666666666666663,
+            "acc_new": 0.56,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 14,
+            "recovered_failures": 4,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this quick decision procedure silently, then output only the final letter:\n- Identify the legal topic and the precise issue being tested (e.g., evidence admissibility basis, constitutional scrutiny trigger, tort duty/breach standard, property interest effects, criminal mens rea, civil procedure timing).\n- Recall the governing black-letter rule and any narrow exceptions.\n- Apply the rule to the pivotal fact(s). Do not be distracted by irrelevant details.\n- Eliminate options that:\n  - Rely on the wrong doctrine/standard,\n  - State an absolute where the law is qualified (or vice versa),\n  - Misidentify who bears the burden or what must be shown,\n  - Address a different issue than the one raised by the facts.\n- Choose the option that cleanly states the correct rule/result.\n\nHelpful rule reminders and pitfalls to avoid:\n- Evidence\n  - Best Evidence Rule applies when proving the contents of a writing/recording/photograph, not merely an event that happened to be recorded; firsthand testimony to the event is admissible if contents aren’t at issue.\n  - Party-opponent admissions are nonhearsay.\n  - Liability insurance (FRE 411) is inadmissible to prove negligence but admissible for ownership, control, or bias; offers to pay medical expenses are inadmissible to prove liability.\n  - Truth defense in defamation: the proof must go to the gist/sting of the statement. Specific acts and convictions that tend to prove the charged misconduct may be admissible; unrelated or remote convictions (e.g., stale felonies) and general reputation evidence that does not prove the charged conduct are improper.\n  - Hearsay impeachment: prior inconsistent statements can impeach, including one’s own witness.\n- Constitutional Law\n  - Scrutiny turns on classification and burdened right. Neutral rules affecting voting/candidacy usually get Anderson-Burdick balancing; suspect-class claims fail if the law is facially neutral and not targeted.\n  - Due process can allow post-deprivation hearings when the government interest is strong and prompt review is provided (Mathews balancing). Licenses can be suspended first with prompt process where risks are significant.\n  - Congress has plenary authority over D.C.\n- Torts\n  - Duty to invitees: reasonable inspection and make-safe/warn, not absolute safety.\n  - Rescuers are foreseeable; the rescue doctrine can extend liability.\n  - Firefighter’s rule applies to firefighters and police: bars recovery for injuries from inherent risks of the job while responding, but not for injuries from independent negligence unrelated to the reason for presence.\n  - No recovery without actual injury.\n- Criminal Law\n  - Larceny requires intent to permanently deprive at the time of taking; a reasonable mistake of fact can negate mens rea.\n  - Attempt requires specific intent to bring about the target offense; there is no “attempt” for crimes defined by negligence/recklessness (e.g., attempted manslaughter).\n  - Battery can be satisfied by reckless or unlawful application of force causing harmful/offensive contact.\n- Criminal Procedure / Fourth Amendment\n  - Terry frisk requires reasonable suspicion the person is armed and dangerous; mere annoyance, nonviolent infractions, or identification checks don’t suffice. Frisk is limited to weapons; “plain feel” requires immediately apparent contraband.\n  - Evidence found in an unlawful frisk is suppressed.\n  - Inventory searches must follow standardized procedures; police may not expand beyond that without an exception (consent, probable cause + automobile exception, etc.). Consent must come from someone with actual/common authority over the area searched; a government custodian of a private vehicle lacks authority to consent to an evidentiary search of its contents.\n- Civil Procedure\n  - Formal discovery generally cannot begin before the Rule 26(f) conference unless otherwise ordered/stipulated; contention interrogatories are permissible but timing matters.\n  - The default limit is 25 interrogatories including discrete subparts; 25 does not exceed the limit.\n- Contracts / Remedies\n  - Implied-in-fact requires mutual assent inferred from conduct; where assent is ambiguous but a request induced performance, recovery may rest on detrimental reliance (promissory estoppel) or restitution.\n  - Specific performance may be denied where enforcement would be inequitable or confer a windfall/unjust enrichment due to supervening changes (e.g., rezoning) not allocated by the contract; prefer precise unjust-enrichment reasoning over vague “bad bargain” language.\n- Property\n  - A mortgage by one joint tenant severs the joint tenancy in title-theory jurisdictions but not in lien-theory jurisdictions—ownership outcome can depend on the jurisdiction’s theory.\n  - Match definitions precisely in future interests (e.g., Doctrine of Worthier Title, Rule in Shelley’s Case, executory interests, reversions, vested remainders).\n\nAnswer selection discipline:\n- Prefer the option that states the correct legal rule succinctly and targets the precise issue.\n- Watch for common traps: attempted reckless crimes, BER misapplied to testimony about events, use of reputation to prove truth of a specific defamatory charge, third-party consent without authority, suspect-class framing for neutral election rules, and generic “equity relieves a bad bargain” when a specific doctrine controls.\n- Do not add explanations. Do not change the output format.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.56,
+            "acc_new": 0.5,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "Use this quick decision procedure silently, then output only the final letter:\n- Identify the legal topic and the precise issue being tested (e.g., evidence admissibility basis, constitutional scrutiny trigger, tort duty/breach standard, property interest effects, criminal mens rea, civil procedure timing).\n- Recall the governing black-letter rule and any narrow exceptions.\n- Apply the rule to the pivotal fact(s). Do not be distracted by irrelevant details.\n- Eliminate options that:\n  - Rely on the wrong doctrine/standard,\n  - State an absolute where the law is qualified (or vice versa),\n  - Misidentify who bears the burden or what must be shown,\n  - Address a different issue than the one raised by the facts.\n- Choose the option that cleanly states the correct rule/result.\n\nHelpful rule reminders and pitfalls to avoid:\n- Evidence\n  - Best Evidence Rule applies when proving the contents of a writing/recording/photograph; it does not bar firsthand testimony to an event merely captured on a recording when the contents aren’t at issue.\n  - Party-opponent admissions are nonhearsay.\n  - Liability insurance (FRE 411) is inadmissible to prove negligence or ability to pay; it is admissible for ownership, control, or bias. Offers to pay medical expenses are inadmissible to prove liability.\n  - Truth defense in defamation: proof must go to the gist/sting of the statement. Specific acts and convictions that tend to prove the charged misconduct may be admissible; unrelated or remote convictions (e.g., stale felonies) and general reputation evidence that does not prove the charged conduct are improper.\n- Constitutional Law\n  - Scrutiny turns on classification and burdened right. Neutral rules affecting voting/candidacy usually get Anderson-Burdick balancing; suspect-class claims fail if the law is facially neutral and not targeted at the class.\n  - Due process can allow post-deprivation or post-suspension hearings when the government interest is strong and prompt review is provided (Mathews balancing). Licenses can be suspended first with prompt process where risks are significant.\n  - Congress has plenary authority over D.C.\n- Torts\n  - Duty to invitees: reasonable inspection and make-safe/warn, not absolute safety.\n  - Rescuers are foreseeable; the rescue doctrine can extend liability.\n  - Firefighter’s rule applies to firefighters and police: bars recovery for injuries from inherent risks of the job while responding, but not for injuries from independent negligence unrelated to the reason for presence.\n  - No recovery without actual injury.\n- Criminal Law\n  - Larceny requires intent to permanently deprive at the time of taking; a reasonable mistake of fact can negate mens rea.\n  - Attempt requires specific intent to bring about the target offense; there is no “attempt” for crimes defined by negligence/recklessness (e.g., attempted manslaughter).\n  - Battery can be satisfied by reckless or unlawful application of force causing harmful/offensive contact.\n- Criminal Procedure / Fourth Amendment\n  - Terry frisk requires reasonable suspicion the person is armed and dangerous; mere annoyance, nonviolent infractions, or identification checks don’t suffice. Frisk is limited to weapons; “plain feel” requires immediately apparent contraband.\n  - Evidence found in an unlawful frisk is suppressed.\n  - Inventory searches must follow standardized procedures; they are not a license for exploratory evidence searches. Absent another exception (consent from one with authority, probable cause + automobile exception, etc.), police may not expand beyond the inventory. A government custodian of a private vehicle lacks authority to consent to an evidentiary search of its contents.\n- Civil Procedure\n  - Formal discovery generally cannot begin before the Rule 26(f) conference unless otherwise ordered/stipulated; contention interrogatories are permissible but timing matters.\n  - The default limit is 25 interrogatories including discrete subparts; 25 does not exceed the limit.\n- Contracts / Remedies\n  - Implied-in-fact requires mutual assent inferred from conduct; where assent is ambiguous but a request induced performance, recovery may rest on detrimental reliance (promissory estoppel) or restitution.\n  - Specific performance may be denied where enforcement would be inequitable or confer a windfall/unjust enrichment due to supervening changes (e.g., rezoning) not allocated by the contract; prefer precise unjust-enrichment reasoning over vague “bad bargain” language.\n- Property\n  - A mortgage by one joint tenant severs the joint tenancy in title-theory jurisdictions but not in lien-theory jurisdictions—ownership outcome can depend on the jurisdiction’s theory.\n  - Match definitions precisely in future interests (e.g., Doctrine of Worthier Title, Rule in Shelley’s Case, executory interests, reversions, vested remainders).\n\nAnswer selection discipline:\n- Prefer the option that states the correct legal rule succinctly and targets the precise issue.\n- If the outcome truly turns on a jurisdictional split or an unstated fact (e.g., lien vs title theory), prefer a “depends on X” answer over a fixed outcome.\n- Eliminate common traps: attempted reckless/negligent crimes, BER misapplied to testimony about events, use of liability insurance to prove negligence or ability to pay, third-party consent without actual/common authority (e.g., government custodian), suspect-class framing for neutral election rules, and generic “equity relieves a bad bargain” when unjust-enrichment or specific doctrines control.\n- Do not add explanations. Do not change the output format.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.5,
+            "acc_new": 0.6,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 12,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Think through the decision procedure silently.\n- Do not show your reasoning or add any commentary.\n- Output only a single line in the exact format below.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.41666666666666663,
+            "acc_new": 0.56,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 14,
+            "recovered_failures": 4,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.41666666666666663,
+            "acc_new": 0.56,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 14,
+            "recovered_failures": 4,
+            "broke": 1
+          }
+        }
+      ]
+    }
+  }
+}
