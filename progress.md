@@ -270,3 +270,73 @@ exactly this.
 2. MMLU not fetched yet (not needed for anything run so far).
 3. `edit_log` (raw find/replace proposals from the optimizer) is not
    persisted anywhere — see "Where to resume" #4.
+
+---
+
+## Session update — 2026-08-26: Claude Haiku 4.5 solver + gpt-5 optimizer; Trace2Policy LegalBench replication; test-leak finding + oracle diagnostic
+
+**New model config**: solver = `claude-haiku-4-5-20251001` via Anthropic's
+OpenAI-compatible endpoint (`https://api.anthropic.com/v1/`) — zero code
+change, `.env` only. Critical gotcha: no `SOLVER_API_VERSION` line, or it
+silently falls back to the shared `AZURE_OPENAI_API_VERSION` and routes
+through the wrong (`AzureOpenAI`) client. Optimizer/judge = `gpt-5` on Azure
+(`aifeedbackloop`) — needs `max_completion_tokens` instead of `max_tokens`
+and no `temperature` override, handled by `_is_reasoning_model()` in
+`openai_client.py`.
+
+### Replicating Trace2Policy's LegalBench-hearsay protocol
+
+Trace2Policy (arXiv:2606.10457, Appendix H) reports, for Claude Haiku 4.5 on
+the 94-item LegalBench hearsay task (seed 42, 30-case iteration / 64-case
+held-out): B1b baseline 79.7% → v_EISR (2 rounds, human-authored) 93.8%.
+
+Ran the equivalent protocol with our mechanism (`--split-mode stratified
+--n-train 30 --n-test 64 --seed 42 --simple-max-rounds 2 --simple-val-frac 0
+--accept-margin 0.0`, solver=Claude Haiku 4.5, optimizer=gpt-5):
+
+| | Baseline | Final | Delta |
+|---|---:|---:|---:|
+| Ours (sealed test, honest) | 68.8% (44/64) | 73.4% (47/64) | **+4.6 pp** |
+
+Round 1 rewrote all 5 sections (mining 73.3%→90.0%, 8 recovered/3 regressed,
+shipped); round 2 regressed on mining (83.3%) and was correctly **not**
+shipped by the `--accept-margin 0.0` gate. Cost $0.09. Artifacts:
+`results/hearsay_trace2policy_repl/legalbench_hearsay_simple_fdpo_claude-haiku-4-5-20251001_s42_20260826-140211/`.
+
+Our baseline (68.8%) is well below theirs (79.7%) on the identical task —
+likely their exact B1b phrasing ("Q: {text} Is there hearsay? A: Answer with
+exactly Yes or No.") vs. our vague one-liner seed, not a solver capability gap.
+
+### Finding: Trace2Policy's hearsay probe leaks the held-out set into training
+
+Their own Appendix H states Round 1 was "diagnosed from v1's iter-30 errors
+**plus Opus v1's heldout errors**" — their human curator read failures on
+the 64-item "held-out" set and wrote rules to fix them. That set is not
+actually held out from refinement. (Their *main* damage-audit study is clean
+on this point — "two held-out sets ... disjoint from the pool" — the leak is
+specific to the public LegalBench probe, the one comparable numbers come
+from.) This plausibly explains a meaningful share of their reported gain.
+
+### Oracle/leakage diagnostic: same leak, via LLM instead of a human
+
+To quantify the leak's contribution, ran one deliberate oracle diagnostic
+(`oracle_leak_check.py`, repo root — NOT part of the normal pipeline, NOT a
+valid held-out result): pass the sealed 64-item test set in as the `train`
+(mining) pool, so the gpt-5 optimizer sees the same 64 items' own failures
+Trace2Policy's human curator saw.
+
+| | Baseline | Final (oracle) | Delta |
+|---|---:|---:|---:|
+| Ours, test-exposed (leak) | 68.8% (44/64) | **95.3%** (61/64) | **+26.6 pp** |
+| Trace2Policy, test-exposed (leak), Haiku 4.5 | 79.7% | 93.8% | +14.1 pp |
+
+**An automated, 2-round, $0.15 LLM rewrite matches/exceeds a human curator's
+multi-session rule-authoring, given the same test exposure.** This answers
+"how much can FDPO gain via LLM vs. human rule-writing" (at least as much,
+here) and reframes Trace2Policy's 93.8%: a large chunk of it is plausibly
+explainable by the leak alone, not by EISR's mechanism. Artifacts:
+`results/hearsay_ORACLE_LEAK_diagnostic/`, `oracle_leak_check.py`.
+
+**Do not cite the 95.3% number as an FDPO result anywhere** — it is a
+ceiling under test exposure, kept clearly separated (directory name, warning
+log line, `oracle_summary.json`) from the legitimate 73.4% result above.

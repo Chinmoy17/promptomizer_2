@@ -1,0 +1,110 @@
+{
+  "warning": "ORACLE/LEAKAGE DIAGNOSTIC -- not a valid held-out result",
+  "baseline_accuracy": 0.6875,
+  "final_accuracy": 0.953125,
+  "delta_pp": 26.5625,
+  "n_items": 64,
+  "optimizer_calls": 2,
+  "rounds_log": [
+    {
+      "round": 1,
+      "status": "committed_best",
+      "n_failures_before": 20,
+      "n_failures_after": 5,
+      "train_acc_after": 0.921875,
+      "val_acc_after": 0.921875,
+      "sections_changed": [
+        "constraints",
+        "context",
+        "output_format",
+        "system_role",
+        "task_details"
+      ],
+      "failing_ids_before": [
+        "hearsay_test_16",
+        "hearsay_test_23",
+        "hearsay_test_28",
+        "hearsay_test_29",
+        "hearsay_test_43",
+        "hearsay_test_51",
+        "hearsay_test_52",
+        "hearsay_test_63",
+        "hearsay_test_68",
+        "hearsay_test_74",
+        "hearsay_test_76",
+        "hearsay_test_77",
+        "hearsay_test_78",
+        "hearsay_test_80",
+        "hearsay_test_85",
+        "hearsay_test_89",
+        "hearsay_test_90",
+        "hearsay_test_91",
+        "hearsay_test_92",
+        "hearsay_train_0"
+      ],
+      "failing_ids_after": [
+        "hearsay_test_6",
+        "hearsay_test_62",
+        "hearsay_test_72",
+        "hearsay_test_78",
+        "hearsay_test_89"
+      ],
+      "recovered_this_round": [
+        "hearsay_test_16",
+        "hearsay_test_23",
+        "hearsay_test_28",
+        "hearsay_test_29",
+        "hearsay_test_43",
+        "hearsay_test_51",
+        "hearsay_test_52",
+        "hearsay_test_63",
+        "hearsay_test_68",
+        "hearsay_test_74",
+        "hearsay_test_76",
+        "hearsay_test_77",
+        "hearsay_test_80",
+        "hearsay_test_85",
+        "hearsay_test_90",
+        "hearsay_test_91",
+        "hearsay_test_92",
+        "hearsay_train_0"
+      ],
+      "regressed_this_round": [
+        "hearsay_test_6",
+        "hearsay_test_62",
+        "hearsay_test_72"
+      ]
+    },
+    {
+      "round": 2,
+      "status": "committed_best",
+      "n_failures_before": 5,
+      "n_failures_after": 2,
+      "train_acc_after": 0.96875,
+      "val_acc_after": 0.96875,
+      "sections_changed": [
+        "task_details"
+      ],
+      "failing_ids_before": [
+        "hearsay_test_6",
+        "hearsay_test_62",
+        "hearsay_test_72",
+        "hearsay_test_78",
+        "hearsay_test_89"
+      ],
+      "failing_ids_after": [
+        "hearsay_test_68",
+        "hearsay_test_78"
+      ],
+      "recovered_this_round": [
+        "hearsay_test_6",
+        "hearsay_test_62",
+        "hearsay_test_72",
+        "hearsay_test_89"
+      ],
+      "regressed_this_round": [
+        "hearsay_test_68"
+      ]
+    }
+  ]
+}

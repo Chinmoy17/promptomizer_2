@@ -667,4 +667,69 @@ These are the decisions we would like guidance on before proceeding.
    LegalBench tasks so the story is a task-family result rather than a
    single-task result.
 
+---
+
+## 10. Addendum (2026-08-26): Replicating Trace2Policy's hearsay result, and a leak we found in it
+
+Question #4 above (closing the gap with Trace2Policy on hearsay) was
+investigated directly, using a new solver (Claude Haiku 4.5, the same model
+Trace2Policy evaluates) and gpt-5 as the optimizer, so the comparison is now
+apples-to-apples on the executor model.
+
+### What Trace2Policy actually reports, and what we found reading closely
+
+Trace2Policy's headline hearsay number for Claude Haiku 4.5 is 79.7% → 93.8%
+(+14.1 pp) after two rounds of human-authored rule refinement. Reading their
+methodology closely (their own Appendix H) turned up something important:
+their first refinement round was explicitly "diagnosed from v1's iter-30
+errors **plus Opus v1's heldout errors**" — meaning their human expert looked
+at mistakes on the 64-item set they call "held-out" and wrote rules to fix
+them. That set was not actually held out from the refinement process. (Their
+main enterprise case study does this correctly — held-out sets there are
+explicitly disjoint from anything used in refinement. The leak is specific
+to the public LegalBench probe, which is the number we are being compared
+against.)
+
+### Our honest replication of their exact protocol
+
+Running the same 94-item pool, seed 42, 30-case/64-case split, with our
+mechanism (2 rounds, Claude Haiku 4.5 solver, gpt-5 optimizer, a regression-
+safe accept gate that only ships a round if it does not fall below baseline):
+
+| | Baseline | Final | Change |
+|---|---:|---:|---:|
+| Ours (test set never touched) | 68.8% | 73.4% | **+4.6 pp** |
+
+This is the number that means something. Our baseline is lower than their
+79.7% on the identical task, which is most likely a difference in the exact
+zero-shot phrasing rather than a difference in the model.
+
+### What happens if we allow the same leak, using an LLM instead of a human
+
+To find out how much of Trace2Policy's reported gain is explainable by the
+leak itself, we ran one deliberate, clearly-labeled diagnostic: give our
+optimizer the sealed 64-item test set's own mistakes to look at, exactly the
+information their human curator had.
+
+| | Baseline | Final | Change |
+|---|---:|---:|---:|
+| Ours, given the same test exposure | 68.8% | **95.3%** | **+26.6 pp** |
+| Trace2Policy, given the same test exposure (their number) | 79.7% | 93.8% | +14.1 pp |
+
+An automated rewrite loop — two rounds, about 10 minutes, $0.15 — reaches a
+slightly higher number than a human expert's iterative rule-writing, once
+both are given the same shortcut. This tells us two things: our mechanism is
+not lagging Trace2Policy's on capability, only on measurement, since the
+task apparently rewards fitting closely to the exact 64 evaluation items; and
+a meaningful part of Trace2Policy's headline number should be read as "what
+you can get by seeing the test items," not purely "what EISR's rule-quality
+argument buys you."
+
+**This second number is a diagnostic ceiling, not a real result, and should
+never be reported as an FDPO accuracy figure.** It lives in a separately
+named results folder (`hearsay_ORACLE_LEAK_diagnostic`) precisely so it can
+never be confused with the legitimate 73.4% figure above.
+
+---
+
 _End of report._

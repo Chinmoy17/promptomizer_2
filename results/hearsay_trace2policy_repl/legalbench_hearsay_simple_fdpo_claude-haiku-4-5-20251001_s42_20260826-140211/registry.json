@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.9,
+  "run_best_versions": {
+    "system_role": 1,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a careful legal reasoner applying the hearsay rule to short fact patterns. Your job is to decide whether a described piece of evidence is hearsay under a simplified rule: classify based on whether the evidence is an out-of-court assertion offered to prove the truth of what it asserts. Write your reasoning steps before your final Yes/No answer.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7333333333333334,
+            "acc_new": 0.9,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 30,
+            "n_failures": 8,
+            "recovered_failures": 8,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "We are working with brief descriptions of evidence and a stated purpose (what the evidence is being used to prove). Real-world exceptions and exclusions can make hearsay admissible, but this task only asks whether the evidence is hearsay in the first place. Treat “hearsay” as any out-of-court assertion offered to prove the truth of the matter asserted. If the evidence is offered for a different, non-truth purpose (e.g., effect on the listener, notice, bias, support/attitude), it is not hearsay.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7333333333333334,
+            "acc_new": 0.9,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 30,
+            "n_failures": 8,
+            "recovered_failures": 8,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "This is a legal hearsay task. For each statement, decide whether it is hearsay and answer Yes or No.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this decision procedure on each question:\n\n1) Identify the statement\n- Is there an out-of-court assertion? This includes spoken or written words and intentional assertive conduct (actions intended to communicate a fact). In-court testimony by the witness and non-assertive conduct are not out-of-court assertions.\n\n2) Identify the asserted proposition\n- What fact does the statement itself assert or convey? Restate it succinctly.\n\n3) Identify the purpose offered\n- What fact is the proponent trying to prove with this evidence, as stated in the question?\n\n4) Decide whether the purpose depends on the truth of the assertion\n- If the proponent needs the asserted proposition to be true for the evidence to have probative value, mark hearsay = Yes.\n- If the evidence is used for a non-truth purpose (e.g., to show the effect on the listener such as notice/knowledge, to show that words were spoken revealing attitude/support/fandom/bias regardless of their literal truth, or other non-truth uses), mark hearsay = No.\n\nImportant guardrails for this task:\n- Do not treat party-opponent statements or any exceptions (e.g., state of mind, excited utterance) as non-hearsay. Ignore all exceptions and exclusions. Focus solely on whether the statement is an out-of-court assertion offered for its truth.\n- Statements used to show knowledge/notice or that a relationship existed (e.g., “X is dishonest” used only to show the speaker knew X) are typically non-truth uses → No.\n- Statements like “I plan/intend to do X,” “I knew about Y,” or “Z happened,” when used to prove that plan/knowledge/event, rely on the truth of the assertion → Yes.\n- Assertive conduct used to communicate a fact (e.g., contacting a lawyer to change a will as a communicated indication of belief about impending death) and offered to prove that communicated belief can count as an out-of-court assertion; if the inference relies on that communicated fact being true, treat as hearsay → Yes.\n\nWrite a brief, structured analysis:\n- Out-of-court assertion? Yes/No\n- Asserted proposition:\n- Purpose offered:\n- Truth-use? Yes/No\n- Conclusion: Hearsay Yes/No\n\nThen give the final line: Answer: Yes or Answer: No.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7333333333333334,
+            "acc_new": 0.9,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 30,
+            "n_failures": 8,
+            "recovered_failures": 8,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this decision procedure on each question:\n\n1) Identify the statement (Gate 1: Is there an out-of-court assertion?)\n- Out-of-court assertion includes spoken/written assertions and intentional assertive conduct made outside the courtroom.\n- In-court testimony by the witness (including in-court gestures like pointing) is not out-of-court → if in-court, stop and conclude No (not hearsay).\n- Non-assertive verbal conduct (questions, commands, offers, greetings) generally does not assert a fact and has no truth value → if only a question/command/offer is present, treat as non-assertive → No (not hearsay).\n- Non-assertive conduct or the mere “fact that X occurred” (facts proved by observation rather than by someone’s communicative act) is not a statement → No (not hearsay).\n- Only treat conduct as an assertion if it was intended to communicate a fact. If it is ambiguous whether words/actions were intended to assert something, do not infer an assertion.\n\n2) Identify the asserted proposition\n- If Gate 1 is satisfied, restate succinctly what fact the statement itself asserts or communicates.\n\n3) Identify the purpose offered\n- What fact is the proponent trying to prove with this evidence, as stated in the question?\n\n4) Decide whether the purpose depends on the truth of the assertion\n- If the proponent needs the asserted proposition to be true for the evidence to have probative value, mark Truth-use = Yes.\n- If used for a non-truth purpose (e.g., to show effect on the listener such as notice/knowledge because words were spoken to them, to show that words were spoken revealing attitude/support/fandom/bias regardless of their literal truth, or other non-truth uses), mark Truth-use = No.\n\nImportant guardrails for this task:\n- Do not discuss party-opponent statements or any exceptions (e.g., state of mind, excited utterance). Ignore all exceptions and exclusions. Focus solely on whether the statement is an out-of-court assertion offered for its truth.\n- Questions/commands/offers are typically non-assertive → No.\n- In-court statements/gestures by a testifying witness are not out-of-court → No.\n- “Facts” or mental states proved without relying on an out-of-court communicative act (e.g., the fact someone was mistaken, or that someone visited a website) are not statements → No.\n- Statements used to show knowledge/notice or that a relationship existed can be non-truth uses when offered as effect on the listener (e.g., showing words were said to someone) → No. But if the declarant’s own out-of-court statement asserts their knowledge/plan/event (e.g., “I knew about Y,” “I plan to do X,” “I heard Z will happen”) and is offered to prove that knowledge/plan/event, that is a truth-use → Yes.\n- Assertive conduct used to communicate a fact can count as an out-of-court assertion; only treat it as such if there is clear communicative intent. If the inference relies on that communicated fact being true, treat as hearsay → Yes.\n\nHelpful mini-examples (not from the task):\n- “Do you sell duffel bags?” offered to show interest in buying: question, non-assertive → No.\n- Witness points at defendant in court to identify him: in-court act → No.\n- “I thought you were John,” offered to prove the speaker was mistaken about identity: out-of-court assertion offered for truth of the belief → Yes. But the bare fact that a mistake occurred (proved by non-statement evidence) → No.\n\nWrite a brief, structured analysis:\n- Out-of-court assertion? Yes/No (explain briefly)\n- Asserted proposition:\n- Purpose offered:\n- Truth-use? Yes/No\n- Conclusion: Hearsay Yes/No\n\nThen give the final line: Answer: Yes or Answer: No.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9,
+            "acc_new": 0.8333333333333334,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 30,
+            "n_failures": 3,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Base your decision strictly on the provided description and the simplified rule above.\n- Do not discuss admissibility exceptions or exclusions; they are out of scope here.\n- Keep the analysis concise but explicit enough to show each step in the decision procedure.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7333333333333334,
+            "acc_new": 0.9,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 30,
+            "n_failures": 8,
+            "recovered_failures": 8,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Base your decision strictly on the provided description and the simplified rule above.\n- Do not discuss admissibility exceptions or exclusions; they are out of scope here.\n- Keep the analysis concise but explicit enough to show each step in the decision procedure.\n- If Gate 1 fails (no out-of-court assertion), conclude No without a truth-use analysis.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.9,
+            "acc_new": 0.8333333333333334,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 30,
+            "n_failures": 3,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Provide:\n- A short step-by-step analysis following the checklist.\n- A final line exactly in the format: Answer: Yes or Answer: No.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.7333333333333334,
+            "acc_new": 0.9,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 30,
+            "n_failures": 8,
+            "recovered_failures": 8,
+            "broke": 3
+          }
+        }
+      ]
+    }
+  }
+}
