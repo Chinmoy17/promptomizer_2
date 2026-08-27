@@ -8,6 +8,7 @@ internally consistent.
 import pytest
 
 from fdpo.config import ExperimentConfig
+from fdpo.prompts.simple_optimizer_prompt import build_simple_optimizer_messages
 from fdpo.utils.io import read_json
 from scripts.run_experiment import run
 
@@ -188,3 +189,10 @@ def test_simple_fdpo_accept_margin_flows_to_metrics(tmp_path):
                            accept_margin=0.0))
     m = read_json(run_dir / "metrics.json")
     assert m["optimization"]["accept_margin"] == 0.0
+
+
+def test_simple_optimizer_uses_arc_task_description():
+    messages = build_simple_optimizer_messages(
+        "## System Role\nSolve the task.", [], [], dataset="arc"
+    )
+    assert "ARC-Challenge science multiple-choice question" in messages[0]["content"]

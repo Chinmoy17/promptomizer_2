@@ -80,17 +80,17 @@ class ExperimentConfig:
     tau: int = 5               # simple_fdpo: min failures on baseline batch to trigger
                                 # one-shot optimization (paper's `|F_f| >= tau`).
     simple_max_rounds: int = 1 # simple_fdpo: max optimizer rounds. 1 = paper-faithful
-                                # single-pass (backward compatible default). >1 wraps the
-                                # loop with best-snapshot rescue: a round is committed only
-                                # if it reduces the train failure count; a regressing round
-                                # stops the loop and reverts to the best snapshot seen.
+                                # single-pass (backward compatible default). >1 commits each
+                                # parsed candidate as the next round's parent, scores it on
+                                # held-out validation, and restores the validation-best
+                                # structured snapshot after the trajectory.
     accept_margin: float = 1.0 # simple_fdpo: leniency of the accept gate. After the rounds,
-                                # ship the best STRUCTURED round if its train accuracy is
-                                # >= baseline_acc - accept_margin, else revert to the seed.
+                                # ship the best STRUCTURED round if its validation accuracy is
+                                # >= baseline_val_acc - accept_margin, else revert to the seed.
                                 # Default 1.0 = always ship the optimizer's best structured
                                 # prompt (so you see it on the test set) rather than reverting
-                                # to a bare seed. Set 0.0 for strict no-regression (ship only
-                                # if the structured prompt beats/ties baseline on train).
+                                # to a bare seed. Set 0.0 to require the structured prompt to
+                                # beat or tie the baseline on validation.
     skip_above_acc: float = 0.0 # simple_fdpo: if baseline MINING accuracy >= this, skip
                                 # optimization entirely and keep the seed. Near-ceiling
                                 # subjects are downside-only (forced reasoning breaks more
@@ -200,14 +200,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         "required to trigger a single-pass rewrite")
     p.add_argument("--simple-max-rounds", type=int, default=d.simple_max_rounds,
                    help="simple_fdpo: max optimizer rounds. 1 = paper-faithful "
-                        "single-pass (default). >1 enables best-snapshot rescue: "
-                        "a round is committed only if it reduces the train failure "
-                        "count; a regressing round reverts to the best snapshot.")
+                        "single-pass (default). >1 commits parsed candidates as "
+                        "the next round's parent, scores each on held-out "
+                        "validation, and restores the validation-best structured "
+                        "snapshot after the trajectory.")
     p.add_argument("--accept-margin", type=float, default=d.accept_margin,
                    help="simple_fdpo: gate leniency. Ship the best structured round "
-                        "if its train acc >= baseline - margin. Default 1.0 = always "
-                        "ship the optimizer's structured prompt; 0.0 = strict "
-                        "no-regression (revert to seed unless structured beats baseline).")
+                        "if its validation acc >= baseline validation acc - margin. "
+                        "Default 1.0 = always ship the optimizer's structured "
+                        "prompt; 0.0 requires it to beat or tie baseline validation.")
     p.add_argument("--skip-above-acc", type=float, default=d.skip_above_acc,
                    help="simple_fdpo: skip optimization (keep the seed) when baseline "
                         "mining accuracy >= this value. Guards near-ceiling subjects where "

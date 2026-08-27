@@ -43,7 +43,7 @@ _TASK_DESCRIPTIONS = {
         "forced step-by-step reasoning. The final answer is a single letter "
         "A, B, C, or D on an 'Answer:' line."
     ),
-    "arc_challenge": (
+    "arc": (
         "an ARC-Challenge science multiple-choice question (options A, B, "
         "C, D). The output is a single letter A, B, C, or D."
     ),

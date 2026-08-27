@@ -1,5 +1,11 @@
 # Literature Survey: Prompt Optimization for Large Language Models
 
+> **Superseded.** The consolidated, up-to-date literature review (now
+> including ProTeGi, MPO, Trace2Policy, EvoPrompt, GEPA, PromptWizard, and the
+> 2025 optimization-perspective survey in one place) lives in
+> [`literature_review.md`](literature_review.md). This file is kept as
+> archival detail; add new methods there, not here.
+
 **A Case Study of Automatic Prompt Optimization Methods, 2020–2026**
 **Coverage:** 30+ methods, 18 datasets, 4 method families, 9 tables
 **Last revised:** June 2026
