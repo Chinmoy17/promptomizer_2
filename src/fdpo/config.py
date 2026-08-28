@@ -8,7 +8,8 @@ from dataclasses import asdict, dataclass, field
 
 from dotenv import load_dotenv
 
-METHODS = ("zeroshot_cot", "fewshot_cot", "monolithic", "fdpo", "simple_fdpo")
+METHODS = ("zeroshot_cot", "fewshot_cot", "monolithic", "fdpo", "simple_fdpo",
+           "reflect_fdpo")
 DATASETS = ("gsm8k", "arc", "mmlu", "legalbench_hearsay", "legalbench_contract_nli")
 ROLES = ("solver", "judge", "optimizer")
 

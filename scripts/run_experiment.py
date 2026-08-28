@@ -16,6 +16,7 @@ from fdpo.config import ExperimentConfig, build_arg_parser, config_from_args
 from fdpo.core.loop import run_optimization
 from fdpo.core.prompt import SCHEMA_5, SCHEMA_MONOLITHIC
 from fdpo.core.registry import PromptRegistry
+from fdpo.core.reflect_loop import run_reflect_optimization
 from fdpo.core.simple_loop import (bootstrap_registry_from_markdown,
                                     run_simple_optimization)
 from fdpo.data.loaders import load_splits, synthetic_splits
@@ -63,10 +64,10 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
     # baseline eval, so the paper-faithful path measures against the human-
     # editable prompts/<dataset>.md as the true baseline.
     md_source = None
-    if cfg.method == "simple_fdpo":
+    if cfg.method in ("simple_fdpo", "reflect_fdpo"):
         md_source = bootstrap_registry_from_markdown(
             cfg.dataset, run_dir, registry, prompt_file=cfg.prompt_file or None)
-        logger.info("simple_fdpo: prompt source = %s", md_source)
+        logger.info("%s: prompt source = %s", cfg.method, md_source)
 
     eval_log = CsvAppender(run_dir / "eval_log.csv", EVAL_LOG_FIELDS)
 
@@ -106,10 +107,12 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
                                  "correct": row.correct, "pred": row.pred,
                                  "gold": row.gold})
             logger.info("final test accuracy: %.3f", final_result.accuracy)
-        elif cfg.method == "simple_fdpo":
-            opt_summary = run_simple_optimization(cfg, registry, train, cfg.dataset,
-                                                  clients["solver"], clients["optimizer"],
-                                                  run_dir)
+        elif cfg.method in ("simple_fdpo", "reflect_fdpo"):
+            run_opt = (run_reflect_optimization if cfg.method == "reflect_fdpo"
+                       else run_simple_optimization)
+            opt_summary = run_opt(cfg, registry, train, cfg.dataset,
+                                  clients["solver"], clients["optimizer"],
+                                  run_dir)
             final_result = evaluate(clients["solver"], registry.active_prompt(),
                                     test, cfg.dataset,
                                     temperature=cfg.solver_temperature,
