@@ -43,12 +43,15 @@ REFLECTION = {
     "mining_regressed": [
         {"question": "Q-regressed?", "output": "Answer: No", "gold": "Yes"},
     ],
-    "n_mining_recovered": 1,
-    "n_mining_regressed": 1,
+    "val_recovered": [
+        {"question": "V-recovered?", "gold": "No"},
+    ],
+    "val_regressed": [
+        {"question": "V-regressed-1?", "output": "Answer: Yes", "gold": "No"},
+        {"question": "V-regressed-2?", "output": "Answer: Yes", "gold": "No"},
+    ],
     "val_before": 0.72,
     "val_after": 0.68,
-    "val_recovered": 1,
-    "val_regressed": 2,
 }
 
 
@@ -80,14 +83,17 @@ def test_builder_reflection_block_content_and_placement():
     # fenced block as the current prompt).
     effect = user[user.index("EFFECT OF YOUR"):user.index("FAILURES (")]
     assert "```" not in effect
-    # Per-item detail present.
+    # Mining per-item detail present, full (not capped).
     assert "Old constraint text." in effect
     assert "Q-regressed?" in effect
     assert "Model's new wrong answer: Answer: No" in effect
     assert "Q-recovered?" in effect
-    # Validation is aggregate-only.
+    # Validation is now FULL detail too, not aggregate-only.
     assert "0.720 -> 0.680" in effect
-    assert "recovered 1 and regressed 2 held-out item(s)" in effect
+    assert "V-recovered?" in effect
+    assert "V-regressed-1?" in effect
+    assert "V-regressed-2?" in effect
+    assert effect.count("Model's new wrong answer: Answer: Yes") == 2
 
 
 def test_builder_task_description_injected():
@@ -117,6 +123,7 @@ def test_reflect_fdpo_end_to_end_dry_run(tmp_path):
     opt = m["optimization"]
     assert opt["mode"] == "reflect"
     assert opt["simple_max_rounds"] == 3
+    assert opt["selection"] == "last_round"
     # Confusion matrices present with the standard keys.
     for key in ("recoveries", "regressions", "still_wrong",
                 "still_right_count", "net_gain"):
@@ -133,3 +140,10 @@ def test_reflect_fdpo_end_to_end_dry_run(tmp_path):
         assert "val_regressed_this_round" in first
         for later in committed[1:]:
             assert later["reflection_shown"] is True
+        # No keep-best selection: the shipped current_train/val accuracy must
+        # come from the LAST committed round, not whichever round scored
+        # highest.
+        last = committed[-1]
+        assert opt["current_train"]["accuracy"] == last["train_acc_after"]
+        if opt["shipped_structured"]:
+            assert opt["best_structured_val_acc"] == last["val_acc_after"]

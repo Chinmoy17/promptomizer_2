@@ -78,6 +78,8 @@ class ExperimentConfig:
                                 # the optimizer a real sample of "what already works" to
                                 # protect against; 3 (the paper default) is too few for the
                                 # optimizer to reliably avoid breaking existing successes.
+                                # Ignored by reflect_fdpo, which always shows ALL currently-
+                                # correct mining items (no sampling cap) -- see reflect_loop.py.
     tau: int = 5               # simple_fdpo: min failures on baseline batch to trigger
                                 # one-shot optimization (paper's `|F_f| >= tau`).
     simple_max_rounds: int = 1 # simple_fdpo: max optimizer rounds. 1 = paper-faithful

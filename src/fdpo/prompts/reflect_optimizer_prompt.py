@@ -36,30 +36,41 @@ reliably.
 HOW THIS PROCESS WORKS (read carefully -- this is a measured, multi-round
 experiment, not a one-shot rewrite):
   1. You get up to {max_rounds} rewrite rounds. After each round, your
-     rewritten prompt is run on a WORKING SET of examples and on a HELD-OUT
-     VALIDATION set that you never see.
+     rewritten prompt is run on a WORKING SET of examples and on a
+     VALIDATION set -- a second, disjoint batch meant to approximate unseen
+     data.
   2. From round 2 on, you are shown the measured EFFECT of your previous
-     rewrite: the exact working-set items it RECOVERED (wrong -> right), the
-     exact items it REGRESSED (right -> wrong) together with the solver's new
-     wrong answer, the previous text of every section you changed, and how the
-     held-out validation accuracy moved.
+     rewrite, IN FULL, on BOTH sets: every working-set item it RECOVERED
+     (wrong -> right), every item it REGRESSED (right -> wrong) together with
+     the solver's new wrong answer, the previous text of every section you
+     changed, and -- just as fully -- every VALIDATION item it recovered and
+     every validation item it regressed, with the same detail. Nothing about
+     validation is held back from you.
   3. In those later rounds your job is causal: first diagnose WHICH of your
-     previous edits caused WHICH regressions and recoveries, then rewrite --
-     keep the edits that recovered items, revert or repair the edits that
-     regressed items, and address the remaining failures. Do not churn wording
-     that was not implicated by the evidence.
-  4. The prompt that ships is the round with the best held-out validation
-     accuracy, so a rewrite that fixes 2 working-set items but breaks 3
-     held-out items is a net loss. Optimize for generalization, not for the
-     specific examples shown.
+     previous edits caused WHICH regressions and recoveries on EITHER set,
+     then rewrite -- keep the edits that recovered items, revert or repair the
+     edits that regressed items, and address the remaining failures. Do not
+     churn wording that was not implicated by the evidence.
+  4. THERE IS NO "BEST ROUND" SELECTION. Whichever round is LAST is the one
+     that ships. A validation accuracy number is reported each round purely
+     as a diagnostic (did this edit fix what it broke), never as a score you
+     are competing to maximize by round -- optimize every round as if it were
+     the one being shipped, because eventually one will be.
+  5. Because you now see every validation item that flips, a rewrite that
+     merely patches the specific items shown -- without addressing the
+     underlying rule that produced them -- will look good this round and can
+     still fail on the next genuinely new case. Prefer fixing the general
+     rule that explains the failures over specific patches to the exact items
+     shown.
 
 You will see:
   - the solver's current markdown-formatted prompt,
   - (from round 2) the EFFECT REPORT of your previous rewrite described above,
-  - a batch of FAILURES -- questions the solver currently gets wrong, with the
-    solver's answer and the correct answer alongside,
-  - a small batch of CORRECTLY-SOLVED examples the current prompt
-    already handles.
+  - EVERY question the solver currently gets wrong on the working set, with
+    the solver's answer and the correct answer alongside (not a sample --
+    all of them),
+  - EVERY question the current prompt already gets right on the working set
+    (not a sample -- all of them), so you know exactly what must not break.
 
 CRITICAL FACT ABOUT THE SOLVER: it has NO hidden scratchpad. Its ONLY
 reasoning space is the text it actually writes out. So "think step by step"
@@ -133,15 +144,26 @@ def _build_system_prompt(dataset: str, max_rounds: int) -> str:
         task_description=task_desc, max_rounds=max_rounds)
 
 
-# Display caps: keep the effect report informative but bounded. Regressions
-# get more room than recoveries because they are what the optimizer must
-# repair; recoveries only need to be recognizable so they are not reverted.
-_MAX_RECOVERED_SHOWN = 5
-_MAX_REGRESSED_SHOWN = 10
+def _render_item_list(items: list[dict], heading: str, empty_note: str,
+                      show_output: bool) -> list[str]:
+    """Render a full, uncapped list of {question, [output], gold} dicts."""
+    lines: list[str] = ["", heading]
+    if not items:
+        lines[-1] = empty_note
+        return lines
+    for i, item in enumerate(items, 1):
+        lines.append(f"[{i}]")
+        lines.append(f"Question: {item['question']}")
+        if show_output:
+            lines.append(f"Model's new wrong answer: {item['output']}")
+        lines.append(f"Correct answer: {item['gold']}")
+    return lines
 
 
 def _render_reflection(reflection: dict) -> str:
-    """Render the effect report of the previous rewrite.
+    """Render the FULL effect report of the previous rewrite -- every mining
+    and every validation item it recovered/regressed, no caps: this run's
+    mechanism deliberately shows everything (see build task's design notes).
 
     MUST stay free of triple-backtick fences: the dry-run mock optimizer
     extracts the first fenced block in the message as the current prompt, and
@@ -150,7 +172,7 @@ def _render_reflection(reflection: dict) -> str:
     lines: list[str] = []
     lines.append(
         f"EFFECT OF YOUR PREVIOUS REWRITE (round {reflection['prev_round']}) "
-        "-- measured results:"
+        "-- measured results, in full (nothing sampled or held back):"
     )
 
     changed = reflection.get("changed_sections", [])
@@ -163,51 +185,45 @@ def _render_reflection(reflection: dict) -> str:
             lines.append(f"[Section '{c['section']}' previously read:]")
             lines.append(prev)
 
-    recovered = reflection.get("mining_recovered", [])
-    n_rec = reflection.get("n_mining_recovered", len(recovered))
-    lines.append("")
-    if n_rec:
-        shown = recovered[:_MAX_RECOVERED_SHOWN]
-        lines.append(f"Working-set items your rewrite RECOVERED "
-                     f"(wrong -> right), {n_rec} total"
-                     + (f", {len(shown)} shown:" if n_rec > len(shown) else ":"))
-        for i, r in enumerate(shown, 1):
-            lines.append(f"[Recovered {i}]")
-            lines.append(f"Question: {r['question']}")
-            lines.append(f"Correct answer: {r['gold']}")
-    else:
-        lines.append("Working-set items your rewrite RECOVERED: none.")
-
-    regressed = reflection.get("mining_regressed", [])
-    n_reg = reflection.get("n_mining_regressed", len(regressed))
-    lines.append("")
-    if n_reg:
-        shown = regressed[:_MAX_REGRESSED_SHOWN]
-        lines.append(f"Working-set items your rewrite REGRESSED "
-                     f"(right -> wrong), {n_reg} total"
-                     + (f", {len(shown)} shown" if n_reg > len(shown) else "")
-                     + ", with the solver's NEW wrong answer:")
-        for i, r in enumerate(shown, 1):
-            lines.append(f"[Regressed {i}]")
-            lines.append(f"Question: {r['question']}")
-            lines.append(f"Model's new wrong answer: {r['output']}")
-            lines.append(f"Correct answer: {r['gold']}")
-    else:
-        lines.append("Working-set items your rewrite REGRESSED: none.")
+    lines += _render_item_list(
+        reflection.get("mining_recovered", []),
+        "ALL working-set items your rewrite RECOVERED (wrong -> right):",
+        "Working-set items your rewrite RECOVERED: none.",
+        show_output=False)
+    lines += _render_item_list(
+        reflection.get("mining_regressed", []),
+        "ALL working-set items your rewrite REGRESSED (right -> wrong), "
+        "with the solver's NEW wrong answer:",
+        "Working-set items your rewrite REGRESSED: none.",
+        show_output=True)
 
     if reflection.get("val_before") is not None:
         lines.append("")
         lines.append(
-            f"Held-out validation (items you never see): accuracy "
-            f"{reflection['val_before']:.3f} -> {reflection['val_after']:.3f}; "
-            f"your edit recovered {reflection['val_recovered']} and regressed "
-            f"{reflection['val_regressed']} held-out item(s)."
+            f"VALIDATION accuracy: {reflection['val_before']:.3f} -> "
+            f"{reflection['val_after']:.3f}. This is a second, disjoint batch "
+            "meant to approximate unseen data -- shown here in full detail, "
+            "same as the working set above."
         )
+        lines += _render_item_list(
+            reflection.get("val_recovered", []),
+            "ALL validation items your rewrite RECOVERED (wrong -> right):",
+            "Validation items your rewrite RECOVERED: none.",
+            show_output=False)
+        lines += _render_item_list(
+            reflection.get("val_regressed", []),
+            "ALL validation items your rewrite REGRESSED (right -> wrong), "
+            "with the solver's NEW wrong answer:",
+            "Validation items your rewrite REGRESSED: none.",
+            show_output=True)
 
     lines.append("")
     lines.append("Diagnose which of your edits caused the regressions and "
-                 "which caused the recoveries BEFORE rewriting. Keep what "
-                 "worked; revert or repair what broke.")
+                 "which caused the recoveries, on BOTH sets, BEFORE "
+                 "rewriting. Keep what worked; revert or repair what broke. "
+                 "Prefer fixing the general rule over patching the exact "
+                 "items shown -- there is no held-out set left to catch "
+                 "overfitting for you.")
     return "\n".join(lines)
 
 
@@ -222,17 +238,22 @@ def build_reflect_optimizer_messages(
 ) -> list[dict]:
     """Build the two-message optimizer call for reflect mode.
 
-    `reflection` (None in round 1) carries the effect report of the previous
-    committed rewrite:
+    `reflection` (None in round 1) carries the FULL effect report of the
+    previous committed rewrite -- every recovered/regressed item on both
+    sets, uncapped:
         {
           "prev_round": int,
           "changed_sections": [{"section": str, "previous_text": str}],
           "mining_recovered": [{"question", "gold"}],
           "mining_regressed": [{"question", "output", "gold"}],
-          "n_mining_recovered": int, "n_mining_regressed": int,
+          "val_recovered": [{"question", "gold"}],
+          "val_regressed": [{"question", "output", "gold"}],
           "val_before": float | None, "val_after": float | None,
-          "val_recovered": int, "val_regressed": int,
         }
+
+    `failures` is expected to contain ALL currently-wrong mining items (no
+    sampling cap) -- reflect_fdpo's caller passes the full list, unlike
+    simple_fdpo which samples up to `n_fail`.
     """
     fail_blocks = []
     for i, f in enumerate(failures, 1):
@@ -253,10 +274,12 @@ def build_reflect_optimizer_messages(
 
     iteration_context = (
         f"ITERATION CONTEXT: This is refinement round {round_num} of "
-        f"{max_rounds}. Your rewrite is scored on held-out examples"
-        + (" and you will be shown its measured per-item effect next round"
-           if round_num < max_rounds else "")
-        + ", so make one deliberate, testable change this round.\n\n"
+        f"{max_rounds}. There is no best-round selection -- whichever round "
+        f"is last ships"
+        + (", and you will be shown its full measured effect (both the "
+           "working set and validation) next round"
+           if round_num < max_rounds else " and this round is the last one")
+        + ", so make one deliberate, testable change now.\n\n"
     )
 
     # NOTE: the "FULL CURRENT PROMPT (markdown)" marker and its fenced block
@@ -273,12 +296,14 @@ def build_reflect_optimizer_messages(
         f"{current_markdown.rstrip()}\n"
         "```\n\n"
         + reflection_block
-        + f"FAILURES ({len(failures)} training examples the current prompt "
-        "gets WRONG):\n"
+        + f"FAILURES (ALL {len(failures)} working-set examples the current "
+        "prompt currently gets WRONG -- this is every one of them, not a "
+        "sample):\n"
         + "\n\n".join(fail_blocks)
         + "\n\n"
-        f"CORRECTLY-SOLVED EXAMPLES ({len(golds)} cases the current prompt "
-        "already gets right — do not break these):\n"
+        f"CORRECTLY-SOLVED EXAMPLES (ALL {len(golds)} working-set cases the "
+        "current prompt already gets right -- this is every one of them, "
+        "not a sample -- do not break these):\n"
         + "\n\n".join(gold_blocks)
         + "\n\nRewrite the markdown now. You may start with a short "
         "`## Analysis` section (it is discarded), then the full new markdown."
