@@ -47,6 +47,38 @@ _TASK_DESCRIPTIONS = {
         "an ARC-Challenge science multiple-choice question (options A, B, "
         "C, D). The output is a single letter A, B, C, or D."
     ),
+    "ifeval": (
+        "an instruction-following task: the user's request embeds one or "
+        "more mechanically VERIFIABLE constraints (e.g. exact word/sentence/"
+        "paragraph counts, forbidden or required keywords, output format "
+        "such as JSON or a title wrapped in << >>, letter case, punctuation "
+        "rules, quotation wrapping). There is no single correct 'answer' to "
+        "match against a gold label -- correctness means the CHECKED text "
+        "satisfies every listed constraint, checked by code, not by content "
+        "quality. UNLIKE every other task type: the checker scores the "
+        "solver's ENTIRE raw output, not one extracted final line -- EXCEPT "
+        "that text before a standalone 'FINAL RESPONSE:' line (if the "
+        "solver writes one) is ignored, and only the text after it is "
+        "checked. This means the solver MAY reason/plan out loud before "
+        "that marker (e.g. counting words, checking a forbidden-word list) "
+        "-- keep the Output Format section instructing the solver to use "
+        "this marker; do NOT tell it to give zero reasoning/commentary at "
+        "all, since planning genuinely helps on multi-constraint items, as "
+        "long as the planning stays before the marker so it is never "
+        "checked. A failure means one or more specific constraints were "
+        "violated in the checked text; the fix is to make the solver track "
+        "and satisfy ALL stated constraints simultaneously."
+    ),
+    "ifbench": (
+        "an instruction-following task with the same mechanically verifiable "
+        "constraint structure and the same 'FINAL RESPONSE:' marker "
+        "convention as IFEval (see that description for the full "
+        "explanation), but drawn from a broader set of constraint types "
+        "(word/consonant/vowel counts, keyword-frequency and forbidden-word "
+        "rules, formatting requirements, and more). Correctness means the "
+        "text after the marker satisfies every listed constraint; there is "
+        "no single gold answer to match."
+    ),
 }
 
 _DEFAULT_TASK_DESCRIPTION = "a classification task"

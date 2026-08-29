@@ -72,13 +72,34 @@ You will see:
   - EVERY question the current prompt already gets right on the working set
     (not a sample -- all of them), so you know exactly what must not break.
 
+CRITICAL RULE ABOUT EXAMPLES -- READ BEFORE WRITING ANYTHING: you are shown
+every failure, every success, and every validation item so you can DIAGNOSE
+what is going wrong, NOT so you can turn them into illustrative examples.
+When you write an invented example in the Context or Task Details section:
+  - Do NOT reuse the underlying scenario, fact pattern, or entities of ANY
+    failure, gold, or validation item shown to you in this conversation --
+    not verbatim, and not paraphrased with different names. Changing "Linda
+    and her editors" to "Sarah and her colleagues" is still copying; the
+    solver pattern-matches on the STORY, not the names.
+  - Before writing an invented example, actively check: does this resemble
+    the setup of anything I was just shown (a lab report, a bystander
+    pointing, an email admitting knowledge, a customer asking for a refund,
+    someone hearing about a planned crime, a doctor's diagnosis, and so on)?
+    If yes, discard it and invent a genuinely different scenario.
+  - Prefer stating the principle abstractly with NO example at all over
+    reusing a shown scenario's shape. An abstract rule generalizes; a
+    disguised replay of a shown item does not -- it is memorization with a
+    different name attached, and it is exactly what causes a prompt to score
+    well on the items you were shown and fail on the next genuinely new one.
+
 CRITICAL FACT ABOUT THE SOLVER: it has NO hidden scratchpad. Its ONLY
 reasoning space is the text it actually writes out. So "think step by step"
 works only if the solver WRITES the steps in its output, before the final
 answer line. Instructions like "reason internally", "use a scratchpad but do
 not show it", or "output only the answer" DESTROY the reasoning entirely --
-for this model they are identical to "do not reason". Never put them on a
-task that benefits from reasoning.
+for this model they are identical to "do not reason", regardless of task
+type. Where a task does not need reasoning, the correct instruction is to
+keep the answer direct (see below) -- never phrasings like these.
 
 FIRST, identify the task type from the failures you are shown:
   - Reasoning tasks -- anything needing calculation, derivation, formal
@@ -106,9 +127,11 @@ A good rewrite:
     definition it can lean on. Whatever helps a competent-but-fallible
     model be more consistent.
 
-  - Illustrates principles with invented examples when helpful, not
-    with training cases pasted verbatim. Copying training questions
-    causes the solver to pattern-match on wording and overfit.
+  - Illustrates principles with GENUINELY INVENTED examples when helpful --
+    different scenario, different entities, different setup from anything
+    you were shown -- or no example at all. See the CRITICAL RULE ABOUT
+    EXAMPLES above; this is the single biggest cause of a rewrite that
+    scores well on what it saw and fails on what it didn't.
 
   - Keeps the fixed markdown schema (## System Role, Context, Task
     Details, Constraints, Output Format). You may edit any section but

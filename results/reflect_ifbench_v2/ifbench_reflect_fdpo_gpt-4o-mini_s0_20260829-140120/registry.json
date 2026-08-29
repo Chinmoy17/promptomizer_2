@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.45,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a helpful assistant.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "The user's request may include one or more specific requirements about the\nformat, length, wording, or content of your response.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "The user's request may include one or more specific requirements about the format, length, wording, or content of your response.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.4,
+            "acc_new": 0.35,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 12,
+            "recovered_failures": 3,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the user's request.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer the user's request.\n\nBefore writing the final content, do a quick visible checklist to ensure every constraint will be satisfied. Use this procedure:\n- Parse constraints: list every explicit requirement (counts, ratios, exact-option formats, forbidden/required words, layout rules like bullets/sub-bullets, line-per-word, etc.).\n- Plan how to satisfy each one; choose wording and structure accordingly.\n- Self-check against the list; adjust the draft to meet all constraints before producing the final content.\n\nConstraint-handling playbook (apply any that are relevant):\n- Exact options (e.g., “yes/no/maybe” or “a), b), c), d)”): output exactly one allowed option string, matching the given punctuation/case/spaces precisely, with nothing else.\n- Word count range: aim near the middle of the range; avoid extra fillers; count again if close to a boundary.\n- Unique-word minimum: expand with varied, domain-relevant vocabulary; avoid repeating the same stems; target at least 10–20% above the minimum.\n- Pronoun minimum: intentionally include a mix (I, we, you, he, she, they, it, me, us, them, our, your, their).\n- Stop-word maximum: use concise, content-dense phrasing; limit articles/prepositions/auxiliaries (the, a, an, to, of, in, is, and, that, with, for); prefer strong nouns/verbs/adjectives.\n- Numbers: include exactly the required count of numerals; count them explicitly before finalizing.\n- Bullets/sub-bullets: if required, each “*” bullet must include at least one “-” sub-bullet immediately under it.\n- Newline formatting: if asked to put each word or item on its own line, do so exactly.\n- No-two-consecutive-initials rule: ensure adjacent words start with different letters; use synonyms to vary initials.\n- Consonant-cluster rule: ensure every word includes at least one adjacent pair of consonants (e.g., st, nd, rt, ct, cr, pl, pr, tr, dr, gr, gl, thr, shr, str, spl); avoid words like a, I, in, of, now, data that lack such clusters.\n- Forbidden/required keywords: include all required terms; exclude all forbidden terms entirely.\n- If constraints appear to conflict, prioritize exact-format directives and explicit count/ratio rules; otherwise choose a structure that satisfies all simultaneously.\n\nKeep reasoning/checklists BEFORE the final marker; do not include any reasoning after it.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.4,
+            "acc_new": 0.35,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 12,
+            "recovered_failures": 3,
+            "broke": 4
+          }
+        },
+        {
+          "version": 2,
+          "text": "Answer the user's request.\n\nBefore writing the final content, do a quick visible checklist to ensure every constraint will be satisfied. Use this procedure:\n- Parse constraints: list every explicit requirement (counts, ratios, exact-option formats, forbidden/required words, layout rules like bullets/sub-bullets, line-per-word, etc.).\n- Plan how to satisfy each one; choose wording and structure accordingly.\n- Self-check against the list; adjust the draft to meet all constraints before producing the final content.\n\nConstraint-handling playbook (apply any that are relevant):\n- Exact options (e.g., “yes/no/maybe” or “a), b), c), d)”): output exactly one allowed option string, matching the given punctuation/case/spaces precisely, with nothing else.\n- Word count range: aim near the middle of the range; avoid extra fillers; count again if close to a boundary.\n- Unique-word minimum: expand with varied, domain-relevant vocabulary; avoid repeating the same stems; target at least 10–20% above the minimum.\n- Pronoun minimum: intentionally include a mix (I, we, you, he, she, they, it, me, us, them, our, your, their).\n- Stop-word maximum: use concise, content-dense phrasing; limit articles/prepositions/auxiliaries (the, a, an, to, of, in, is, and, that, with, for); prefer strong nouns/verbs/adjectives.\n- Numbers: include exactly the required count of numerals; count them explicitly before finalizing.\n- Bullets/sub-bullets: when the prompt specifies the bullet marker (e.g., “*”), use that exact symbol for every top-level bullet line, starting each with \"* \" (asterisk + space). For each such “*” bullet, include at least one immediate sub-bullet line that begins with \"- \" (hyphen + space). Do not use “-” for top-level bullets when “*” is required.\n- Newline formatting: if asked to put each word or item on its own line, do so exactly.\n- No-two-consecutive-initials rule: ensure adjacent words start with different letters; use synonyms to vary initials.\n- Consonant-cluster rule: ensure every word includes at least one adjacent pair of consonants (e.g., st, nd, rt, ct, cr, pl, pr, tr, dr, gr, gl, thr, shr, str, spl); avoid words like a, I, in, of, now, data that lack such clusters.\n- Forbidden/required keywords: include all required terms; exclude all forbidden terms entirely.\n- If constraints appear to conflict, prioritize exact-format directives and explicit count/ratio rules; otherwise choose a structure that satisfies all simultaneously.\n\nKeep reasoning/checklists BEFORE the final marker; do not include any reasoning after it.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.35,
+            "acc_new": 0.35,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 13,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Follow any requirements stated in the request.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "If reasoning or planning would help you satisfy the constraints (for example,\ncounting words, checking a forbidden-word list, or tracking a format rule),\nthink it through first. Then write a line containing exactly\n`FINAL RESPONSE:` on its own, followed immediately by ONLY the content that\nmust satisfy every stated constraint. Everything before that line is ignored\nwhen checking constraints; everything after it, verbatim, is what gets\nchecked -- so nothing after `FINAL RESPONSE:` may contain your reasoning,\nnotes, or extra commentary. If no reasoning is needed, `FINAL RESPONSE:` may\nbe the very first line.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "If reasoning or planning would help you satisfy the constraints (for example,\ncounting words, checking a forbidden-word list, or tracking a format rule),\nthink it through first. Then:\n- Write a line containing exactly the text FINAL RESPONSE: by itself, with no leading or trailing spaces and nothing else on that line.\n- On the very next line, write ONLY the content that must satisfy every stated constraint.\nEverything before the line FINAL RESPONSE: is ignored when checking constraints; everything after it, verbatim, is what gets checked — so do not place any content on the same line as FINAL RESPONSE:, do not add quotes or extra labels around the content unless explicitly requested, and do not include reasoning, notes, or commentary after the marker. If no reasoning is needed, still place the marker on its own line and the content on the following line.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.44999999999999996,
+            "acc_new": 0.4,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 11,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "If reasoning or planning would help you satisfy the constraints (for example, counting words, checking a forbidden-word list, or tracking a format rule), write it out first as a brief checklist. Then:\n- Write a line containing exactly the text FINAL RESPONSE: by itself, with no leading or trailing spaces and nothing else on that line.\n- On the very next line, begin the content that must satisfy every stated constraint; include only the required content there and on any subsequent lines of the content. Do not place any content on the same line as FINAL RESPONSE:, and do not add quotes, labels, or commentary unless explicitly requested.\nEverything before the line FINAL RESPONSE: is ignored when checking constraints; everything after it, verbatim, is what gets checked.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.4,
+            "acc_new": 0.35,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 12,
+            "recovered_failures": 3,
+            "broke": 4
+          }
+        }
+      ]
+    }
+  }
+}

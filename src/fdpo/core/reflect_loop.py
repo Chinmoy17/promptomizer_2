@@ -122,8 +122,10 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
     registry.record_round(passed=True, acc=baseline.accuracy)
 
     # 2. Cache baseline outputs so failures always show the CURRENT prompt's
-    #    actual wrong answer.
+    #    actual wrong answer. baseline_details carries verifier-dataset
+    #    constraint-violation text (empty "" for every other dataset).
     baseline_outputs = {r.example_id: r.output for r in baseline.rows}
+    baseline_details = {r.example_id: r.detail for r in baseline.rows}
 
     # 3. Multi-round loop. Every round is committed and becomes the parent of
     #    the next; there is no per-round "best" selection (see module
@@ -143,6 +145,7 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
     final_edit_status = "skipped_high_baseline" if skip_high else "not_triggered"
 
     current_outputs = baseline_outputs
+    current_details = baseline_details
     prev_val_acc = baseline_val_acc      # validation accuracy of the CURRENT prompt
     reflection: dict | None = None       # effect report of the last committed round
 
@@ -150,11 +153,16 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
     for round_num in range(1, effective_rounds + 1):
         # ALL current failures are shown -- no sampling cap. n_fail no longer
         # applies to reflect_fdpo (it still governs simple_fdpo unchanged).
+        # "gold" here means "why this counts as wrong": for verifier datasets
+        # (ifeval/ifbench) current_details carries the DYNAMIC constraint
+        # violations of the CURRENT output (which constraint, why); for every
+        # other dataset current_details is empty and this falls back to the
+        # example's static reference/gold text, unchanged from before.
         failures = [
             {
                 "question": train_by_id[eid].question,
                 "output": current_outputs.get(eid, "(wrong)"),
-                "gold": train_by_id[eid].reference,
+                "gold": current_details.get(eid) or train_by_id[eid].reference,
                 "example_id": eid,
             }
             for eid in current_wrong
@@ -247,15 +255,18 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
             cand_val_acc = val_eval.accuracy
             val_wrong = val_eval.wrong_ids()
             val_new_outputs = {r.example_id: r.output for r in val_eval.rows}
+            val_new_details = {r.example_id: r.detail for r in val_eval.rows}
         else:
             cand_val_acc = new_eval.accuracy
             val_wrong = None
             val_new_outputs = {}
+            val_new_details = {}
 
         # Full per-item churn of THIS rewrite, on BOTH sets.
         recovered_ids = sorted(current_wrong - new_wrong)
         regressed_ids = sorted(new_wrong - current_wrong)
         new_outputs = {r.example_id: r.output for r in new_eval.rows}
+        new_details = {r.example_id: r.detail for r in new_eval.rows}
         if val_wrong is not None and prev_val_wrong is not None:
             val_recovered_ids = sorted(prev_val_wrong - val_wrong)
             val_regressed_ids = sorted(val_wrong - prev_val_wrong)
@@ -327,7 +338,7 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
             "mining_regressed": [
                 {"question": train_by_id[eid].question,
                  "output": new_outputs.get(eid, "(wrong)"),
-                 "gold": train_by_id[eid].reference}
+                 "gold": new_details.get(eid) or train_by_id[eid].reference}
                 for eid in regressed_ids
             ],
             "val_recovered": [
@@ -338,7 +349,7 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
             "val_regressed": [
                 {"question": train_by_id[eid].question,
                  "output": val_new_outputs.get(eid, "(wrong)"),
-                 "gold": train_by_id[eid].reference}
+                 "gold": val_new_details.get(eid) or train_by_id[eid].reference}
                 for eid in val_regressed_ids
             ],
             "val_before": prev_val_acc if has_val_split else None,
@@ -346,6 +357,7 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
         }
 
         current_outputs = new_outputs
+        current_details = new_details
         prev_val_acc = cand_val_acc
         if val_wrong is not None:
             prev_val_wrong = val_wrong

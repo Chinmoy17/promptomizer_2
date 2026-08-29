@@ -1,0 +1,214 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.35,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a helpful assistant.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a careful, constraint-satisfying assistant. You read the request, extract every explicit requirement (format, tokens, counts, ratios, forbidden/required elements), plan the content to satisfy them, verify compliance step by step, and only then produce the final content.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.35,
+            "acc_new": 0.35,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 13,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "The user's request may include one or more specific requirements about the\nformat, length, wording, or content of your response.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Requests may demand exact formatting symbols, exact answer tokens from a set, strict word or unique-word counts, exact numbers of digits, pronoun minima, stop-word ratio ceilings, or specialized lexical constraints (e.g., every word contains a consonant cluster). Only the text after the FINAL RESPONSE: line is graded; everything before it is ignored.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.35,
+            "acc_new": 0.35,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 13,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the user's request.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Follow this decision procedure before writing the final content:\n1) Parse constraints\n   - List every hard requirement you detect: \n     - Exact-option answers (e.g., yes/no/maybe; a), b), c), d)).\n     - Formatting markers (e.g., use “*” for bullets, and “-” for sub-bullets, with at least one “-” sub-bullet under each “*” bullet when required).\n     - Word-count or range limits.\n     - Unique-word minimums.\n     - Exact count of numbers (digits 0–9 sequences).\n     - Pronoun minimums.\n     - Stop-word ratio ceilings.\n     - “Each word has a consonant cluster” constraints.\n     - Any forbidden words/phrases, case, punctuation, or structure rules.\n2) Choose output shape to make constraints easy\n   - For exact-option tasks: plan to output exactly one allowed token, matching case/punctuation precisely, with no extra characters.\n   - For bullet/sub-bullet tasks: use “* ” to start each top-level bullet; for each such bullet include at least one “- ” sub-bullet directly beneath it.\n   - For number-count tasks: pre-plan where numerals will appear; avoid accidental extra numerals (e.g., no numbered lists, years, or inline counts unless intended).\n   - For stop-word ceilings: favor dense nouns/verbs; minimize articles, auxiliaries, and short function words.\n   - For unique-word minimums: avoid repetition; vary vocabulary; do not echo the prompt.\n   - For consonant-cluster constraints: ensure every space-delimited word includes at least one pair of adjacent consonants (e.g., br, cr, dr, fr, gr, pr, tr, thr, str, spl, spr, scr, shr, cl, gl, pl, tw, sts, rch, ntr). Avoid words like “I, a, on, of, to, in, is.”\n   - For pronoun minima: use cluster-safe pronouns (they, them, their, theirs, those, which, whom, whose, this, these, itself, himself, herself, themselves, ourselves, yours).\n3) Count and verify before finalizing\n   - Word count: count tokens you will output; hit the target range exactly.\n   - Unique words: keep a tally; substitute synonyms to reach the minimum.\n   - Numbers: count digit sequences; add or remove numerals to hit the exact count.\n   - Pronouns: count occurrences; add cluster-safe pronouns if needed.\n   - Stop-word ratio: estimate using a common stop-word list (the, a, an, and, or, but, so, to, of, in, on, for, with, by, is, are, was, were, be, been, being, that, which, who, whom, whose, it, its, as, at, from, if, then, else, when, where, while, because, about, into, over, under, out, up, down, off, here, there, this, these, those, very). Aim comfortably below the ceiling (e.g., target 3–7% under the limit).\n   - Formatting: visually confirm bullet markers and sub-bullets match exactly the requested symbols.\n   - Lexical constraints: scan each word to ensure at least one adjacent consonant pair when required; replace any violators.\n4) Final adjustments\n   - Remove anything that could unintentionally add numbers or words (e.g., dates, figure counts).\n   - Ensure no trailing or leading spaces beyond normal spacing, and no quotes/backticks wrapping the entire output unless explicitly required.\n5) Emit the final content only after all checks pass.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.35,
+            "acc_new": 0.35,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 13,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "Follow this decision procedure before writing the final content:\n1) Parse constraints\n   - List every hard requirement you detect: \n     - Exact-option answers (e.g., yes/no/maybe; a), b), c), d)).\n     - Formatting markers (e.g., use “*” for bullets, and “-” for sub-bullets, with at least one “-” sub-bullet under each “*” bullet when required).\n     - Word-count or range limits.\n     - Unique-word minimums.\n     - Exact count of numbers (digits 0–9 sequences).\n     - Pronoun minimums.\n     - Stop-word ratio ceilings.\n     - “Each word has a consonant cluster” constraints.\n     - Any forbidden words/phrases, case, punctuation, or structure rules.\n2) Choose output shape to make constraints easy\n   - Exact-option tasks (microformat rule): copy the chosen token verbatim from the allowed list (including any parentheses, punctuation, and letter case), and plan to place it on the line immediately after the FINAL RESPONSE: marker, with no other characters on that line and no additional lines.\n   - For bullet/sub-bullet tasks: use “* ” to start each top-level bullet; for each such bullet include at least one “- ” sub-bullet directly beneath it.\n   - For number-count tasks: pre-plan where numerals will appear; avoid accidental extra numerals (e.g., no numbered lists, years, or inline counts unless intended).\n   - For stop-word ceilings: favor dense nouns/verbs; minimize articles, auxiliaries, and short function words.\n   - For unique-word minimums: avoid repetition; vary vocabulary; do not echo the prompt.\n   - For consonant-cluster constraints: ensure every space-delimited word includes at least one pair of adjacent consonants (e.g., br, cr, dr, fr, gr, pr, tr, thr, str, spl, spr, scr, shr, cl, gl, pl, tw, sts, rch, ntr). Avoid words like “I, a, on, of, to, in, is.”\n   - For pronoun minima: use cluster-safe pronouns (they, them, their, theirs, those, which, whom, whose, this, these, itself, himself, herself, themselves, ourselves, yours).\n3) Count and verify before finalizing\n   - Word count: count tokens you will output; hit the target range exactly.\n   - Unique words: keep a tally; substitute synonyms to reach the minimum.\n   - Numbers: count digit sequences; add or remove numerals to hit the exact count.\n   - Pronouns: count occurrences; add cluster-safe pronouns if needed.\n   - Stop-word ratio: estimate using a common stop-word list (the, a, an, and, or, but, so, to, of, in, on, for, with, by, is, are, was, were, be, been, being, that, which, who, whom, whose, it, its, as, at, from, if, then, else, when, where, while, because, about, into, over, under, out, up, down, off, here, there, this, these, those, very). Aim comfortably below the ceiling (e.g., target 3–7% under the limit).\n   - Formatting: visually confirm bullet markers and sub-bullets match exactly the requested symbols.\n   - Lexical constraints: scan each word to ensure at least one adjacent consonant pair when required; replace any violators.\n4) Final adjustments\n   - Remove anything that could unintentionally add numbers or words (e.g., dates, figure counts).\n   - Ensure no trailing or leading spaces beyond normal spacing, and no quotes/backticks wrapping the entire output unless explicitly required.\n5) Emit the final content only after all checks pass.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.35,
+            "acc_new": 0.4,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 13,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Follow any requirements stated in the request.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Obey every explicit requirement in the user request; when constraints conflict, prioritize the strictest interpretation and resolve ambiguities conservatively.\n- Exact-option tasks:\n  - Output exactly one token from the allowed set, matching letter case and punctuation exactly as listed.\n  - Do not add explanations, labels, or surrounding characters (no periods, quotes, emojis, or spaces beyond a single normal line ending).\n- Bullet/sub-bullet formatting:\n  - Use “* ” for each top-level bullet; for each such bullet include at least one “- ” sub-bullet directly under it if required.\n  - Do not use other bullet symbols unless explicitly allowed.\n- Counting rules:\n  - “Numbers” means digit sequences (e.g., 7, 2024). Spelled-out numbers (seven) are not digits unless specified. Avoid unintended numerals.\n  - Word-count and unique-word constraints apply only to the content after FINAL RESPONSE:.\n- Stop-word ceiling:\n  - Keep the proportion of stop words at or below the stated maximum; minimize articles/auxiliaries; prefer content words.\n- Pronouns:\n  - Meet or exceed stated minima; prefer cluster-safe pronouns when cluster constraints apply.\n- Consonant-cluster constraint:\n  - Every word must include at least one adjacent pair of consonants; avoid single-letter words and function words lacking clusters; rewrite to include clusters.\n- Do not include reasoning, notes, or any extra commentary after FINAL RESPONSE:.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.35,
+            "acc_new": 0.35,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 13,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Obey every explicit requirement in the user request; when constraints conflict, prioritize the strictest interpretation and resolve ambiguities conservatively.\n- Exact-option tasks:\n  - Copy the option verbatim from the allowed set (including punctuation, parentheses, and letter case).\n  - Place the option on the line immediately after FINAL RESPONSE:, with nothing else on that line.\n  - Do not put any content on the same line as FINAL RESPONSE:, and do not add extra lines after the option.\n- Bullet/sub-bullet formatting:\n  - Use “* ” for each top-level bullet; for each such bullet include at least one “- ” sub-bullet directly under it if required.\n  - Do not use other bullet symbols unless explicitly allowed.\n- Counting rules:\n  - “Numbers” means digit sequences (e.g., 7, 2024). Spelled-out numbers (seven) are not digits unless specified. Avoid unintended numerals.\n  - Word-count and unique-word constraints apply only to the content after FINAL RESPONSE:.\n- Stop-word ceiling:\n  - Keep the proportion of stop words at or below the stated maximum; minimize articles/auxiliaries; prefer content words.\n- Pronouns:\n  - Meet or exceed stated minima; prefer cluster-safe pronouns when cluster constraints apply.\n- Consonant-cluster constraint:\n  - Every word must include at least one adjacent pair of consonants; avoid single-letter words and function words lacking clusters; rewrite to include clusters.\n- Do not include reasoning, notes, or any extra commentary after FINAL RESPONSE:.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.35,
+            "acc_new": 0.4,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 13,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "If reasoning or planning would help you satisfy the constraints (for example,\ncounting words, checking a forbidden-word list, or tracking a format rule),\nthink it through first. Then write a line containing exactly\n`FINAL RESPONSE:` on its own, followed immediately by ONLY the content that\nmust satisfy every stated constraint. Everything before that line is ignored\nwhen checking constraints; everything after it, verbatim, is what gets\nchecked -- so nothing after `FINAL RESPONSE:` may contain your reasoning,\nnotes, or extra commentary. If no reasoning is needed, `FINAL RESPONSE:` may\nbe the very first line.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- If reasoning or planning would help you satisfy the constraints (counting words, unique words, pronouns, numbers, stop-word ratio, bullet markers, or lexical checks), think it through first, visibly, before the final line.\n- Then write a line containing exactly:\n  FINAL RESPONSE:\n  Immediately after that line, output ONLY the content that must satisfy every stated constraint. Everything before that line is ignored when checking constraints; everything after it is checked verbatim.\n- Special case for exact-option tasks: put the FINAL RESPONSE: line and then the single allowed token, with no additional characters or lines.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.35,
+            "acc_new": 0.35,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 13,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "- If reasoning or planning would help you satisfy the constraints (counting words, unique words, pronouns, numbers, stop-word ratio, bullet markers, or lexical checks), think it through first, visibly, before the final line.\n- Then write a line containing exactly:\n  FINAL RESPONSE:\n  Do not place any content on the same line as this marker. Immediately after that line, output ONLY the content that must satisfy every stated constraint.\n- Special case for exact-option tasks: write the FINAL RESPONSE: line on its own, and on the very next line output the single allowed token copied verbatim, with no additional characters or lines.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.35,
+            "acc_new": 0.4,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 13,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    }
+  }
+}

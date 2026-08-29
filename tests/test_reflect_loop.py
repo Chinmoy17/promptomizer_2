@@ -68,6 +68,8 @@ def test_builder_round1_has_no_reflection_block():
     # The protocol is still explained up front in the system message.
     assert "HOW THIS PROCESS WORKS" in messages[0]["content"]
     assert "## Analysis" in messages[0]["content"]
+    assert "CRITICAL RULE ABOUT EXAMPLES" in messages[0]["content"]
+    assert "not paraphrased with different names" in messages[0]["content"]
 
 
 def test_builder_reflection_block_content_and_placement():

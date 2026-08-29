@@ -23,6 +23,7 @@ import requests
 import truststore
 
 from fdpo.data.extraction import gsm8k_gold
+from fdpo.data.ifeval_verifiers import describe_requirements
 from fdpo.data.loaders import Example
 
 truststore.inject_into_ssl()
@@ -170,10 +171,81 @@ def fetch_legalbench_contract_nli() -> tuple[list[Example], list[Example]]:
     return convert("train"), convert("test")
 
 
+def _jsonable(obj):
+    """Recursively convert numpy/pandas containers (ndarray, np.generic) to
+    plain Python types so json.dumps() accepts them -- IFEval/IFBench's
+    `kwargs` column comes back from parquet with numpy arrays nested inside
+    dicts (e.g. a forbidden-words list), which plain dict()/list() casts
+    don't reach."""
+    if isinstance(obj, dict):
+        return {k: _jsonable(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_jsonable(v) for v in obj]
+    if hasattr(obj, "tolist"):  # numpy ndarray or scalar (np.generic)
+        return _jsonable(obj.tolist())
+    return obj
+
+
+def fetch_ifeval() -> tuple[list[Example], list[Example]]:
+    """google/IFEval: 541 verifiable-instruction prompts, single upstream
+    split (no official train/test division -- like HumanEval's 0/164
+    convention, everything goes to test; --split-mode stratified re-pools
+    and re-carves train/test at experiment time, same as legalbench_hearsay).
+
+    There is no single "gold answer" for this task -- correctness means
+    every listed instruction_id passed its own verifier function against the
+    raw output, not an extracted-answer-vs-gold match. `gold` is a
+    placeholder; the real verification spec lives in `meta`. See
+    `fdpo.data.ifeval_verifiers` for the (partial -- 18 of 83 distinct
+    instruction types) checker implementation; `is_fully_covered()` filters
+    the loaded pool at load time (see loaders.py) so only examples where
+    every listed instruction has an implemented checker are ever scored."""
+    df = _read_parquet_split("google/IFEval", "train")
+    test = [
+        Example(
+            id=f"ifeval_{row['key']}",
+            question=row["prompt"],
+            gold="PASS",
+            reference=describe_requirements(
+                list(row["instruction_id_list"]), _jsonable(list(row["kwargs"]))),
+            meta=_jsonable({
+                "instruction_id_list": row["instruction_id_list"],
+                "kwargs": row["kwargs"],
+            }),
+        )
+        for _, row in df.iterrows()
+    ]
+    return [], test
+
+
+def fetch_ifbench() -> tuple[list[Example], list[Example]]:
+    """allenai/IFBench_test: 300 out-of-domain verifiable-instruction prompts
+    (58 new constraint types beyond IFEval), same single-split/no-gold
+    situation as fetch_ifeval() above -- see its docstring."""
+    df = _read_parquet_split("allenai/IFBench_test", "train")
+    test = [
+        Example(
+            id=f"ifbench_{row['key']}",
+            question=row["prompt"],
+            gold="PASS",
+            reference=describe_requirements(
+                list(row["instruction_id_list"]), _jsonable(list(row["kwargs"]))),
+            meta=_jsonable({
+                "instruction_id_list": row["instruction_id_list"],
+                "kwargs": row["kwargs"],
+            }),
+        )
+        for _, row in df.iterrows()
+    ]
+    return [], test
+
+
 FETCHERS = {
     "gsm8k": fetch_gsm8k,
     "arc": fetch_arc,
     "mmlu": fetch_mmlu,
     "legalbench_hearsay": fetch_legalbench_hearsay,
     "legalbench_contract_nli": fetch_legalbench_contract_nli,
+    "ifeval": fetch_ifeval,
+    "ifbench": fetch_ifbench,
 }

@@ -16,9 +16,31 @@ import random
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from fdpo.data.ifeval_verifiers import is_fully_covered
 from fdpo.utils.io import read_jsonl
 
 logger = logging.getLogger("fdpo")
+
+# Datasets whose correctness is "every listed instruction's checker passes",
+# not "extracted answer == gold" -- the loaded pool is filtered to examples
+# fully covered by fdpo.data.ifeval_verifiers.CHECKERS (see its module
+# docstring for exactly which instruction types are and aren't implemented).
+VERIFIER_DATASETS = ("ifeval", "ifbench")
+
+# Example IDs that deterministically trip Azure's content filter regardless
+# of prompt wording (confirmed by inspecting the actual text: keywords like
+# "ballistics"/"projectiles" or "military officer ... Iraq ... private
+# military contractor" false-positive on Azure's safety classifier -- same
+# pattern already documented for MMLU professional_law elsewhere in this
+# project). Excluded outright rather than left to eat solver/optimizer
+# budget every run for a call that will never score. Append here as more
+# surface -- content_filter blocks during mining/validation aren't currently
+# tracked in metrics.json (only seed_test/final_test are), so this list is
+# necessarily grown empirically, not computed once.
+KNOWN_CONTENT_FILTER_IDS = {
+    "ifeval_288",   # "ballistics (the study of the motion of projectiles)"
+    "ifeval_3718",  # "military officer ... Iraq ... private military contractor"
+}
 
 DATASET_DIRS = {
     "gsm8k": "gsm8k",
@@ -26,6 +48,12 @@ DATASET_DIRS = {
     "mmlu": "mmlu",
     "legalbench_hearsay": "legalbench_hearsay",
     "legalbench_contract_nli": "legalbench_contract_nli",
+    # Downloadable but NOT yet in config.DATASETS -- these have no single
+    # gold answer (correctness = per-instruction verifier functions, not
+    # extracted-answer-vs-gold), so run_experiment can't score them until a
+    # verifier is wired into the evaluator. Data-only for now.
+    "ifeval": "ifeval",
+    "ifbench": "ifbench",
 }
 
 DEFAULT_DATASET_ROOT = "Dataset"
@@ -52,6 +80,15 @@ def _load_local(dataset: str, split: str,
     rows = [Example(**row) for row in read_jsonl(path)]
     if subjects:
         rows = [e for e in rows if (e.meta or {}).get("subject") in subjects]
+    if dataset in VERIFIER_DATASETS:
+        before = len(rows)
+        rows = [e for e in rows
+                if e.id not in KNOWN_CONTENT_FILTER_IDS
+                and is_fully_covered(e.meta.get("instruction_id_list", []))]
+        if len(rows) < before:
+            logger.info("%s: filtered to %d/%d examples (verifier coverage + "
+                        "known content-filter exclusions)",
+                        dataset, len(rows), before)
     return rows
 
 

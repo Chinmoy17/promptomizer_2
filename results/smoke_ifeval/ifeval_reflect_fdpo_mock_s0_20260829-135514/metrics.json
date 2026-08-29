@@ -1,0 +1,104 @@
+{
+  "run_id": "ifeval_reflect_fdpo_mock_s0_20260829-135514",
+  "status": "completed",
+  "method": "reflect_fdpo",
+  "dataset": "ifeval",
+  "solver_model": "mock",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 1.0,
+    "n_examples": 6,
+    "n_evaluated": 6,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 1.0,
+    "n_examples": 6,
+    "n_evaluated": 6,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "reflect",
+    "edit_status": "not_triggered",
+    "triggered": false,
+    "tau": 1,
+    "skip_above_acc": 0.0,
+    "skipped_high_baseline": false,
+    "simple_max_rounds": 2,
+    "accept_margin": 1.0,
+    "shipped_structured": false,
+    "selection": "last_round",
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.35,
+      "n_mining": 6,
+      "n_validation": 4
+    },
+    "baseline_val_acc": 1.0,
+    "best_structured_val_acc": null,
+    "n_failures_triggering": 0,
+    "optimizer_calls": 0,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "below_tau",
+        "n_failures_before": 0
+      }
+    ],
+    "baseline_failing_ids": [],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 1.0,
+      "n_correct": 6,
+      "n_wrong": 0
+    },
+    "current_train": {
+      "accuracy": 1.0,
+      "n_correct": 6,
+      "n_wrong": 0
+    },
+    "train_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [],
+      "still_right_count": 6,
+      "net_gain": 0
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 0,
+      "rejects": 0
+    },
+    "rounds_run": 0,
+    "train_acc_per_round": [
+      1.0
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [],
+      "still_right_count": 6,
+      "net_gain": 0
+    },
+    "markdown_source": "prompts\\ifeval.md"
+  },
+  "content_filter": null,
+  "wall_clock_s": 0.0,
+  "cost": {
+    "total_calls": 22,
+    "total_cost_usd": 0.0,
+    "by_role": {
+      "solver": {
+        "calls": 22,
+        "prompt_tokens": 5280,
+        "completion_tokens": 308,
+        "cost_usd": 0.0
+      }
+    }
+  }
+}

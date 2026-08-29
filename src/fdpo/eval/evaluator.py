@@ -12,7 +12,8 @@ from dataclasses import dataclass
 from fdpo.clients.base import ModelClient
 from fdpo.core.prompt import render_messages
 from fdpo.data.extraction import extract_pred, is_correct
-from fdpo.data.loaders import Example
+from fdpo.data.ifeval_verifiers import verify
+from fdpo.data.loaders import VERIFIER_DATASETS, Example
 
 DEFAULT_MAX_WORKERS = 1  # safe default: sequential unless a caller opts in.
 # Callers with scripted/order-dependent mock responses (tests) must stay
@@ -27,6 +28,9 @@ class EvalRow:
     correct: bool
     output: str
     blocked: bool = False   # provider refused (content filter) -> not evaluable
+    detail: str = ""        # verifier datasets only: which instruction(s)
+                             # failed and why (see fdpo.data.ifeval_verifiers);
+                             # empty for every other dataset
 
 
 @dataclass
@@ -84,6 +88,15 @@ def evaluate(solver: ModelClient, sections: dict[str, str],
         result = solver.complete(
             render_messages(sections, ex.question, shots=shots),
             temperature=temperature, max_tokens=max_tokens, purpose=purpose)
+        if dataset in VERIFIER_DATASETS:
+            # No extracted-answer-vs-gold match for this task family --
+            # correctness is "every listed instruction's checker passes
+            # against the raw response text" (see ifeval_verifiers.verify).
+            passed, detail = verify(ex.meta.get("instruction_id_list", []),
+                                    ex.meta.get("kwargs", []), result.text)
+            return EvalRow(example_id=ex.id, pred=("PASS" if passed else "FAIL"),
+                          gold=ex.gold, correct=passed, output=result.text,
+                          blocked=result.blocked, detail=detail)
         pred = extract_pred(dataset, result.text)
         return EvalRow(example_id=ex.id, pred=pred, gold=ex.gold,
                        correct=is_correct(dataset, pred, ex.gold),
