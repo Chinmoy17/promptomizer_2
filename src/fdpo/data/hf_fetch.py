@@ -240,6 +240,43 @@ def fetch_ifbench() -> tuple[list[Example], list[Example]]:
     return [], test
 
 
+def fetch_aime() -> tuple[list[Example], list[Example]]:
+    """AIME competition math, split exactly as GEPA's own protocol: train =
+    AIME 2022-2024 (AI-MO/aimo-validation-aime, 90 problems), test = AIME
+    2025 (opencompass/AIME2025, 30 problems across its I/II configs). Kept
+    as the OFFICIAL train/test boundary (no re-pooling) so numbers are
+    directly comparable to GEPA's table -- use --split-mode seeded (the
+    default), never stratified/balanced, which would pool train+test
+    together and erase that boundary.
+
+    Answers are integers 0-999; reuses gsm8k's "#### <number>" extractor
+    (see fdpo.data.extraction) rather than a new format."""
+    train_df = _read_parquet_split("AI-MO/aimo-validation-aime", "train")
+    train = [
+        Example(
+            id=f"aime_train_{row['id']}",
+            question=row["problem"],
+            gold=str(row["answer"]).strip(),
+            reference=row["solution"],
+            meta={},
+        )
+        for _, row in train_df.iterrows()
+    ]
+
+    test: list[Example] = []
+    for config in ("AIME2025-I", "AIME2025-II"):
+        test_df = _read_parquet_split("opencompass/AIME2025", "test", config=config)
+        for i, row in test_df.iterrows():
+            test.append(Example(
+                id=f"aime_test_{config}_{i}",
+                question=row["question"],
+                gold=str(row["answer"]).strip(),
+                reference=str(row["answer"]),
+                meta={},
+            ))
+    return train, test
+
+
 FETCHERS = {
     "gsm8k": fetch_gsm8k,
     "arc": fetch_arc,
@@ -248,4 +285,5 @@ FETCHERS = {
     "legalbench_contract_nli": fetch_legalbench_contract_nli,
     "ifeval": fetch_ifeval,
     "ifbench": fetch_ifbench,
+    "aime": fetch_aime,
 }

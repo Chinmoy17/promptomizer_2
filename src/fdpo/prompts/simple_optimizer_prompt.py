@@ -35,6 +35,13 @@ _TASK_DESCRIPTIONS = {
         "specific integer. The output must end with a line containing the "
         "final numeric answer."
     ),
+    "aime": (
+        "a competition-level (AIME) math problem, substantially harder than "
+        "grade-school word problems -- multi-step algebra, combinatorics, "
+        "number theory, geometry, or probability. The correct answer is "
+        "always a specific integer between 0 and 999. The output must end "
+        "with a line containing the final numeric answer."
+    ),
     "mmlu": (
         "a 4-way multiple-choice exam question (options A, B, C, D) from one "
         "academic subject. Computational subjects (mathematics, econometrics) "

@@ -54,6 +54,7 @@ DATASET_DIRS = {
     # verifier is wired into the evaluator. Data-only for now.
     "ifeval": "ifeval",
     "ifbench": "ifbench",
+    "aime": "aime",
 }
 
 DEFAULT_DATASET_ROOT = "Dataset"

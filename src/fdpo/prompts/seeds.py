@@ -104,6 +104,15 @@ _SEEDS: dict[str, dict[str, str]] = {
                          "what gets checked. If no reasoning is needed, "
                          "`FINAL RESPONSE:` may be the very first line.",
     },
+    "aime": {
+        "system_role": "You are a competition mathematician.",
+        "context": "You will be given a competition-style math problem whose "
+                   "answer is always an integer between 0 and 999.",
+        "task_details": "Solve the problem.",
+        "constraints": "The final answer must be an integer between 0 and 999.",
+        "output_format": "After your work, write the final numeric answer on "
+                         "its own line in exactly this form: #### <number>",
+    },
 }
 
 
