@@ -15,16 +15,25 @@ Two changes from the blind mechanism:
      blind to the optimizer.
 
 Consequence of (2): once validation's items are visible to the optimizer, its
-accuracy is no longer an independent signal of generalization — the optimizer
-can specifically target what it will be scored on next round. So there is NO
-per-round "keep the best validation round" selection anymore. Every round is
-committed and becomes the parent of the next; the run ships whichever round
-is LAST. A single accept-margin check still runs once at the end, comparing
-the LAST round's validation accuracy against the untouched baseline, so a
-trajectory that ends worse than doing nothing still reverts to the seed.
-Validation accuracy is still computed and logged every round as a diagnostic
-number (informative — did the round fix what it was shown — not a proof of
-generalization) but plays no role in which round ships.
+accuracy is no longer a fully independent signal of generalization — the
+optimizer can specifically target what it will be scored on next round. That
+motivated an earlier version of this mechanism to ship whichever round was
+simply LAST, ignoring validation for the selection itself. In practice that
+threw away real signal: a real run's round 2 beat round 3 on BOTH mining
+(0.862 vs 0.828) AND validation (0.633 vs 0.533) by a wide margin, yet
+"last round" shipped round 3 anyway. So the mechanism now ships whichever
+COMMITTED round has the best validation accuracy (mining accuracy if the val
+split is disabled) — using validation as the best signal available, however
+imperfect, rather than discarding it. Every round still commits
+unconditionally (so a bad round doesn't block a later good one from being
+found), but the FINAL choice of which round to ship is a comparison across
+all of them. There is still no accept-margin gate against baseline (removed
+earlier after this project's own reruns showed a round's val accuracy vs.
+the untouched baseline is noisy enough that gating on it discarded as much
+signal as it protected) and the run never reverts to the untouched seed
+UNLESS no round ever committed at all (never triggered, or skipped for an
+already-high baseline) — in that case there is nothing to choose among, and
+the seed was never touched anyway.
 
 Test is handled entirely by the caller and is never touched here, in either
 mechanism.
@@ -50,11 +59,15 @@ logger = logging.getLogger("fdpo")
 def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
                              train: list[Example], dataset: str,
                              solver: ModelClient, optimizer: ModelClient,
-                             run_dir: Path) -> dict:
+                             run_dir: Path, *,
+                             judge: ModelClient | None = None,
+                             external: ModelClient | None = None) -> dict:
     """Multi-round FDPO where the optimizer sees the full per-item effect of
-    its own previous rewrite on both mining and validation. Ships the LAST
-    round (no keep-best selection — see module docstring for why). Test
-    evaluation is done by the caller.
+    its own previous rewrite on both mining and validation. Every round
+    commits unconditionally; ships whichever committed round has the BEST
+    validation accuracy (see module docstring for why, and for why this
+    never falls back to the untouched seed once at least one round has
+    committed). Test evaluation is done by the caller.
     """
     rng = random.Random(cfg.seed)
     train_by_id = {ex.id: ex for ex in train}
@@ -83,7 +96,7 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
     baseline = evaluate(solver, registry.active_prompt(), mining, dataset,
                         temperature=cfg.solver_temperature,
                         max_tokens=cfg.solver_max_tokens, purpose="reflect:baseline",
-                        max_workers=cfg.max_workers)
+                        max_workers=cfg.max_workers, judge=judge, external=external)
     baseline_correct = baseline.correct_ids()
     baseline_wrong = baseline.wrong_ids()
     logger.info("reflect: baseline mining accuracy %.3f (%d correct, %d wrong)",
@@ -105,7 +118,8 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
                                 temperature=cfg.solver_temperature,
                                 max_tokens=cfg.solver_max_tokens,
                                 purpose="reflect:baseline-val",
-                                max_workers=cfg.max_workers)
+                                max_workers=cfg.max_workers, judge=judge,
+                                external=external)
         baseline_val_acc = baseline_val.accuracy
         prev_val_wrong = baseline_val.wrong_ids()
     else:
@@ -115,12 +129,6 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
     save_markdown_prompt(registry.active_prompt(), run_dir / "prompt_baseline.md",
                          schema=registry.schema)
 
-    # Seeds the registry's best-snapshot pointer at version 0 (the seed). We
-    # never move this pointer again during the loop (no keep-best tracking):
-    # it is only used, unmodified, as the explicit revert target if the final
-    # accept gate rejects the last round (see the end of the loop).
-    registry.record_round(passed=True, acc=baseline.accuracy)
-
     # 2. Cache baseline outputs so failures always show the CURRENT prompt's
     #    actual wrong answer. baseline_details carries verifier-dataset
     #    constraint-violation text (empty "" for every other dataset).
@@ -128,14 +136,18 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
     baseline_details = {r.example_id: r.detail for r in baseline.rows}
 
     # 3. Multi-round loop. Every round is committed and becomes the parent of
-    #    the next; there is no per-round "best" selection (see module
-    #    docstring). `last_*` tracks whatever the most recently committed
-    #    round produced, so the loop's final state is always "the last round"
-    #    with no restore step needed to reach it.
-    last_val_acc = baseline_val_acc
-    last_wrong = baseline_wrong
-    last_correct = baseline_correct
-    last_result = baseline
+    #    the next (so a bad round doesn't block a later good one). `best_*`
+    #    tracks whichever COMMITTED round has scored highest so far on the
+    #    comparison metric (validation accuracy, or mining accuracy if the
+    #    val split is disabled) -- `best_round_num` starts at 0 (the seed) but
+    #    `best_val_acc` starts below any real score, so the FIRST committed
+    #    round always displaces it; the untouched seed can only ever "win" by
+    #    never being displaced, i.e. if no round ever commits at all.
+    best_round_num = 0
+    best_val_acc = float("-inf")
+    best_wrong = baseline_wrong
+    best_correct = baseline_correct
+    best_result = baseline
     current_wrong = baseline_wrong
     current_correct = baseline_correct
     optimizer_calls = 0
@@ -243,7 +255,8 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
                             temperature=cfg.solver_temperature,
                             max_tokens=cfg.solver_max_tokens,
                             purpose=f"reflect:round{round_num}",
-                            max_workers=cfg.max_workers)
+                            max_workers=cfg.max_workers, judge=judge,
+                            external=external)
         new_wrong = new_eval.wrong_ids()
         new_correct = new_eval.correct_ids()
         if has_val_split:
@@ -251,6 +264,7 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
                                 temperature=cfg.solver_temperature,
                                 max_tokens=cfg.solver_max_tokens,
                                 purpose=f"reflect:round{round_num}-val",
+                                judge=judge, external=external,
                                 max_workers=cfg.max_workers)
             cand_val_acc = val_eval.accuracy
             val_wrong = val_eval.wrong_ids()
@@ -288,13 +302,18 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
         any_committed = True
         final_edit_status = "committed"
 
-        # This round is now "last" unconditionally -- no best-of-rounds
-        # comparison. The active prompt after commit_bundle already IS this
-        # round, so no restore step is needed to reach it later.
-        last_val_acc = cand_val_acc
-        last_wrong = new_wrong
-        last_correct = new_correct
-        last_result = new_eval
+        # Every round commits (so a bad round doesn't block a later good
+        # one), but only the best-by-validation (or best-by-mining, if no
+        # val split) round is tracked as the one to actually ship -- see
+        # module docstring. `registry.restore_round()` reconstructs this
+        # round's exact prompt at the end regardless of what committed after
+        # it.
+        if cand_val_acc > best_val_acc:
+            best_round_num = round_num
+            best_val_acc = cand_val_acc
+            best_wrong = new_wrong
+            best_correct = new_correct
+            best_result = new_eval
 
         rounds_log.append({
             "round": round_num,
@@ -366,39 +385,33 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
         current_wrong = new_wrong
         current_correct = new_correct
 
-    # Final accept gate (once, after the loop) -- compares the LAST round to
-    # baseline, not a best-of-trajectory. No restore is needed to ship: the
-    # active prompt after the loop already IS the last committed round.
-    ship_structured = any_committed and (
-        last_val_acc >= baseline_val_acc - cfg.accept_margin
-    )
+    # No accept gate against baseline, and no fallback to the untouched seed
+    # once anything has committed: ship whichever COMMITTED round scored
+    # best (validation, or mining if no val split) -- see module docstring.
+    # restore_round() reconstructs that round's exact prompt from full
+    # version history, regardless of what a LATER round subsequently did.
+    ship_structured = any_committed
     if ship_structured:
+        registry.restore_round(best_round_num)
         logger.info(
-            "reflect: ACCEPT last round (val acc %.3f, baseline val %.3f, "
-            "margin %.2f) -- shipping to test",
-            last_val_acc, baseline_val_acc, cfg.accept_margin,
+            "reflect: SHIP round %d (best val acc %.3f, baseline val %.3f) "
+            "-- best-of-committed-rounds, never falls back to baseline",
+            best_round_num, best_val_acc, baseline_val_acc,
         )
     else:
-        if any_committed:
-            reason = (f"last round val acc {last_val_acc:.3f} < baseline val "
-                      f"{baseline_val_acc:.3f} - margin {cfg.accept_margin:.2f}")
-        else:
-            reason = ("baseline at/above skip_above_acc; optimization skipped"
-                      if skip_high else "no round was committed")
-        logger.info("reflect: REVERT to baseline seed (%s)", reason)
-        registry.run_best_versions = {name: 0 for name in registry.schema}
-        registry.restore_best_snapshot()
-        last_wrong, last_correct, last_result = (
-            baseline_wrong, baseline_correct, baseline)
+        reason = ("baseline at/above skip_above_acc; optimization skipped"
+                  if skip_high else "no round was committed (never triggered)")
+        logger.info("reflect: nothing to ship (%s) -- active prompt is "
+                    "already the untouched seed", reason)
 
     save_markdown_prompt(registry.active_prompt(), run_dir / "prompt_current.md",
                          schema=registry.schema)
 
     # 4. Confusion matrix on the mining batch (baseline vs. the shipped round).
-    recoveries = sorted(baseline_wrong & last_correct)
-    regressions = sorted(baseline_correct & last_wrong)
-    still_wrong = sorted(baseline_wrong & last_wrong)
-    still_right = len(baseline_correct & last_correct)
+    recoveries = sorted(baseline_wrong & best_correct)
+    regressions = sorted(baseline_correct & best_wrong)
+    still_wrong = sorted(baseline_wrong & best_wrong)
+    still_right = len(baseline_correct & best_correct)
     net_gain = len(recoveries) - len(regressions)
 
     logger.info(
@@ -407,8 +420,8 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
         len(recoveries), len(regressions), len(still_wrong), still_right, net_gain,
     )
     logger.info("reflect: MINING accuracy %.3f -> %.3f (delta %+.3f)",
-                baseline.accuracy, last_result.accuracy,
-                last_result.accuracy - baseline.accuracy)
+                baseline.accuracy, best_result.accuracy,
+                best_result.accuracy - baseline.accuracy)
 
     return {
         "mode": "reflect",
@@ -420,7 +433,11 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
         "simple_max_rounds": max_rounds,
         "accept_margin": cfg.accept_margin,
         "shipped_structured": ship_structured,
-        "selection": "last_round",  # no keep-best selection in reflect_fdpo
+        "selection": "best_of_rounds",  # ships whichever committed round
+                                        # scored best on validation (mining
+                                        # if no val split); never baseline
+                                        # unless nothing ever committed.
+        "shipped_round": best_round_num if any_committed else None,
         "val_split": {
             "enabled": has_val_split,
             "val_frac": val_frac,
@@ -428,10 +445,9 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
             "n_validation": len(validation) if has_val_split else 0,
         },
         "baseline_val_acc": baseline_val_acc,
-        # Holds the LAST committed round's validation accuracy (diagnostic
-        # only, not a maximum -- see module docstring). None if nothing
-        # committed.
-        "best_structured_val_acc": last_val_acc if any_committed else None,
+        # The genuine best validation accuracy among all committed rounds
+        # (this is the round that actually ships). None if nothing committed.
+        "best_structured_val_acc": best_val_acc if any_committed else None,
         "n_failures_triggering": len(baseline_wrong),
         "optimizer_calls": optimizer_calls,
         "rounds_log": rounds_log,
@@ -444,9 +460,9 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
             "n_wrong": len(baseline_wrong),
         },
         "current_train": {
-            "accuracy": last_result.accuracy,
-            "n_correct": len(last_correct),
-            "n_wrong": len(last_wrong),
+            "accuracy": best_result.accuracy,
+            "n_correct": len(best_correct),
+            "n_wrong": len(best_wrong),
         },
         "train_confusion": {
             "recoveries": recoveries,
@@ -461,8 +477,8 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
         "rounds_run": len([r for r in rounds_log
                             if r["status"] == "committed"]),
         "train_acc_per_round": [
-            r.get("train_acc_after", last_result.accuracy) for r in rounds_log
-        ] if rounds_log else [last_result.accuracy],
+            r.get("train_acc_after", best_result.accuracy) for r in rounds_log
+        ] if rounds_log else [best_result.accuracy],
         "time_to_stabilization": None,
         "judge_parse_failures": 0,
     }

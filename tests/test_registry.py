@@ -121,6 +121,36 @@ def test_json_round_trip(tmp_path):
     assert loaded.sections["context"].versions[1].gate["passed"] is False
 
 
+def test_restore_round_reconstructs_a_past_round_regardless_of_current_state():
+    reg = make_registry()
+    seed_constraints = reg.active_prompt()["constraints"]
+    seed_context = reg.active_prompt()["context"]
+
+    reg.commit_bundle({"constraints": "round1 constraints"}, round_num=1, gate=gate(True))
+    reg.commit_bundle({"constraints": "round2 constraints"}, round_num=2, gate=gate(True))
+    reg.commit_bundle({"context": "round3 context"}, round_num=3, gate=gate(True))
+    # After round 3: constraints untouched since round 2 (still round2's text),
+    # context freshly changed in round 3.
+    assert reg.active_prompt()["constraints"] == "round2 constraints"
+    assert reg.active_prompt()["context"] == "round3 context"
+
+    restored = reg.restore_round(2)
+    assert restored["constraints"] == "round2 constraints"
+    # context was never touched in round <= 2, so round 2's state is the seed.
+    assert restored["context"] == seed_context
+    assert reg.active_prompt() == restored  # active state actually moved
+
+    # Round 0 (nothing committed yet) reconstructs the untouched seed.
+    reg.restore_round(0)
+    assert reg.active_prompt()["constraints"] == seed_constraints
+    assert reg.active_prompt()["context"] == seed_context
+
+    # Moving forward again to the latest round still works (not one-directional).
+    reg.restore_round(3)
+    assert reg.active_prompt()["constraints"] == "round2 constraints"
+    assert reg.active_prompt()["context"] == "round3 context"
+
+
 def test_render():
     reg = make_registry()
     system = render_system(reg.active_prompt())

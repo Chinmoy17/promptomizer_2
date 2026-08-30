@@ -1,0 +1,208 @@
+{
+  "run_id": "mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-150241",
+  "status": "completed",
+  "method": "reflect_fdpo",
+  "dataset": "mmlu",
+  "solver_model": "gpt-4o-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.8787878787878788,
+    "n_examples": 66,
+    "n_evaluated": 66,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.8939393939393939,
+    "n_examples": 66,
+    "n_evaluated": 66,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "reflect",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 1,
+    "skip_above_acc": 0.95,
+    "skipped_high_baseline": false,
+    "simple_max_rounds": 3,
+    "accept_margin": 0.0,
+    "shipped_structured": true,
+    "selection": "last_round",
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.5,
+      "n_mining": 25,
+      "n_validation": 25
+    },
+    "baseline_val_acc": 0.92,
+    "best_structured_val_acc": 0.96,
+    "n_failures_triggering": 2,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed",
+        "n_failures_before": 2,
+        "n_failures_after": 2,
+        "train_acc_after": 0.92,
+        "val_acc_after": 0.96,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "output_format",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_high_school_biology_test_100",
+          "mmlu_high_school_biology_test_142"
+        ],
+        "failing_ids_after": [
+          "mmlu_high_school_biology_test_100",
+          "mmlu_high_school_biology_test_142"
+        ],
+        "recovered_this_round": [],
+        "regressed_this_round": [],
+        "val_recovered_this_round": 1,
+        "val_regressed_this_round": 0,
+        "reflection_shown": false
+      },
+      {
+        "round": 2,
+        "status": "committed",
+        "n_failures_before": 2,
+        "n_failures_after": 3,
+        "train_acc_after": 0.88,
+        "val_acc_after": 0.96,
+        "sections_changed": [
+          "constraints",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_high_school_biology_test_100",
+          "mmlu_high_school_biology_test_142"
+        ],
+        "failing_ids_after": [
+          "mmlu_high_school_biology_dev_4",
+          "mmlu_high_school_biology_test_100",
+          "mmlu_high_school_biology_test_142"
+        ],
+        "recovered_this_round": [],
+        "regressed_this_round": [
+          "mmlu_high_school_biology_dev_4"
+        ],
+        "val_recovered_this_round": 0,
+        "val_regressed_this_round": 0,
+        "reflection_shown": true
+      },
+      {
+        "round": 3,
+        "status": "committed",
+        "n_failures_before": 3,
+        "n_failures_after": 2,
+        "train_acc_after": 0.92,
+        "val_acc_after": 0.96,
+        "sections_changed": [
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "mmlu_high_school_biology_dev_4",
+          "mmlu_high_school_biology_test_100",
+          "mmlu_high_school_biology_test_142"
+        ],
+        "failing_ids_after": [
+          "mmlu_high_school_biology_test_100",
+          "mmlu_high_school_biology_test_142"
+        ],
+        "recovered_this_round": [
+          "mmlu_high_school_biology_dev_4"
+        ],
+        "regressed_this_round": [],
+        "val_recovered_this_round": 0,
+        "val_regressed_this_round": 0,
+        "reflection_shown": true
+      }
+    ],
+    "baseline_failing_ids": [
+      "mmlu_high_school_biology_test_100",
+      "mmlu_high_school_biology_test_142"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.92,
+      "n_correct": 23,
+      "n_wrong": 2
+    },
+    "current_train": {
+      "accuracy": 0.92,
+      "n_correct": 23,
+      "n_wrong": 2
+    },
+    "train_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "mmlu_high_school_biology_test_100",
+        "mmlu_high_school_biology_test_142"
+      ],
+      "still_right_count": 23,
+      "net_gain": 0
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 8,
+      "rejects": 0
+    },
+    "rounds_run": 3,
+    "train_acc_per_round": [
+      0.92,
+      0.88,
+      0.92
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "mmlu_high_school_biology_test_186",
+        "mmlu_high_school_biology_test_205"
+      ],
+      "regressions": [
+        "mmlu_high_school_biology_test_28"
+      ],
+      "still_wrong": [
+        "mmlu_high_school_biology_test_114",
+        "mmlu_high_school_biology_test_260",
+        "mmlu_high_school_biology_test_36",
+        "mmlu_high_school_biology_test_56",
+        "mmlu_high_school_biology_validation_2",
+        "mmlu_high_school_biology_validation_27"
+      ],
+      "still_right_count": 57,
+      "net_gain": 1
+    },
+    "markdown_source": "prompts\\mmlu_oneliner.md"
+  },
+  "content_filter": null,
+  "wall_clock_s": 327.2,
+  "cost": {
+    "total_calls": 335,
+    "total_cost_usd": 0.209716,
+    "by_role": {
+      "solver": {
+        "calls": 332,
+        "prompt_tokens": 246112,
+        "completion_tokens": 25784,
+        "cost_usd": 0.052387
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 16359,
+        "completion_tokens": 13688,
+        "cost_usd": 0.157329
+      }
+    }
+  }
+}

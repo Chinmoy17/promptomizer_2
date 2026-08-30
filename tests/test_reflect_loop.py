@@ -6,7 +6,8 @@ Uses --dry-run (mock clients) so no API calls, no cost. The blind control
 
 from fdpo.config import ExperimentConfig, build_arg_parser
 from fdpo.data.md_prompt import parse_markdown
-from fdpo.prompts.reflect_optimizer_prompt import build_reflect_optimizer_messages
+from fdpo.prompts.reflect_optimizer_prompt import (_MAX_OUTPUT_CHARS,
+                                                   build_reflect_optimizer_messages)
 from fdpo.utils.io import read_json
 from scripts.run_experiment import run
 
@@ -98,6 +99,48 @@ def test_builder_reflection_block_content_and_placement():
     assert effect.count("Model's new wrong answer: Answer: Yes") == 2
 
 
+def test_builder_truncates_long_solver_output():
+    """A verbose completion (e.g. GPT-4.1 on AIME writing thousands of tokens
+    of working) must not be pasted into the optimizer request in full -- only
+    a bounded tail survives, which is what previously blew the gpt-5
+    deployment's per-minute token quota on a single optimizer call."""
+    long_output = ("scratch work " * 200) + "#### 42"
+    assert len(long_output) > _MAX_OUTPUT_CHARS
+
+    failures = [{"question": "Q1?", "output": long_output, "gold": "42"}]
+    messages = build_reflect_optimizer_messages(
+        "## System Role\nSolve.", failures, [], dataset="aime",
+        round_num=1, max_rounds=3, reflection=None)
+    user = messages[1]["content"]
+    assert "#### 42" in user
+    assert long_output not in user
+    assert user.count("scratch work") < 200
+
+    reflection = {
+        **REFLECTION,
+        "mining_regressed": [
+            {"question": "Q2?", "output": long_output, "gold": "7"},
+        ],
+    }
+    messages2 = build_reflect_optimizer_messages(
+        "## System Role\nSolve.", [], [], dataset="aime",
+        round_num=2, max_rounds=3, reflection=reflection)
+    user2 = messages2[1]["content"]
+    assert "#### 42" in user2
+    assert long_output not in user2
+    assert "```" not in user2[user2.index("EFFECT OF YOUR"):user2.index("FAILURES (")]
+
+
+def test_builder_leaves_short_solver_output_unchanged():
+    """No-op for existing short-completion datasets (hearsay/MMLU/etc)."""
+    short_output = "Answer: Yes"
+    failures = [{"question": "Q?", "output": short_output, "gold": "No"}]
+    messages = build_reflect_optimizer_messages(
+        "## System Role\nSolve.", failures, [], dataset="legalbench_hearsay",
+        round_num=1, max_rounds=3, reflection=None)
+    assert f"Model's wrong answer: {short_output}" in messages[1]["content"]
+
+
 def test_builder_task_description_injected():
     messages = build_reflect_optimizer_messages(
         "## System Role\nSolve.", [], [], dataset="arc")
@@ -125,7 +168,7 @@ def test_reflect_fdpo_end_to_end_dry_run(tmp_path):
     opt = m["optimization"]
     assert opt["mode"] == "reflect"
     assert opt["simple_max_rounds"] == 3
-    assert opt["selection"] == "last_round"
+    assert opt["selection"] == "best_of_rounds"
     # Confusion matrices present with the standard keys.
     for key in ("recoveries", "regressions", "still_wrong",
                 "still_right_count", "net_gain"):
@@ -142,10 +185,11 @@ def test_reflect_fdpo_end_to_end_dry_run(tmp_path):
         assert "val_regressed_this_round" in first
         for later in committed[1:]:
             assert later["reflection_shown"] is True
-        # No keep-best selection: the shipped current_train/val accuracy must
-        # come from the LAST committed round, not whichever round scored
-        # highest.
-        last = committed[-1]
-        assert opt["current_train"]["accuracy"] == last["train_acc_after"]
+        # Best-of-rounds selection: the shipped val accuracy must be the
+        # MAXIMUM val_acc_after among all committed rounds, and the shipped
+        # round number must actually be the round that achieved it.
         if opt["shipped_structured"]:
-            assert opt["best_structured_val_acc"] == last["val_acc_after"]
+            best = max(committed, key=lambda r: r["val_acc_after"])
+            assert opt["best_structured_val_acc"] == best["val_acc_after"]
+            assert opt["shipped_round"] == best["round"]
+            assert opt["current_train"]["accuracy"] == best["train_acc_after"]

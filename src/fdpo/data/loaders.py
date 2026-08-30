@@ -55,6 +55,11 @@ DATASET_DIRS = {
     "ifeval": "ifeval",
     "ifbench": "ifbench",
     "aime": "aime",
+    # Data-only, same as ifeval/ifbench were before their verifiers landed:
+    # PUPA's task is a two-hop pipeline (redact -> external call -> synthesize)
+    # scored by a quality-judge + mechanical-leakage composite, not a single
+    # extracted-answer-vs-gold match. No evaluator/optimizer support yet.
+    "pupa": "pupa",
 }
 
 DEFAULT_DATASET_ROOT = "Dataset"
@@ -139,7 +144,7 @@ def _stratum_key(ex: Example) -> str:
     and datasets without any category metadata (GSM8K, ARC) fall back to the
     gold label."""
     if ex.meta:
-        for key in ("slice", "subject", "category"):
+        for key in ("slice", "subject", "category", "predicted_category"):
             if key in ex.meta:
                 return ex.meta[key]
     return ex.gold

@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 METHODS = ("zeroshot_cot", "fewshot_cot", "monolithic", "fdpo", "simple_fdpo",
            "reflect_fdpo")
 DATASETS = ("gsm8k", "arc", "mmlu", "legalbench_hearsay", "legalbench_contract_nli",
-           "ifeval", "ifbench", "aime")
+           "ifeval", "ifbench", "aime", "pupa")
 ROLES = ("solver", "judge", "optimizer")
 
 
@@ -314,4 +314,11 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
     )
     if not cfg.dry_run:
         cfg.roles = {role: load_role(role) for role in ROLES}
+        if cfg.dataset == "pupa":
+            # PUPA's 3-call pipeline needs a 4th, FIXED role: the untrusted
+            # external model that answers the redacted request. Never
+            # optimized, never the same model as solver/judge/optimizer --
+            # resolved only for this dataset so no other run needs an
+            # EXTERNAL_* block in .env.
+            cfg.roles["external"] = load_role("external")
     return cfg

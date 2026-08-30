@@ -34,6 +34,13 @@ def standard_metrics(dataset: str, result: EvalResult) -> dict:
     if dataset == "legalbench_hearsay":
         out["macro_f1"] = macro_f1([r.pred for r in result.rows],
                                    [r.gold for r in result.rows])
+    if dataset == "pupa":
+        # The real, reportable metric -- `accuracy` here is only a boolean
+        # threshold proxy (see evaluator.PUPA_PASS_THRESHOLD) kept so
+        # reflect_fdpo's existing recovered/regressed bookkeeping works
+        # unmodified; mean_score is the actual (quality + (1-leakage))/2
+        # composite, directly comparable to GEPA's reported PUPA numbers.
+        out["mean_score"] = result.mean_score
     return out
 
 

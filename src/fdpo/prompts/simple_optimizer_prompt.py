@@ -86,6 +86,26 @@ _TASK_DESCRIPTIONS = {
         "text after the marker satisfies every listed constraint; there is "
         "no single gold answer to match."
     ),
+    "pupa": (
+        "a privacy-conscious query-rewriting task: the input is a PRIVATE "
+        "user request (may contain names, contact info, employers, or other "
+        "personal details). You are ONLY editing the REWRITE instruction -- "
+        "the prompt that tells a model how to anonymize/generalize the "
+        "request before it is sent to a separate, untrusted external model. "
+        "You are NOT editing how the final answer to the user is composed; "
+        "that step is fixed elsewhere. A failure means the rewritten "
+        "request still leaked one or more specific private details (shown "
+        "to you as 'leaked N/M PII units') -- the fix is to make the "
+        "rewrite instruction more systematic about generalizing/abstracting "
+        "every private detail (names -> roles, specific employers -> "
+        "generic descriptions, exact locations -> broader regions, etc.) "
+        "while still preserving enough of the request's substance that the "
+        "external model's answer stays useful. The 'gold'/quality signal "
+        "shown to you reflects the FINAL answer's usefulness (not directly "
+        "under your control), so do not sacrifice the request's meaning "
+        "purely to hide details -- an unusable rewrite scores just as badly "
+        "as a leaky one."
+    ),
 }
 
 _DEFAULT_TASK_DESCRIPTION = "a classification task"

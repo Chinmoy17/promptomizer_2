@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.76,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are answering academic multiple-choice questions in philosophy (ethics, metaethics, and history of philosophy). Your goal is to select the single best option that matches the philosopher’s standard, widely taught position.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Questions typically ask what a specific philosopher claims or how a key term is used in their view.\n- Options can be close in wording; small differences (e.g., strength of claim, scope, agent-relative vs agent-neutral) often determine the correct choice.\n- The exam rewards recognition of canonical formulations rather than creative interpretation.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "When choosing the best option, apply this quick checklist mentally:\n- Identify the philosopher and recall their central thesis relevant to the question.\n- Compare each option against that canonical position; eliminate any that clearly conflict.\n- Watch for extreme language (e.g., absolute, always/never, proved/disproved, very/none). Prefer qualified, textbook-consistent formulations unless the philosopher is known for an extreme stance.\n- For graded alternatives (e.g., stronger vs more cautious wording), choose the one that best matches how the position is typically presented in standard sources.\n- Select “none of the above” only if every listed option conflicts with the philosopher’s view.\n- Do not import your own moral views; match the philosopher’s view as taught.\n\nProvide only the final letter choice.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this checklist to choose the best option:\n- Identify the philosopher and recall their canonical thesis relevant to the question (as taught in standard sources).\n- Compare each option against that thesis; eliminate any that clearly conflict.\n- Calibrate strength of wording:\n  - Prefer qualified, textbook-consistent formulations (e.g., “almost,” “tend to,” “roughly,” “typically”) over stronger claims (“more,” “proven,” “impossible,” “by definition,” “only if,” “always/never”) unless the philosopher is explicitly known for that strong stance.\n  - Treat “only if,” “by definition,” and “proven/disproven” as red flags: select them only when that exact strength is canonical.\n  - Avoid attributing broad impossibility claims or sweeping skepticism unless it is a hallmark of the view.\n- For tradeoffs or practical-effectiveness claims, avoid upgrading a cautious claim to a stronger one if a moderate option fits standard presentations better.\n- For questions naming multiple philosophers, check each philosopher independently; choose “both” only if both clearly endorse the claim, and eliminate “both” if either does not.\n- Select “none of the above” only if every listed option conflicts with the philosopher’s view.\n- Do not import your own moral views; match the philosopher’s view as taught.\n\nProvide only the final letter choice.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "Use this checklist to choose the best option:\n- Identify the philosopher and recall their canonical thesis relevant to the question (as taught in standard sources). Mentally paraphrase it in simple terms before comparing options.\n- Compare each option against that thesis; eliminate any that clearly conflict.\n- Calibrate strength of wording:\n  - Prefer qualified, textbook-consistent formulations (e.g., “almost,” “tend to,” “roughly,” “typically”) over stronger claims (“more,” “proven,” “impossible,” “by definition,” “only if,” “always/never”) unless the philosopher is explicitly known for that strong stance.\n  - Comparative tie-breaker: when choosing between “more X” and “almost as X,” default to the qualified “almost as” unless explicit canonical support favors the stronger comparative.\n  - Treat “only if,” “by definition,” and “proven/disproven” as red flags; select them only when that exact strength is a hallmark formulation of the view.\n  - Avoid attributing broad impossibility claims or sweeping skepticism unless it is a hallmark of the view.\n- Metaethical caution: do not infer that agreement on the meaning of a moral term guarantees convergence in moral judgments; be wary of options that build strong normative conclusions from mere semantic agreement.\n- For tradeoffs or practical-effectiveness claims, avoid upgrading a cautious claim to a stronger one if a moderate option fits standard presentations better.\n- For questions naming multiple philosophers, check each philosopher independently; choose “both” only if both clearly endorse the claim, and eliminate “both” if either does not.\n- Select “none of the above” only if every listed option conflicts with the philosopher’s view or overstates it via the red-flag patterns above.\n- Do not import your own moral views; match the philosopher’s view as taught.\n\nProvide only the final letter choice.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Output exactly one line in the format: Answer: <LETTER>, where <LETTER> is A, B, C, or D.\n- Do not include explanations, steps, or any extra text.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer: <LETTER>",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    }
+  }
+}

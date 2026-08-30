@@ -277,6 +277,49 @@ def fetch_aime() -> tuple[list[Example], list[Example]]:
     return train, test
 
 
+def fetch_pupa() -> tuple[list[Example], list[Example]]:
+    """Columbia-NLP/PUPA (PAPILLON paper): privacy-conscious delegation data.
+    Two upstream configs, each a single unsplit "train" rows-bag (no official
+    train/test division, like IFEval/IFBench above) -- PUPA-TNB (237 rows,
+    from the Trust No Bot annotations) and PUPA-New (664 rows, from WildChat).
+    All 901 rows go to `test`; --split-mode stratified/balanced re-pools and
+    re-carves train/test at experiment time.
+
+    This is data-only in the sense that no HF network access happens outside
+    this fetch step; the evaluator/optimizer pipeline for PUPA lives in
+    fdpo.data.pupa_pipeline (see reflect_loop.py's judge/external threading).
+    PUPA's task is a two-hop pipeline (redact query -> query an untrusted
+    external model -> synthesize final response), scored by a CONTINUOUS
+    composite (quality judge + mechanical PII-leakage fraction) -- not a
+    boolean pass/fail like IFEval/IFBench, and not a single
+    extracted-answer-vs-gold match. `gold` is deliberately "N/A": it is
+    unused by design, not a stand-in for a pass/fail verdict."""
+    def _str_or_empty(v) -> str:
+        # Some rows have no PII units / no redacted_query recorded upstream;
+        # pandas reads that as NaN (a float), not "" -- .split()/.lower() on
+        # a NaN crashes downstream in pupa_pipeline.compute_leakage().
+        return "" if pd.isna(v) else str(v)
+
+    test: list[Example] = []
+    for config in ("pupa_new", "pupa_tnb"):
+        df = _read_parquet_split("Columbia-NLP/PUPA", "train", config=config)
+        for i, row in df.iterrows():
+            test.append(Example(
+                id=f"pupa_{config}_{i}",
+                question=_str_or_empty(row["user_query"]),
+                gold="N/A",
+                reference=_str_or_empty(row["target_response"]),
+                meta={
+                    "subset": config,
+                    "conversation_hash": _str_or_empty(row["conversation_hash"]),
+                    "predicted_category": _str_or_empty(row["predicted_category"]),
+                    "pii_units": _str_or_empty(row["pii_units"]),
+                    "redacted_query": _str_or_empty(row["redacted_query"]),
+                },
+            ))
+    return [], test
+
+
 FETCHERS = {
     "gsm8k": fetch_gsm8k,
     "arc": fetch_arc,
@@ -286,4 +329,5 @@ FETCHERS = {
     "ifeval": fetch_ifeval,
     "ifbench": fetch_ifbench,
     "aime": fetch_aime,
+    "pupa": fetch_pupa,
 }

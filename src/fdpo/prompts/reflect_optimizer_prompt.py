@@ -29,6 +29,26 @@ from fdpo.data.loaders import Example
 from fdpo.prompts.simple_optimizer_prompt import (_DEFAULT_TASK_DESCRIPTION,
                                                   _TASK_DESCRIPTIONS)
 
+# Cap on the solver's raw completion text shown per item. Uncapped, a
+# long-completion dataset (e.g. AIME, where GPT-4.1 writes ~2,800 completion
+# tokens of working per item) times an uncapped failure count can put >100K
+# tokens of solver reasoning into a single optimizer request -- enough to
+# exceed the deployment's per-minute token quota outright (a sustained 429
+# that retries can't fix, since the request is the same size every time). A
+# no-op for every short-completion dataset (hearsay/MMLU/contract_nli/gsm8k)
+# and safe for ifeval/ifbench, whose real diagnostic signal is the separate
+# constraint-violation `gold`/detail field, not this raw text.
+_MAX_OUTPUT_CHARS = 400
+
+
+def _truncate_output(text: str, max_chars: int = _MAX_OUTPUT_CHARS) -> str:
+    """Keep only the tail of a long solver completion (where the final
+    answer line lives), dropping the bulk of any scratch work before it."""
+    text = text.strip()
+    if len(text) <= max_chars:
+        return text
+    return "...[earlier reasoning truncated]... " + text[-max_chars:]
+
 _REFLECT_OPTIMIZER_SYSTEM_TEMPLATE = """You are working with an expert prompt
 engineer to help a smaller LLM (the "solver") solve {task_description} more
 reliably.
@@ -178,7 +198,7 @@ def _render_item_list(items: list[dict], heading: str, empty_note: str,
         lines.append(f"[{i}]")
         lines.append(f"Question: {item['question']}")
         if show_output:
-            lines.append(f"Model's new wrong answer: {item['output']}")
+            lines.append(f"Model's new wrong answer: {_truncate_output(item['output'])}")
         lines.append(f"Correct answer: {item['gold']}")
     return lines
 
@@ -283,7 +303,7 @@ def build_reflect_optimizer_messages(
         fail_blocks.append(
             f"[Failure {i}]\n"
             f"Question: {f['question']}\n"
-            f"Model's wrong answer: {f['output']}\n"
+            f"Model's wrong answer: {_truncate_output(f['output'])}\n"
             f"Correct answer: {f['gold']}"
         )
 
