@@ -1,0 +1,289 @@
+{
+  "run_id": "pupa_reflect_fdpo_claude-haiku-4-5-20251001_s0_20260830-163820",
+  "status": "completed",
+  "method": "reflect_fdpo",
+  "dataset": "pupa",
+  "solver_model": "claude-haiku-4-5-20251001",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.75,
+    "n_examples": 40,
+    "n_evaluated": 40,
+    "n_blocked": 0,
+    "extraction_failures": 0,
+    "mean_score": 0.8049285714285714
+  },
+  "final_test": {
+    "accuracy": 0.825,
+    "n_examples": 40,
+    "n_evaluated": 40,
+    "n_blocked": 0,
+    "extraction_failures": 0,
+    "mean_score": 0.8428035714285714
+  },
+  "optimization": {
+    "mode": "reflect",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 1,
+    "skip_above_acc": 0.0,
+    "skipped_high_baseline": false,
+    "simple_max_rounds": 3,
+    "accept_margin": 1.0,
+    "shipped_structured": true,
+    "selection": "best_of_rounds",
+    "shipped_round": 1,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.5,
+      "n_mining": 30,
+      "n_validation": 30
+    },
+    "baseline_val_acc": 0.5333333333333333,
+    "best_structured_val_acc": 0.7666666666666667,
+    "n_failures_triggering": 6,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed",
+        "n_failures_before": 6,
+        "n_failures_after": 5,
+        "train_acc_after": 0.8333333333333334,
+        "val_acc_after": 0.7666666666666667,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "pupa_pupa_new_201",
+          "pupa_pupa_new_350",
+          "pupa_pupa_new_594",
+          "pupa_pupa_new_631",
+          "pupa_pupa_new_661",
+          "pupa_pupa_tnb_151"
+        ],
+        "failing_ids_after": [
+          "pupa_pupa_new_350",
+          "pupa_pupa_new_457",
+          "pupa_pupa_new_54",
+          "pupa_pupa_new_631",
+          "pupa_pupa_tnb_214"
+        ],
+        "recovered_this_round": [
+          "pupa_pupa_new_201",
+          "pupa_pupa_new_594",
+          "pupa_pupa_new_661",
+          "pupa_pupa_tnb_151"
+        ],
+        "regressed_this_round": [
+          "pupa_pupa_new_457",
+          "pupa_pupa_new_54",
+          "pupa_pupa_tnb_214"
+        ],
+        "val_recovered_this_round": 8,
+        "val_regressed_this_round": 1,
+        "reflection_shown": false
+      },
+      {
+        "round": 2,
+        "status": "committed",
+        "n_failures_before": 5,
+        "n_failures_after": 9,
+        "train_acc_after": 0.7,
+        "val_acc_after": 0.5,
+        "sections_changed": [
+          "constraints",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "pupa_pupa_new_350",
+          "pupa_pupa_new_457",
+          "pupa_pupa_new_54",
+          "pupa_pupa_new_631",
+          "pupa_pupa_tnb_214"
+        ],
+        "failing_ids_after": [
+          "pupa_pupa_new_229",
+          "pupa_pupa_new_263",
+          "pupa_pupa_new_493",
+          "pupa_pupa_new_50",
+          "pupa_pupa_new_54",
+          "pupa_pupa_new_554",
+          "pupa_pupa_new_594",
+          "pupa_pupa_new_631",
+          "pupa_pupa_tnb_17"
+        ],
+        "recovered_this_round": [
+          "pupa_pupa_new_350",
+          "pupa_pupa_new_457",
+          "pupa_pupa_tnb_214"
+        ],
+        "regressed_this_round": [
+          "pupa_pupa_new_229",
+          "pupa_pupa_new_263",
+          "pupa_pupa_new_493",
+          "pupa_pupa_new_50",
+          "pupa_pupa_new_554",
+          "pupa_pupa_new_594",
+          "pupa_pupa_tnb_17"
+        ],
+        "val_recovered_this_round": 1,
+        "val_regressed_this_round": 9,
+        "reflection_shown": true
+      },
+      {
+        "round": 3,
+        "status": "committed",
+        "n_failures_before": 9,
+        "n_failures_after": 5,
+        "train_acc_after": 0.8333333333333334,
+        "val_acc_after": 0.6,
+        "sections_changed": [
+          "constraints",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "pupa_pupa_new_229",
+          "pupa_pupa_new_263",
+          "pupa_pupa_new_493",
+          "pupa_pupa_new_50",
+          "pupa_pupa_new_54",
+          "pupa_pupa_new_554",
+          "pupa_pupa_new_594",
+          "pupa_pupa_new_631",
+          "pupa_pupa_tnb_17"
+        ],
+        "failing_ids_after": [
+          "pupa_pupa_new_1",
+          "pupa_pupa_new_229",
+          "pupa_pupa_new_350",
+          "pupa_pupa_new_605",
+          "pupa_pupa_new_631"
+        ],
+        "recovered_this_round": [
+          "pupa_pupa_new_263",
+          "pupa_pupa_new_493",
+          "pupa_pupa_new_50",
+          "pupa_pupa_new_54",
+          "pupa_pupa_new_554",
+          "pupa_pupa_new_594",
+          "pupa_pupa_tnb_17"
+        ],
+        "regressed_this_round": [
+          "pupa_pupa_new_1",
+          "pupa_pupa_new_350",
+          "pupa_pupa_new_605"
+        ],
+        "val_recovered_this_round": 5,
+        "val_regressed_this_round": 2,
+        "reflection_shown": true
+      }
+    ],
+    "baseline_failing_ids": [
+      "pupa_pupa_new_201",
+      "pupa_pupa_new_350",
+      "pupa_pupa_new_594",
+      "pupa_pupa_new_631",
+      "pupa_pupa_new_661",
+      "pupa_pupa_tnb_151"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.8,
+      "n_correct": 24,
+      "n_wrong": 6
+    },
+    "current_train": {
+      "accuracy": 0.8333333333333334,
+      "n_correct": 25,
+      "n_wrong": 5
+    },
+    "train_confusion": {
+      "recoveries": [
+        "pupa_pupa_new_201",
+        "pupa_pupa_new_594",
+        "pupa_pupa_new_661",
+        "pupa_pupa_tnb_151"
+      ],
+      "regressions": [
+        "pupa_pupa_new_457",
+        "pupa_pupa_new_54",
+        "pupa_pupa_tnb_214"
+      ],
+      "still_wrong": [
+        "pupa_pupa_new_350",
+        "pupa_pupa_new_631"
+      ],
+      "still_right_count": 21,
+      "net_gain": 1
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 7,
+      "rejects": 0
+    },
+    "rounds_run": 3,
+    "train_acc_per_round": [
+      0.8333333333333334,
+      0.7,
+      0.8333333333333334
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "pupa_pupa_new_336",
+        "pupa_pupa_new_552",
+        "pupa_pupa_tnb_4"
+      ],
+      "regressions": [],
+      "still_wrong": [
+        "pupa_pupa_new_108",
+        "pupa_pupa_new_117",
+        "pupa_pupa_new_209",
+        "pupa_pupa_new_542",
+        "pupa_pupa_new_69",
+        "pupa_pupa_tnb_141",
+        "pupa_pupa_tnb_178"
+      ],
+      "still_right_count": 30,
+      "net_gain": 3
+    },
+    "markdown_source": "prompts\\pupa.md"
+  },
+  "content_filter": null,
+  "wall_clock_s": 2085.3,
+  "cost": {
+    "total_calls": 1283,
+    "total_cost_usd": 4.595318,
+    "by_role": {
+      "solver": {
+        "calls": 640,
+        "prompt_tokens": 694708,
+        "completion_tokens": 211752,
+        "cost_usd": 0.0
+      },
+      "external": {
+        "calls": 320,
+        "prompt_tokens": 60861,
+        "completion_tokens": 128009,
+        "cost_usd": 1.145794
+      },
+      "judge": {
+        "calls": 320,
+        "prompt_tokens": 362006,
+        "completion_tokens": 274169,
+        "cost_usd": 3.194197
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 78077,
+        "completion_tokens": 15773,
+        "cost_usd": 0.255326
+      }
+    }
+  }
+}

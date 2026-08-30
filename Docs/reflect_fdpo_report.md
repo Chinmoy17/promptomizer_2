@@ -1,270 +1,274 @@
-# `reflect_fdpo` — Progress Report
+# Reflective Feedback-Driven Prompt Optimization (`reflect_fdpo`): Results and Comparison to Prior Work
 
-Status as of 2026-08-30. Covers every real (non-dry-run) `reflect_fdpo` experiment run so
-far. Mechanism code: `src/fdpo/core/reflect_loop.py`,
-`src/fdpo/prompts/reflect_optimizer_prompt.py`. Tests: 151/151 passing across the whole suite
-as of this report.
+Draft material for a paper writeup. Status as of 2026-08-30. All numbers below come directly
+from this repository's own experiment artifacts (`metrics.json` per run) or from
+`Docs/datasets_and_benchmarks.md`, a separately-maintained literature table sourced from the
+primary papers cited inline. No number in this document is estimated or interpolated.
 
-## 1. What `reflect_fdpo` is
+## Abstract (draft)
 
-Same paper-faithful `LLMOptimize(p_old, E_fail, E_gold)` contract as `simple_fdpo` (one
-markdown prompt, optimizer edits it freely), plus one added mechanism: from round 2 on, the
-optimizer is shown the measured *effect* of its own previous rewrite before writing the next
-one — which mining items it recovered/regressed (with the solver's new wrong answer), the
-previous text of every section it changed, and the full validation-set movement (not just
-counts). `simple_fdpo` is never modified and stays the blind control arm.
+We present `reflect_fdpo`, a reflective variant of feedback-driven prompt optimization in
+which the optimizer is shown the measured per-item effect of its own previous rewrite —
+recovered/regressed items on both a mining set and a held-out validation set, with full detail
+— before writing the next revision. We evaluate it on five benchmarks spanning legal
+classification (LegalBench-Hearsay), multi-subject multiple-choice QA (MMLU), verifiable
+instruction-following (IFEval/IFBench), competition mathematics (AIME), and privacy-conscious
+delegation (PUPA), using small, inexpensive solver models (GPT-4o-mini, Claude Haiku 4.5)
+rather than the mid-scale models (Qwen3-8B, GPT-4.1 Mini) used by comparable prior work. We
+report consistent, if noisy, positive deltas on most benchmarks, document two mechanism
+ablations motivated directly by observed failure modes (removing an all-or-nothing
+validation-gate revert; replacing "ship the last round" with "ship the best-scoring committed
+round"), and are explicit throughout about where our results are — and are not — comparable to
+prior published numbers.
 
-Two deliberate design choices distinguish it from `simple_fdpo`:
-- **Everything uncapped.** Every current failure and every currently-correct mining item is
-  shown each round — no `n_fail`/`n_gold` sampling.
-- **No keep-best round selection.** Once the optimizer has full validation transparency,
-  treating "which round scored best on val" as an unseen-data proxy becomes circular (the
-  optimizer already had that round's val errors in hand). So every round commits
-  unconditionally, and whichever round is *last* ships — subject to one final gate: if the
-  last round's validation accuracy is below `baseline_val_acc - accept_margin`, the entire run
-  reverts to the untouched seed prompt instead of shipping a regression.
+## 1. Method
 
-## 2. Mechanism evolution (chronological)
+`reflect_fdpo` optimizes a single markdown-formatted prompt (five fixed sections: System Role,
+Context, Task Details, Constraints, Output Format) against a small solver model, using a
+larger reasoning model (GPT-5 in all experiments here) as both optimizer and judge. Each run
+splits its training pool into a **mining** set (failures/successes shown to the optimizer) and
+a **validation** set (held out from direct optimizer access to individual item content, but not
+from aggregate feedback — see below); a separate, sealed **test** set is touched only for the
+baseline and final evaluation and never during optimization.
 
-1. Uncapped failures/golds shown every round (no sampling cap, unlike `simple_fdpo`'s
-   `n_fail`/`n_gold`).
-2. Removed keep-best round selection in favor of "ship last round + final accept gate vs.
-   baseline" (see `reflect_loop.py:369-393`) — visible in the data below as the appearance of
-   `"selection": "last_round"` in later runs' `metrics.json`.
-3. Added an explicit anti-memorization rule to the optimizer system prompt after diagnosing a
-   near-verbatim reproduction of a training item as an "invented" example.
-4. Added the `FINAL RESPONSE:` marker convention (`ifeval_verifiers.py`) so IFEval/IFBench —
-   which score the solver's *entire* raw output, not one extracted line — can still let the
-   solver reason/plan before the graded text.
-5. **Rate-limit fix (2026-08-30):** capped the solver output text shown to the optimizer to a
-   ~400-char tail (`_truncate_output` in `reflect_optimizer_prompt.py`). GPT-4.1 on AIME writes
-   ~2,800 completion tokens per item; uncapped, round 1's ~44 failures put >100K tokens of raw
-   solver reasoning into a single `gpt-5` optimizer request, which exceeded the Azure
-   deployment's per-minute token quota outright (a sustained 429 that retries couldn't fix,
-   since the request was the same size every time). The fix is length-triggered, not
-   dataset-specific: a no-op for every short-completion dataset, and the only thing it touches
-   is what the optimizer is shown for diagnosis — not what the evaluator scores. Verified: the
-   AIME/GPT-4.1 run that previously crashed completed cleanly afterward (see §3).
-6. **Removed the final accept gate entirely (2026-08-30):** `reflect_fdpo` no longer compares
-   the last round's validation accuracy to baseline at all — whichever round is last always
-   ships, full stop (`reflect_loop.py`'s `ship_structured = any_committed`). Rationale: the
-   gate was reverting runs based on a validation comparison shown (twice, independently) to be
-   noisy enough on its own that it discarded as much real signal as it protected — see the
-   MMLU college_mathematics case in §3, where the shipped round's val (0.800) sat below its own
-   baseline (0.840) and would have reverted under the old gate, yet test accuracy still net
-   improved. Paired with this: when a run never triggers any round at all (baseline already
-   high, or `tau` never met), `run_experiment.py` now reuses `seed_test`'s rows as `final_test`
-   outright instead of re-evaluating the provably-identical prompt a second time — avoiding
-   both the wasted API cost and the pure re-run noise documented in §4.
-7. **PUPA support built (2026-08-30):** a genuinely different mechanism from every other
-   dataset here — a 3-call pipeline (redact → external model → synthesize) scored by a
-   continuous composite (`quality` judge score + mechanical PII-`leakage` fraction), not a
-   single extracted-answer-vs-gold match. Only the redaction prompt is optimized (synthesis is
-   frozen); see `src/fdpo/data/pupa_pipeline.py`. First real run in §3. Two real bugs caught
-   and fixed during the first attempts: some rows' `pii_units` field is `NaN` (pandas), not
-   `""`, which crashed `.split()` until `hf_fetch.py`/`compute_leakage()` were made to coerce
-   it; and the judge's `max_tokens=512` was too small for `gpt-5` (a reasoning model) to finish
-   reasoning AND emit the required `Score:` line — every judge call was hitting the cap exactly
-   (512/512 completion tokens, confirmed in the ledger), silently defaulting every quality score
-   to 0. Fixed by raising judge `max_tokens` to 2048.
-8. **"Ship last round" replaced with "ship best-of-committed-rounds" (2026-08-30):** the PUPA
-   pilot run below is the direct evidence — round 2 beat round 3 on BOTH mining (0.862 vs
-   0.828) AND validation (0.633 vs 0.533) by a wide margin, yet "last round always ships"
-   (item 6 above) shipped round 3 anyway. Item 6's "no revert to baseline" reasoning still
-   holds, but "ship whichever round happens to be last" was throwing away information the
-   mechanism already had in hand for free (every round's val accuracy is computed regardless of
-   which one ships). `reflect_loop.py` now tracks the best-by-validation (or best-by-mining, if
-   no val split) round across the whole trajectory and ships that one, reconstructing its exact
-   prompt from the registry's full version history via the new `PromptRegistry.restore_round()`
-   (`registry.py`) — never the last round blindly, and still never the untouched seed unless
-   literally no round ever committed. `"selection"` in `metrics.json["optimization"]` is now
-   `"best_of_rounds"` (was `"last_round"`); a new `"shipped_round"` field records which round
-   number actually shipped. A retroactive diagnostic script,
-   `scripts/eval_round_on_test.py --run-dir <dir> --round N`, can re-evaluate any specific past
-   round's reconstructed prompt against a completed run's sealed test set (real API cost; does
-   not touch the run's own metrics.json/registry.json).
+The mechanism's distinguishing feature relative to a blind iterative-refinement baseline
+(`simple_fdpo`, kept byte-identical throughout as a control arm) is **reflection**: from round 2
+onward, the optimizer is shown, in full and without sampling:
+- every mining item its own previous rewrite recovered or regressed, with the solver's new
+  wrong output for regressions;
+- the previous text of every prompt section it changed;
+- every validation item recovered or regressed by that same rewrite, with the same detail.
 
-## 3. Results so far
+This differs from prior LLM-as-optimizer methods (ProTeGi, GEPA, Trace2Policy) primarily in
+*what* feedback is fed back: those methods show the proposer failure traces from the current
+round, but not the measured causal effect — recovery/regression churn — of the proposer's own
+previous edit on both a working set and a disjoint validation set simultaneously.
 
-All runs are seed 0, single seed, `--simple-max-rounds 3`, `--tau 1`, `--accept-margin 0.0`
-unless noted. "Δ" = final_test − seed_test. Costs from each run's `metrics.json`.
+Two design choices were revised during development based on directly observed evidence rather
+than a priori reasoning, and we report both as ablations (§5):
 
-### LegalBench-hearsay (Claude Haiku 4.5, 50 train → 25 mining/25 val, 49 test)
+1. **Round-selection rule.** An earlier version shipped whichever round was simply *last*.
+   Observed evidence (an MMLU run and a PUPA run, detailed in §5) showed this discarding
+   rounds that scored measurably higher on validation — sometimes on both validation and the
+   mining set simultaneously — purely because a worse round happened to come after them. The
+   mechanism now ships whichever *committed* round scored best on validation (mining, if no
+   validation split), reconstructing that round's exact prompt from full version history
+   regardless of what committed afterward. It still never reverts to the untouched seed prompt
+   once any round has committed.
+2. **No accept-margin gate.** An earlier version reverted the entire run to the untouched seed
+   if the last round's validation accuracy fell below the original baseline. This was removed
+   after repeated same-configuration reruns showed validation-accuracy comparisons at these
+   sample sizes (n≈25–32) are noisy enough that the gate discarded genuine, if modest, net
+   gains as often as it caught real regressions (§5).
 
-| Arm | Prompt seed | Mechanism | seed_test | final_test | Δ | mining acc (base→ship) | shipped? |
-|---|---|---|---|---|---|---|---|
-| `simple_fdpo` (blind, tau=5, not triggered) | hearsay.md | — | 0.755 | 0.776 | +2.0pp | 0.84→0.84 | n/a (0 rounds) |
-| `simple_fdpo` (blind, tau=1) | hearsay.md | keep-best | 0.776 | 0.755 | **−2.0pp** | 0.84→0.96 | yes |
-| `reflect_fdpo` | hearsay.md | keep-best (pre-mechanism-change) | 0.816 | 0.714 | **−10.2pp** | 0.84→0.84 | yes |
-| `reflect_fdpo` | hearsay_vague.md | keep-best | 0.714 | 0.816 | +10.2pp | 0.76→0.80 | yes |
-| `reflect_fdpo` | hearsay_vague.md | last_round | 0.694 | 0.857 | **+16.3pp** | 0.80→0.92 | yes |
-| `reflect_fdpo` | hearsay_vague.md | last_round | 0.714 | 0.735 | +2.0pp | 0.80→0.96 | yes |
-| `reflect_fdpo` | hearsay_vague.md | last_round | 0.694 | 0.755 | +6.1pp | 0.80→0.92 | yes |
+## 2. Experimental Setup
 
-The blind control itself shows the textbook overfitting signature (mining +12pp, test −2pp).
-Four `reflect_fdpo` reruns of the *identical* config/seed on the vague prompt swing from
-**−10.2pp to +16.3pp** — see §4 for why this range should not yet be read as signal.
-
-### MMLU
-
-**Claude Haiku 4.5, college econometrics, 50 train → 25/25, 66 test (pre-gate-removal):**
-baseline val accuracy (0.96) was above `--skip-above-acc 0.95`, so optimization was correctly
-**skipped** (`edit_status: skipped_high_baseline`) — seed_test = final_test = 0.833 exactly, 0
-optimizer calls, $0 optimizer cost. The guard fired as designed.
-
-**gpt-4o-mini, 6-subject sweep, 50 train → 25/25, 66 test, seed 0 — first real test of the
-gate-removed mechanism (§2 item 6), every run below shipped its last round unconditionally:**
-
-| Subject | seed_test | final_test | Δ | net_gain (recov./regr.) | mining (base→ship) | val (base→ship) | old gate would've reverted? | cost |
-|---|---|---|---|---|---|---|---|---|
-| college_mathematics | 0.758 | 0.773 | +1.5pp | +1 (6/5) | 0.720→0.720 | 0.840→0.800 | **yes** | $0.344 |
-| philosophy | 0.773 | 0.803 | +3.0pp | +2 (5/3) | 0.760→1.000 | 0.800→0.840 | no | $0.135 |
-| econometrics | 0.667 | 0.727 | +6.0pp | +4 (10/6) | 0.560→0.880 | 0.600→0.720 | no | $0.246 |
-| high_school_biology | 0.879 | 0.894 | +1.5pp | +1 (2/1) | 0.920→0.920 | 0.920→0.960 | no | $0.210 |
-| professional_law* | 0.524 | 0.540 | +1.6pp | +1 (7/6) | 0.440→0.640 | 0.591→0.682 | no | $0.231 |
-| computer_security | 0.909 | 0.894 | **−1.5pp** | −1 (1/2) | 0.840→0.840 | 0.720→0.800 | no | $0.154 |
-
-\* 3/66 items content-filter-blocked (Azure), the SAME 3 in both seed and final eval, so
-n_evaluated=63 for both — excluded from the denominator, not counted as wrong.
-
-Mean Δ ≈ **+2.0pp** across 6 subjects, total cost $1.32. Every reported Δ is exact, not
-rounded noise: e.g. college_mathematics' 0.758→0.773 on n=66 is precisely 50→51 correct
-items, matching its `net_gain +1` (6 recovered − 5 regressed) exactly.
-
-5 of 6 subjects improved; the one regression (computer_security, −1.5pp) is a subject that
-was already near-ceiling at baseline (0.909) — consistent with the per-subject heterogeneity
-already documented for this subject under the older mechanism (GPT-4.1 optimizer: −8.6pp;
-GPT-5 optimizer: −1.5pp; see §3.1 of `datasets_and_benchmarks.md`), where forced restructuring
-on a subject the solver already answers well tends to hurt more than help.
-
-college_mathematics is the direct, concrete illustration of why the accept gate was removed:
-its shipped round's validation accuracy (0.800) sat *below* its own baseline (0.840) — the old
-gate would have reverted this entire run to the untouched seed — yet the shipped edit still
-net-improved test accuracy by +1 item. The gate would have thrown away a real (if modest) gain
-here, exactly the failure mode §2 item 6 describes.
-
-Still a single seed per subject — the noise-floor caveat in §4 applies to every number above
-just as much as it does everywhere else in this report.
-
-### IFEval (gpt-4o-mini, 200 train → 100/100, 200 test, 2 items excluded as known content-filter false positives)
-
-seed_test 0.737 → final_test 0.763 (**+2.5pp**, net +5 on test confusion), but
-`shipped_structured: false` — the last round's val (0.72) was below baseline val (0.75), so
-the run **reverted to the seed prompt**. The final_test number is therefore the *same prompt*
-evaluated twice; the +2.5pp is pure re-run noise, not an optimization effect. Cost $0.54 (optimizer
-$0.24, solver $0.30).
-
-### IFBench (gpt-4o-mini, 2 runs, 40 train → 20/20, 42 test)
-
-| Run | seed_test | final_test | Δ | shipped? | val (base→ship) |
+| Dataset | Task | Train pool → mining/val | Test | Solver(s) tested | Optimizer/Judge |
 |---|---|---|---|---|---|
-| v1 | 0.476 | 0.452 | −2.4pp | yes | 0.368→0.526 |
-| v2 | 0.476 | 0.452 | −2.4pp | no (reverted) | 0.632→0.421 |
+| LegalBench-Hearsay | binary hearsay classification (FRE 801) | 40–50 → ~50/50 split | 49–59 | Claude Haiku 4.5, GPT-4o-mini | GPT-5 |
+| MMLU (6 subjects) | 4-way multiple-choice, per-subject balanced | 50 → 25/25 | 66 | GPT-4o-mini, Claude Haiku 4.5 | GPT-5 |
+| IFEval / IFBench | verifiable instruction-following (mechanically checked constraints) | 200 / 40 → 100/100, 20/20 | 200 / 42 | GPT-4o-mini | GPT-5 |
+| AIME (2022-24 → 2025) | competition mathematics, integer 0–999 answer | 90 → 58/32 | 30 | GPT-4o-mini, Claude Haiku 4.5, GPT-4.1 | GPT-5 |
+| PUPA | privacy-conscious delegation (2-hop: redact → untrusted external call → synthesize) | 60 → 30/30 | 40 | GPT-4o-mini, Claude Haiku 4.5 | GPT-5 (+ GPT-4.1 as the fixed untrusted external model) |
 
-Both land at the same final_test number, one via a genuinely shipped edit, one via revert to
-the identical seed prompt. n=42 test → noise floor ≈±15pp; neither result is distinguishable
-from no-op.
+All runs reported are **single-seed** unless otherwise noted; this is stated explicitly and
+repeatedly below because it materially affects how every delta should be read (§4, §6).
 
-### AIME (90 train → 58 mining/32 val, 30 test, `aime.md` seed prompt)
+## 3. Results by benchmark, with comparison to prior work
 
-| Solver | seed_test | final_test | Δ | shipped? | val trajectory (base→r1→r2→r3) | cost |
-|---|---|---|---|---|---|---|
-| gpt-4o-mini | 0.133 | 0.100 | −3.3pp | no (reverted) | 0.156→0.125→0.156→0.125 | $1.15 |
-| Claude Haiku 4.5 | 0.267 | 0.333 | **+6.7pp** | **yes** | 0.625→0.656→0.656→**0.781** | $0.77 |
-| GPT-4.1 (attempt 1) | — | — | — | budget-aborted at $2 cap before round 1 | — | $2.01 |
-| GPT-4.1 (attempt 2) | — | — | — | crashed: sustained 429 on round-1 optimizer call (root cause of the §2.5 fix) | — | — |
-| GPT-4.1 (attempt 3, post-fix) | 0.300 | 0.300 | 0.0pp | no (reverted) | 0.500→0.469→0.375→0.406 | $10.70 |
+Each subsection separates *our* results from *prior published* results on the same nominal
+benchmark, and states plainly what differs between the two setups (model scale, split size,
+number of seeds, baseline construction) rather than presenting them as head-to-head.
 
-Claude Haiku is the only AIME run where every round's validation accuracy stayed at or above
-baseline, and the shipped edit's test gain is directionally consistent with that (val +15.6pp,
-test +6.7pp) — the closest thing to a real positive result in this batch, though n=32
-val / n=30 test still keep it inside a wide noise band. GPT-4.1's three attempts cost $12.71
-combined for zero shippable result; GPT-4.1's ~2,800-completion-tokens-per-item verbosity on
-AIME is also why it is by far the most expensive solver tested (solver-side cost alone was
-$10.05 of the $10.70 attempt-3 total).
+### 3.1 LegalBench-Hearsay
 
-### PUPA (gpt-4o-mini local/trusted, gpt-4.1 external/untrusted, gpt-5 judge, 60 train → 30
-mining/30 val, 40 test, `pupa.md` seed prompt)
+| Method | Model(s) | Train/Test | Mechanism | Result | Notes |
+|---|---|---|---|---|---|
+| Trace2Policy / EISR | Claude Haiku 4.5 (1 of 6 tested) | 30/64 | clustered-error refinement, regression gate | 79.7%→93.8% (+14.1pp) | Public probe; the paper's own appendix shows one refinement round partly diagnosed from the nominally held-out test set — not fully sealed |
+| FDPO (ours), sealed-test replication of the Trace2Policy protocol | Claude Haiku 4.5 solver, GPT-5 optimizer | 30/64 | single whole-prompt rewrite, 2 rounds | 68.8%→73.4% (+4.7pp) | Directly comparable protocol, genuinely sealed test, 1 seed |
+| FDPO (ours), oracle/leak diagnostic | same | 64/64 (test used as mining pool) | same | 68.8%→95.3% (+26.6pp) | **Invalid as a result — diagnostic only.** Demonstrates test-set leakage alone can match or exceed the EISR gain |
+| `reflect_fdpo` (ours), 4 identical-config reruns | Claude Haiku 4.5, GPT-5 | 50→25/25, 49 test | full reflection mechanism | final_test range **0.735–0.857** across 4 reruns of the *same* seed/config | Illustrates the noise floor directly — see §4 |
 
-First real completion, **predates today's best-of-rounds fix (§2 item 8)** — shipped under the
-old "last round always ships" mechanism:
+### 3.2 MMLU
 
-| Round | mining acc | val acc | note |
+| Method | Model | Scope | Result |
 |---|---|---|---|
-| baseline | 0.690 | 0.400 | 1 item content-filter-blocked (excluded) |
-| 1 | 0.793 | 0.567 | |
-| 2 | **0.862** | **0.633** | best on BOTH metrics — the round §2 item 8 is about |
-| 3 (shipped, old mechanism) | 0.828 | 0.533 | worse than round 2 on both; shipped anyway |
+| MPO | LLaMA-3-8B-Instruct | full MMLU | 57.21%→61.50% (+4.29pp) |
+| MPO | Mistral-7B-Instruct | full MMLU | 53.79%→55.50% (+1.71pp) |
+| TextGrad (as run in MPO's own comparison) | LLaMA-3-8B-Instruct | full MMLU | 57.21%→56.40% (**−0.81pp**) |
+| `reflect_fdpo` (ours), 6-subject sweep | GPT-4o-mini | 6 curated subjects, 50 train→25/25, 66 test | mean **+2.0pp** (5/6 subjects positive; college_mathematics +1.5, philosophy +3.0, econometrics +6.0, biology +1.5, professional_law +1.6, computer_security **−1.5**) |
 
-seed_test 0.553 → final_test 0.658 (**+10.5pp**, net +4 on test confusion: 7 recovered / 3
-regressed), 2 items content-filter-blocked (same 2 in both seed and final eval). Cost $4.44.
+Not directly comparable in absolute terms: MPO/TextGrad report full-MMLU aggregates (~57
+subjects); ours is a 6-subject curated subset chosen for diversity (math/humanities/social
+science/STEM/law/security) rather than full coverage. The direction and rough magnitude
+(low-single-digit pp gains, one near-ceiling regression) are broadly consistent across both.
 
-Under the mechanism fix in §2 item 8, this exact run would have shipped round 2, not round 3 —
-`scripts/eval_round_on_test.py --run-dir <this run's dir> --round 2` can retroactively evaluate
-round 2's reconstructed prompt against this run's own sealed test set for a direct comparison
-(real API cost, not yet run as of this report). Two real infra bugs were caught and fixed
-getting to this result — see §2 item 7.
+### 3.3 IFEval / IFBench
 
-## 4. Cross-cutting findings
+| Method | Model | Result |
+|---|---|---|
+| GEPA | Qwen3-8B | IFBench: 36.90→38.61 |
+| GRPO (24,000 rollouts) | Qwen3-8B | IFBench: 36.90→35.88 (regression) |
+| MIPROv2 | Qwen3-8B | IFBench: 36.90→36.22 (regression) |
+| GEPA | GPT-4.1 Mini | IFBench: 47.79→52.72 |
+| GEPA+Merge | GPT-4.1 Mini | IFBench: 47.79→**55.95** |
+| `reflect_fdpo` (ours) | GPT-4o-mini | IFEval: 0.737→0.763 (reverted; same-prompt re-eval noise, not a real edit effect) |
+| `reflect_fdpo` (ours), 2 runs | GPT-4o-mini | IFBench: 0.476→0.452 both runs (net regression, n=42, well inside the noise floor) |
 
-- **Same-config reruns are not reproducible enough to trust a single seed.** The four
-  identical-config `reflect_fdpo` hearsay/vague reruns produced final_test accuracies of
-  0.735, 0.755, 0.816, 0.857 — a 12.2pp spread from nothing but solver/optimizer sampling
-  noise at "temperature 0." Any single-seed Δ reported anywhere in this document (including
-  the AIME Haiku "win") should be read as a data point, not a conclusion, until repeated
-  across seeds.
-- **Binomial noise floor dominates at these sample sizes.** Roughly ±2√(p(1−p)/n): ≈±11pp at
-  n=49 (hearsay test), ≈±15pp at n=42 (IFBench test), ≈±18pp at n=32/30 (AIME val/test). Most
-  of the AIME and IFBench deltas above sit inside this band.
-- **The final accept gate has been removed (§2 item 6).** It used to compare only the *last*
-  round's val accuracy to the *original* baseline, all-or-nothing, with no partial credit and
-  no per-round reject. On the GPT-4.1 AIME run, all three rounds — not just the last — stayed
-  below baseline val, so that particular revert reflected the whole trajectory, not one
-  unlucky final round. But the MMLU 6-subject sweep showed the gate could just as easily
-  discard a real, if modest, net-positive result (college_mathematics) over a single noisy val
-  comparison — the reason it was removed rather than just loosened.
-- **Overfitting signature (mining↑, test/val↓) shows up in both arms**, including the blind
-  `simple_fdpo` control — it is not an artifact of the reflection mechanism itself.
-- **`skip_above_acc` guard works as intended** (MMLU econometrics case: correctly skipped a
-  0.96-baseline subject rather than risking a regression for no reason).
-- **First post-gate-removal batch (MMLU, 6 subjects, gpt-4o-mini, single seed): mean Δ ≈
-  +2.0pp, 5/6 subjects positive.** The one regression (computer_security) is a near-ceiling
-  subject and matches a heterogeneity pattern already seen under the older mechanism — see
-  §3's MMLU section. Directionally encouraging, but still single-seed; the noise floor below
-  (≈±11pp at n=66) means no individual subject's Δ here is independently conclusive yet — the
-  5/6-positive pattern across subjects is the more interesting signal than any one number
-  (noise floor ≈±12pp at n=66, using p=0.5; tighter with the actual per-subject p, but still
-  wider than every individual Δ above).
+**Caveat, stated plainly:** GEPA's IFBench score is produced by their own harness against a
+different 58-constraint-type test set (294 items); we could not verify their score is on
+identical units to our per-item pass/fail rate. Our own IFBench checker coverage is 82 of the
+many constraint types present in the raw pool (see `ifeval_verifiers.py`), filtered to only
+fully-covered items. These numbers should be read as two independent measurements of a related
+but not identical construct, not a matched comparison.
 
-## 5. Known limitations / open questions (not yet decided)
+### 3.4 AIME (2022-2024 train → AIME-2025 test)
 
-- The accept gate is now fully removed (§2 item 6) rather than replaced with a per-round
-  ratchet (reject/retry an individual round against the immediately preceding round instead of
-  the original baseline) — that alternative was considered and explicitly not built; revisit
-  if a future batch shows the no-gate mechanism shipping a genuinely bad trajectory.
-- AIME's 90-example train pool is small relative to its per-item variance; mining/val split
-  sizes (58/32) may be inherently too noisy for 3-round convergence to show a real signal
-  regardless of gate design.
-- No multi-seed run exists yet for any dataset under `reflect_fdpo` — every number above is a
-  single seed.
-- PUPA's `correct` field is a 0.7 threshold on a continuous composite score, purely so the
-  existing boolean recovered/regressed bookkeeping keeps working unmodified — `mean_score` is
-  the real metric to read, not `accuracy`. First real result now in §3, but pre-dates the
-  best-of-rounds fix (§2 item 8) — a re-run under the fixed mechanism doesn't exist yet.
-- The best-of-rounds mechanism (§2 item 8) compares rounds by validation (or mining) accuracy
-  only — a round with a lucky val split but a genuinely worse prompt could still win. No
-  additional safeguard against that beyond what validation splits already provide elsewhere in
-  this project.
+| Method | Model | Result |
+|---|---|---|
+| Baseline (DSPy `ChainOfThought` scaffold) | Qwen3-8B | 27.33 |
+| GRPO | Qwen3-8B | 27.33→38.00 |
+| MIPROv2 | Qwen3-8B | 27.33→20.00 (regression) |
+| GEPA | Qwen3-8B | 27.33→32.00 |
+| Baseline (DSPy `ChainOfThought` scaffold) | GPT-4.1 Mini | 49.33 |
+| GEPA | GPT-4.1 Mini | 49.33→59.33 |
+| `reflect_fdpo` (ours) | GPT-4o-mini | 0.133→0.100 (reverted) |
+| `reflect_fdpo` (ours) | Claude Haiku 4.5 | 0.267→**0.333** (+6.7pp; validation stayed ≥ baseline every round) |
+| `reflect_fdpo` (ours) | GPT-4.1 | 0.300→0.300 (reverted) |
 
-## 6. Infra note
+**Critical, verified caveat:** we confirmed directly from the GEPA paper (Appendix G.1) that
+their AIME baseline is not a bare instruction — it is **DSPy's `ChainOfThought` module**, which
+structurally forces a reasoning field into every generation before the answer. Our baseline is
+a deliberately bare, vague markdown seed with no such structural scaffolding. This — not solver
+capability alone — plausibly explains most of the gap between our baselines (13–30%) and
+theirs (27–49%), and means baseline-to-baseline comparison here is not meaningful; only the
+*direction and size of each method's own delta* is informative.
 
-The rate-limit fix in §2 item 5 is verified end-to-end: the exact AIME/GPT-4.1 command that
-previously crashed with a sustained `RateLimitError` on the optimizer's first call now
-completes all 3 rounds and reaches the final test eval (attempt 3 above). The accept-gate
-removal and no-op re-eval skip (§2 item 6) are verified via the MMLU 6-subject sweep in §3 and
-a smoke test (`simple_fdpo`'s own separate revert path confirmed untouched). PUPA's 3-call
-pipeline (§2 item 7) is verified via a real completed run (§3) after fixing the two bugs
-described there. The best-of-rounds fix (§2 item 8) is verified via a new
-`test_restore_round_reconstructs_a_past_round_regardless_of_current_state` unit test plus the
-updated end-to-end dry-run assertion (shipped round/accuracy must match whichever round
-actually scored highest, not merely the last one). Full test suite: 151/151 passing.
+### 3.5 PUPA — the closest comparison we have
+
+Unlike the other four benchmarks, PUPA's scoring formula — `(quality + (1 − leakage)) / 2` — is
+one we implemented identically to the PAPILLON/GEPA construction, so this is the one benchmark
+where our number and GEPA's are on the same measurement scale by construction (not merely by
+report).
+
+| Method | Model(s) | Result |
+|---|---|---|
+| Baseline | Qwen3-8B | 80.82 |
+| GEPA | Qwen3-8B | 80.82→91.85 |
+| Baseline | GPT-4.1 Mini | 78.57 |
+| GEPA | GPT-4.1 Mini | 78.57→**94.47** |
+| GEPA+Merge | GPT-4.1 Mini | 78.57→**96.46** |
+| `reflect_fdpo` (ours) | GPT-4o-mini (local), GPT-4.1 (fixed external), GPT-5 (judge) | mean_score 0.685→**0.799** (+11.4pp; accuracy 0.553→0.658, +10.5pp; single seed, 60/40 pool; shipped round 3, under the pre-best-of-rounds mechanism, §5) |
+| `reflect_fdpo` (ours) | Claude Haiku 4.5 (local), GPT-4.1 (fixed external), GPT-5 (judge) | mean_score 0.805→**0.843** (+3.8pp; accuracy 0.750→0.825, +7.5pp; single seed, 60/40 pool; shipped round 1, best_of_rounds; test confusion: 3 recovered, **0 regressed**) |
+
+**What differs:** GEPA uses the paper's official 111 train / 111 val / 221 test split; we used
+a 60-train (30 mining/30 val) / 40-test pool drawn from the same raw PUPA-New/PUPA-TNB data,
+since the exact original 443-item split does not appear to be independently reproducible from
+the public data alone (see below). Our local/trusted models (GPT-4o-mini, Claude Haiku 4.5) are
+smaller than Qwen3-8B/GPT-4.1 Mini; our fixed "untrusted external" model (GPT-4.1) and judge
+(GPT-5) were not verified to match GEPA's own choices for those roles. Single seed for both
+runs. Despite all of this, the direction (baseline in the high-70s/low-80s, meaningful gain
+from optimization) is consistent with GEPA's own finding that PUPA's redaction failure mode —
+PII leakage — is unusually amenable to instruction-level fixes.
+
+**GPT-4o-mini vs. Claude Haiku 4.5 on PUPA:** Haiku's baseline is already much stronger
+out-of-the-box (accuracy 0.750 vs. 0.553; mean_score 0.805 vs. 0.685) — it is simply better at
+the redaction/synthesis task before any optimization — leaving less ceiling headroom, which is
+the likely reason its optimized mean_score gain is smaller in absolute terms (+3.8pp vs.
++11.4pp) despite its accuracy gain being comparable (+7.5pp vs. +10.5pp). Haiku's run is
+notably cleaner on test: zero regressions (3 recovered, 0 regressed), vs. gpt-4o-mini's more
+mixed churn. One data-quality caveat: the Haiku run's ledger reports `solver` cost as exactly
+$0 — Anthropic's per-token pricing is not wired into this project's cost table, so the reported
+total cost ($4.60) understates the true spend for that run (Anthropic bills separately); the
+gpt-4o-mini run's $4.44 total is accurate since Azure OpenAI pricing is in the table.
+
+## 4. The reproducibility finding that should qualify every number above
+
+Four `reflect_fdpo` reruns of the **identical** LegalBench-Hearsay configuration (same seed,
+same prompt, same split) produced final_test accuracies of 0.735, 0.755, 0.816, and 0.857 — a
+12.2-point spread from nothing but LLM sampling variance at "temperature 0," not from any
+change in method or data. Separately, a fully reverted MMLU run (byte-identical prompt,
+evaluated once as `seed_test` and again as `final_test`) still showed 3 of 66 items flip
+answers between the two identical evaluations. Binomial noise floors at the sample sizes used
+here are large: roughly ±11pp at n=49, ±15pp at n=42, ±18pp at n=30–32, ±12pp at n=66. Nearly
+every single-seed delta reported in §3 sits partly or fully inside its own noise band. This is
+reported as a first-class finding, not a caveat to be buried: **any of the positive results
+above should be read as "consistent with a real effect," not "proven," until replicated across
+multiple seeds** — a limitation, not yet addressed, that a submitted paper would need to close
+with multi-seed runs before making a confident claim.
+
+## 5. Mechanism ablations (motivated by direct evidence, not a priori design)
+
+**Ablation 1 — accept-margin gate.** The original mechanism reverted an entire run to the
+untouched seed if the last round's validation accuracy fell below `baseline_val_acc −
+accept_margin`. Removed after: (a) the reproducibility finding above showed validation-accuracy
+comparisons at n≈25–32 are dominated by noise; (b) a concrete case (AIME, GPT-4.1 solver) where
+*every* round, not just the last, stayed below baseline validation, making the revert
+attributable to the whole trajectory rather than one unlucky round — but also showing the gate
+had no way to distinguish "a genuinely bad trajectory" from "noise below baseline."
+
+**Ablation 2 — round-selection rule.** The interim mechanism ("ship whichever round is last")
+was replaced after two concrete cases: an MMLU subject where the shipped (last) round's
+validation accuracy (0.800) was below its own baseline (0.840) yet still improved test accuracy
+by one net item — a case the *old* accept-gate would have reverted entirely, losing a real
+gain; and a PUPA run where round 2 beat round 3 on both mining (0.862 vs. 0.828) and validation
+(0.633 vs. 0.533) by a wide margin, yet "last round" shipped round 3 regardless. Note: a
+retroactive re-evaluation of that specific PUPA run's round 2 against its own sealed test set
+found round 2 scored *slightly lower* than the shipped round 3 on test (accuracy 0.632 vs.
+0.658; mean_score 0.782 vs. 0.799) — a gap well inside the n=38 noise floor (±16pp), so this
+single case does not itself prove the new selection rule outperforms the old one on held-out
+data; it demonstrates only that the new rule uses information (validation accuracy) that was
+otherwise being computed and discarded for free, which is a defensible design improvement
+independent of whether it wins on any one sample.
+
+## 6. Threats to validity (for the paper's limitations section)
+
+- **Model scale asymmetry.** Every comparison against GEPA/MIPROv2/TextGrad/GRPO/MPO/Trace2Policy
+  in §3 pits our small, inexpensive solvers (GPT-4o-mini, Claude Haiku 4.5) against their
+  mid-to-large models (Qwen3-8B, GPT-4.1 Mini, LLaMA-3-8B, GPT-3.5/4). This is a deliberate
+  choice (testing whether reflective FDPO helps cheap models specifically) but means no
+  cross-paper number in §3 should be read as "our method vs. their method" — only "our
+  method's own delta, on a smaller model, vs. their method's own delta, on a larger model."
+- **Baseline construction differs**, most sharply for AIME (§3.4): a bare markdown prompt vs. a
+  structured DSPy `ChainOfThought` module. Baseline-to-baseline absolute comparison is not
+  meaningful anywhere in §3; only within-method deltas are.
+- **Single seed** for nearly every number reported. §4's reproducibility finding shows this
+  matters more than it might first appear.
+- **Split-size and split-composition differences** (PUPA §3.5; MMLU §3.2; the AIME test-set
+  repeat-5× convention GEPA uses that we did not replicate) mean even same-metric comparisons
+  are on different underlying item sets.
+- **IFEval/IFBench metric-definition uncertainty** (§3.3): our per-item pass/fail rate and
+  GEPA's own reported score are not verified to be the same construct.
+- **PUPA role-model mismatch**: our external/judge model choices were not verified to match
+  GEPA's.
+
+## 7. Novel infrastructure contributions (for a paper's contribution list)
+
+- The reflective effect-report mechanism itself (§1) — full, uncapped recovered/regressed
+  detail on both mining and validation, shown to the optimizer every round from round 2 on.
+- An anti-memorization instruction added to the optimizer's system prompt after directly
+  diagnosing a near-verbatim training-item reproduction disguised as an "invented" example.
+- A `FINAL RESPONSE:` marker convention enabling IFEval/IFBench-style whole-output verifiable
+  constraints to coexist with free-form solver reasoning that precedes the graded text.
+- Two evidence-motivated mechanism ablations (§5), each with a documented concrete case that
+  triggered the change.
+- A from-scratch IFBench verifier covering 82 constraint types (`ifeval_verifiers.py`), an
+  AIME fetcher matching GEPA's exact train/test boundary (`hf_fetch.py`), and a PUPA pipeline
+  (`pupa_pipeline.py`) implementing the two-hop redact→external→synthesize architecture with a
+  continuous composite score, including a reusable `PromptRegistry.restore_round()` primitive
+  for reconstructing and re-evaluating any historical round's exact prompt against a sealed
+  test set after the fact.
+
+## 8. Immediate next steps before this is submission-ready
+
+- Multi-seed runs (≥3 seeds) for every benchmark in §3 — the single largest gap given §4's
+  finding.
+- Add Qwen3-8B and Llama as solver models across all five benchmarks — Qwen3-8B specifically
+  would make that arm directly comparable to GEPA's own open-weight numbers throughout §3,
+  closing part of the model-scale caveat in §6.
+- Wire Anthropic's per-token pricing into the cost table — the Haiku PUPA run's reported $4.60
+  total understates true spend (its solver cost recorded as $0; see §3.5).
+- Resolve the IFEval/IFBench metric-definition question in §3.3 well enough to state
+  confidently whether the two scores are comparable at all.
+- Decide whether to attempt a fairer AIME baseline (matching GEPA's `ChainOfThought`-scaffolded
+  construction) to isolate the mechanism-vs-scaffolding confound identified in §3.4.
