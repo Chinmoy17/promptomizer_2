@@ -56,8 +56,7 @@ search (EvoPrompt, PromptBreeder), to structured multi-stage and modular pipelin
 SAMMO, Modular Prompt Optimization), and most recently to reflective, "LLM-as-optimizer"
 approaches that treat the model's own critique of its failures as the search signal (GEPA,
 Trace2Policy). Across this entire progression, almost every method is still evaluated the same
-way: a single before/after aggregate accuracy delta per benchmark, sometimes averaged over a
-small number of seeds. This paper argues that this shared evaluation practice obscures something
+way: a single before/after aggregate accuracy delta per benchmark. This paper argues that this shared evaluation practice obscures something
 that matters for anyone trying to use or build on these methods: the aggregate delta cannot
 distinguish an edit that fixed several failures while breaking none from one that fixed the same
 failures while silently breaking others, and it does not verify that gains measured on the data
@@ -65,7 +64,7 @@ used to guide editing transfer to genuinely unseen examples.
 
 Much as a human prompt engineer reviewing an edit would first check what it broke and what it
 fixed before making another change, we argue the optimizer itself should be shown this same
-per-item outcome, round over round, rather than only a final score. We build **Promptomizer**, a
+per-item outcome (except for held-out test set), round over round, rather than only a final score. We build **Promptomizer**, a
 framework for both optimizing and evaluating prompts, around a mechanism we call **Reflective
 FDPO** (Feedback-Driven Prompt Optimization): every round, it computes exactly which examples
 were recovered and which were newly broken relative to the previous round — on both the
