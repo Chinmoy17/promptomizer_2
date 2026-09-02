@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.5,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a competition mathematician.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a competition mathematician who solves AIME-style problems with rigorous, step-by-step reasoning and verification.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.5,
+            "acc_new": 0.4482758620689655,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 29,
+            "recovered_failures": 3,
+            "broke": 6
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You will be given a competition-style math problem whose answer is always\nan integer between 0 and 999.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Solve the problem.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Solve the problem carefully and efficiently by following this process:\n1) Understand and Record\n- Restate given data and unknowns in your own words.\n- Introduce variables and write down all equations/constraints/relationships.\n- Note domain restrictions (integers, positives, orderings like a<b<c, parity, ranges, triangle inequality, base-digit bounds, etc.).\n\n2) Classify and Plan\n- Briefly classify the problem (algebra, number theory, geometry, combinatorics/probability, or mixed).\n- Choose fitting tools and a plan. Use standard toolboxes:\n  - Algebra: substitution, factoring, symmetric sums, Vieta’s formulas, inequalities, recurrences, telescoping, AM-GM/Cauchy/Jensen (as appropriate), bounding.\n  - Number Theory: gcd/relatively prime, modular arithmetic (orders, residues), divisibility, CRT, orders of elements, lifting the exponent, periodicity, base representations, fractions in lowest terms (gcd with denominator), totients.\n  - Geometry: similar triangles, angle chasing, cyclic quadrilaterals, Power of a Point, Ptolemy, homothety, coordinates/vectors/complex plane, Law of Cosines/Sines, right-triangle altitudes, area formulas, trapezoid midline, properties of tangents.\n  - Combinatorics: constructive counting, casework with symmetry, complementary counting, inclusion–exclusion, stars and bars, recurrences, graph/Euler characteristic, invariants/monovariants, lattice paths.\n- If multiple approaches exist, pick the cleanest; note any symmetries to reduce cases.\n\n3) Execute Step by Step\n- Carry out the plan with clear, justified steps.\n- Maintain algebraic accuracy; simplify expressions cleanly.\n- In casework, cover all cases and avoid overlaps; prune impossible ones early using constraints.\n- For equations, track and later test for extraneous solutions.\n\n4) Verification and Sanity Checks (critical)\n- Domain checks: positivity, integrality, order (e.g., a<b<c), angle/length feasibility, triangle inequalities.\n- Congruence/parity checks where divisibility is involved; verify periodicity cycles or residues if used.\n- Plug candidate solutions back into original key equations/conditions; discard extraneous ones.\n- Bound checks: ensure magnitudes are reasonable (e.g., base digits in range, lengths consistent, counts nonnegative).\n- Uniqueness: if uniqueness is implied, confirm no other solutions fit.\n- Units/structures: e.g., areas nonnegative; circle/triangle relations consistent.\n\n5) Conclude\n- State the final integer answer clearly.\n- Ensure it is between 0 and 999 inclusive.\n\nHelpful reminders for common themes:\n- Repeating decimals: 0.\\overline{k} = k/(10^t−1); reduce via gcd with denominator.\n- Base representations: two-digit base-b is xb+y with digits in [0,b−1], leading digit ≥1.\n- Totient sums: ∑_{d|n} φ(d)=n; orders modulo primes divide p−1.\n- Grid/toroidal paths: use modular coordinates; count cycles/periods carefully.\n- Polygon/line intersections: count via combinations and adjust for multiplicity; Euler’s formula for planar graphs.\n- Tangent/power: from an external point, tangents are equal; Power of a Point ties chords/secants/tangents.\n- Similar triangles ratios propagate areas by square of scale; midlines equal average of bases in trapezoids.\n\nWrite all intermediate reasoning before the final answer line.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.5,
+            "acc_new": 0.4482758620689655,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 29,
+            "recovered_failures": 3,
+            "broke": 6
+          }
+        },
+        {
+          "version": 2,
+          "text": "Solve the problem carefully and efficiently by following this process:\n1) Understand and Record\n- Restate given data and unknowns in your own words.\n- Introduce variables and write down all equations/constraints/relationships.\n- Note domain restrictions (integers, positives, orderings like a<b<c, parity, ranges, triangle inequality, base-digit bounds, etc.).\n\n2) Classify and Plan\n- Briefly classify the problem (algebra, number theory, geometry, combinatorics/probability, or mixed).\n- Choose fitting tools and a plan. Use standard toolboxes:\n  - Algebra: substitution, factoring, symmetric sums, Vieta’s formulas, inequalities, recurrences, telescoping, AM-GM/Cauchy/Jensen (as appropriate), bounding.\n  - Number Theory: gcd/relatively prime, modular arithmetic (orders, residues), divisibility, CRT, orders of elements, lifting the exponent, periodicity, base representations, fractions in lowest terms (gcd with denominator), totients.\n  - Geometry: similar triangles, angle chasing, cyclic quadrilaterals, Power of a Point, Ptolemy, homothety, coordinates/vectors/complex plane, Law of Cosines/Sines, right-triangle altitudes, area formulas, trapezoid midline, properties of tangents, angle bisectors (internal/external), symmedians.\n  - Combinatorics: constructive counting, casework with symmetry, complementary counting, inclusion–exclusion, stars and bars, recurrences, graph/Euler characteristic, invariants/monovariants, lattice paths.\n- Method discipline:\n  - Prefer invariant/theorem-based geometry (Power of a Point, similar triangles, cyclicity, angle bisectors) before jumping to coordinates; use coordinates only when they simplify.\n  - For modular/floor-sum problems, structure computations by residue classes and fractional parts explicitly.\n  - For counting, control double counting; if using inclusion–exclusion, name sets and write the terms.\n\n3) Execute Step by Step\n- Carry out the plan with clear, justified steps.\n- Maintain algebraic accuracy; simplify expressions cleanly.\n- In casework, cover all cases and avoid overlaps; prune impossible ones early using constraints.\n- For equations, track and later test for extraneous solutions.\n\n4) Verification and Sanity Checks (critical, do not skip)\n- Plug-back check: Substitute your candidate(s) into the original defining conditions/equations (not just derived ones). For geometry, ensure computed lengths/angles satisfy the defining properties (e.g., tangency/power-of-point equalities, triangle inequalities, angle conditions). For number theory, verify modular relations and gcd conditions. For combinatorics, test that the count matches structural constraints.\n- Constraint checks: positivity/integrality, ordering (e.g., a<b<c), digit/base bounds (leading digits, digit ranges 0–b−1), parity/divisibility, triangle inequalities, magnitude bounds (e.g., |z|), and answer range 0–999.\n- Modular/parity sanity: Reduce key identities/mods to detect slips (e.g., reduce both sides mod small primes; confirm parity).\n- Independent cross-check (quick): When feasible, verify by an alternative lens:\n  - Geometry: confirm with a second theorem (e.g., use both Power of a Point and similar triangles; or confirm midline/symmetry implications).\n  - Number theory: confirm via another modulus or order argument; check small residues.\n  - Combinatorics: verify on small n/toy instances that your formula/rule yields the correct counts; or use complementary counting as a check.\n  - Algebra: for symmetric polynomials, confirm Vieta-compliant relations; for roots, check another identity (e.g., sum/product).\n- Edge-case/degeneracy scan: Ensure no accidental inclusion of forbidden cases (e.g., parallel lines assumed non-parallel, zero denominators, repeated roots violating “distinct”).\n- Reasonableness: Units/scale/angle ranges reasonable; for base conversions, reconvert to confirm palindrome/tangent property etc.\n\n5) Conclude\n- State the final integer answer clearly.\n- Ensure it is between 0 and 999 inclusive.\n\nHelpful reminders for common themes:\n- Repeating decimals: 0.\\overline{k} = k/(10^t−1); reduce via gcd with denominator; track residues class-by-class if summing floors.\n- Base representations: a two-digit base-b is xb+y with digits in [0,b−1], leading digit ≥1; reconvert to verify palindromes.\n- Totient/residues: ∑_{d|n} φ(d)=n; orders modulo primes divide p−1; check orders/periodicity in modular exponent problems.\n- Grid/toroidal paths: use modular coordinates; count cycles/periods carefully.\n- Polygon/line intersections: count via combinations and adjust for multiplicity; Euler’s formula for planar graphs.\n- Tangent/power: from an external point, tangents are equal; use Power of a Point ties chords/secants/tangents; angle bisector locus is equidistant from sides.\n- Similar triangles ratios propagate areas and lengths; midlines average bases in trapezoids; symmedian vs median distinctions.\n- Counting with floor/fractional-part sums: write ⌊x⌋ = x − {x}; sum fractional parts by residue classes.\n\nWrite all intermediate reasoning before the final answer line.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.4482758620689655,
+            "acc_new": 0.5172413793103449,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 32,
+            "recovered_failures": 6,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "Solve the problem carefully and efficiently by following this process:\n1) Understand and Record\n- Restate given data and unknowns in your own words.\n- Introduce variables and write down all equations/constraints/relationships.\n- Note domain restrictions (integers, positives, orderings like a<b<c, parity, ranges, triangle inequality, base-digit bounds, etc.).\n\n2) Classify and Plan\n- Briefly classify the problem (algebra, number theory, geometry, combinatorics/probability, or mixed).\n- Choose fitting tools and a plan. Use standard toolboxes:\n  - Algebra: substitution, factoring, symmetric sums, Vieta’s formulas, inequalities, recurrences, telescoping, AM-GM/Cauchy/Jensen (as appropriate), bounding.\n  - Number Theory: gcd/relatively prime, modular arithmetic (orders, residues), divisibility, CRT, orders of elements, lifting the exponent, periodicity, base representations, fractions in lowest terms (gcd with denominator), totients.\n  - Geometry: similar triangles, angle chasing, cyclic quadrilaterals, Power of a Point, Ptolemy, homothety, coordinates/vectors/complex plane, Law of Cosines/Sines, right-triangle altitudes, area formulas, trapezoid midline, properties of tangents, angle bisectors (internal/external), symmedians.\n  - Combinatorics: constructive counting, casework with symmetry, complementary counting, inclusion–exclusion, stars and bars, recurrences, graph/Euler characteristic, invariants/monovariants, lattice paths.\n- Method discipline:\n  - Prefer invariant/theorem-based geometry (Power of a Point, similar triangles, cyclicity, angle bisectors) before jumping to coordinates; use coordinates only when they simplify.\n  - For modular/floor-sum problems, structure computations by residue classes and fractional parts explicitly.\n  - For counting, control double counting; if using inclusion–exclusion, name sets and write the terms.\n\n3) Execute Step by Step\n- Carry out the plan with clear, justified steps.\n- Maintain algebraic accuracy; simplify expressions cleanly.\n- In casework, cover all cases and avoid overlaps; prune impossible ones early using constraints.\n- For equations, track and later test for extraneous solutions.\n\n4) Verification and Sanity Checks (critical, do not skip)\n- Plug-back check: Substitute your candidate(s) into the original defining conditions/equations (not just derived ones). For geometry, ensure computed lengths/angles satisfy the defining properties (e.g., tangency/power-of-point equalities, triangle inequalities, angle conditions). For number theory, verify modular relations and gcd conditions. For combinatorics, test that the count matches structural constraints.\n- Constraint checks: positivity/integrality, ordering (e.g., a<b<c), digit/base bounds (leading digits, digit ranges 0–b−1), parity/divisibility, triangle inequalities, magnitude bounds (e.g., |z|), and answer range 0–999.\n- Modular/parity sanity: Reduce key identities/mods to detect slips (e.g., reduce both sides mod small primes; confirm parity).\n- Independent cross-check (quick): When feasible, verify by an alternative lens:\n  - Geometry: confirm with a second theorem (e.g., use both Power of a Point and similar triangles; or confirm midline/symmetry implications).\n  - Number theory: confirm via another modulus or order argument; check small residues.\n  - Combinatorics: verify on small n/toy instances that your formula/rule yields the correct counts; or use complementary counting as a check.\n  - Algebra: for symmetric polynomials, confirm Vieta-compliant relations; for roots, check another identity (e.g., sum/product).\n- Edge-case/degeneracy scan: Ensure no accidental inclusion of forbidden cases (e.g., parallel lines assumed non-parallel, zero denominators, repeated roots violating “distinct”).\n- Reasonableness: Units/scale/angle ranges reasonable; for base conversions, reconvert to confirm palindrome/tangent property etc.\n- Provided-example replication (mandatory when present): If the problem statement includes a worked small-case or reference value (e.g., “the figure shows 8 regions when m=3, n=2”), your method or derived formula must exactly reproduce that example before applying it to the target parameters. If it does not, revise your counting/graph/Euler setup or derivation until it matches the given example.\n\n5) Conclude\n- State the final integer answer clearly.\n- Ensure it is between 0 and 999 inclusive.\n\nHelpful reminders for common themes:\n- Repeating decimals: 0.\\overline{k} = k/(10^t−1); reduce via gcd with denominator; track residues class-by-class if summing floors.\n- Base representations: a two-digit base-b is xb+y with digits in [0,b−1], leading digit ≥1; reconvert to verify palindromes.\n- Totient/residues: ∑_{d|n} φ(d)=n; orders modulo primes divide p−1; check orders/periodicity in modular exponent problems.\n- Grid/toroidal paths: use modular coordinates; count cycles/periods carefully.\n- Polygon/line intersections: count via combinations and adjust for multiplicity; Euler’s formula for planar graphs.\n- Tangent/power: from an external point, tangents are equal; use Power of a Point ties chords/secants/tangents; angle bisector locus is equidistant from sides.\n- Similar triangles ratios propagate areas and lengths; midlines average bases in trapezoids; symmedian vs median distinctions.\n- Counting with floor/fractional-part sums: write ⌊x⌋ = x − {x}; sum fractional parts by residue classes.\n\nWrite all intermediate reasoning before the final answer line.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.5172413793103448,
+            "acc_new": 0.46551724137931033,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 28,
+            "recovered_failures": 2,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "The final answer must be an integer between 0 and 999.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- The final answer must be a single integer between 0 and 999.\n- Show your derivation with clear steps and checks.\n- Do not assume results without proof or citation of standard facts; derive or justify briefly.\n- If multiple candidates arise, eliminate invalid ones using the given constraints.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.5,
+            "acc_new": 0.4482758620689655,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 29,
+            "recovered_failures": 3,
+            "broke": 6
+          }
+        },
+        {
+          "version": 2,
+          "text": "- The final answer must be a single integer between 0 and 999.\n- Show your derivation with clear steps and checks.\n- Do not assume results without proof or a brief justification by standard facts.\n- If multiple candidates arise, eliminate invalid ones using the given constraints.\n- Do not skip the plug-back and cross-verification step.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.4482758620689655,
+            "acc_new": 0.5172413793103449,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 32,
+            "recovered_failures": 6,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "After your work, write the final numeric answer on its own line in exactly\nthis form: #### <number>",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

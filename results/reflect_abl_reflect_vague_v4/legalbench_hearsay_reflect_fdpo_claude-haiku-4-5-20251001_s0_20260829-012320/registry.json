@@ -1,0 +1,246 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.8,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You answer questions about statements.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a legal analyst. Your job is to decide whether a described item of evidence is hearsay under FRE 801. Write your reasoning step by step, then give a single Yes/No answer.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.72,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "This is a legal task about hearsay.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay is an out-of-court statement (oral, written, or assertive nonverbal conduct) offered to prove the truth of the matter asserted. A “statement” includes human-made writings and reports. In-court testimony by the witness on the stand and items created during testimony are not hearsay.\n\nKey non-hearsay uses: when a statement is offered for something other than its truth (e.g., to show words were spoken, to show a conversation occurred, to show effect on a listener such as notice/knowledge, or as circumstantial evidence of the declarant’s attitude/bias/emotional state), it is not hearsay.\n\nCautions:\n- If the purpose relies on the content being true (including proving that the declarant actually knew, intended, or perceived what they asserted), treat it as offered for its truth.\n- Written analyses/reports/diagnoses by people are statements; if offered to establish what they assert, that is hearsay.\n- Layered statements (A says B said X; or “I heard X”) often involve multiple out-of-court assertions. If the use depends on any layer being true, treat it as hearsay.\n- Assertive nonverbal conduct intended to communicate a fact (e.g., a gesture identifying something) is a statement and can be hearsay if offered for its truth.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.72,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "Hearsay is an out-of-court statement (oral, written, or assertive nonverbal conduct) offered to prove the truth of the matter asserted. A “statement” includes human-made writings and reports. In-court testimony by a witness on the stand and items created during testimony are not hearsay.\n\nKey non-hearsay uses (not offered for truth):\n- Effect on listener: offered to show words were said/heard to give notice or knowledge, regardless of whether the content was true.\n- To show that a conversation occurred or that the declarant could speak/was alive/conscious.\n- Circumstantial evidence of the speaker’s attitude, bias, or affiliation (e.g., praise/insult/opinion used to show support or animus), where the truth of the evaluative content is irrelevant.\n- Verbal acts and non-assertive verbal conduct (questions, commands, requests) that do not assert facts.\n- Pure facts/events or status (selections, rankings, occurrences) when not proved through a person’s out-of-court assertion.\n\nCautions:\n- Human-authored writings/analyses/reports/diagnoses are statements; if offered to establish what they assert about the world or the writer’s asserted internal state (e.g., “I intend/know/perceived X”), that use is for truth.\n- Layered statements (A says B said X; or “I heard/was told X”) involve multiple assertions. If the relevance requires any embedded assertion to be true (including the report “I heard/was told”), treat it as hearsay.\n- Assertive nonverbal conduct intended to communicate a fact (e.g., an identifying gesture) is a statement and can be hearsay if offered for its truth.\n- Do not infer an out-of-court declarant when the item is just a fact or event; identify an actual human assertion first.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.72,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 3,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "Hearsay is an out-of-court statement (oral, written, or assertive nonverbal conduct) offered to prove the truth of the matter asserted. A “statement” includes human-made writings and reports. In-court testimony by a witness on the stand and items created during testimony are not hearsay.\n\nKey non-hearsay uses (not offered for truth):\n- Effect on listener: offered to show words were said/heard to give notice or knowledge (including accusations, suspicions, rumors, or diagnoses communicated), regardless of whether the content was true.\n- To show that a conversation occurred or that the declarant could speak/was alive/conscious.\n- Circumstantial evidence of the speaker’s attitude, bias, or affiliation (e.g., praise/insult/opinion used to show support or animus), where the truth of the evaluative content is irrelevant.\n- Circumstantial evidence of familiarity or relationship/knowledge (e.g., a person’s words about someone used to show they know or are familiar with that person), where the descriptive content’s truth is irrelevant.\n- Verbal acts and non-assertive verbal conduct (questions, commands, requests) that do not assert facts.\n- Pure facts/events or status (selections, rankings, occurrences) when not proved through a person’s out-of-court assertion.\n\nCautions:\n- Human-authored writings/analyses/reports/diagnoses are statements; if offered to establish what they assert about the world or the writer’s asserted internal state (e.g., “I intend/know/perceived X”), that use is for truth. But using the occurrence/communication itself (e.g., that a diagnosis or accusation was made) for notice/effect-on-listener or to show attitude/familiarity is not for truth.\n- Layered statements (A says B said X; or “I heard/was told X”) involve multiple assertions. If the relevance requires any embedded assertion to be true (including the report “I heard/was told”), treat it as hearsay.\n- Assertive nonverbal conduct intended to communicate a fact (e.g., an identifying gesture) is a statement and can be hearsay if offered for its truth.\n- Do not infer an out-of-court declarant when the item is just a fact or event; identify an actual human assertion first.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide if the statement is hearsay or not.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Follow this decision procedure and write your reasoning before answering:\n\n1) Identify a statement:\n- Is there an out-of-court assertion by a person (spoken, written, or assertive conduct)? Written emails, messages, reports, and diagnoses are statements. Purely physical evidence or items created in court are not statements.\n\n2) Identify the purpose:\n- Is the statement being offered to prove the truth of what it asserts? This includes proving the declarant actually knew, intended, or perceived as they claimed, or that the reported facts are so.\n- If instead it is offered only to show that words were said (e.g., a conversation occurred), to show effect on a listener (notice/knowledge) without needing the content to be true, or as circumstantial evidence of the declarant’s attitude/bias/emotional state where the truth of the content is irrelevant, then it is not hearsay.\n\n3) Check for layers:\n- If the statement includes “X said that Y said/that X heard …,” and the relevance depends on any embedded assertion being true, treat it as hearsay.\n\n4) Apply the rule:\n- If out-of-court statement + offered for its truth (including proving the declarant’s asserted knowledge/intent/perception) → Answer: Yes.\n- Otherwise (not offered for truth; or no out-of-court assertion) → Answer: No.\n\nKeep your reasoning concise (2–6 sentences), then give the final answer line.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.72,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "Follow this decision procedure and write your reasoning before answering:\n\n1) Identify a statement:\n- Is there an out-of-court assertion by a person (spoken, written, or assertive conduct)? Human-written emails, messages, reports, and diagnoses are statements.\n- In-court testimony and items made during testimony are not hearsay.\n- Questions, commands, and requests are generally non-assertive and not statements.\n- Purely physical evidence, machine-generated data, or bare facts/events (e.g., a ranking/selection) are not statements unless proved via a person’s out-of-court assertion.\n\n2) Identify the purpose:\n- Offered for truth if used to establish the factual content asserted about the world or to prove the declarant’s internal state as asserted within the statement (e.g., “I intend/know/saw X” to prove that intent/knowledge/perception).\n- Not for truth if used only to show words were spoken/heard (effect on listener: notice/knowledge), that a conversation occurred, that the declarant was alive/conscious/able to speak, or as circumstantial evidence of the speaker’s attitude/bias/affiliation where the content’s truth is irrelevant.\n\n3) Check for layers:\n- If the statement includes “X said that Y said …” or “I heard/was told …,” and the relevance depends on any embedded assertion being true (including the report that the communication occurred), treat it as hearsay.\n\n4) Apply the rule:\n- If there is an out-of-court statement and it is offered for its truth (including proving the declarant’s asserted internal state) → Answer: Yes.\n- Otherwise (no out-of-court assertion; or offered only for non-truth purposes like effect on listener, conversation occurred, attitude/bias, or non-assertive verbal conduct) → Answer: No.\n\nKeep your reasoning concise (2–6 sentences), then give the final answer line.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.72,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 3,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "Follow this decision procedure and write your reasoning before answering:\n\n1) Identify a statement:\n- Is there an out-of-court assertion by a person (spoken, written, or assertive conduct)? Human-written emails, messages, reports, and diagnoses are statements.\n- In-court testimony and items made during testimony are not hearsay.\n- Questions, commands, and requests are generally non-assertive and not statements.\n- Purely physical evidence, machine-generated data, or bare facts/events (e.g., a ranking/selection/occurrence) are not statements unless proved via a person’s out-of-court assertion.\n\n2) Identify the purpose:\n- Offered for truth if used to establish the factual content asserted about the world or to prove the declarant’s internal state as asserted within the statement (e.g., “I intend/know/saw X” to prove that intent/knowledge/perception).\n- Not for truth if used only to show words were spoken/heard (effect on listener: notice/knowledge), including accusations/suspicions/diagnoses communicated; to show that a conversation occurred; as circumstantial evidence of the speaker’s attitude/bias/support/animus (truth of evaluative content irrelevant); or to show familiarity/relationship/knowledge of identity (truth of the descriptive content irrelevant).\n\n3) Check for layers:\n- If the statement includes “X said that Y said …” or “I heard/was told …,” and the relevance depends on any embedded assertion being true (including the report that the communication occurred), treat it as hearsay.\n\n4) Apply the rule:\n- If there is an out-of-court statement and it is offered for its truth (including proving the declarant’s asserted internal state) → Answer: Yes.\n- Otherwise (no out-of-court assertion; or offered only for non-truth purposes like effect on listener, conversation occurred, attitude/bias/support, familiarity/relationship, or non-assertive verbal conduct) → Answer: No.\n\nKeep your reasoning concise (2–6 sentences), then give the final answer line.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer Yes or No.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Answer Yes or No, based strictly on the above.\n- Show brief reasoning before the final answer line.\n- Do not discuss exceptions or exclusions; classify based on whether it is an out-of-court assertion offered for its truth.\n- Be cautious with layered statements and written reports/diagnoses: if used to establish what they assert, that is hearsay; if used only to show words were said or someone’s attitude/notice without needing truth, not hearsay.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.72,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Answer Yes or No, based strictly on the above.\n- Show brief reasoning before the final answer line.\n- Do not discuss exceptions or exclusions; classify only on whether it is an out-of-court assertion offered for its truth.\n- Be careful with layered statements and with human-written reports/diagnoses: if used to establish what they assert, that is hearsay; if used only to show words were said, effect on a listener, conversation occurred, or attitude/bias without needing truth, not hearsay.\n- Do not assume an out-of-court declarant when none is identified.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.72,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 3,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "- Answer Yes or No, based strictly on the above.\n- Show brief reasoning before the final answer line.\n- Do not discuss exceptions or exclusions; classify only on whether it is an out-of-court assertion offered for its truth.\n- Be careful with layered statements and with human-written reports/diagnoses: if used to establish what they assert, that is hearsay; if used only to show words were said, effect on a listener (including accusations/suspicions/diagnoses), conversation occurred, attitude/bias/support, or familiarity/relationship without needing truth, not hearsay.\n- Do not assume an out-of-court declarant when none is identified.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

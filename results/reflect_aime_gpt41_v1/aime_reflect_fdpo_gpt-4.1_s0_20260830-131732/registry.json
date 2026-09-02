@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.2413793103448276,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a competition mathematician.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You will be given a competition-style math problem whose answer is always\nan integer between 0 and 999.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Solve the problem.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Solve the problem with clear, step-by-step reasoning before concluding with the final numeric answer. Use a systematic approach:\n- Parse the question carefully. Identify exactly what integer is requested (e.g., m+n, p+q, a remainder, a count).\n- Define variables and translate conditions into equations or inequalities.\n- Choose suitable tools: algebraic manipulation, Vieta’s formulas, modular arithmetic, orders/primitive roots, inclusion–exclusion, stars and bars, Pigeonhole Principle, recurrences, generating functions, symmetry, graph/Euler characteristics, coordinate or vector methods, power of a point, similar triangles, angle chasing, law of cosines/sines, mass points, Ceva/Menelaus, area/length relations, calculus optimization if appropriate for algebraic extrema, etc.\n- When dealing with number theory, track congruences carefully and note cycles/orders; use gcd, lcm, Euler’s totient, CRT as needed.\n- For combinatorics, specify the counting model and justify factors/divisions (symmetry, overcount corrections).\n- For geometry, draw or describe key constructions, name points, and justify each relation used.\n- Simplify expressions fully. If the question asks for something like m+n or p+q or a remainder, compute that exact integer.\n- If multiple candidate values arise, use constraints to eliminate invalid ones (range, parity, modular checks, primality, distinctness, positivity, integrality).\n\nBefore finalizing:\n- Verify the result satisfies all conditions (quick substitution/check).\n- Confirm the final required output is a single integer between 0 and 999.\n- Ensure you are returning exactly what is asked (e.g., m+n, remainder mod N, number of ways).\n\nKeep the reasoning concise but sufficient to avoid leaps.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.24137931034482762,
+            "acc_new": 0.2413793103448276,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 44,
+            "recovered_failures": 4,
+            "broke": 4
+          }
+        },
+        {
+          "version": 2,
+          "text": "Solve the problem with clear, step-by-step reasoning before concluding with the final numeric answer. Use a systematic approach:\n\n- Parse the question carefully. Identify exactly what integer is requested (e.g., m+n, p+q, a remainder, a count).\n- Structure your solution in four phases:\n  1) Interpret: restate the goal, define variables, and note known constraints/ranges.\n  2) Represent: translate into equations, inequalities, or a counting model; draw or describe key geometric relations.\n  3) Compute: carry out algebra/number theory/combinatorics/geometry steps with labeled equations; simplify cleanly.\n  4) Check: verify each key step (dimensional consistency, modular/parity checks, boundary cases) and confirm the result satisfies all conditions.\n\n- Choose suitable tools. Match the problem pattern to the standard method when applicable:\n  - Symmetric products/sums over roots of unity or roots of a polynomial: use factorization via minimal polynomials, Vieta’s formulas, or identities like ∏(x−r_k)=x^n−1.\n  - Intersection counting of lines/objects: count unordered pairs via combinations, then subtract overcounts from multi-way intersections (e.g., k-line point contributes C(k,2) pairs).\n  - Stars and bars, hockey-stick, Vandermonde’s identity for binomial-sum problems; use generating functions only if needed.\n  - Diophantine/modular constraints: reduce via gcd/lcm, use congruences, parity, and bounding; test minimal positive solutions.\n  - Geometry with circles: power of a point, similar triangles, angle bisector and right-angle implications, Pythagorean relations, and coordinate setups as needed; use trapezoid midline and perpendicular facts.\n  - Optimization with symmetric constraints (e.g., xy+yz+zx fixed, xyz fixed): by symmetry expect two variables equal and justify, or use Lagrange multipliers.\n  - Telescoping sums/products or partial fraction patterns: search for factorization that cancels.\n  - Lattice/area problems: shoelace formula; for ratios and simplifications, reduce to lowest terms.\n\n- When dealing with number theory, track congruences and bounds carefully; use gcd, lcm, Euler’s totient, CRT as needed.\n- For combinatorics, specify the counting model and justify factors/divisions (symmetry, overcount corrections).\n- For geometry, define points/lengths/angles clearly, name altitudes/medians/bisectors, and justify relations (similarity, power of a point, cyclicity).\n- Label key equations (e.g., (1), (2)) and solve systematically to avoid algebra slips.\n- Simplify expressions fully. If the question asks for something like m+n or p+q or a remainder, compute that exact integer.\n- If multiple candidate values arise, use constraints (range, parity, modular checks, primality, distinctness, positivity, integrality) to eliminate invalid ones.\n\nBefore finalizing:\n- Verify the result satisfies all conditions (quick substitution/check).\n- Confirm the final required output is a single integer between 0 and 999, in lowest terms where applicable (e.g., for m+n, ensure fraction is reduced before summing).\n- Ensure you are returning exactly what is asked (e.g., m+n, remainder mod N, number of ways).\n\nKeep the reasoning concise but sufficient to avoid leaps.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.24137931034482762,
+            "acc_new": 0.3275862068965517,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 44,
+            "recovered_failures": 8,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "Solve the problem with clear, step-by-step reasoning before concluding with the final numeric answer. Use a systematic approach:\n\n- Parse the question carefully. Identify exactly what integer is requested (e.g., m+n, p+q, a remainder, a count).\n- Structure your solution in four phases:\n  1) Interpret: restate the goal, define variables, and note known constraints/ranges.\n  2) Represent: translate into equations, inequalities, or a counting model; draw or describe key geometric relations.\n  3) Compute: carry out algebra/number theory/combinatorics/geometry steps with labeled equations; simplify cleanly.\n  4) Check: verify each key step (dimensional consistency, modular/parity checks, boundary cases) and confirm the result satisfies all conditions.\n\n- Choose suitable tools. Match the problem pattern to the standard method when applicable:\n  - Symmetric products/sums over roots of unity or roots of a polynomial: use factorization via minimal polynomials, Vieta’s formulas, or identities like ∏(x−r_k)=x^n−1; rewrite products over all roots as evaluations of a polynomial at constants rather than termwise expansion.\n  - Intersection counting of lines/objects: count unordered pairs via combinations, then subtract overcounts from multi-way intersections (a k-line intersection contributes C(k,2) line-pairs).\n  - Stars and bars, hockey-stick, Vandermonde’s identity for binomial-sum problems; use generating functions only if needed.\n  - Diophantine/modular constraints: reduce via gcd/lcm, use congruences, parity, and bounding; test minimal positive solutions; enforce digit ranges 0–9 where applicable.\n  - Geometry with circles: power of a point, similar triangles, angle bisector and right-angle implications, Pythagorean relations, and coordinate setups as needed; use homothety centers and 3-4-5 similarity patterns where appropriate.\n  - Optimization with symmetric constraints (e.g., xy+yz+zx fixed, xyz fixed): by symmetry expect two variables equal and justify, or use Lagrange multipliers.\n  - Telescoping sums/products or partial fraction patterns: search for factorization that cancels.\n  - Lattice/area problems: shoelace formula; for ratios and simplifications, reduce to lowest terms.\n\n- When dealing with number theory, track congruences and bounds carefully; use gcd, lcm, Euler’s totient, CRT as needed.\n- For combinatorics, specify the counting model and justify factors/divisions (symmetry, overcount corrections).\n- For geometry, define points/lengths/angles clearly, name altitudes/medians/bisectors, and justify relations (similarity, power of a point, cyclicity).\n- Label key equations (e.g., (1), (2)) and solve systematically to avoid algebra slips.\n- Simplify expressions fully. If the question asks for something like m+n or p+q or a remainder, compute that exact integer.\n- If multiple candidate values arise, use constraints (range, parity, modular checks, primality, distinctness, positivity, integrality) to eliminate invalid ones.\n\nCritical checks and common pitfalls to avoid:\n- Overcounting: when multiple lines/objects meet at a point, subtract C(k,2) contributions for each k-way intersection from the total C(n,2) pairs to get the number of distinct 2-way intersections.\n- Modular/digit constraints: for “change a digit to 1” or base-conversion problems, write place-value congruences, solve systematically, and enforce 0–9 digit bounds and lexicographic maximization/minimization as required.\n- Symmetry/orientation: in polygon/rectangle counting, classify by direction sets (parallel/perpendicular families), use symmetry, and ensure each configuration is counted once.\n- Roots/products: for products over all roots of unity, convert to polynomial evaluations instead of multiplying term by term.\n- Tangents/homothety: for tangent circles/lines, use external/internal homotheties and right-triangle similarity to find segment lengths cleanly.\n- Bounds and domains: in geometry with parameters (e.g., slopes bounded by asymptotes), derive the allowable range first, then use monotonicity to locate extrema within that range.\n- Exactness: keep work exact (fractions/radicals), reduce fractions to lowest terms before forming m+n or p+q, and avoid premature decimal approximations.\n\nBefore finalizing:\n- Verify the result satisfies all conditions (quick substitution/check).\n- Confirm the final required output is a single integer between 0 and 999, in lowest terms where applicable (e.g., for m+n, ensure fraction is reduced before summing).\n- Ensure you are returning exactly what is asked (e.g., m+n, remainder mod N, number of ways).\n\nKeep the reasoning concise but sufficient to avoid leaps.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.3275862068965517,
+            "acc_new": 0.3103448275862069,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 39,
+            "recovered_failures": 4,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "The final answer must be an integer between 0 and 999.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- The final answer must be a single integer between 0 and 999.\n- Do not output explanations after the final answer line.\n- Do not output multiple different final answers.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.24137931034482762,
+            "acc_new": 0.2413793103448276,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 44,
+            "recovered_failures": 4,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "After your work, write the final numeric answer on its own line in exactly\nthis form: #### <number>",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

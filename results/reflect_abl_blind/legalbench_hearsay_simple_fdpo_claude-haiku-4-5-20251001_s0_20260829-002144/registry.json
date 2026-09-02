@@ -1,0 +1,230 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.84,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 2,
+    "task_details": 2,
+    "constraints": 2,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Under FRE 801:\n- Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.\n- A \"statement\" is an oral or written assertion, or nonverbal conduct intended as an assertion.\n- Out-of-court means not made while testifying at the current trial/hearing.\n- If the statement’s relevance does not depend on its truth (i.e., the jury could use it even if the content were false), it is not hearsay.\n\nKey distinctions:\n- In-court testimony in this trial is not hearsay (it is not \"out-of-court\").\n- Non-assertive words (questions, commands, greetings, offers) and non-assertive conduct are not hearsay.\n- Statements offered to show their effect on a listener (notice, knowledge, motive) are not for truth and thus are not hearsay.\n- BUT using a declarant’s own out-of-court assertion to prove the declarant’s asserted mental state (e.g., “I heard X” to prove the declarant had notice) depends on the truth of the assertion that the declarant heard/knows, and is hearsay.\n- For multiple layers of statements, analyze each layer; if any layer is offered for its truth, the overall is hearsay.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "Under FRE 801:\n- Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.\n- A \"statement\" is an oral or written assertion, or nonverbal conduct intended as an assertion.\n- Out-of-court means not made while testifying at the current trial/hearing.\n- If the statement’s relevance does not depend on its truth (i.e., the jury could use it even if the content were false), it is not hearsay.\n\nKey distinctions:\n- In-court testimony in this trial is not hearsay (it is not \"out-of-court\").\n- Non-assertive words (questions, commands, greetings, offers) and non-assertive conduct are not hearsay. Inferring someone’s intent or knowledge from their non-assertive words or acts does not convert them into hearsay.\n- Statements offered to show their effect on a listener (notice, knowledge, motive) are not for truth and thus are not hearsay. This includes situations where the listener is the party whose awareness is at issue (e.g., being told a diagnosis to show notice of a condition), because the relevance is the fact of exposure, not the truth of the content.\n- Using a speaker’s out-of-court words as circumstantial evidence of the speaker’s attitude, bias, or familiarity (e.g., praise/insults to show support/animus, or specific references to show the speaker knew/recognized a person/thing) is not hearsay because it does not require the truth of the proposition asserted.\n- Narrow trap: If the statement itself asserts the speaker’s own mental state or knowledge (e.g., “I know/heard/was told X,” “I think Y”), and it is offered to prove that the speaker indeed knew/heard/believed, it depends on the truth of that assertion about the speaker’s state and is hearsay.\n- For multiple layers of statements, analyze each layer; if any layer is offered for its truth, the overall is hearsay.\n- Conduct is not hearsay unless it is intended as an assertion.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.96,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "Under FRE 801:\n- Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.\n- A \"statement\" is an oral or written assertion, or nonverbal conduct intended as an assertion.\n- Out-of-court means not made while testifying at the current trial/hearing.\n- If the statement’s relevance does not depend on its truth (i.e., the jury could use it even if the content were false), it is not hearsay.\n\nKey distinctions:\n- In-court testimony in this trial is not hearsay (it is not \"out-of-court\").\n- Non-assertive words (questions, commands, greetings, offers) and non-assertive conduct are not hearsay. Inferring someone’s intent or knowledge from their non-assertive words or acts does not convert them into hearsay.\n- Statements offered to show their effect on a listener (notice, knowledge, motive) are not for truth and thus are not hearsay. This includes situations where the listener is the party whose awareness is at issue (e.g., being told a diagnosis to show notice of a condition), because the relevance is the fact of exposure, not the truth of the content.\n- Using a speaker’s out-of-court words as circumstantial evidence of the speaker’s attitude, bias, or familiarity (e.g., praise/insults to show support/animus, or specific references to show the speaker knew/recognized a person/thing) is not hearsay because it does not require the truth of the proposition asserted.\n- Narrow trap: If the statement itself asserts the speaker’s own mental state or knowledge (e.g., “I know/heard/was told X,” “I think Y”), and it is offered to prove that the speaker indeed knew/heard/believed, it depends on the truth of that assertion about the speaker’s state and is hearsay. Do not re-label this as “effect on listener” when the relevance turns on the truth that the speaker had that knowledge.\n- Reputation/rumor nuance: To show reputational harm, a direct slur or accusation (“Alice is a thief”) can be non-hearsay if offered only to show the words were spoken (harm regardless of truth). But a meta-statement like “I heard bad things about Alice” is offered to prove the truth of the assertion that the speaker actually heard such things (i.e., that rumors existed) and is hearsay.\n- For multiple layers of statements, analyze each layer; if any layer is offered for its truth, the overall is hearsay.\n- Conduct is not hearsay unless it is intended as an assertion.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.96,
+            "acc_new": 0.96,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 1,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Decide whether the given statement is hearsay. Write brief step-by-step reasoning before the final answer. Use this checklist:\n1) Identify the statement and the declarant.\n2) Was it made out of court (i.e., not in current testimony)? If in-court now, not hearsay.\n3) What specific fact is it offered to prove? Be precise about the proponent’s purpose.\n4) Truth-of-matter test: Could the statement serve that purpose even if its content were false?\n   - If yes, it’s not hearsay (e.g., to show effect on listener, that a conversation occurred, that the speaker held a belief/attitude).\n   - If no, it’s hearsay.\n5) Speaker vs. listener purposes:\n   - To show a listener’s notice/knowledge/motive: generally not for truth.\n   - To show the speaker’s own knowledge/notice via the speaker’s assertion (“I know/heard X”): offered for the truth of that assertion about the speaker’s state, thus hearsay.\n6) If nested statements exist, assess each layer for truth-use.\n\nIllustrative examples:\n- Not hearsay: “Stay back!” offered to show warning/notice (effect on listener), even if no danger existed.\n- Not hearsay: “John is awful” offered to show the speaker disliked John (state-of-mind circumstantially), regardless of whether John is actually awful.\n- Not hearsay: “She hit me” offered solely to show the speaker was alive at that time.\n- Hearsay: “It’s raining” offered to prove that it was raining.\n- Hearsay: “I heard there will be a raid” offered to prove the declarant had notice (relies on truth that the declarant in fact heard/knows).",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "Decide whether the given statement is hearsay. Write brief step-by-step reasoning before the final answer. Use this checklist:\n1) Identify the statement (or conduct) and the declarant/actor.\n2) Was it made out of court (i.e., not in current testimony)? If in-court now, not hearsay.\n3) Are the words an assertion? If they are a question/command/offer, or the item is non-assertive conduct, it is not hearsay.\n4) What specific fact is it offered to prove? Be precise about the proponent’s purpose.\n5) Truth-of-matter test: Could the evidence serve that purpose even if its propositional content were false?\n   - If yes, it’s not hearsay (e.g., effect on listener/notice, that a conversation occurred, that the speaker held an attitude/bias, that the speaker was familiar with a person/thing, that the actor behaved diligently).\n   - If no, it’s hearsay.\n6) Speaker vs. listener purposes:\n   - To show a listener’s notice/knowledge/motive: generally not for truth (effect on listener).\n   - To show the speaker’s own attitude/bias/familiarity via their words (without needing the proposition to be true): not hearsay.\n   - To show the speaker’s own knowledge/notice via a statement that asserts that very knowledge (“I heard/know/was told X”): offered for the truth of that assertion about the speaker’s state, thus hearsay.\n7) If nested statements exist, assess each layer for truth-use.\n\nIllustrative examples:\n- Not hearsay: “Back off!” to show a warning was given (effect on listener), even if no danger existed.\n- Not hearsay: “Z is a crook,” offered to show the speaker knew or was familiar with Z (circumstantial familiarity), regardless of whether Z is actually a crook.\n- Not hearsay: “She’s the greatest manager,” offered to show the speaker supported her (attitude), regardless of whether she actually is the greatest.\n- Not hearsay: Customer asks, “Do you sell 12mm bolts?” offered to show the customer was seeking bolts (non-assertive question).\n- Not hearsay: Reporter collaborated with multiple editors (conduct) offered to show diligence; the acts are not intended as assertions.\n- Not hearsay: The fact a patient was told “you have diabetes” offered to show the patient had notice of a condition (effect on listener), even if the diagnosis might be wrong.\n- Hearsay: “It’s raining” offered to prove that it was raining.\n- Hearsay: “I heard there will be a raid,” offered to prove the speaker had notice of a planned raid (relies on the truth that the speaker actually heard/knows).",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.96,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "Decide whether the given statement is hearsay. Write brief step-by-step reasoning before the final answer. Use this checklist:\n1) Identify the statement (or conduct) and the declarant/actor.\n2) Was it made out of court (i.e., not in current testimony)? If in-court now, not hearsay.\n3) Are the words an assertion? If they are a question/command/offer, or the item is non-assertive conduct, it is not hearsay.\n4) What specific fact is it offered to prove? Be precise about the proponent’s purpose.\n5) Truth-of-matter test: Could the evidence serve that purpose even if its propositional content were false?\n   - If yes, it’s not hearsay (e.g., effect on listener/notice, that a conversation occurred, that the speaker held an attitude/bias, that the speaker was familiar with a person/thing, that the actor behaved diligently).\n   - If no, it’s hearsay.\n6) Speaker vs. listener purposes:\n   - To show a listener’s notice/knowledge/motive: generally not for truth (effect on listener).\n   - To show the speaker’s own attitude/bias/familiarity via their words (without needing the proposition to be true): not hearsay.\n   - To show the speaker’s own knowledge/notice via a statement that asserts that very knowledge (“I heard/know/was told X,” “I think Y”): offered for the truth of that assertion about the speaker’s state, thus hearsay. This includes using “I heard X” to prove that rumors existed.\n7) If nested statements exist, assess each layer for truth-use.\n\nIllustrative examples:\n- Not hearsay: “Back off!” to show a warning was given (effect on listener), even if no danger existed.\n- Not hearsay: “Z is a crook,” offered to show the speaker knew or was familiar with Z (circumstantial familiarity), regardless of whether Z is actually a crook.\n- Not hearsay: “She’s the greatest manager,” offered to show the speaker supported her (attitude), regardless of whether she actually is the greatest.\n- Not hearsay: Customer asks, “Do you sell 12mm bolts?” offered to show the customer was seeking bolts (non-assertive question).\n- Not hearsay: Reporter collaborated with multiple editors (conduct) offered to show diligence; the acts are not intended as assertions.\n- Not hearsay: The fact a patient was told “you have diabetes” offered to show the patient had notice of a condition (effect on listener), even if the diagnosis might be wrong.\n- Hearsay: “It’s raining” offered to prove that it was raining.\n- Hearsay: “I heard there will be a raid,” offered to prove the speaker had notice of a planned raid (relies on the truth that the speaker actually heard/knows).\n- Not hearsay vs. hearsay in reputation proof:\n  - Not hearsay: “Alice is dishonest,” offered solely to show defamatory words circulated (harm regardless of truth).\n  - Hearsay: “I’ve heard bad things about Alice,” offered to show that negative rumors existed (relies on the truth that the speaker actually heard them).",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.96,
+            "acc_new": 0.96,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 1,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Apply the definition strictly.\n- Conduct is not hearsay unless it is intended as an assertion.\n- Perform layered analysis when there are statements within statements.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Apply the definition strictly.\n- Distinguish assertions from non-assertive words and non-assertive conduct.\n- Perform layered analysis when there are statements within statements.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.96,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Write your step-by-step analysis, then end your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 3
+          }
+        }
+      ]
+    }
+  }
+}

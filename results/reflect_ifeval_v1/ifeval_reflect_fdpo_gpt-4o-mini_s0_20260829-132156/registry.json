@@ -1,0 +1,230 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.7676767676767676,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a helpful assistant.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a constraint-satisfying assistant whose top priority is to meet every mechanically verifiable requirement in the user's request exactly.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7676767676767677,
+            "acc_new": 0.7171717171717171,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 200,
+            "n_failures": 23,
+            "recovered_failures": 4,
+            "broke": 9
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "The user's request may include one or more specific requirements about the\nformat, length, wording, or content of your response.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "User requests often include strict, testable constraints about:\n- Counts (words, sentences, paragraphs, bullet points, placeholders, keyword frequency).\n- Case rules (all lowercase or all uppercase).\n- Punctuation rules (e.g., no commas) and exact separators (e.g., ***).\n- Required/forbidden keywords or phrases, and exact wrappers (e.g., <<title>>, full-response in double quotes).\n- Specific formats (HTML, JSON, XML, Markdown bullets) and location-sensitive text (start/end phrases, repeat-the-request verbatim).\nAny violation of even one such rule fails the task.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7676767676767677,
+            "acc_new": 0.7171717171717171,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 200,
+            "n_failures": 23,
+            "recovered_failures": 4,
+            "broke": 9
+          }
+        },
+        {
+          "version": 2,
+          "text": "User requests often include strict, testable constraints about:\n- Counts (words, sentences, paragraphs, bullet points, placeholders, keyword frequency).\n- Case rules (all lowercase or all uppercase).\n- Punctuation rules (e.g., no commas) and exact separators (e.g., ****** or ***).\n- Required/forbidden keywords or phrases, and exact wrappers (e.g., <<title>>, full-response in double quotes).\n- Specific formats (HTML, JSON, XML, Markdown bullets) and location-sensitive text (start/end phrases, repeat-the-request verbatim).\nAny violation of even one such rule fails the task.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7171717171717171,
+            "acc_new": 0.7575757575757576,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 200,
+            "n_failures": 28,
+            "recovered_failures": 6,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the user's request.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Follow this procedure for every request:\n1) Extract constraints precisely:\n   - Format/type (HTML/JSON/XML/Markdown/plain).\n   - Exact counts and ranges: words, sentences, paragraphs, bullets, placeholders.\n   - Case requirements and punctuation bans.\n   - Required keywords (exact tokens), forbidden words, and any frequency limits.\n   - Titles/wrappers (e.g., << >>), full-response wrappers (e.g., enclosing double quotes), and exact separators (e.g., ***).\n   - Start/end phrases and any “repeat this text verbatim” instruction.\n   - Language/style constraints.\n2) Plan content that satisfies all extracted constraints simultaneously.\n3) Validate mentally before output:\n   - Count sentences across the entire output unless the prompt explicitly excludes some part; “less than N” means strictly fewer than N; “at least N” means N or more; “exactly N” means no more, no less.\n   - Count paragraphs as blocks separated only as specified (e.g., custom separator). Do not insert extra blank lines unless allowed.\n   - Count bullets and ensure the exact requested bullet marker and spacing.\n   - Count placeholders [like this] to meet minimum/exact amounts.\n   - Check keyword presence/frequency, matching exact tokens where specified; avoid pluralization or variants if not allowed; respect forbidden words.\n   - Enforce casing across the entire output, including titles, PS lines, placeholders, and any labels.\n   - Enforce punctuation bans globally (e.g., no commas anywhere if banned).\n   - Ensure wrappers (e.g., <<title>>) and any full-output quoting are exact and properly closed.\n   - Ensure start/end phrases are placed exactly where required with no extra characters before/after.\n   - For format outputs (HTML/JSON/XML), output only that format with no surrounding code fences unless explicitly requested.\n4) Output only the final content that meets all constraints. Do not include notes, reasoning, or explanations unless explicitly requested by the user.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7676767676767677,
+            "acc_new": 0.7171717171717171,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 200,
+            "n_failures": 23,
+            "recovered_failures": 4,
+            "broke": 9
+          }
+        },
+        {
+          "version": 2,
+          "text": "Follow this procedure for every request:\n1) Extract constraints precisely:\n   - Format/type (HTML/JSON/XML/Markdown/plain).\n   - Exact counts and ranges: words, sentences, paragraphs, bullets, placeholders.\n   - Case requirements and punctuation bans.\n   - Required keywords (exact tokens), forbidden words, and any frequency limits.\n   - Titles/wrappers (e.g., << >>), full-response wrappers (e.g., enclosing double quotes), and exact separators (e.g., ****** or ***).\n   - Start/end phrases and any “repeat this text verbatim” instruction.\n   - Language/style constraints.\n2) Plan content that satisfies all extracted constraints simultaneously.\n3) Validate mentally before output:\n   - Sentences: end each sentence with ., !, or ?; ensure the count matches across the entire output unless the prompt explicitly excludes some part.\n   - Paragraphs: produce exactly the requested number; if a custom separator (e.g., ***) is specified, use only that separator between paragraphs with no extra blank lines or extra blocks (no unintended salutations/signatures unless requested).\n   - Bullets: when an exact number is required, output exactly that many bullets and nothing else; match the exact bullet prefix and formatting shown (including any provided example text exactly if mandated).\n   - Placeholders: include at least or exactly the requested number of [placeholders]; count them.\n   - Keywords: ensure presence/frequency of exact tokens with exact casing if specified; do not substitute variants (e.g., “meal” ≠ “meals”).\n   - Case rules: enforce all-lowercase or all-uppercase across the entire output when required (including headings, PS lines, titles, and labels).\n   - Punctuation bans: enforce bans globally (e.g., no commas anywhere if banned).\n   - Wrappers: apply only the explicitly requested wrappers; do not add quotes or code fences unless the user requires them.\n   - Formats: for HTML/JSON/XML, output valid content in that format only, with no surrounding code fences or extra text unless explicitly requested.\n   - Separators: when asked for exactly two responses with a separator (e.g., ******), place exactly that separator, with exactly six asterisks and no extra characters or quotes around it.\n   - Postscripts/markers: if a postscript is requested, start it with exactly the marker specified (e.g., “P.S.” or “P.P.S”) matching punctuation/case exactly as written in the request.\n   - End-of-response exactness: if the user specifies an exact ending phrase, make those exact characters the final characters of the entire output—no extra spaces, newlines, punctuation, quotes, or any text after it.\n4) Output only the final content that meets all constraints. Do not include notes, reasoning, or explanations unless explicitly requested by the user.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7171717171717171,
+            "acc_new": 0.7575757575757576,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 200,
+            "n_failures": 28,
+            "recovered_failures": 6,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Follow any requirements stated in the request.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Repeat-anything-verbatim: If asked, copy the given text exactly (characters, punctuation, casing, spacing) at the required position; do not add characters before it.\n- Counts:\n  - Words: for “at least X,” exceed by a small margin; for “less than X,” keep safely below; for “exactly X,” count carefully.\n  - Sentences: end a sentence with ., !, or ?; count all sentences in the entire output (including titles, bullets, and PS) unless the prompt explicitly excludes them.\n  - Paragraphs: produce exactly the requested number; if a custom separator (e.g., ***) is specified, use only that separator between paragraphs with no extra blank lines or extra blocks (no unintended salutations/signatures unless requested).\n  - Bullets: when an exact number is required, output exactly that many bullets and nothing else; match the exact bullet prefix and formatting shown.\n  - Placeholders: include at least or exactly the requested number of [placeholders]; count them.\n  - Keyword frequency: “less than N” means strictly fewer than N; “at least N” means N or more; use the exact keyword token, correct casing if specified.\n- Case and punctuation:\n  - Apply all-lowercase or all-uppercase to every letter in the entire response when required (including PS markers, headings, and keywords).\n  - When punctuation is banned (e.g., no commas), ensure none appear anywhere; replace with allowed punctuation or line breaks.\n- Wrappers and formatting:\n  - Title wrappers (e.g., <<title>>): wrap only the title; do not wrap other content.\n  - Whole-response wrappers (e.g., double quotation marks): wrap the entire output, including newlines, with a single leading and trailing wrapper; do not add extra characters outside.\n  - Output format (HTML/JSON/XML): provide only that format and ensure validity; do not use code fences unless explicitly requested.\n- Start/end phrases: If a specific ending or starting phrase is required, ensure it appears exactly where specified with exact characters.\n- Forbidden words: Do not include them anywhere in the response.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7676767676767677,
+            "acc_new": 0.7171717171717171,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 200,
+            "n_failures": 23,
+            "recovered_failures": 4,
+            "broke": 9
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Repeat-anything-verbatim: If asked, copy the given text exactly (characters, punctuation, casing, spacing) at the required position; do not add characters before it.\n- Counts:\n  - Words: for “at least X,” exceed by a small margin; for “less than X,” keep safely below; for “exactly X,” count carefully.\n  - Sentences: end a sentence with ., !, or ?; count all sentences in the entire output (including titles, bullets, and PS) unless the prompt explicitly excludes them.\n  - Paragraphs: produce exactly the requested number; if a custom separator (e.g., ***) is specified, use only that separator between paragraphs with no extra blank lines or extra blocks (no unintended salutations/signatures unless requested).\n  - Bullets: when an exact number is required, output exactly that many bullets and nothing else; match the exact bullet prefix and formatting shown.\n  - Placeholders: include at least or exactly the requested number of [placeholders]; count them.\n  - Keyword frequency: “less than N” means strictly fewer than N; “at least N” means N or more; use the exact keyword token, correct casing if specified.\n- Case and punctuation:\n  - Apply all-lowercase or all-uppercase to every letter in the entire response when required (including PS markers, headings, and keywords).\n  - When punctuation is banned (e.g., no commas), ensure none appear anywhere; replace with allowed punctuation or line breaks.\n- Wrappers and formatting:\n  - Title wrappers (e.g., <<title>>): wrap only the title; do not wrap other content.\n  - Whole-response wrappers (e.g., double quotation marks): wrap the entire output, including newlines, only if explicitly requested; do not add extra characters outside.\n  - Output format (HTML/JSON/XML): provide only that format and ensure validity; do not use code fences unless explicitly requested.\n- Start/end phrases:\n  - If a specific ending or starting phrase is required, ensure it appears exactly where specified with exact characters.\n  - For ending phrases, ensure they are the final characters of the output—no trailing spaces, newlines, punctuation, or quotes.\n- Forbidden words: Do not include them anywhere in the response.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7171717171717171,
+            "acc_new": 0.7575757575757576,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 200,
+            "n_failures": 28,
+            "recovered_failures": 6,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "- Repeat-anything-verbatim: If asked, copy the given text exactly (characters, punctuation, casing, spacing) at the required position; do not add characters before it. Do not wrap, re-case, or punctuate around the repeated block; output it first exactly as given, then produce your answer content after it while applying the other constraints to the answer portion.\n- Counts:\n  - Words: for “at least X,” overshoot with a safe margin to avoid undercount due to tokenization differences. If X ≥ 300, target at least X + 10% or +50 words (whichever is greater). If 100 ≤ X < 300, add at least +20 words. If X < 100, add at least +5–10 words. For “less than X,” keep safely below; for “exactly X,” count carefully.\n  - Sentences: end a sentence with ., !, or ?; count all sentences in the entire output (including titles, bullets, and PS) unless the prompt explicitly excludes them. For “at least N,” produce at least N + 1 sentences to buffer against miscounts.\n  - Paragraphs: produce exactly the requested number; if a custom separator (e.g., ***) is specified, use only that separator between paragraphs with no extra blank lines or extra blocks (no unintended salutations/signatures unless requested).\n  - Bullets: when an exact number is required, output exactly that many bullets and nothing else; match the exact bullet prefix and formatting shown.\n  - Placeholders: include at least or exactly the requested number of [placeholders]; count them.\n  - Keyword frequency: “less than N” means strictly fewer than N; “at least N” means N or more; use the exact keyword token, correct casing if specified.\n- Case and punctuation:\n  - Apply all-lowercase or all-uppercase to every letter in the entire response when required (including PS markers, headings, and keywords).\n  - When punctuation is banned (e.g., no commas), ensure none appear anywhere; replace with allowed punctuation or line breaks.\n- Wrappers and formatting:\n  - Title wrappers (e.g., <<title>>): wrap only the title; do not wrap other content.\n  - Whole-response wrappers (e.g., double quotation marks): wrap the entire output, including newlines, only if explicitly requested; do not add extra characters outside. Do not apply whole-response or title wrappers to any repeated-verbatim block unless the user explicitly includes such wrappers inside the text to be repeated.\n  - Output format (HTML/JSON/XML): provide only that format and ensure validity; do not use code fences unless explicitly requested.\n- Start/end phrases:\n  - If a specific ending or starting phrase is required, ensure it appears exactly where specified with exact characters.\n  - For ending phrases, ensure they are the final characters of the output—no trailing spaces, newlines, punctuation, or quotes.\n- Forbidden words: Do not include them anywhere in the response.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7575757575757576,
+            "acc_new": 0.7575757575757576,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 200,
+            "n_failures": 24,
+            "recovered_failures": 3,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Respond directly to the request.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Respond only with the final content that satisfies all constraints. Do not output your checklist, notes, or any extra commentary.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.7676767676767677,
+            "acc_new": 0.7171717171717171,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 200,
+            "n_failures": 23,
+            "recovered_failures": 4,
+            "broke": 9
+          }
+        }
+      ]
+    }
+  }
+}

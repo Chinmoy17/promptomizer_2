@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.92,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 1
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You answer questions about statements.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "This is a legal task about hearsay.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "This is a legal task about hearsay under Federal Rule of Evidence 801. For this task, decide only whether the proffer fits the basic hearsay definition. Do not apply hearsay exclusions (e.g., opposing-party statements) or exceptions; treat them as still hearsay here if they fit the core definition.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 5,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide if the statement is hearsay or not.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this decision procedure, and write your reasoning briefly before the final answer:\n\n1) Identify the statement and its purpose:\n- What words/writing are being offered, and what fact are they offered to prove?\n\n2) Is it an out-of-court statement by a person?\n- Spoken/written words or human-authored documents/reports made outside current testimony count as statements.\n- In-court testimony and on-stand demonstrations are not out-of-court.\n- Pure physical facts/events (e.g., presence at a ceremony) are not statements.\n\n3) Is it offered to prove the truth of what it asserts?\n- If yes, answer Yes (hearsay) for this task, even if the declarant is a party or an exception/exclusion might apply in real court.\n- If offered for a non-truth purpose, answer No (not hearsay). Common non-truth purposes include:\n  • Effect on listener/notice/knowledge (to show someone was told or had notice, not that the content was true).\n  • Verbal acts/legally operative words (the fact words were said has legal significance).\n  • Circumstantial evidence of a person’s state of mind when the truth of the content isn’t required (e.g., calling someone “the best boss” to show support, not to prove he is the best).\n- Direct assertions of a mental state used to prove that state (e.g., “I knew X,” “I will do Y”) are offered for their truth and count as hearsay here.\n\nGuiding examples (illustrative only):\n- Non-truth use: To show R had notice of a hazard, evidence that “R was warned about the hazard” is not for the truth of the hazard itself; it’s to show R was warned (effect on listener) ⇒ Not hearsay.\n- Truth use: A lab report stating “sample contains defendant’s DNA” offered to prove that fact ⇒ Hearsay.\n- Truth use even if the speaker is a party: An email “I knew about the fraud” offered to prove the speaker knew ⇒ Hearsay for this task.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 5,
+            "broke": 4
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this decision procedure, and write your reasoning briefly before the final answer:\n\n1) Identify the statement and its purpose:\n- What words/writing are being offered, and what fact are they offered to prove?\n\n2) Is it an out-of-court statement by a person?\n- Spoken/written words or human-authored documents/reports made outside current testimony count as statements.\n- In-court testimony and on-stand demonstrations are not out-of-court.\n- Pure physical facts/events (e.g., presence at a ceremony) are not statements.\n\n3) Is it offered to prove the truth of what it asserts?\n- If yes, answer Yes (hearsay) for this task, even if the declarant is a party or an exception/exclusion might apply in real court.\n- If offered for a non-truth purpose, answer No (not hearsay). Common non-truth purposes include:\n  • Effect on listener/notice/knowledge (to show someone was told or had notice, not that the content was true).\n  • Verbal acts/legally operative words (the fact words were said has legal significance).\n  • Circumstantial evidence of a person’s state of mind when the truth of the content isn’t required (e.g., calling someone “the best boss” to show support, not to prove he is the best).\n- Direct assertions of a mental state used to prove that state (e.g., “I knew X,” “I will do Y”) are offered for their truth and count as hearsay here.\n\nClarifications for common edge cases:\n- Using a declarant’s utterance solely to show the declarant was alive/conscious or to show the declarant’s familiarity with a person/topic (where the content’s truth is irrelevant) ⇒ Not hearsay. Example: “I was attacked by K” used only to show the speaker was alive and speaking right after the incident.\n- Statements like “I heard X” or “I knew X” offered to prove the speaker heard or knew X depend on the truth of the embedded assertion of knowledge ⇒ Hearsay for this task. Example: “I heard a bank robbery was going to happen” offered to prove notice.\n- Layered reports that others “had heard/said bad things” offered to prove that such hearing/saying occurred (e.g., to show reputational harm) rely on the truth of that embedded assertion ⇒ Hearsay here.\n- Proof that someone else communicated information to the person (e.g., “R was warned,” or “a doctor diagnosed Jessica”) offered to show the recipient’s notice/knowledge does not require the content be true ⇒ Not hearsay.\n\nGuiding examples (illustrative only):\n- Non-truth use: To show R had notice of a hazard, evidence that “R was warned about the hazard” is not for the truth of the hazard itself; it’s to show R was warned (effect on listener) ⇒ Not hearsay.\n- Truth use: A lab report stating “sample contains defendant’s DNA” offered to prove that fact ⇒ Hearsay.\n- Truth use even if the speaker is a party: An email “I knew about the fraud” offered to prove the speaker knew ⇒ Hearsay for this task.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 4,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "Use this decision procedure, and write your reasoning briefly before the final answer:\n\n1) Identify the statement and its purpose:\n- What words/writing are being offered, and what fact are they offered to prove?\n\n2) Is it an out-of-court statement by a person?\n- Spoken/written words or human-authored documents/reports made outside current testimony count as statements.\n- Nonverbal conduct intended as an assertion (e.g., pointing to identify a person/car, nodding “yes”) counts as a statement; non-assertive conduct (mere physical acts not meant to assert a fact) does not.\n- In-court testimony and on-stand demonstrations are not out-of-court.\n- Pure physical facts/events (e.g., presence at a ceremony) are not statements.\n\n3) Is it offered to prove the truth of what it asserts?\n- If yes, answer Yes (hearsay) for this task, even if the declarant is a party or an exception/exclusion might apply in real court.\n- If offered for a non-truth purpose, answer No (not hearsay). Common non-truth purposes include:\n  • Effect on listener/notice/knowledge (to show someone was told or had notice, not that the content was true).\n  • Verbal acts/legally operative words (the fact words were said has legal significance).\n  • Circumstantial evidence of a person’s state of mind when the truth of the content isn’t required (e.g., calling someone “the best boss” to show support, not to prove he is the best).\n- Direct assertions of a mental state used to prove that state (e.g., “I knew X,” “I will do Y”) are offered for their truth and count as hearsay here.\n\nClarifications for common edge cases:\n- Using a declarant’s utterance solely to show the declarant was alive/conscious or to show the declarant’s familiarity with a person/topic (where the content’s truth is irrelevant) ⇒ Not hearsay. Example: “I was attacked by K” used only to show the speaker was alive and speaking right after the incident.\n- Statements like “I heard X” or “I knew X” offered to prove the speaker heard or knew X depend on the truth of the embedded assertion of knowledge ⇒ Hearsay for this task. Example: “I heard a bank robbery was going to happen” offered to prove notice.\n- Layered reports that others “had heard/said bad things” offered to prove that such hearing/saying occurred (e.g., to show reputational harm) rely on the truth of that embedded assertion ⇒ Hearsay here.\n- Proof that someone else communicated information to the person (e.g., “R was warned,” or “a doctor diagnosed Jessica”) offered to show the recipient’s notice/knowledge does not require the content be true ⇒ Not hearsay.\n\nGuiding examples (illustrative only):\n- Non-truth use: To show R had notice of a hazard, evidence that “R was warned about the hazard” is not for the truth of the hazard itself; it’s to show R was warned (effect on listener) ⇒ Not hearsay.\n- Truth use: A lab report stating “sample contains defendant’s DNA” offered to prove that fact ⇒ Hearsay.\n- Truth use even if the speaker is a party: An email “I knew about the fraud” offered to prove the speaker knew ⇒ Hearsay for this task.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.96,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer Yes or No.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Provide a brief, clear reasoning applying the steps above.\n- Answer Yes or No.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 5,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Write a short step-by-step analysis first. End your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 5,
+            "broke": 4
+          }
+        }
+      ]
+    }
+  }
+}

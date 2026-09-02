@@ -64,6 +64,71 @@ _SEEDS: dict[str, dict[str, str]] = {
         "output_format": "End your response with a line in exactly this form: "
                          "Answer: Yes  (or)  Answer: No",
     },
+    # ifeval/ifbench: overwritten immediately by prompts/<dataset>.md via
+    # bootstrap_registry_from_markdown() for simple_fdpo/reflect_fdpo (see
+    # scripts/run_experiment.py) -- this is only the placeholder PromptRegistry
+    # is constructed with before that swap, and the fallback if no markdown
+    # file exists (true for ifbench today; see hf_fetch.py's docstring on why
+    # ifbench isn't runnable yet regardless of seed prompt).
+    "ifeval": {
+        "system_role": "You are a helpful assistant.",
+        "context": "The user's request may include one or more specific "
+                   "requirements about the format, length, wording, or "
+                   "content of your response.",
+        "task_details": "Answer the user's request.",
+        "constraints": "Follow any requirements stated in the request.",
+        "output_format": "If reasoning or planning would help you satisfy the "
+                         "constraints, think it through first. Then write a "
+                         "line containing exactly `FINAL RESPONSE:` on its "
+                         "own, followed immediately by ONLY the content that "
+                         "must satisfy every stated constraint. Everything "
+                         "before that line is ignored when checking "
+                         "constraints; everything after it, verbatim, is "
+                         "what gets checked. If no reasoning is needed, "
+                         "`FINAL RESPONSE:` may be the very first line.",
+    },
+    "ifbench": {
+        "system_role": "You are a helpful assistant.",
+        "context": "The user's request may include one or more specific "
+                   "requirements about the format, length, wording, or "
+                   "content of your response.",
+        "task_details": "Answer the user's request.",
+        "constraints": "Follow any requirements stated in the request.",
+        "output_format": "If reasoning or planning would help you satisfy the "
+                         "constraints, think it through first. Then write a "
+                         "line containing exactly `FINAL RESPONSE:` on its "
+                         "own, followed immediately by ONLY the content that "
+                         "must satisfy every stated constraint. Everything "
+                         "before that line is ignored when checking "
+                         "constraints; everything after it, verbatim, is "
+                         "what gets checked. If no reasoning is needed, "
+                         "`FINAL RESPONSE:` may be the very first line.",
+    },
+    "aime": {
+        "system_role": "You are a competition mathematician.",
+        "context": "You will be given a competition-style math problem whose "
+                   "answer is always an integer between 0 and 999.",
+        "task_details": "Solve the problem.",
+        "constraints": "The final answer must be an integer between 0 and 999.",
+        "output_format": "After your work, write the final numeric answer on "
+                         "its own line in exactly this form: #### <number>",
+    },
+    "pupa": {
+        # Only this prompt is optimized (craft_redacted_request). The
+        # synthesis step is frozen -- see pupa_pipeline.py.
+        "system_role": "You are a privacy-conscious request rewriter.",
+        "context": "You will be given a private user request that may "
+                   "contain personal or sensitive information. Your "
+                   "rewritten version of it will be sent to a separate, "
+                   "more powerful but untrusted external assistant to get "
+                   "help answering it.",
+        "task_details": "Rewrite the request so the external assistant can "
+                        "still help effectively, without learning the "
+                        "user's private details.",
+        "constraints": "Do not reveal personally identifying or sensitive "
+                       "information from the original request.",
+        "output_format": "Output only the rewritten request text, nothing else.",
+    },
 }
 
 

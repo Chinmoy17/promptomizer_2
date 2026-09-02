@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.8,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You answer questions about statements.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You analyze whether a proffered statement is hearsay under FRE 801(c). Write brief, visible reasoning using the decision steps below, then give the final Yes/No line.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 4,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "This is a legal task about hearsay.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay (FRE 801(c)) = an out-of-court statement by a person that is offered to prove the truth of what it asserts. A “statement” includes oral/written assertions and nonverbal conduct intended as an assertion (e.g., pointing to identify). In-court testimony is not hearsay. Physical evidence and machine-only outputs are not “statements,” but a human-authored report describing or interpreting them is a statement.\n\nFor this task, classify strictly by the definition (truth-of-the-matter use) and nonhearsay purposes. Do not apply hearsay exceptions or 801(d) exclusions (e.g., do not treat a party’s own statement as automatically nonhearsay).",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 4,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "Hearsay (FRE 801(c)) = an out-of-court statement by a person that is offered to prove the truth of what it asserts. A “statement” includes oral/written assertions and nonverbal conduct intended as an assertion (e.g., pointing to identify). In-court testimony is not hearsay. Physical evidence and machine-only outputs are not “statements,” but a human-authored report describing or interpreting them is a statement.\n\nFor this task, classify strictly by the 801(c) definition (truth-of-the-matter use) and nonhearsay purposes. Do not apply hearsay exceptions or 801(d) exclusions (e.g., do not treat a party’s own statement as automatically nonhearsay).",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.88,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 3,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide if the statement is hearsay or not.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this decision procedure:\n\n1) Identify the proffered item and its purpose.\n- What words/act are being proved?\n- What is the proponent trying to show with it?\n\n2) Is it an out-of-court statement by a person (oral, written, or assertive gesture)?\n- If it happened in court, answer No (not hearsay).\n- Non-assertive conduct (e.g., performing a role, being selected for an honor) is not a statement → go to 5 (Answer No).\n- Nonverbal conduct intended as an assertion (e.g., pointing to identify) counts as a statement.\n- Machine/animal output is not a statement, but a human-authored analysis/report about it is a statement.\n\n3) If it is a person’s out-of-court statement, ask: Must the factfinder accept the content of the statement as true to reach the proponent’s point?\n- If yes → hearsay (Answer Yes).\n- If no → not hearsay (Answer No).\n\n4) Common nonhearsay purposes (content not relied on as true):\n- Effect on the listener/notice (offered to show what someone knew or was put on notice of because they heard it).\n- Legally operative words/verbal acts (offers, acceptances, threats, defamation—words have independent legal effect).\n- To prove words were spoken or a conversation occurred (regardless of truth of content).\n- Circumstantial evidence of the declarant’s state of mind/bias/attitude (e.g., “X is the best boss” to show the speaker supports X).\n\n5) Cautions and examples to apply consistently:\n- Human-authored forensic/lab reports and emails offered to prove what they assert are out-of-court statements; if used for their truth, classify as hearsay (Yes).\n- Do not invoke exceptions or 801(d) “opposing party” rules here; a person’s own out-of-court assertion used to prove what it asserts (e.g., their knowledge or intent) is hearsay (Yes) in this task.\n- Effect-on-listener applies to the person who heard the statement; using a declarant’s self-assertion to prove the declarant knew something relies on the truth of that assertion and is hearsay (Yes).\n- Gestures intended to assert (like pointing out the culprit) are statements; if used for their truth, hearsay (Yes).\n- Statements offered only to show that the declarant spoke (e.g., to show they were alive) are not for truth (No).\n\nThink briefly through steps 1–5, then conclude.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 4,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this decision procedure:\n\n1) Identify the proffered item and its purpose.\n- What words/act are being proved?\n- What is the proponent trying to show with it?\n\n2) Is it an out-of-court statement by a person (oral, written, or assertive gesture)?\n- If it happened in court, answer No (not hearsay).\n- Non-assertive conduct (e.g., performing a role, being selected for an honor) is not a statement → go to 5 (Answer No).\n- Nonverbal conduct intended as an assertion (e.g., pointing to identify) counts as a statement.\n- Purely interrogative or imperative speech (questions, requests, commands, greetings) generally does not assert a fact → treat as not a “statement” for 801 → go to 5 (Answer No) unless the use depends on an asserted factual proposition.\n- Machine/animal output is not a statement, but a human-authored analysis/report about it is a statement.\n\n3) If it is a person’s out-of-court statement, ask: Must the factfinder accept the content of the statement as true to reach the proponent’s point?\n- Quick test: Would the evidence still be relevant and probative for the stated purpose even if the statement’s content were false?\n  - If yes → not offered for truth → not hearsay (Answer No).\n  - If no → offered for truth → hearsay (Answer Yes).\n\n4) Common nonhearsay purposes (content not relied on as true):\n- Effect on the listener/notice: offered to show what someone heard/knew or was put on notice of because they heard it. The truth of the content is irrelevant for this use.\n- Legally operative words/verbal acts (offers, acceptances, threats, defamation—words have independent legal effect).\n- To prove words were spoken or a conversation occurred (regardless of truth of content).\n- Circumstantial evidence of the declarant’s state of mind/bias/attitude/familiarity (e.g., praising a team to show fandom; calling someone “dishonest” or by a nickname to show acquaintance or attitude). This does not require the content (“X is best/dishonest”) to be true.\n\n5) Cautions and examples to apply consistently:\n- Human-authored forensic/lab reports and emails offered to prove what they assert are out-of-court statements; if used for their truth, classify as hearsay (Yes).\n- Do not invoke exceptions or 801(d) “opposing party” rules here; decide only under 801(c).\n- Do not relabel a truth-use as “effect on listener.” If the proponent needs the asserted proposition itself to be true (e.g., “I know the safe combination” to prove the speaker actually knew it; “I have insider info” to prove he actually had insider info), that is for truth → hearsay (Yes).\n- For effect-on-listener, the focus is the listener’s state of mind after hearing the statement; it remains nonhearsay even if the statement was false (e.g., warnings, rumors, diagnoses communicated to someone to show notice/knowledge) → not for truth (No).\n- Gestures intended to assert (like pointing out the culprit) are statements; if used for their truth, hearsay (Yes).\n- Statements offered only to show that the declarant spoke (e.g., to show they were alive) are not for truth (No).\n\nThink briefly through steps 1–5, apply the “would it matter if false?” test, then conclude.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.88,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 3,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "Use this decision procedure:\n\n1) Identify the proffered item and its purpose.\n- What words/act are being proved?\n- What is the proponent trying to show with it?\n\n2) Is it an out-of-court statement by a person (oral, written, or assertive gesture)?\n- If it happened in court, answer No (not hearsay).\n- Non-assertive conduct (e.g., performing a role, being selected for an honor) is not a statement → go to 5 (Answer No).\n- Nonverbal conduct intended as an assertion (e.g., pointing to identify) counts as a statement.\n- Purely interrogative or imperative speech (questions, requests, commands, greetings) generally does not assert a fact → treat as not a “statement” for 801 → go to 5 (Answer No) unless the use depends on an asserted factual proposition.\n- Machine/animal output is not a statement, but a human-authored analysis/report about it is a statement.\n\n3) If it is a person’s out-of-court statement, ask: Must the factfinder accept the content of the statement as true to reach the proponent’s point?\n- Quick test: Would the evidence still be relevant and probative for the stated purpose even if the statement’s content were false?\n  - If yes → not offered for truth → not hearsay (Answer No).\n  - If no → offered for truth → hearsay (Answer Yes).\n\n4) Common nonhearsay purposes (content not relied on as true):\n- Effect on the listener/notice: offered to show what someone heard/knew or was put on notice of because they heard it. The truth of the content is irrelevant for this use.\n- Legally operative words/verbal acts (offers, acceptances, threats, defamation—words have independent legal effect).\n- To prove words were spoken or a conversation occurred (regardless of truth of content).\n- Circumstantial evidence of the declarant’s state of mind/bias/attitude/familiarity (e.g., praising a team to show fandom; calling someone “dishonest” or by a nickname to show acquaintance or attitude). This does not require the content (“X is best/dishonest”) to be true.\n\n5) Cautions and examples to apply consistently:\n- Human-authored forensic/lab reports and emails offered to prove what they assert are out-of-court statements; if used for their truth, classify as hearsay (Yes).\n- Do not invoke exceptions or 801(d) “opposing party” rules here; decide only under 801(c).\n- Do not relabel a truth-use as “effect on listener.” If the proponent needs the asserted proposition itself to be true (e.g., “I know the safe combination” to prove the speaker actually knew it; “I have insider info” to prove he actually had insider info), that is for truth → hearsay (Yes).\n- Effect-on-listener applies only when the listener’s state of mind after hearing the words is the point and the communication to that listener is the evidence (e.g., “Bob told Jane ‘The floor is wet’” to show Jane’s notice) → not for truth (No). A speaker’s self-report “I heard/knew/was told X,” offered to prove that the speaker actually heard/knew/was told X, relies on the truth of that self-report → hearsay (Yes).\n- Do not overuse “words were spoken.” That category covers when the fact that words occurred is itself material (e.g., contract formation, threats) → not for truth (No). But using a report “people were saying/they heard bad things about Alice” to prove that such statements were circulating (e.g., reputational harm) depends on the truth that those statements were in fact made → hearsay (Yes).\n- Diagnoses communicated to someone can be used as effect-on-listener to show notice/knowledge (regardless of medical accuracy) → not for truth (No) when the purpose is what the patient knew/was told, not to prove the medical condition itself.\n- Bare facts/outcomes/status (e.g., “came first in class,” “was hired,” “received an award”) are not “statements” by a person. Unless the proffer is a human assertion reporting that fact (like a written certificate offered for its truth), treat such outcomes as non-statement facts → not hearsay (No).\n- Gestures intended to assert (like pointing out the culprit) are statements; if used for their truth, hearsay (Yes).\n- Statements offered only to show that the declarant spoke (e.g., to show they were alive) are not for truth (No).\n\nThink briefly through steps 1–5, apply the “would it matter if false?” test, then conclude.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.88,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer Yes or No.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Provide short, clear reasoning following the steps before the final line.\n- Do not discuss hearsay exceptions or exclusions; decide only under the 801(c) truth-of-the-matter framework.\n- Keep it concise; end with the exact final answer line.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 4,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

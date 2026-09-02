@@ -1,0 +1,9 @@
+phase,example_id,correct,pred,gold,blocked
+seed,hearsay_test_30,True,No,No,False
+seed,hearsay_test_10,True,No,No,False
+seed,hearsay_test_50,False,No,Yes,False
+seed,hearsay_test_4,True,No,No,False
+final,hearsay_test_30,True,No,No,False
+final,hearsay_test_10,True,No,No,False
+final,hearsay_test_50,False,No,Yes,False
+final,hearsay_test_4,True,No,No,False

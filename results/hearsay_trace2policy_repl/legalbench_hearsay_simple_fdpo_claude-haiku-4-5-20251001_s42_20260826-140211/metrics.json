@@ -1,0 +1,241 @@
+{
+  "run_id": "legalbench_hearsay_simple_fdpo_claude-haiku-4-5-20251001_s42_20260826-140211",
+  "status": "completed",
+  "method": "simple_fdpo",
+  "dataset": "legalbench_hearsay",
+  "solver_model": "claude-haiku-4-5-20251001",
+  "seed": 42,
+  "seed_test": {
+    "accuracy": 0.6875,
+    "n_examples": 64,
+    "n_evaluated": 64,
+    "n_blocked": 0,
+    "extraction_failures": 0,
+    "macro_f1": 0.6875
+  },
+  "final_test": {
+    "accuracy": 0.734375,
+    "n_examples": 64,
+    "n_evaluated": 64,
+    "n_blocked": 0,
+    "extraction_failures": 0,
+    "macro_f1": 0.733790066063127
+  },
+  "optimization": {
+    "mode": "simple",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 3,
+    "skip_above_acc": 0.0,
+    "skipped_high_baseline": false,
+    "simple_max_rounds": 2,
+    "accept_margin": 0.0,
+    "shipped_structured": true,
+    "val_split": {
+      "enabled": false,
+      "val_frac": 0.0,
+      "n_mining": 30,
+      "n_validation": 0
+    },
+    "baseline_val_acc": 0.7333333333333333,
+    "best_structured_val_acc": 0.9,
+    "n_failures_triggering": 8,
+    "optimizer_calls": 2,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed_best",
+        "n_failures_before": 8,
+        "n_failures_after": 3,
+        "train_acc_after": 0.9,
+        "val_acc_after": 0.9,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "output_format",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "hearsay_test_39",
+          "hearsay_test_47",
+          "hearsay_test_50",
+          "hearsay_test_61",
+          "hearsay_test_71",
+          "hearsay_test_86",
+          "hearsay_test_88",
+          "hearsay_train_2"
+        ],
+        "failing_ids_after": [
+          "hearsay_test_18",
+          "hearsay_test_21",
+          "hearsay_test_53"
+        ],
+        "recovered_this_round": [
+          "hearsay_test_39",
+          "hearsay_test_47",
+          "hearsay_test_50",
+          "hearsay_test_61",
+          "hearsay_test_71",
+          "hearsay_test_86",
+          "hearsay_test_88",
+          "hearsay_train_2"
+        ],
+        "regressed_this_round": [
+          "hearsay_test_18",
+          "hearsay_test_21",
+          "hearsay_test_53"
+        ]
+      },
+      {
+        "round": 2,
+        "status": "committed",
+        "n_failures_before": 3,
+        "n_failures_after": 5,
+        "train_acc_after": 0.8333333333333334,
+        "val_acc_after": 0.8333333333333334,
+        "sections_changed": [
+          "constraints",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "hearsay_test_18",
+          "hearsay_test_21",
+          "hearsay_test_53"
+        ],
+        "failing_ids_after": [
+          "hearsay_test_47",
+          "hearsay_test_64",
+          "hearsay_test_82",
+          "hearsay_test_86",
+          "hearsay_train_2"
+        ],
+        "recovered_this_round": [
+          "hearsay_test_18",
+          "hearsay_test_21",
+          "hearsay_test_53"
+        ],
+        "regressed_this_round": [
+          "hearsay_test_47",
+          "hearsay_test_64",
+          "hearsay_test_82",
+          "hearsay_test_86",
+          "hearsay_train_2"
+        ]
+      }
+    ],
+    "baseline_failing_ids": [
+      "hearsay_test_39",
+      "hearsay_test_47",
+      "hearsay_test_50",
+      "hearsay_test_61",
+      "hearsay_test_71",
+      "hearsay_test_86",
+      "hearsay_test_88",
+      "hearsay_train_2"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.7333333333333333,
+      "n_correct": 22,
+      "n_wrong": 8
+    },
+    "current_train": {
+      "accuracy": 0.9,
+      "n_correct": 27,
+      "n_wrong": 3
+    },
+    "train_confusion": {
+      "recoveries": [
+        "hearsay_test_39",
+        "hearsay_test_47",
+        "hearsay_test_50",
+        "hearsay_test_61",
+        "hearsay_test_71",
+        "hearsay_test_86",
+        "hearsay_test_88",
+        "hearsay_train_2"
+      ],
+      "regressions": [
+        "hearsay_test_18",
+        "hearsay_test_21",
+        "hearsay_test_53"
+      ],
+      "still_wrong": [],
+      "still_right_count": 19,
+      "net_gain": 5
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 7,
+      "rejects": 0
+    },
+    "rounds_run": 2,
+    "train_acc_per_round": [
+      0.9,
+      0.8333333333333334
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "hearsay_test_16",
+        "hearsay_test_2",
+        "hearsay_test_28",
+        "hearsay_test_29",
+        "hearsay_test_43",
+        "hearsay_test_51",
+        "hearsay_test_52",
+        "hearsay_test_63",
+        "hearsay_test_80",
+        "hearsay_test_91",
+        "hearsay_test_92"
+      ],
+      "regressions": [
+        "hearsay_test_15",
+        "hearsay_test_17",
+        "hearsay_test_30",
+        "hearsay_test_4",
+        "hearsay_test_69",
+        "hearsay_test_72",
+        "hearsay_test_9",
+        "hearsay_train_0"
+      ],
+      "still_wrong": [
+        "hearsay_test_23",
+        "hearsay_test_68",
+        "hearsay_test_74",
+        "hearsay_test_76",
+        "hearsay_test_77",
+        "hearsay_test_78",
+        "hearsay_test_85",
+        "hearsay_test_89",
+        "hearsay_test_90"
+      ],
+      "still_right_count": 36,
+      "net_gain": 3
+    },
+    "markdown_source": "prompts\\hearsay_oneliner.md"
+  },
+  "content_filter": null,
+  "wall_clock_s": 352.8,
+  "cost": {
+    "total_calls": 220,
+    "total_cost_usd": 0.094566,
+    "by_role": {
+      "solver": {
+        "calls": 218,
+        "prompt_tokens": 130155,
+        "completion_tokens": 56547,
+        "cost_usd": 0.0
+      },
+      "optimizer": {
+        "calls": 2,
+        "prompt_tokens": 7157,
+        "completion_tokens": 8562,
+        "cost_usd": 0.094566
+      }
+    }
+  }
+}

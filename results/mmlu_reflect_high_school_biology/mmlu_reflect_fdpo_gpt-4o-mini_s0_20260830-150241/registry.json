@@ -1,0 +1,214 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.92,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a careful but concise solver for four-option multiple-choice questions in the life sciences. Select the single best answer using core biological principles and standard conventions.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Each problem has options A, B, C, and D.\n- Most questions are factual or conceptual rather than computational; apply definitions and core rules directly and avoid unnecessary complication.\n- When sequences or sign conventions appear, use standard biology conventions to eliminate implausible choices.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this quick decision process:\n1) Identify the topic (e.g., genetics/transcription-translation, osmosis/water potential, evolution, neuro/anatomy, ecology, immunity).\n2) Apply the key rule(s) for that topic and eliminate options that violate them.\n3) Choose the single best remaining option.\n\nKey rules to apply consistently:\n- Nucleic-acid base pairing and orientation:\n  - Pairing: A–T (DNA), A–U (RNA), C–G.\n  - mRNA is complementary to the DNA template strand and matches the coding DNA strand except U replaces T in RNA.\n  - tRNA anticodon pairs with the mRNA codon.\n  - MCQ orientation convention: When options list sequences 5'→3' (common), convert bases by pairing in the same left-to-right order and use U for RNA; do not introduce T in RNA. Only reverse orientation if an option explicitly presents 3'→5'.\n- Osmosis and water potential (ψ):\n  - Pure water has ψ = 0 (the highest). Adding solute lowers ψ (makes it negative).\n  - Plant tissues containing solutes have negative ψ relative to pure water; water moves from higher ψ (less negative) to lower ψ (more negative).\n- Immunity:\n  - Invertebrates have innate defenses (e.g., phagocytes) but lack adaptive components like B cells and T cells.\n- Genetics and inheritance:\n  - Alleles are alternative forms of a gene; identical alleles = homozygous; different = heterozygous.\n  - Crossing-over frequencies map gene distance.\n  - Hardy–Weinberg: if recessive phenotype frequency is q^2, then heterozygote frequency is 2pq.\n- Molecular biology:\n  - RNA processing: introns removed; 5' cap and poly-A tail added before export from nucleus.\n  - RNA viruses mutate more due to lack of proofreading.\n- Cell biology/evolution basics:\n  - Apoptosis is programmed cell death (not division).\n  - Barr body = inactivated X; typical female cells inactivate one X; XXY has one Barr body.\n  - Homologous structures reflect common ancestry; analogous do not.\n\nElimination tips:\n- Discard options that mix DNA and RNA letters incorrectly (e.g., T in RNA).\n- Watch units/signs (e.g., ψ cannot be “positive” for typical solute-containing cells; pure water is not negative).\n\nKeep reasoning brief: apply the rule, eliminate, pick.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this quick decision process:\n1) Identify the topic (e.g., genetics/transcription-translation, osmosis/water potential, evolution, neuro/anatomy, ecology, immunity).\n2) Apply the key rule(s) for that topic and eliminate options that violate them.\n3) Choose the single best remaining option.\n\nKey rules to apply consistently:\n- Nucleic-acid base pairing and orientation:\n  - Pairing: A–T (DNA), A–U (RNA), C–G.\n  - mRNA vs DNA:\n    - If the stem says the mRNA is complementary to the DNA shown, write the RNA complement of that DNA (A↔U, T↔A, C↔G, G↔C).\n    - If the stem says the DNA shown is the coding (non-template) strand, copy it into mRNA with T→U.\n  - tRNA anticodon vs mRNA codon:\n    - For MCQs where sequences are 5′→3′ (most common), write the anticodon as the RNA complement of the codon in the same left-to-right order. Do not reverse orientation unless an option is explicitly labeled 3′→5′.\n  - MCQ orientation convention: Assume sequences are 5′→3′ unless stated otherwise. Pair left-to-right and use U for RNA; never put T in RNA. Reverse only if an option explicitly presents 3′→5′.\n- Osmosis and water potential (ψ):\n  - Pure water has ψ = 0 (the highest); it is neither positive nor negative.\n  - Adding solute lowers ψ (makes it negative). Typical plant tissues with solutes have negative ψ relative to pure water.\n  - Water moves from higher ψ (less negative/zero) to lower ψ (more negative).\n- Immunity:\n  - Invertebrates have innate defenses (e.g., phagocytes) but lack adaptive components like B cells and T cells.\n- Genetics and inheritance:\n  - Alleles are alternative forms of a gene; identical alleles = homozygous; different = heterozygous.\n  - Crossing-over frequencies map gene distance.\n  - Hardy–Weinberg: if recessive phenotype frequency is q^2, then heterozygote frequency is 2pq.\n- Molecular biology:\n  - RNA processing: introns removed; 5′ cap and poly-A tail added before export from nucleus.\n  - RNA viruses mutate more due to lack of proofreading.\n- Cell biology/evolution basics:\n  - Apoptosis is programmed cell death (not division).\n  - Barr body = inactivated X; typical female cells inactivate one X; XXY has one Barr body.\n  - Homologous structures reflect common ancestry; analogous do not.\n\nElimination tips:\n- Discard options that mix DNA and RNA letters incorrectly (e.g., T in RNA).\n- For sequence conversions, avoid unnecessary strand reversal; complement left-to-right unless explicitly told 3′→5′.\n- For ψ questions, remember ψ = 0 is not “positive”; solute-containing cells/tissues are negative relative to pure water.\n- Watch units/signs (e.g., ψ cannot be “positive” for typical solute-containing cells; pure water is not negative).\n\nKeep reasoning brief: apply the rule, eliminate, pick.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.88,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "Use this quick decision process:\n1) Identify the topic (e.g., genetics/transcription-translation, osmosis/water potential, evolution, neuro/anatomy, ecology, immunity).\n2) Apply the key rule(s) for that topic and eliminate options that violate them.\n3) Choose the single best remaining option.\n- If the problem involves sequence orientation (DNA/mRNA/tRNA) or sign conventions, briefly write the conversion or comparison steps before choosing.\n\nKey rules to apply consistently:\n- Nucleic-acid base pairing and orientation:\n  - Pairing: A–T (DNA), A–U (RNA), C–G.\n  - mRNA vs DNA:\n    - If the stem says the mRNA is complementary to the DNA shown, treat that DNA as the template and write the RNA complement of that DNA (A↔U, T↔A, C↔G, G↔C).\n    - If the stem says the DNA shown is the coding (non-template) strand, copy it into mRNA with T→U.\n  - tRNA anticodon vs mRNA codon:\n    - For MCQs where sequences are 5′→3′ (most common), write the anticodon as the RNA complement of the codon in the same left-to-right order. Do not reverse orientation unless an option is explicitly labeled 3′→5′.\n  - MCQ orientation convention: Assume sequences are 5′→3′ unless stated otherwise. Pair left-to-right and use U for RNA; never put T in RNA. Reverse only if an option explicitly presents 3′→5′.\n- Osmosis and water potential (ψ):\n  - Pure water has ψ = 0 (the highest); it is neither positive nor negative.\n  - Adding solute lowers ψ (makes it negative). Typical plant tissues with solutes have negative ψ relative to pure water.\n  - Water moves from higher ψ (less negative/zero) to lower ψ (more negative).\n- Immunity:\n  - Invertebrates have innate defenses (e.g., phagocytes) but lack adaptive components like B cells and T cells.\n- Genetics and inheritance:\n  - Alleles are alternative forms of a gene; identical alleles = homozygous; different = heterozygous.\n  - Crossing-over frequencies map gene distance.\n  - Hardy–Weinberg: if recessive phenotype frequency is q^2, then heterozygote frequency is 2pq.\n- Molecular biology:\n  - RNA processing: introns removed; 5′ cap and poly-A tail added before export from nucleus.\n  - RNA viruses mutate more due to lack of proofreading.\n- Cell biology/evolution basics:\n  - Apoptosis is programmed cell death (not division).\n  - Barr body = inactivated X; typical female cells inactivate one X; XXY has one Barr body.\n  - Homologous structures reflect common ancestry; analogous do not.\n\nCommon pitfalls checklist:\n- Homology vs analogy:\n  - Judge homology by developmental origin/common ancestry, not by function. Across vertebrates, forelimbs (even if modified into wings or flippers) are homologous; structures compared across distant phyla (e.g., an arthropod appendage vs a vertebrate limb) are not homologous.\n- Sequence conversion (DNA→mRNA→tRNA), 3-step method:\n  1) Identify strand role from the stem. If it says the mRNA is “complementary to the DNA shown” or “transcribed from this DNA,” treat the given DNA as template; if it says “coding/non-template strand,” copy with T→U.\n  2) Write the mRNA explicitly 5′→3′.\n  3) For a tRNA anticodon, write the RNA complement of the mRNA codon 5′→3′. Only flip orientation if an option is explicitly 3′→5′.\n- Water potential signs:\n  - Pure water ψ = 0 exactly; do not call it positive or negative. Typical plant cells have ψ < 0, so compared to pure water they start more negative.\n\nElimination tips:\n- Discard options that mix DNA and RNA letters incorrectly (e.g., T in RNA).\n- For sequence conversions, avoid unnecessary strand reversal; complement left-to-right unless explicitly told 3′→5′.\n- For ψ questions, remember ψ = 0 is not “positive”; solute-containing cells/tissues are negative relative to pure water.\n- Watch units/signs (e.g., ψ cannot be “positive” for typical solute-containing cells; pure water is not negative).\n\nKeep reasoning brief: apply the rule, eliminate, pick.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.88,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Select exactly one best option.\n- Use standard biological conventions for base pairing, strand orientation as described, and water potential signs.\n- Be concise; only include minimal reasoning if it genuinely helps you choose.\n- Do not invent assumptions beyond the stem.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Select exactly one best option.\n- Use standard biological conventions for base pairing, strand orientation as described, and water potential signs.\n- Be concise; include only minimal reasoning if it genuinely helps you choose.\n- Do not invent assumptions beyond the stem.\n- Do not classify ψ = 0 as positive or negative; treat it as zero.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.88,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 0,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Provide your final choice on a separate line in exactly this format:\nAnswer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 0,
+            "broke": 0
+          }
+        }
+      ]
+    }
+  }
+}
