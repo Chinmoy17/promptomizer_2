@@ -1,0 +1,198 @@
+{
+  "run_id": "legalbench_hearsay_reflect_fdpo_mock_s0_20260829-001455",
+  "status": "completed",
+  "method": "reflect_fdpo",
+  "dataset": "legalbench_hearsay",
+  "solver_model": "mock",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.5,
+    "n_examples": 6,
+    "n_evaluated": 6,
+    "n_blocked": 0,
+    "extraction_failures": 0,
+    "macro_f1": 0.3333333333333333
+  },
+  "final_test": {
+    "accuracy": 0.5,
+    "n_examples": 6,
+    "n_evaluated": 6,
+    "n_blocked": 0,
+    "extraction_failures": 0,
+    "macro_f1": 0.3333333333333333
+  },
+  "optimization": {
+    "mode": "reflect",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 3,
+    "skip_above_acc": 0.0,
+    "skipped_high_baseline": false,
+    "simple_max_rounds": 3,
+    "accept_margin": 1.0,
+    "shipped_structured": true,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.35,
+      "n_mining": 6,
+      "n_validation": 4
+    },
+    "baseline_val_acc": 0.5,
+    "best_structured_val_acc": 0.5,
+    "n_failures_triggering": 3,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed_best",
+        "n_failures_before": 3,
+        "n_failures_after": 3,
+        "train_acc_after": 0.5,
+        "val_acc_after": 0.5,
+        "sections_changed": [
+          "constraints"
+        ],
+        "failing_ids_before": [
+          "syn_train_1",
+          "syn_train_3",
+          "syn_train_5"
+        ],
+        "failing_ids_after": [
+          "syn_train_1",
+          "syn_train_3",
+          "syn_train_5"
+        ],
+        "recovered_this_round": [],
+        "regressed_this_round": [],
+        "val_recovered_this_round": 0,
+        "val_regressed_this_round": 0,
+        "reflection_shown": false
+      },
+      {
+        "round": 2,
+        "status": "committed",
+        "n_failures_before": 3,
+        "n_failures_after": 3,
+        "train_acc_after": 0.5,
+        "val_acc_after": 0.5,
+        "sections_changed": [
+          "constraints"
+        ],
+        "failing_ids_before": [
+          "syn_train_1",
+          "syn_train_3",
+          "syn_train_5"
+        ],
+        "failing_ids_after": [
+          "syn_train_1",
+          "syn_train_3",
+          "syn_train_5"
+        ],
+        "recovered_this_round": [],
+        "regressed_this_round": [],
+        "val_recovered_this_round": 0,
+        "val_regressed_this_round": 0,
+        "reflection_shown": true
+      },
+      {
+        "round": 3,
+        "status": "committed",
+        "n_failures_before": 3,
+        "n_failures_after": 3,
+        "train_acc_after": 0.5,
+        "val_acc_after": 0.5,
+        "sections_changed": [
+          "constraints"
+        ],
+        "failing_ids_before": [
+          "syn_train_1",
+          "syn_train_3",
+          "syn_train_5"
+        ],
+        "failing_ids_after": [
+          "syn_train_1",
+          "syn_train_3",
+          "syn_train_5"
+        ],
+        "recovered_this_round": [],
+        "regressed_this_round": [],
+        "val_recovered_this_round": 0,
+        "val_regressed_this_round": 0,
+        "reflection_shown": true
+      }
+    ],
+    "baseline_failing_ids": [
+      "syn_train_1",
+      "syn_train_3",
+      "syn_train_5"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.5,
+      "n_correct": 3,
+      "n_wrong": 3
+    },
+    "current_train": {
+      "accuracy": 0.5,
+      "n_correct": 3,
+      "n_wrong": 3
+    },
+    "train_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "syn_train_1",
+        "syn_train_3",
+        "syn_train_5"
+      ],
+      "still_right_count": 3,
+      "net_gain": 0
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 3,
+      "rejects": 0
+    },
+    "rounds_run": 3,
+    "train_acc_per_round": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "syn_test_1",
+        "syn_test_3",
+        "syn_test_5"
+      ],
+      "still_right_count": 3,
+      "net_gain": 0
+    },
+    "markdown_source": "prompts\\legalbench_hearsay.md"
+  },
+  "content_filter": null,
+  "wall_clock_s": 0.1,
+  "cost": {
+    "total_calls": 55,
+    "total_cost_usd": 0.0,
+    "by_role": {
+      "solver": {
+        "calls": 52,
+        "prompt_tokens": 6032,
+        "completion_tokens": 728,
+        "cost_usd": 0.0
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 5741,
+        "completion_tokens": 324,
+        "cost_usd": 0.0
+      }
+    }
+  }
+}

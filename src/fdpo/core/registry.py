@@ -137,6 +137,30 @@ class PromptRegistry:
             self.run_stagnant_rounds += 1
         self._save()
 
+    def version_as_of_round(self, section: str, round_num: int) -> int:
+        """Index of the version active for `section` immediately after round
+        `round_num` committed -- the highest version whose `created_round`
+        is <= round_num (rejected candidates never count). Works regardless
+        of which version is CURRENTLY active, since full history is kept."""
+        candidates = [v.version for v in self.sections[section].versions
+                     if v.created_round <= round_num and v.status != "rejected"]
+        return max(candidates) if candidates else 0
+
+    def restore_round(self, round_num: int) -> dict[str, str]:
+        """Reactivate every section's version as of the end of `round_num`,
+        reconstructed from full version history -- lets a run ship ANY past
+        round (e.g. the best-by-validation one), not just whichever is
+        currently active."""
+        for name in self.schema:
+            target = self.version_as_of_round(name, round_num)
+            state = self.sections[name]
+            if state.active_version != target:
+                state.versions[state.active_version].status = "archived"
+                state.versions[target].status = "active"
+                state.active_version = target
+        self._save()
+        return self.active_prompt()
+
     def restore_best_snapshot(self) -> dict[str, str]:
         """Roll every section back to the whole-run best-known snapshot."""
         for name, best_version in self.run_best_versions.items():

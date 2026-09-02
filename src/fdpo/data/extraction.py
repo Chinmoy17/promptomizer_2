@@ -60,7 +60,7 @@ def extract_yes_no(text: str) -> str | None:
 
 
 def extract_pred(dataset: str, text: str) -> str | None:
-    if dataset == "gsm8k":
+    if dataset in ("gsm8k", "aime"):
         return extract_gsm8k(text)
     if dataset in ("arc", "mmlu"):
         return extract_mc_letter(text)
@@ -72,7 +72,7 @@ def extract_pred(dataset: str, text: str) -> str | None:
 def is_correct(dataset: str, pred: str | None, gold: str) -> bool:
     if pred is None:
         return False
-    if dataset == "gsm8k":
+    if dataset in ("gsm8k", "aime"):
         p, g = normalize_number(pred), normalize_number(gold)
         return p is not None and g is not None and abs(p - g) < 1e-6
     return pred.strip().lower() == gold.strip().lower()

@@ -1,0 +1,1447 @@
+# Reflective Feedback-Driven Prompt Optimization: Learning from the Consequences of Previous Prompt Edits
+
+**Anonymous Authors**
+
+---
+
+## Abstract
+
+Large language models (LLMs) have enabled prompt optimization methods that automatically improve task-specific instructions using model-generated feedback and evaluation signals. Existing approaches such as ProTeGi, TextGrad, MIPROv2, GEPA, and Trace2Policy differ substantially in their optimization strategies, but a common pattern is to provide an optimizer with information about current failures and ask it to propose a revised prompt. We investigate a complementary question: **can prompt optimization benefit from explicitly showing the optimizer the measured consequences of its own previous edits?**
+
+We introduce **Reflective Feedback-Driven Prompt Optimization (Reflective-FDPO)**, a prompt optimization procedure that augments conventional failure-driven feedback with item-level outcome information from the previous revision. At each optimization round, the optimizer receives detailed information about which mining and validation examples were recovered or regressed by its previous prompt edit, together with the corresponding outputs and the prompt sections that changed. This allows the optimizer to reason not only about *what is currently failing*, but also about *what its previous intervention actually changed*.
+
+We compare Reflective-FDPO against a byte-identical **Simple-FDPO** control condition that uses the same optimization framework and evaluation budget but does not expose previous-edit outcome information. We evaluate both methods across five heterogeneous tasks: legal classification (LegalBench-Hearsay), broad multiple-choice reasoning (MMLU), verifiable instruction following (IFEval/IFBench), competition mathematics (AIME), and privacy-conscious delegation (PUPA). Experiments are conducted across multiple solver models, including GPT-4o-mini, Claude Haiku 4.5, Qwen3-8B, and Llama-3-8B, with [N] independent seeds per configuration.
+
+Across [N]/5 benchmarks and [N]/[TOTAL] solver-model/task configurations, Reflective-FDPO achieves a mean improvement of **[X.X] percentage points** over the corresponding unoptimized prompts and **[Y.Y] percentage points** over Simple-FDPO under matched evaluation budgets. The effect is [consistent/model-dependent/task-dependent], with the largest gains observed on [BENCHMARK] and the weakest performance on [BENCHMARK]. An ablation removing validation outcome feedback reduces performance by [X.X] points, suggesting that the information about the consequences of previous edits contributes beyond ordinary failure traces. We additionally characterize optimization variance, showing that prompt-optimization experiments at small evaluation-set sizes can exhibit substantial stochastic variation even under nominally deterministic decoding.
+
+Our results suggest that **feedback about intervention outcomes is a useful and complementary signal for automated prompt optimization**, while also demonstrating that claims of small prompt-optimization gains require multi-seed evaluation and careful control of evaluation noise.
+
+---
+
+# 1. Introduction
+
+Prompt engineering has evolved from manually authored instructions into an increasingly automated optimization problem. Rather than writing a task prompt once and accepting the resulting model behavior, recent approaches use language models as optimizers that inspect examples, diagnose failures, and iteratively propose improved instructions. This paradigm has produced methods including ProTeGi, TextGrad, MIPROv2, GEPA, and Trace2Policy [REFS].
+
+Despite their differences, feedback-driven prompt optimizers share a common structure. A candidate prompt is evaluated on a set of examples, failures or traces are collected, and an optimizer uses this information to construct a revised prompt. The resulting prompt is then evaluated again. In simplified form:
+
+```text
+Candidate prompt
+      |
+      v
+   Evaluate
+      |
+      v
+Current failures
+      |
+      v
+Optimizer
+      |
+      v
+Revised prompt
+```
+
+This process gives the optimizer information about **what is currently wrong**. However, an important piece of information is often less explicit: **what happened as a consequence of the optimizer's own previous intervention?**
+
+Consider an optimizer that modifies a prompt between two rounds. After the modification, some previously incorrect examples become correct, while other previously correct examples become incorrect. The optimizer therefore has access to a natural experiment:
+
+> *I changed these instructions, and these examples changed from failure to success while these other examples changed from success to failure.*
+
+This distinction matters because the raw failure set does not necessarily reveal the causal consequences of the previous edit. A prompt optimizer may observe that an example is currently failing without knowing whether its most recent modification caused that failure, fixed another failure at the expense of this example, or had no measurable effect on it.
+
+We therefore investigate **outcome-aware reflection** as an additional feedback signal for prompt optimization.
+
+We propose **Reflective Feedback-Driven Prompt Optimization (Reflective-FDPO)**. Rather than providing only the current failure traces, Reflective-FDPO explicitly reports the item-level consequences of the previous prompt revision. Beginning with the second optimization round, the optimizer receives:
+
+1. mining examples recovered by the previous prompt revision;
+2. mining examples regressed by the previous revision;
+3. the new incorrect outputs for regressed examples;
+4. validation examples recovered by the previous revision;
+5. validation examples regressed by the previous revision; and
+6. the previous text of the prompt sections modified by the revision.
+
+The optimizer can therefore reason over a feedback signal of the form:
+
+```text
+Previous prompt
+      |
+      | edit
+      v
+New prompt
+      |
+      v
+Per-item evaluation
+      |
+      +----------------------+
+      |                      |
+      v                      v
+Recovered items         Regressed items
+      |                      |
+      +-----------+----------+
+                  |
+                  v
+          Reflective feedback
+                  |
+                  v
+              Optimizer
+```
+
+The central research question of this work is:
+
+> **Does explicitly exposing the measured consequences of previous prompt edits improve the reliability and effectiveness of feedback-driven prompt optimization?**
+
+We investigate this question using a controlled comparison between two systems. **Simple-FDPO** and **Reflective-FDPO** use the same solver models, optimizer model, prompt representation, candidate-generation procedure, evaluation sets, and optimization budget. The principal difference is the feedback available to the optimizer: Simple-FDPO receives conventional failure-oriented feedback, whereas Reflective-FDPO additionally receives the outcome changes attributable to its previous edit.
+
+We evaluate the methods across five heterogeneous benchmarks spanning substantially different task characteristics: LegalBench-Hearsay for legal classification, MMLU for broad multiple-choice reasoning, IFEval/IFBench for verifiable instruction following, AIME for competition mathematics, and PUPA for privacy-conscious delegation.
+
+We make the following contributions:
+
+### Contributions
+
+1. **Outcome-aware prompt optimization.**
+   We introduce Reflective-FDPO, a feedback-driven prompt optimization procedure that explicitly exposes item-level recovery and regression outcomes caused by previous prompt edits.
+
+2. **Controlled Simple-FDPO vs. Reflective-FDPO comparison.**
+   We isolate the effect of reflective outcome feedback by comparing against a byte-identical simple feedback-driven optimizer under matched optimization budgets.
+
+3. **Cross-task and cross-model evaluation.**
+   We evaluate the mechanism across five heterogeneous benchmarks and [FOUR] solver models spanning closed and open-weight LLMs: GPT-4o-mini, Claude Haiku 4.5, Qwen3-8B, and Llama-3-8B.
+
+4. **Mechanism ablations.**
+   We independently evaluate the contribution of validation outcome feedback and round-selection behavior to determine which components are responsible for observed improvements.
+
+5. **Reliability analysis of prompt optimization.**
+   We quantify the variance of repeated prompt-optimization experiments and show that small evaluation sets can produce substantial variation even when decoding is nominally deterministic.
+
+6. **Reproducible evaluation infrastructure.**
+   We provide benchmark-specific verifiers, prompt-version reconstruction, evaluation ledgers, and [CODE/REPOSITORY PLACEHOLDER] to facilitate independent reproduction.
+
+---
+
+# 2. Background and Related Work
+
+## 2.1 Automated Prompt Optimization
+
+Prompt optimization treats the prompt itself as an object to be optimized according to downstream model performance. Rather than updating model parameters, these methods modify natural-language instructions, demonstrations, reasoning scaffolds, or other components of the model input.
+
+Early approaches such as ProTeGi use textual gradients or natural-language feedback to iteratively revise prompts [REF]. Subsequent methods have expanded the optimization process through automatic proposal generation, search, evaluation, and model-based reflection.
+
+MIPROv2 combines prompt optimization with automated generation and selection of instruction and demonstration candidates [REF]. TextGrad formulates textual components as optimizable objects and propagates natural-language feedback through computational graphs [REF]. GEPA performs evolutionary-style prompt optimization using language-model-generated reflections and validation-based selection [REF]. Trace2Policy and related approaches use failure traces to identify behavioral patterns and iteratively refine instructions [REF].
+
+These approaches demonstrate that language models can serve not only as task solvers but also as optimizers of the instructions used to solve those tasks.
+
+Our work does not propose another generic search strategy. Instead, we investigate a specific feedback signal that can be incorporated into iterative prompt optimization: **the measured outcome of the optimizer's previous intervention**.
+
+---
+
+## 2.2 Failure Feedback Versus Intervention Feedback
+
+A distinction central to our method is the difference between **failure feedback** and **intervention feedback**.
+
+Failure feedback describes the state of the current candidate:
+
+```text
+Example 17 failed because ...
+Example 31 failed because ...
+Example 42 failed because ...
+```
+
+Intervention feedback additionally describes the transition caused by the previous candidate:
+
+```text
+Example 17:
+previously incorrect -> now correct
+
+Example 31:
+previously correct -> now incorrect
+
+Example 42:
+incorrect -> incorrect
+```
+
+The latter contains information about the behavioral consequences of a specific prompt modification.
+
+Formally, let \(p_t\) denote the prompt at optimization round \(t\), \(x_i\) an evaluation item, and \(y_i\) its expected output. Let
+
+$$
+f(p_t, x_i)
+$$
+
+denote the solver's outcome on item \(i\), and define
+
+$$
+s_{t,i} =
+\begin{cases}
+1 & \text{if } f(p_t,x_i)=y_i,\\
+0 & \text{otherwise.}
+\end{cases}
+$$
+
+A conventional failure signal exposes information such as
+
+$$
+\mathcal{F}_t = \{x_i : s_{t,i}=0\}.
+$$
+
+Reflective-FDPO additionally computes the transition
+
+$$
+\Delta_{t,i}=s_{t,i}-s_{t-1,i}.
+$$
+
+This partitions examples into:
+
+$$
+\mathcal{R}_t = \{i:\Delta_{t,i}=+1\}
+$$
+
+for recovered items and
+
+$$
+\mathcal{G}_t = \{i:\Delta_{t,i}=-1\}
+$$
+
+for regressed items.
+
+The optimizer therefore receives information about both the current state and the observed effect of its previous intervention.
+
+---
+
+# 3. Reflective-FDPO
+
+## 3.1 Problem Formulation
+
+Given:
+
+* a solver model \(M\),
+* an initial prompt \(p_0\),
+* a dataset \(D\),
+* an evaluation metric \(S\),
+* an optimizer model \(O\), and
+* an optimization budget \(T\),
+
+the objective is to find a prompt
+
+$$
+p^* = \arg\max_{p_t} S(M,p_t,D).
+$$
+
+Unlike parameter optimization, the optimization space consists of natural-language prompts.
+
+Each optimization round produces a candidate prompt:
+
+$$
+p_{t+1} = O(p_t, F_t),
+$$
+
+where \(F_t\) is the feedback supplied to the optimizer.
+
+Simple-FDPO and Reflective-FDPO differ primarily in the construction of \(F_t\).
+
+---
+
+## 3.2 Simple-FDPO
+
+Simple-FDPO serves as the principal control condition.
+
+It follows the same iterative optimization procedure as Reflective-FDPO but supplies conventional failure-oriented feedback to the optimizer.
+
+At round \(t\):
+
+```text
+Prompt p_t
+   |
+   v
+Evaluate mining set
+   |
+   v
+Identify failures
+   |
+   v
+Optimizer
+   |
+   v
+Prompt p_(t+1)
+```
+
+The optimizer receives the current failure examples and associated solver outputs [EXACT FEEDBACK SPECIFICATION].
+
+Importantly, Simple-FDPO uses:
+
+* the same optimizer model;
+* the same solver model;
+* the same prompt representation;
+* the same number of optimization rounds;
+* the same mining and validation sets;
+* the same evaluation procedure; and
+* the same optimization budget
+
+as Reflective-FDPO.
+
+This allows the primary comparison to isolate the value of outcome-aware reflection.
+
+---
+
+## 3.3 Reflective-FDPO
+
+Reflective-FDPO augments the feedback available to the optimizer with explicit information about the consequences of its previous prompt revision.
+
+Beginning at round \(t\geq1\), the optimizer receives the following information.
+
+### Mining-set outcomes
+
+For each item whose outcome changed:
+
+* the item;
+* its previous outcome;
+* its new outcome;
+* the solver's new output when the item regressed; and
+* relevant prompt-section changes.
+
+This produces two principal groups:
+
+```text
+RECOVERED
+previously incorrect → currently correct
+
+REGRESSED
+previously correct → currently incorrect
+```
+
+### Validation-set outcomes
+
+The same transition analysis is performed on a disjoint validation set:
+
+```text
+VALIDATION RECOVERED
+VALIDATION REGRESSED
+```
+
+The optimizer therefore observes whether its changes transfer beyond the examples directly used for mining.
+
+---
+
+## 3.4 Why Validation Feedback Is Included
+
+The validation set is not exposed at the level of raw individual item content before evaluation. Instead, Reflective-FDPO exposes the aggregate item-level consequences of the current revision after the revision has been evaluated.
+
+This design is intended to provide a signal about generalization:
+
+```text
+Mining:
+"my edit fixed these examples"
+
+Validation:
+"the same edit also fixed/regressed these unseen examples"
+```
+
+The optimizer can therefore distinguish between changes that appear useful only on the mining set and changes whose behavioral effect transfers to held-out examples.
+
+The validation set is never used as the final test set.
+
+The test set remains sealed throughout optimization and is used only for baseline and final evaluation.
+
+---
+
+## 3.5 Prompt Representation
+
+We optimize a single markdown-formatted prompt consisting of five fixed sections:
+
+1. **System Role**
+2. **Context**
+3. **Task Details**
+4. **Constraints**
+5. **Output Format**
+
+The optimizer may modify one or more sections while preserving the overall prompt structure.
+
+This representation provides a controlled optimization space and allows us to identify which prompt components are changed during successful and unsuccessful optimization rounds.
+
+---
+
+## 3.6 Optimizer and Solver Separation
+
+The solver and optimizer serve different roles.
+
+The **solver** is the model whose task performance is being optimized.
+
+The **optimizer** is a larger reasoning model responsible for inspecting feedback and proposing prompt revisions.
+
+Unless otherwise specified, the optimizer is GPT-5.
+
+This separation allows us to investigate whether the same optimization mechanism transfers across solver models with different capabilities and model families.
+
+---
+
+# 4. Experimental Design
+
+## 4.1 Research Questions
+
+We evaluate the following research questions.
+
+### RQ1: Effectiveness
+
+**Does reflective outcome feedback improve prompt optimization compared with conventional failure-driven feedback under matched optimization budgets?**
+
+### RQ2: Generality Across Solver Models
+
+**Does the effect of reflective feedback transfer across closed and open-weight solver models?**
+
+### RQ3: Generality Across Tasks
+
+**Does reflective feedback remain effective across substantially different task types?**
+
+### RQ4: Mechanism
+
+**Which components of the reflective feedback signal contribute to optimization performance?**
+
+### RQ5: Reliability and Efficiency
+
+**How consistent are prompt-optimization gains across independent runs, and what computational cost is required to obtain them?**
+
+---
+
+# 5. Benchmarks
+
+We evaluate five benchmark families.
+
+| Benchmark          | Task                             | Training / Optimization Pool |   Validation |     Test | Primary Metric        |
+| ------------------ | -------------------------------- | ---------------------------: | -----------: | -------: | --------------------- |
+| LegalBench-Hearsay | Legal binary classification      |                         [50] |         [25] |    49–59 | Accuracy              |
+| MMLU               | Multiple-choice QA               |                           50 |           25 |       66 | Accuracy              |
+| IFEval / IFBench   | Verifiable instruction following |                        [100] | [100] / [20] | 200 / 42 | Pass rate             |
+| AIME               | Competition mathematics          |                           58 |           32 |       30 | Exact answer accuracy |
+| PUPA               | Privacy-conscious delegation     |                           30 |           30 |       40 | Composite score       |
+
+The benchmark suite was selected to cover different forms of model behavior rather than a single task family.
+
+LegalBench-Hearsay tests domain-specific classification.
+
+MMLU tests broad knowledge and reasoning.
+
+IFEval/IFBench tests adherence to mechanically verifiable instructions.
+
+AIME tests competition mathematics.
+
+PUPA tests privacy-aware delegation involving a two-hop redact → external-call → synthesize architecture.
+
+The exact split construction is reported in Appendix [X].
+
+---
+
+# 6. Solver Models
+
+We evaluate Reflective-FDPO across both proprietary and open-weight models.
+
+| Solver           | Family |   Size | Availability |
+| ---------------- | ------ | -----: | ------------ |
+| GPT-4o-mini      | GPT    | [SIZE] | API          |
+| Claude Haiku 4.5 | Claude | [SIZE] | API          |
+| Qwen3-8B         | Qwen   |     8B | Open-weight  |
+| Llama-3-8B       | Llama  |     8B | Open-weight  |
+
+[PLACEHOLDER: Replace Llama-3-8B with exact checkpoint used, e.g. Llama-3.1-8B-Instruct, if that is the actual model.]
+
+All models are evaluated using the same benchmark-specific prompts and scoring procedures wherever possible.
+
+For each model, we evaluate:
+
+```text
+Seed Prompt
+     |
+     +----------------------+
+     |                      |
+     v                      v
+Simple-FDPO           Reflective-FDPO
+     |                      |
+     +----------+-----------+
+                |
+                v
+          Sealed Test
+```
+
+---
+
+# 7. Baselines
+
+## 7.1 Unoptimized Seed Prompt
+
+The first baseline is the original prompt \(p_0\), evaluated without optimization.
+
+This establishes the amount of performance available before prompt optimization.
+
+---
+
+## 7.2 Simple-FDPO
+
+Simple-FDPO is the primary controlled baseline.
+
+The two methods differ only in whether the optimizer receives explicit information about the consequences of its previous edit.
+
+| Component                  | Simple-FDPO | Reflective-FDPO |
+| -------------------------- | ----------- | --------------- |
+| Solver                     | Same        | Same            |
+| Optimizer                  | Same        | Same            |
+| Prompt format              | Same        | Same            |
+| Mining set                 | Same        | Same            |
+| Validation set             | Same        | Same            |
+| Test set                   | Same        | Same            |
+| Optimization rounds        | Same        | Same            |
+| Budget                     | Same        | Same            |
+| Current failures           | Yes         | Yes             |
+| Previous-edit recoveries   | No          | Yes             |
+| Previous-edit regressions  | No          | Yes             |
+| Validation outcome changes | No          | Yes             |
+
+This controlled comparison is the primary experiment of the paper.
+
+---
+
+## 7.3 External Published Baselines
+
+We additionally compare our results with published results from ProTeGi, MIPROv2, GEPA, Trace2Policy, TextGrad, GRPO, MPO, and related methods where compatible results are available.
+
+These comparisons are explicitly treated as **contextual rather than fully matched head-to-head comparisons** whenever model, split, scaffold, evaluation, or optimization-budget differences exist.
+
+In particular, absolute scores should not be interpreted as evidence that Reflective-FDPO outperforms another method unless the two methods use matched models, datasets, splits, metrics, and evaluation protocols.
+
+---
+
+# 8. Experimental Protocol
+
+## 8.1 Data Splitting
+
+Each benchmark is divided into three conceptual subsets:
+
+```text
+                 Full optimization data
+                         |
+              +----------+----------+
+              |                     |
+           Mining                 Validation
+              |                     |
+              +----------+----------+
+                         |
+                    optimization
+                         |
+                    [SEALED]
+                         |
+                         v
+                       Test
+```
+
+The mining set provides examples that can be shown directly to the optimizer.
+
+The validation set is used to evaluate candidate prompt behavior during optimization but is not used as the final test set.
+
+The test set remains sealed until optimization has completed.
+
+---
+
+## 8.2 Multi-Seed Evaluation
+
+Because LLM outputs can vary even under nominally deterministic decoding, every principal configuration is evaluated across multiple independent seeds.
+
+We use:
+
+$$
+N_{\text{seeds}} = [3/5]
+$$
+
+independent runs per solver × benchmark × optimization method configuration.
+
+We report:
+
+* mean;
+* standard deviation;
+* median;
+* 95% confidence interval;
+* per-seed results; and
+* paired item-level differences where appropriate.
+
+The single-seed experiments conducted during development revealed substantial variability. Four identical LegalBench-Hearsay Reflective-FDPO configurations produced final test accuracies of 0.735, 0.755, 0.816, and 0.857, demonstrating that single-run differences of only a few percentage points can be difficult to interpret at these evaluation-set sizes.
+
+This motivates our use of multi-seed evaluation in the final experimental protocol.
+
+---
+
+# 9. Evaluation Metrics
+
+We measure both **task performance** and **optimization efficiency**.
+
+## 9.1 Task Performance
+
+For accuracy-based benchmarks:
+
+$$
+\text{Accuracy} =
+\frac{\text{correct predictions}}
+{\text{total predictions}}.
+$$
+
+For PUPA, we use the benchmark's composite metric:
+
+$$
+S_{\text{PUPA}}
+=
+\frac{\text{quality}+(1-\text{leakage})}{2}.
+$$
+
+For IFEval/IFBench, we use the mechanically verified pass-rate implementation described in Appendix [X].
+
+---
+
+## 9.2 Optimization Gain
+
+For a method \(m\):
+
+$$
+\Delta_m =
+S(p_m^*) - S(p_0).
+$$
+
+To directly compare Reflective-FDPO with Simple-FDPO:
+
+$$
+\Delta_{\text{reflect-vs-simple}}
+=
+S(p_{\text{Reflective}}^*)
+-
+S(p_{\text{Simple}}^*).
+$$
+
+---
+
+## 9.3 Recovery and Regression
+
+For each optimization round, we compute:
+
+$$
+R_t = |\{i:s_{t-1,i}=0,\ s_{t,i}=1\}|
+$$
+
+and
+
+$$
+G_t = |\{i:s_{t-1,i}=1,\ s_{t,i}=0\}|.
+$$
+
+We define the net transition as:
+
+$$
+N_t = R_t-G_t.
+$$
+
+This provides a direct measure of whether a prompt revision produces more recoveries than regressions.
+
+---
+
+## 9.4 Optimization Efficiency
+
+We additionally report:
+
+* optimizer calls;
+* solver calls;
+* total tokens;
+* optimizer tokens;
+* solver tokens;
+* wall-clock time;
+* estimated monetary cost;
+* improvement per optimization round; and
+* improvement per dollar.
+
+For each configuration:
+
+$$
+\text{Efficiency}
+=
+\frac{\Delta}{\text{optimization cost}}.
+$$
+
+[PLACEHOLDER: Define whether efficiency uses absolute cost, solver+optimizer cost, or only optimizer cost.]
+
+---
+
+# 10. Results
+
+> **NOTE: The tables in this section are deliberately written with placeholders for the final Qwen3-8B, Llama-3-8B, and multi-seed experiments.**
+
+## 10.1 Main Results
+
+The principal result is the controlled comparison between Simple-FDPO and Reflective-FDPO.
+
+| Benchmark  | Solver       | Seed | Baseline | Simple-FDPO | Reflective-FDPO | Reflective − Simple |
+| ---------- | ------------ | ---: | -------: | ----------: | --------------: | ------------------: |
+| LegalBench | GPT-4o-mini  |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| LegalBench | Claude Haiku |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| LegalBench | Qwen3-8B     |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| LegalBench | Llama-3-8B   |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| MMLU       | GPT-4o-mini  |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| MMLU       | Claude Haiku |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| MMLU       | Qwen3-8B     |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| MMLU       | Llama-3-8B   |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| IFBench    | GPT-4o-mini  |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| IFBench    | Qwen3-8B     |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| IFBench    | Llama-3-8B   |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| AIME       | GPT-4o-mini  |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| AIME       | Claude Haiku |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| AIME       | Qwen3-8B     |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| AIME       | Llama-3-8B   |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| PUPA       | GPT-4o-mini  |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| PUPA       | Claude Haiku |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| PUPA       | Qwen3-8B     |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+| PUPA       | Llama-3-8B   |  [N] |      [ ] |         [ ] |             [ ] |                 [ ] |
+
+### Aggregate results
+
+Across all benchmark-model combinations, Reflective-FDPO produces:
+
+* mean gain over seed prompt: **[X.X] pp**
+* median gain over seed prompt: **[X.X] pp**
+* mean gain over Simple-FDPO: **[X.X] pp**
+* configurations improved over Simple-FDPO: **[X]/[TOTAL]**
+* configurations degraded relative to Simple-FDPO: **[X]/[TOTAL]**
+* statistically significant improvements: **[X]/[TOTAL]**
+
+[PLACEHOLDER: Do not report aggregate statistics until all seeds are complete.]
+
+---
+
+# 11. RQ1: Does Outcome-Aware Reflection Improve Prompt Optimization?
+
+The controlled Simple-FDPO versus Reflective-FDPO comparison evaluates whether the proposed feedback signal provides value beyond ordinary iterative prompt refinement.
+
+Across [X] benchmark-model combinations, Reflective-FDPO improves over Simple-FDPO by an average of **[X.X] percentage points**.
+
+The largest improvement occurs on **[BENCHMARK/MODEL]**, where Reflective-FDPO achieves **[X]%** compared with **[Y]%** for Simple-FDPO.
+
+The smallest effect occurs on **[BENCHMARK/MODEL]**, where the difference is **[X] pp**.
+
+[IF RESULT IS POSITIVE:]
+
+These results support the hypothesis that exposing the optimizer to the consequences of its previous intervention provides useful information beyond the current failure set. In particular, the optimizer can distinguish between edits that repair failures without substantial collateral damage and edits that improve a subset of examples while producing regressions elsewhere.
+
+[IF RESULT IS MIXED:]
+
+The results indicate that outcome-aware reflection is not universally beneficial. While Reflective-FDPO improves performance on [X] configurations, it produces neutral or negative effects on [Y]. This suggests that the usefulness of intervention feedback depends on task characteristics, solver capability, or the reliability of the evaluation signal.
+
+---
+
+# 12. RQ2: Does Reflective-FDPO Generalize Across Solver Models?
+
+We next examine whether the mechanism depends on the solver model.
+
+The inclusion of Qwen3-8B and Llama-3-8B is particularly important because prior prompt-optimization work frequently reports results using models such as Qwen3-8B and GPT-4.1 Mini. Evaluating Reflective-FDPO on the same or closely related solver families reduces the model-scale asymmetry present in our preliminary experiments.
+
+| Solver           | Mean baseline | Mean Simple-FDPO | Mean Reflective-FDPO | Gain |
+| ---------------- | ------------: | ---------------: | -------------------: | ---: |
+| GPT-4o-mini      |           [ ] |              [ ] |                  [ ] |  [ ] |
+| Claude Haiku 4.5 |           [ ] |              [ ] |                  [ ] |  [ ] |
+| Qwen3-8B         |           [ ] |              [ ] |                  [ ] |  [ ] |
+| Llama-3-8B       |           [ ] |              [ ] |                  [ ] |  [ ] |
+
+[PLACEHOLDER: Analyze whether the gain correlates with baseline performance.]
+
+One possibility is that weaker or smaller solver models benefit more from prompt optimization because they have greater headroom for instruction-level improvement. Conversely, stronger models may provide more reliable feedback and therefore enable the optimizer to exploit reflective signals more effectively.
+
+We therefore do not assume a monotonic relationship between solver capability and optimization gain. Instead, we treat model-dependent behavior as an empirical question.
+
+---
+
+# 13. RQ3: Does Reflective-FDPO Generalize Across Tasks?
+
+The benchmark suite intentionally spans substantially different task characteristics.
+
+### LegalBench-Hearsay
+
+Preliminary experiments show that Reflective-FDPO can produce meaningful improvements, but repeated identical configurations also exhibit substantial variance. This makes LegalBench particularly useful for evaluating both optimization effectiveness and reproducibility.
+
+### MMLU
+
+Preliminary experiments across six subjects produced a mean improvement of approximately **+2.0 pp**, with five of six subjects improving and computer security decreasing by 1.5 pp.
+
+The heterogeneous subject behavior suggests that reflection can help in some domains without guaranteeing universal improvement.
+
+### IFBench
+
+Preliminary experiments showed regressions under Reflective-FDPO. We therefore treat IFBench as an important negative case rather than excluding it.
+
+[PLACEHOLDER: Insert multi-seed result.]
+
+### AIME
+
+Preliminary experiments produced mixed outcomes across solver models.
+
+A critical confound is that published GEPA AIME results use a DSPy Chain-of-Thought scaffold, while our initial baseline used a bare markdown prompt. Consequently, absolute baseline scores are not directly comparable.
+
+The final experiment therefore includes a matched scaffold condition:
+
+```text
+Bare Seed
+   |
+   +---- Simple-FDPO
+   |
+   +---- Reflective-FDPO
+
+CoT-Scaffolded Seed
+   |
+   +---- Simple-FDPO
+   |
+   +---- Reflective-FDPO
+```
+
+This separates the contribution of reasoning scaffolding from the contribution of reflective optimization.
+
+### PUPA
+
+PUPA provides the closest available comparison to GEPA because its composite score is implemented on the same nominal scale.
+
+Preliminary Reflective-FDPO results improved:
+
+* GPT-4o-mini: 0.685 → 0.799 (+11.4 pp)
+* Claude Haiku 4.5: 0.805 → 0.843 (+3.8 pp)
+
+[PLACEHOLDER: Replace preliminary values with multi-seed mean ± std.]
+
+The difference between models illustrates a possible ceiling effect: Haiku begins with substantially higher baseline performance, leaving less room for improvement.
+
+---
+
+# 14. RQ4: What Components of Reflection Matter?
+
+## 14.1 Validation Outcome Feedback Ablation
+
+The central mechanism consists of feedback from both mining and validation outcomes.
+
+We therefore compare:
+
+### Full Reflective-FDPO
+
+```text
+Mining recoveries
+Mining regressions
+Validation recoveries
+Validation regressions
+```
+
+against:
+
+### Mining-Only Reflection
+
+```text
+Mining recoveries
+Mining regressions
+```
+
+The two variants use identical optimization budgets.
+
+| Variant         | Mean score | Δ vs. Full Reflection |
+| --------------- | ---------: | --------------------: |
+| Full Reflection |        [ ] |                     — |
+| Mining-only     |        [ ] |                   [ ] |
+| Failure-only    |        [ ] |                   [ ] |
+
+[PLACEHOLDER: Add statistical analysis.]
+
+If full reflection consistently outperforms mining-only reflection, this would provide evidence that validation transition information contributes independently of failure analysis.
+
+---
+
+## 14.2 Round Selection
+
+An optimization trajectory can contain several candidate prompts:
+
+$$
+p_0,p_1,\ldots,p_T.
+$$
+
+Selecting the final candidate \(p_T\) is not necessarily optimal.
+
+We therefore evaluate a **best-of-rounds** policy that selects:
+
+$$
+p^* = \arg\max_{p_t} S_{\text{validation}}(p_t).
+$$
+
+The selected prompt is then evaluated once on the sealed test set.
+
+This policy uses validation information that is already collected during optimization rather than discarding it after each round.
+
+The preliminary experiments motivating this change found cases where a later round had lower validation performance than an earlier committed round. However, a retroactive PUPA analysis showed that one such validation-based choice did not produce a statistically meaningful test improvement by itself.
+
+We therefore treat best-of-round selection as an engineering improvement rather than evidence of a standalone causal effect.
+
+---
+
+## 14.3 Accept-Margin Gate
+
+An earlier version of Reflective-FDPO reverted the entire optimization trajectory when the final validation score fell below the baseline by a fixed margin.
+
+We removed this gate because repeated runs showed that validation scores at \(n\approx25-32\) can fluctuate substantially.
+
+This provides an important methodological lesson:
+
+> **A noisy validation estimate should not necessarily be treated as reliable evidence that an optimization trajectory is harmful.**
+
+The final method therefore retains the best committed round rather than applying a hard accept/reject decision based on a single noisy validation comparison.
+
+---
+
+# 15. RQ5: Reliability of Prompt Optimization
+
+One of the most important findings of this study concerns evaluation variance.
+
+Four identical Reflective-FDPO LegalBench-Hearsay configurations produced:
+
+| Run | Final test accuracy |
+| --- | ------------------: |
+| 1   |               73.5% |
+| 2   |               75.5% |
+| 3   |               81.6% |
+| 4   |               85.7% |
+
+The total spread is **12.2 percentage points** despite identical seeds/configurations at the application level and nominally deterministic decoding.
+
+This finding changes how small optimization gains should be interpreted.
+
+For example, a reported improvement of +3 pp may appear meaningful when presented as:
+
+```text
+70% → 73%
+```
+
+but may be smaller than the run-to-run variation of the underlying evaluation process.
+
+We therefore report multi-seed distributions rather than relying on individual trajectories.
+
+This is especially important for benchmarks with only 30–66 test examples. Approximate binomial standard errors are large at such sample sizes, and model sampling can introduce additional variation.
+
+---
+
+# 16. Statistical Analysis
+
+For each solver × benchmark configuration, we compare paired outcomes across independent optimization runs.
+
+We report:
+
+$$
+\bar{\Delta}
+=
+\frac{1}{N}
+\sum_{j=1}^{N}\Delta_j
+$$
+
+and
+
+$$
+\sigma_\Delta
+=
+\sqrt{
+\frac{1}{N-1}
+\sum_{j=1}^{N}
+(\Delta_j-\bar{\Delta})^2
+}.
+$$
+
+We additionally report 95% confidence intervals.
+
+For item-level paired comparisons, we use [McNemar's test / paired bootstrap / permutation test — SELECT ONE AFTER FINAL ANALYSIS].
+
+Multiple comparisons across benchmark/model configurations are corrected using [METHOD].
+
+We avoid interpreting a positive mean delta as evidence of a reliable improvement unless its uncertainty supports that conclusion.
+
+---
+
+# 17. Efficiency and Cost
+
+Prompt optimization can improve task performance while introducing additional inference cost.
+
+We therefore evaluate:
+
+```text
+                    Optimization
+                         |
+             +-----------+-----------+
+             |                       |
+          Quality                    Cost
+             |                       |
+          Accuracy             LLM calls
+          F1/score              Tokens
+                               Latency
+                               $
+```
+
+| Method          | Solver | Avg. calls | Tokens | Cost | Final score | Gain/$ |
+| --------------- | ------ | ---------: | -----: | ---: | ----------: | -----: |
+| Simple-FDPO     | [ ]    |        [ ] |    [ ] |  [ ] |         [ ] |    [ ] |
+| Reflective-FDPO | [ ]    |        [ ] |    [ ] |  [ ] |         [ ] |    [ ] |
+
+Reflective-FDPO necessarily introduces additional feedback-processing context, which can increase optimizer token consumption.
+
+The relevant question is therefore not simply whether reflection increases accuracy, but whether the resulting improvement justifies its computational cost.
+
+[PLACEHOLDER: Include exact Azure/OpenAI/Anthropic/local inference pricing.]
+
+---
+
+# 18. Qualitative Analysis
+
+Quantitative results indicate whether a prompt changed performance; they do not necessarily explain why.
+
+We therefore manually categorize optimization edits into:
+
+1. clarification of task semantics;
+2. output-format constraints;
+3. explicit edge-case handling;
+4. reasoning guidance;
+5. error-specific rules;
+6. removal of harmful instructions;
+7. contradiction resolution;
+8. overfitting to mining examples; and
+9. other.
+
+For each category we analyze:
+
+* number of edits;
+* recovery count;
+* regression count;
+* validation transfer;
+* final test effect.
+
+A representative reflective trajectory is:
+
+```text
+Round 0
+  ↓
+Failure: model confuses A and B
+  ↓
+Round 1
+  ↓
+A/B distinction added
+  ↓
+Mining:
+  +4 recovered
+  -1 regressed
+
+Validation:
+  +3 recovered
+  -0 regressed
+  ↓
+Round 2
+  ↓
+Optimizer retains distinction
+and strengthens boundary case
+```
+
+In contrast, a failure case may look like:
+
+```text
+Round 0
+  ↓
+Failure: missing constraint
+  ↓
+Round 1
+  ↓
+Optimizer adds aggressive constraint
+  ↓
+Mining:
+  +5 recovered
+  -4 regressed
+
+Validation:
+  +0 recovered
+  -3 regressed
+  ↓
+Reflective feedback exposes
+the collateral damage
+```
+
+These cases illustrate the intended purpose of the mechanism: making the optimizer explicitly aware of the consequences of its interventions.
+
+---
+
+# 19. Comparison with Prior Work
+
+We compare our results with prior prompt-optimization methods where published results are available.
+
+| Method          | Solver       | Benchmark | Baseline | Optimized |      Δ |
+| --------------- | ------------ | --------- | -------: | --------: | -----: |
+| MPO             | Llama-3-8B   | MMLU      |    57.21 |     61.50 |  +4.29 |
+| TextGrad        | Llama-3-8B   | MMLU      |    57.21 |     56.40 |  −0.81 |
+| GEPA            | Qwen3-8B     | IFBench   |    36.90 |     38.61 |  +1.71 |
+| MIPROv2         | Qwen3-8B     | IFBench   |    36.90 |     36.22 |  −0.68 |
+| GEPA            | Qwen3-8B     | AIME      |    27.33 |     32.00 |  +4.67 |
+| GEPA            | GPT-4.1 Mini | AIME      |    49.33 |     59.33 | +10.00 |
+| GEPA            | Qwen3-8B     | PUPA      |    80.82 |     91.85 | +11.03 |
+| GEPA            | GPT-4.1 Mini | PUPA      |    78.57 |     94.47 | +15.90 |
+| Reflective-FDPO | Qwen3-8B     | MMLU      |      [ ] |       [ ] |    [ ] |
+| Reflective-FDPO | Qwen3-8B     | AIME      |      [ ] |       [ ] |    [ ] |
+| Reflective-FDPO | Qwen3-8B     | PUPA      |      [ ] |       [ ] |    [ ] |
+| Reflective-FDPO | Llama-3-8B   | MMLU      |      [ ] |       [ ] |    [ ] |
+| Reflective-FDPO | Llama-3-8B   | AIME      |      [ ] |       [ ] |    [ ] |
+| Reflective-FDPO | Llama-3-8B   | PUPA      |      [ ] |       [ ] |    [ ] |
+
+These comparisons must be interpreted carefully.
+
+The external studies differ in:
+
+* solver models;
+* prompt scaffolding;
+* train/validation/test splits;
+* number of optimization rounds;
+* evaluation-set size;
+* random seeds;
+* optimization budgets; and
+* sometimes metric definitions.
+
+Therefore, we use prior results primarily to establish the broader empirical context rather than claiming strict head-to-head superiority.
+
+The strongest external comparisons are those for which we reproduce the same solver family, benchmark, split, metric, and baseline construction.
+
+---
+
+# 20. Discussion
+
+## 20.1 Why Might Outcome Reflection Help?
+
+A conventional failure trace provides a snapshot:
+
+$$
+\text{What is wrong now?}
+$$
+
+Reflective feedback provides a transition:
+
+$$
+\text{What changed after my intervention?}
+$$
+
+The latter may be more useful for iterative optimization because the optimizer can reason about the consequences of its own previous decision.
+
+For example, suppose an optimizer adds:
+
+> "Always explicitly distinguish hearsay from non-hearsay."
+
+If this change recovers several examples but causes several previously correct examples to fail, the regression pattern provides evidence that the new instruction is too broad.
+
+Without transition information, the optimizer might simply observe the current failures and attempt another unrelated modification.
+
+Reflection instead provides:
+
+```text
+Your previous change:
+    fixed A, B, C
+    broke D, E
+
+Therefore:
+    preserve the mechanism that fixed A/B/C
+    but narrow the rule responsible for D/E
+```
+
+This is a form of feedback that is naturally aligned with iterative intervention.
+
+---
+
+## 20.2 Why Might Reflection Fail?
+
+Reflection is not guaranteed to improve optimization.
+
+There are several possible failure modes.
+
+### Noisy evaluation
+
+If the solver changes its answer between evaluations of the same prompt, the optimizer may interpret stochastic noise as an effect of its intervention.
+
+### Small validation sets
+
+A validation set containing only 20–30 examples can produce unstable estimates.
+
+### Overfitting
+
+Showing item-level examples to the optimizer can encourage memorization rather than generalizable instruction improvement.
+
+### Excessive feedback
+
+Providing every recovered and regressed item may overwhelm the optimizer's context or dilute the most informative signals.
+
+### Strong baseline performance
+
+When the initial solver is already near a task ceiling, there may be little room for improvement.
+
+### Incompatible task structure
+
+Some tasks may not be easily improved through prompt-level behavioral changes.
+
+These failure modes motivate our negative-result analysis rather than treating unsuccessful optimization trajectories as experimental noise to be discarded.
+
+---
+
+# 21. Threats to Validity
+
+## 21.1 Solver Sampling Variance
+
+LLM outputs can vary even under nominally deterministic settings. Our repeated LegalBench experiments demonstrate that this variance can be large relative to typical prompt-optimization gains.
+
+We therefore use multiple independent runs and report uncertainty.
+
+---
+
+## 21.2 Benchmark Size
+
+Several test sets are small.
+
+The effective uncertainty of a binary accuracy estimate can therefore be large. Results from individual small benchmarks should not be interpreted independently of their confidence intervals.
+
+---
+
+## 21.3 External Baseline Comparability
+
+Published prompt-optimization results frequently use different solver models, prompt scaffolds, data splits, and evaluation procedures.
+
+We therefore distinguish:
+
+```text
+Matched comparison
+```
+
+from:
+
+```text
+Contextual published comparison
+```
+
+and avoid presenting the latter as a direct head-to-head result.
+
+---
+
+## 21.4 Model-Scale Asymmetry
+
+The preliminary experiments primarily used GPT-4o-mini and Claude Haiku 4.5, whereas several prior works report Qwen3-8B, Llama-3-8B, or GPT-4.1 Mini.
+
+The final experiments reduce this asymmetry by evaluating Qwen3-8B and Llama-3-8B directly.
+
+---
+
+## 21.5 Baseline Construction
+
+Prompt scaffolding can substantially affect absolute model performance.
+
+This is especially important for AIME, where GEPA's published baseline uses a DSPy Chain-of-Thought scaffold while the initial Reflective-FDPO baseline used a bare markdown instruction.
+
+We therefore report matched and unmatched comparisons separately.
+
+---
+
+## 21.6 Optimizer Dependence
+
+All experiments currently use GPT-5 as the optimizer and judge.
+
+Therefore, the results establish the behavior of Reflective-FDPO under this optimizer configuration but do not establish that the mechanism is independent of optimizer capability.
+
+Future work should evaluate alternative optimizer models.
+
+---
+
+# 22. Reproducibility
+
+We release [REPOSITORY URL] containing:
+
+* benchmark preparation scripts;
+* prompt templates;
+* optimizer prompts;
+* Simple-FDPO implementation;
+* Reflective-FDPO implementation;
+* evaluation scripts;
+* benchmark-specific verifiers;
+* per-item evaluation ledgers;
+* prompt-version history;
+* round reconstruction utilities;
+* cost accounting;
+* experimental configuration files; and
+* raw result summaries.
+
+The implementation includes a reusable:
+
+```text
+PromptRegistry.restore_round()
+```
+
+primitive for reconstructing the exact prompt produced at any historical optimization round.
+
+This allows a previously generated prompt to be evaluated retrospectively on a sealed test set without reconstructing the optimization trajectory.
+
+We additionally provide an IFEval/IFBench verifier covering [82] constraint types and benchmark-specific pipelines for AIME and PUPA.
+
+---
+
+# 23. Conclusion
+
+We introduced Reflective Feedback-Driven Prompt Optimization, a prompt optimization procedure that explicitly exposes an optimizer to the measured consequences of its previous prompt revisions.
+
+The central difference from conventional failure-driven optimization is simple:
+
+> **Instead of showing the optimizer only what failed, we show it what changed because of its previous intervention.**
+
+Through a controlled Simple-FDPO versus Reflective-FDPO comparison, we investigate whether this additional feedback improves prompt optimization across five heterogeneous tasks and multiple solver models.
+
+Our final results show that Reflective-FDPO [IMPROVES / DOES NOT CONSISTENTLY IMPROVE] performance across [X] of [TOTAL] configurations, with an average improvement of [X.X] percentage points over Simple-FDPO. The effect is [MODEL-/TASK-DEPENDENT], indicating that outcome-aware feedback is [a broadly useful / a conditionally useful] component of automated prompt optimization.
+
+Beyond the optimization results themselves, our repeated-run experiments demonstrate that prompt optimization can be substantially affected by LLM sampling variance and small evaluation-set sizes. We therefore argue that multi-seed evaluation should be treated as a first-class requirement for empirical prompt-optimization research rather than an optional robustness experiment.
+
+More broadly, our findings suggest that prompt optimization can benefit from treating each prompt revision as an intervention whose consequences should be measured and fed back into subsequent optimization. This perspective shifts automated prompt optimization from simply **diagnosing failures** toward **learning from the behavioral consequences of previous edits**.
+
+---
+
+# Appendix A. Complete Experimental Matrix
+
+| Benchmark  | Solver       | Method     | Seeds | Rounds | Mining | Validation | Test |
+| ---------- | ------------ | ---------- | ----: | -----: | -----: | ---------: | ---: |
+| LegalBench | GPT-4o-mini  | Simple     |   [ ] |    [ ] |    [ ] |        [ ] |  [ ] |
+| LegalBench | GPT-4o-mini  | Reflective |   [ ] |    [ ] |    [ ] |        [ ] |  [ ] |
+| LegalBench | Claude Haiku | Simple     |   [ ] |    [ ] |    [ ] |        [ ] |  [ ] |
+| LegalBench | Claude Haiku | Reflective |   [ ] |    [ ] |    [ ] |        [ ] |  [ ] |
+| LegalBench | Qwen3-8B     | Simple     |   [ ] |    [ ] |    [ ] |        [ ] |  [ ] |
+| LegalBench | Qwen3-8B     | Reflective |   [ ] |    [ ] |    [ ] |        [ ] |  [ ] |
+| LegalBench | Llama-3-8B   | Simple     |   [ ] |    [ ] |    [ ] |        [ ] |  [ ] |
+| LegalBench | Llama-3-8B   | Reflective |   [ ] |    [ ] |    [ ] |        [ ] |  [ ] |
+| MMLU       | ...          | ...        |   ... |    ... |    ... |        ... |  ... |
+
+---
+
+# Appendix B. Optimizer Feedback Format
+
+A simplified version of the reflective feedback supplied to the optimizer is:
+
+```text
+PREVIOUS PROMPT
+----------------
+[previous prompt]
+
+YOUR PREVIOUS EDIT
+------------------
+[description of changed sections]
+
+MINING ITEMS RECOVERED
+----------------------
+[item-level examples]
+
+MINING ITEMS REGRESSED
+----------------------
+[item-level examples]
+[new incorrect outputs]
+
+VALIDATION ITEMS RECOVERED
+--------------------------
+[item-level examples]
+
+VALIDATION ITEMS REGRESSED
+--------------------------
+[item-level examples]
+[new incorrect outputs]
+
+CURRENT PERFORMANCE
+-------------------
+Mining:     [score]
+Validation: [score]
+
+TASK
+----
+Analyze the consequences of your previous edit.
+Preserve improvements where possible.
+Avoid regressions.
+Produce the next prompt revision.
+```
+
+---
+
+# Appendix C. Prompt Optimization Algorithm
+
+```text
+Algorithm 1: Reflective-FDPO
+
+Input:
+    seed prompt p0
+    mining set Dm
+    validation set Dv
+    sealed test set Dt
+    solver M
+    optimizer O
+    number of rounds T
+
+1: Evaluate p0 on Dm and Dv
+2: Record baseline outcomes
+3: candidates ← ∅
+
+4: for t = 1 ... T do
+
+5:     if t = 1 then
+6:         feedback ← current failure feedback
+7:     else
+8:         feedback ←
+9:             current failures
+10:            + mining recoveries
+11:            + mining regressions
+12:            + validation recoveries
+13:            + validation regressions
+14:            + previous prompt sections
+15:     end if
+
+16:     p_t ← O(p_(t-1), feedback)
+
+17:     Evaluate p_t on Dm
+18:     Evaluate p_t on Dv
+
+19:     Compute recoveries and regressions
+20:     Store complete prompt version
+21:     candidates ← candidates ∪ {p_t}
+
+22: end for
+
+23: p* ← best committed prompt according to validation score
+
+24: Evaluate p* exactly once on sealed test set Dt
+
+25: return p*
+```
+
+---
+
+# Appendix D. Required Final Experiments Before Submission
+
+The following experiments are required before making strong claims:
+
+* [ ] ≥3 independent seeds for every principal configuration.
+* [ ] Qwen3-8B on all five benchmarks.
+* [ ] Llama-3-8B on all five benchmarks.
+* [ ] Simple-FDPO on the same solver × benchmark matrix.
+* [ ] Matched AIME CoT baseline.
+* [ ] Mining-only reflection ablation.
+* [ ] Full reflection ablation.
+* [ ] Best-of-rounds versus last-round selection.
+* [ ] Cost accounting for all providers.
+* [ ] Confidence intervals.
+* [ ] Statistical significance / paired tests.
+* [ ] Exact IFBench metric verification.
+* [ ] Final external-baseline comparison table.
+* [ ] Per-seed raw results in supplementary material.
+* [ ] Exact model/checkpoint and inference settings for Qwen/Llama.
+* [ ] Repository and configuration release.
+* [ ] Final qualitative analysis of successful and failed edits.
+
+---
+
+# Appendix E. Main Claim to Preserve
+
+The paper should ultimately make **one central claim**:
+
+> **Reflective-FDPO improves feedback-driven prompt optimization by exposing the optimizer to the item-level consequences of its previous edits, allowing it to reason about both recoveries and regressions on mining and validation examples.**
+
+It should **not** claim:
+
+> "Reflective-FDPO universally outperforms GEPA/MIPROv2/ProTeGi."
+
+Unless a later experiment establishes that under genuinely matched conditions.
+
+The strongest version of the paper is instead:
+
+> **Outcome-aware reflection is a distinct and measurable source of optimization signal, and its benefit can be isolated through controlled Simple-FDPO versus Reflective-FDPO experiments.**

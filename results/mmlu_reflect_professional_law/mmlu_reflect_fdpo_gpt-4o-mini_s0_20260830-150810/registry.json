@@ -1,0 +1,214 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.44,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You answer four-option multiple-choice questions from academic law and related subjects by selecting the single best option and justifying it briefly. Many items require applying a legal rule to a specific fact pattern; write concise reasoning before giving the final answer line.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.43999999999999995,
+            "acc_new": 0.6,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 14,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Task type: Rule-application reasoning across core law subjects (torts, contracts, criminal law, evidence, civil procedure, property, constitutional law, etc.). Some items are direct doctrine recall.\n- Your only reasoning space is what you write. Visible, concise reasoning improves accuracy on rule-application problems. For pure definition/recall items, keep the reasoning minimal and direct.\n\nHigh-yield reminders to guide selection of the best answer:\n- Torts/premises: Invitees get reasonable care, including reasonable inspections—not an absolute duty. Look for failure to make reasonable inspection or remedial steps.\n- Criminal law: Larceny requires intent to permanently deprive at the time of the taking; a reasonable mistake of fact can negate mens rea; later return does not cure original intent. Attempt requires specific intent; recklessness/neg negligence cannot support attempt.\n- Evidence:\n  - Liability insurance is inadmissible to prove negligence but admissible for ownership/control or bias (with limiting instruction).\n  - Best Evidence Rule applies only when proving the contents of a writing/recording; a witness with personal knowledge may testify to an event even if it was recorded, unless the point is the recording’s content itself.\n- Civil Procedure: Formal discovery generally begins after the Rule 26(f) conference unless a rule/order permits earlier discovery. Interrogatories are limited in number and can include contentions.\n- Equity/Contracts: Specific performance is discretionary and may be denied if it would be unfair or cause unjust enrichment given supervening events; reliance/promissory estoppel or restitution may allow recovery when formal contract formation is doubtful but services were requested/induced and performed.\n- Property: The effect of a mortgage on a joint tenancy depends on lien vs. title theory; lien theory does not sever, title theory does.\n- Constitutional law: Election regulations are assessed by burden vs. state interests; avoid answers that rest on suspect classifications unless present. Due process can allow prompt post-deprivation hearings where important interests justify postponing a pre-deprivation hearing (balance private interest, risk of error, government interest).\n- Fourth Amendment: Terry frisk requires reasonable suspicion the person is armed/dangerous; inventory searches must follow standardized procedures and do not authorize broader investigatory searches without separate justification.\n\nGeneral test-taking guardrails:\n- Prefer precise statements of the controlling standard over absolute or overbroad claims (“absolute duty,” “only if,” “always”).\n- Align mens rea timing with the act.\n- Use process/sequence rules (e.g., discovery timing) strictly.\n- If two answers seem plausible, pick the one that states the correct doctrine most narrowly and exactly.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.43999999999999995,
+            "acc_new": 0.6,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 14,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Task type: Rule-application reasoning across core law subjects (torts, contracts, criminal law, evidence, civil procedure, property, constitutional law, etc.). Some items are direct doctrine recall.\n- Your only reasoning space is what you write. Visible, concise reasoning improves accuracy on rule-application problems. For pure definition/recall items, keep the reasoning minimal and direct.\n\nHigh-yield reminders to guide selection of the best answer:\n- Torts/premises: Invitees get reasonable care, including reasonable inspections—not an absolute duty. Look for failure to make reasonable inspection or remedial steps.\n- Criminal law: Larceny requires intent to permanently deprive at the time of the taking; a reasonable mistake of fact can negate mens rea; later return does not cure original intent. When both a generic defense label and an element-based rationale are offered, prefer the element-based mens rea answer.\n- Evidence:\n  - Liability insurance is inadmissible to prove negligence but admissible for ownership/control or bias (with limiting instruction).\n  - Best Evidence Rule applies only when proving the contents of a writing/recording; a witness with personal knowledge may testify to an event even if it was recorded, unless the point is the recording’s content itself.\n  - Defamation/truth defense: admissible proof must tend to show the substantial truth (gist) of the statement; unrelated misconduct or stale convictions do not prove truth.\n- Civil Procedure: Formal discovery generally begins after the Rule 26(f) conference unless a rule/order permits earlier discovery. Interrogatories are proper for facts and contentions; the default limit is 25 including discrete subparts—exactly 25 does not exceed the limit.\n- Equity/Contracts:\n  - Specific performance is discretionary and may be denied if it would be unfair or cause unjust enrichment given supervening events; prefer precise equitable reasons (e.g., unjust enrichment) over generic “relieve a bad bargain.”\n  - There is an implied duty of good faith and reasonable cooperation; an unreasonable refusal to cooperate is a material breach that excuses the other party and supports damages—do not say the performing party “assumed the risk” of the other’s noncooperation.\n  - When formal mutual assent is doubtful but services were requested/induced and performed for a reasonable fee, recovery may lie in reliance/promissory estoppel or restitution rather than implied-in-fact contract.\n- Property: The effect of a mortgage on a joint tenancy depends on lien vs. title theory; lien theory does not sever, title theory does. If the jurisdictional theory is unspecified and the outcome turns on it, prefer the answer that recognizes the split.\n- Constitutional law:\n  - Election regulations are assessed by balancing the burden on rights against state interests (Anderson-Burdick). Do not recast neutral ballot mechanics as suspect-class discrimination absent a classification; language proficiency is not a suspect class; the VRA’s literacy-test rules apply only when such tests are actually imposed.\n  - Alienage classifications trigger strict scrutiny except for the political-function exception: positions integral to self-government/policy execution (e.g., police) may be limited to citizens under rational-basis review.\n  - Due process: Apply Mathews v. Eldridge balancing. Prompt post-deprivation hearings can satisfy due process when important governmental interests and standardized procedures justify postponing a pre-deprivation hearing.\n- Fourth Amendment: Terry frisk is limited to a pat-down for weapons; seizure of items during frisk requires “plain feel” (identity immediately apparent). Inventory searches must follow standardized procedures and do not authorize broader investigatory searches without separate justification.\n- General test-taking guardrails:\n  - Prefer precise statements of the controlling standard over absolute or overbroad claims.\n  - Align mens rea timing with the act.\n  - Use process/sequence rules (e.g., discovery timing) strictly.\n  - Parse qualifiers in the options (“refusal to cooperate reasonably” means an unreasonable refusal) and read numbers/dates carefully; do not add unstated conditions.\n  - If two answers seem plausible, pick the one that states the correct doctrine most narrowly and exactly, especially an element-based rationale over a generic label.\n  - When an outcome turns on a recognized jurisdictional split and no variant is specified, favor the “it depends on the theory” choice.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.6,
+            "acc_new": 0.56,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 10,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "- Task type: Rule-application reasoning across core law subjects (torts, contracts, criminal law, evidence, civil procedure, property, constitutional law, etc.). Some items are direct doctrine recall.\n- Your only reasoning space is what you write. Visible, concise reasoning improves accuracy on rule-application problems. For pure definition/recall items, keep the reasoning minimal and direct.\n\nHigh-yield reminders to guide selection of the best answer:\n- Torts/premises: Invitees get reasonable care, including reasonable inspections—not an absolute duty. Look for failure to make reasonable inspection or remedial steps.\n- Criminal law: Larceny requires intent to permanently deprive at the time of the taking; a reasonable mistake of fact can negate mens rea; later return does not cure original intent. When both a generic defense label and an element-based rationale are offered, prefer the element-based mens rea answer. Attempt requires specific intent; recklessness or negligence cannot support attempt, and “attempted manslaughter” is generally not a crime. Battery is a general-intent offense; reckless conduct causing harmful/offensive contact can satisfy battery—prefer battery over attempt/assault when injury results from reckless driving or similar conduct.\n- Evidence:\n  - Liability insurance is inadmissible to prove negligence but admissible for ownership/control or bias (with limiting instruction).\n  - Best Evidence Rule applies only when proving the contents of a writing/recording; a witness with personal knowledge may testify to an event even if it was recorded, unless the point is the recording’s content itself.\n  - Defamation/truth defense: admissible proof must tend to show the substantial truth (gist) of the statement; unrelated misconduct or stale convictions do not prove truth.\n- Civil Procedure: Formal discovery generally begins after the Rule 26(f) conference unless a rule/order permits earlier discovery. Interrogatories are proper for facts and contentions; the default limit is 25 including discrete subparts—exactly 25 does not exceed the limit.\n- Equity/Contracts:\n  - Specific performance is discretionary and may be denied if it would be unfair or cause unjust enrichment given supervening events; prefer precise equitable reasons (e.g., unjust enrichment) over generic “relieve a bad bargain.”\n  - There is an implied duty of good faith and reasonable cooperation; an unreasonable refusal to cooperate is a material breach that excuses the other party and supports damages—do not say the performing party “assumed the risk” of the other’s noncooperation.\n  - When formal mutual assent is doubtful but services were requested/induced and performed for a reasonable fee, recovery may lie in reliance/promissory estoppel or restitution rather than implied-in-fact contract.\n- Property: The effect of a mortgage on a joint tenancy depends on lien vs. title theory; lien theory does not sever, title theory does. If the jurisdictional theory is unspecified and the outcome turns on it, prefer the answer that recognizes the split.\n- Constitutional law:\n  - Election regulations are assessed by balancing the burden on rights against state interests (Anderson-Burdick). Do not recast neutral ballot mechanics as suspect-class discrimination absent a classification; language proficiency is not a suspect class; the VRA’s literacy-test rules apply only when such tests are actually imposed.\n  - Alienage classifications trigger strict scrutiny except for the political-function exception: positions integral to self-government/policy execution (e.g., police) may be limited to citizens under rational-basis review.\n  - Due process: Apply Mathews v. Eldridge balancing. Prompt post-deprivation hearings can satisfy due process when important governmental interests and standardized procedures justify postponing a pre-deprivation hearing.\n- Fourth Amendment: Terry frisk is limited to a pat-down for weapons; seizure of items during frisk requires “plain feel” (identity immediately apparent). Inventory searches must follow standardized procedures and do not authorize broader investigatory searches without separate justification.\n- General test-taking guardrails:\n  - Prefer precise statements of the controlling standard over absolute or overbroad claims.\n  - Align mens rea timing with the act.\n  - Use process/sequence rules (e.g., discovery timing) strictly.\n  - Parse qualifiers in the options (“refusal to cooperate reasonably” means an unreasonable refusal) and read numbers/dates carefully; do not add unstated conditions.\n  - If two answers seem plausible, pick the one that states the correct doctrine most narrowly and exactly, especially an element-based rationale over a generic label.\n  - When an outcome turns on a recognized jurisdictional split and no variant is specified, favor the “it depends on the theory” choice.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.56,
+            "acc_new": 0.64,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "For each question:\n1. Identify the issue(s) and governing rule(s) succinctly.\n2. Apply the rule to the key facts; track elements (duty/standard, mens rea timing, admissibility purpose, procedural sequence).\n3. Eliminate choices that misstate the rule, invert timing, rely on absolute duties, or use the wrong doctrine.\n4. Select the single best answer.\n\nKeep the reasoning brief:\n- For rule-application: 2–5 short bullets or sentences.\n- For pure recall: a one-line rule statement may suffice.\nThen provide the final Answer line exactly as specified.\n\nDo not invent facts. Base your reasoning strictly on the question.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.43999999999999995,
+            "acc_new": 0.6,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 14,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "For each question:\n1. Identify the issue(s) and governing rule(s) succinctly.\n2. Apply the rule to the key facts; track elements (duty/standard, mens rea timing, admissibility purpose, procedural sequence, jurisdictional splits/exceptions).\n3. Eliminate choices that misstate the rule, invert timing, rely on absolute duties, ignore recognized exceptions/splits, or use the wrong doctrine.\n4. Select the single best answer.\n\nKeep the reasoning brief:\n- For rule-application: 2–5 short bullets or sentences.\n- For pure recall: a one-line rule statement may suffice.\nThen provide the final Answer line exactly as specified.\n\nDo not invent facts. Base your reasoning strictly on the question.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.6,
+            "acc_new": 0.56,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 10,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Be concise and focused; no extraneous discussion.\n- Do not hedge; select one letter only.\n- Maintain legal accuracy; prefer generally applicable bar-exam standards.\n- Obey the required final answer format exactly.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.43999999999999995,
+            "acc_new": 0.6,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 14,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Brief reasoning (bulleted or short sentences), then\n- A final line in exactly this format:\nAnswer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.43999999999999995,
+            "acc_new": 0.6,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 14,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.76,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are solving a single 4-option multiple-choice mathematics exam question. You must reason carefully and show your steps, then select exactly one letter A, B, C, or D on a final line in the required format.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.76,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 3,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- These questions require applying definitions, theorems, algebraic transformations, and approximations. A short, clear chain of reasoning before the final choice improves accuracy.\n- For two-statement items, assess each statement independently (True/False), then map to the correct option.\n- Keep any computations and logic concise and targeted to the question.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.76,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 3,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this decision procedure:\n1. Parse the question and identify the topic (e.g., algebra, analysis, probability, topology, linear algebra, combinatorics).\n2. Recall and apply the core principle(s) relevant to that topic:\n   - Cardinalities:\n     - |A^B| = |A|^{|B|} for sets of functions B → A.\n     - |R| (the continuum) = 2^{aleph_0}. Countable sequences from a countable set have cardinality continuum.\n     - The power set has strictly larger cardinality: |P(X)| > |X|. In particular, set of functions R → {0,1} has size 2^{|R|}, strictly larger than |R|.\n     - The set of all finite subsets of an infinite set has the same cardinality as the base set.\n   - Geometry of polygons: The sum of exterior angles of any convex polygon is 360°. An interior acute angle (< 90°) corresponds to an exterior angle > 90°, which tightly bounds how many interior angles can be acute.\n   - Probability (binomial tail): For large n, approximate with a normal N(np, np(1−p)) and use a continuity correction. Standardize to z, use a tail area, and ensure the final probability matches the requested range.\n   - Exponentials/logs: To compare equations like a^{log b} = b^{log a}, take logs and use change-of-base; check domain constraints first (positivity for logs). Sometimes the relation is an identity over its domain.\n   - Topology/analysis:\n     - The closure of a connected set is connected.\n     - A continuous map on a compact interval [a,b] into itself has a fixed point (Brouwer/intermediate value), but this can fail on open intervals.\n   - Linear algebra (operators on matrices):\n     - The linear map ad_T: X ↦ TX − XT has ker(ad_T) = {X: TX = XT} and im(ad_T) = {TX − XT}.\n     - Rank–nullity gives dim(ker) + dim(im) = total dimension. For endomorphisms on an n-dimensional space, M(V) has dimension n^2, so dim(U) + dim(W) = n^2.\n     - U = M(V) holds iff T is a scalar multiple of the identity, not merely diagonalizable with an eigenbasis.\n3. Carry out the minimum necessary computation/argument cleanly. For approximation questions, state the approximation method and any correction used.\n4. Compare all options and eliminate those inconsistent with your reasoning.\n5. Sanity-check the choice (units, ranges, limiting behavior, logical consistency).\n6. Provide the single best option.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.76,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 3,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this decision procedure:\n1. Parse the question and identify the topic (e.g., algebra, analysis, probability, topology, linear algebra, combinatorics, group theory, differential equations).\n2. Recall and apply the core principle(s) relevant to that topic:\n   - Cardinalities:\n     - |A^B| = |A|^{|B|} for sets of functions B → A.\n     - |R| (the continuum) = 2^{aleph_0}. Countable sequences from a countable set have cardinality continuum.\n     - The power set has strictly larger cardinality: |P(X)| > |X|. In particular, functions R → {0,1} have size 2^{|R|} > |R|.\n     - The set of all finite subsets of an infinite set has the same cardinality as the base set.\n   - Geometry of polygons: The sum of exterior angles of any convex polygon is 360°. An interior acute angle (< 90°) corresponds to an exterior angle > 90°, bounding how many interior angles can be acute.\n   - Probability:\n     - Binomial tail: For large n, approximate X ~ Bin(n,p) with Normal(np, np(1−p)) and use a continuity correction. For P(X ≥ k), use z = (k − 0.5 − np)/sqrt(np(1−p)); for P(X ≤ k), use z = (k + 0.5 − np)/sqrt(np(1−p)). Map the resulting numeric probability carefully to the given option range.\n     - Geometric probability on rectangles: For independent uniform (x,y) over a rectangle, probability of a region equals its area divided by the rectangle’s area. Draw/key the inequality region and compute area exactly.\n   - Exponentials/logs:\n     - To compare expressions like a^{log b} and b^{log a} (with a,b > 0), take logs; often (log a)(log b) symmetry makes them identically equal on their domain. Always check domain positivity for logs/exponents.\n   - Topology/analysis:\n     - The closure of a connected set is connected.\n     - A continuous map on a compact interval [a,b] into itself has a fixed point (intermediate value/Brouwer in 1D), which can fail on open intervals.\n     - On real intervals, a continuous bijection between intervals is strictly monotone and has a continuous inverse; hence open intervals are not continuously bijective onto half-closed intervals.\n   - Linear algebra (operators on matrices):\n     - The linear map ad_T: X ↦ TX − XT has ker(ad_T) = {X: TX = XT} and im(ad_T) = {TX − XT}.\n     - Rank–nullity: dim(ker) + dim(im) = total dimension. For endomorphisms on an n-dimensional space, M(V) has dimension n^2, so dim(U) + dim(W) = n^2.\n     - U = M(V) iff T is a scalar multiple of the identity; being diagonalizable with an eigenbasis is not sufficient.\n   - Group theory:\n     - Lagrange’s theorem: |H| divides |G| for any subgroup H ≤ G. Presence of a subgroup of order p implies p divides |G|.\n     - Cauchy’s theorem: If a prime p divides |G|, then G has an element of order p. In particular, if 2 divides |G|, G has an involution (x = x^{-1} ≠ e). “No nontrivial element is its own inverse” ⇒ |G| is odd.\n     - If |G| is the product of two distinct odd primes, a cyclic group of that order exists, containing subgroups of those prime orders and no involutions.\n   - Calculus/differentiability:\n     - Chain rule: If f and g are differentiable everywhere on R, then f∘g is differentiable everywhere.\n     - Uniform continuity: A continuous function on a compact set is uniformly continuous (Heine–Cantor).\n   - Differential equations (first-order):\n     - For equations of the form M(x,y) dx + N(x,y) dy = 0, check exactness; if not exact, seek an integrating factor.\n     - For linear form dy/dx + P(x) y = Q(x), use integrating factor μ(x) = e^{∫P(x) dx} to solve exactly before applying initial conditions.\n3. Carry out the minimum necessary computation/argument cleanly. For approximation questions, state the approximation method and any correction used. For interval/range answers, compute a numeric and compare carefully to the provided ranges.\n4. Compare all options and eliminate those inconsistent with your reasoning. For two-statement items, determine each statement’s truth value independently, then map to the option.\n5. Sanity-check the choice (domains, units, ranges, limiting behavior, logical consistency). If a computed probability is p, ensure the selected option’s interval contains p.\n6. Provide the single best option.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.68,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Show your reasoning steps briefly before the final answer.\n- Do not introduce assumptions that contradict the problem’s stated conditions.\n- If using approximations, state them (e.g., normal approximation with continuity correction) and ensure the final choice matches the resulting range or value.\n- Choose exactly one option.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.76,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 3,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Write your reasoning first. Then, on a separate final line, output exactly:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.76,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 3,
+            "broke": 3
+          }
+        }
+      ]
+    }
+  }
+}

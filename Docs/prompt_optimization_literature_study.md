@@ -1,4 +1,11 @@
 # Literature Study: Prompt Optimization and Evaluation
+
+> **Superseded.** The consolidated literature review lives in
+> [`literature_review.md`](literature_review.md). This file is kept as
+> archival detail (dataset/protocol tables and the three externally supplied
+> reference papers in Section 9 are folded in there); add new methods there,
+> not here.
+
 ### A Comprehensive Survey for Research Positioning
 **Prepared for:** Feedback-Driven Prompt Optimization (FDPO) Paper  
 **Coverage:** 2022–2026 | Focus: APO techniques, datasets, experimental setups, evaluation protocols  

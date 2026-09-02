@@ -1,0 +1,13 @@
+phase,example_id,correct,pred,gold,blocked
+seed,syn_test_0,True,PASS,A,False
+seed,syn_test_1,True,PASS,B,False
+seed,syn_test_2,True,PASS,A,False
+seed,syn_test_3,True,PASS,B,False
+seed,syn_test_4,True,PASS,A,False
+seed,syn_test_5,True,PASS,B,False
+final,syn_test_0,True,PASS,A,False
+final,syn_test_1,True,PASS,B,False
+final,syn_test_2,True,PASS,A,False
+final,syn_test_3,True,PASS,B,False
+final,syn_test_4,True,PASS,A,False
+final,syn_test_5,True,PASS,B,False

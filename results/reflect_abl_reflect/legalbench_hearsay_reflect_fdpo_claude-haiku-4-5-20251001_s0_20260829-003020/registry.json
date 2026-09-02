@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.84,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 1,
+    "task_details": 1,
+    "constraints": 1,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted. If a statement is offered for some relevant purpose other than the truth of what it asserts (e.g., to show effect on the listener, notice/knowledge via being told, the declarant’s bias/support, or merely that the declarant was alive/conscious), it is not hearsay. Statements made while testifying in court are not out-of-court and therefore are not hearsay.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 4,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Decide whether the given statement is hearsay by following this short checklist and write your reasoning before the final answer:\n1) Out-of-court? Identify where and when the statement was made. If it was made while testifying in court, it is not hearsay (Answer: No).\n2) What fact is being proved? State the specific proposition the proponent seeks to establish with the statement.\n3) Is the content’s truth required? Ask whether the fact in step 2 is established only if the statement’s content is believed true.\n   - If yes, it is hearsay (Answer: Yes).\n   - If no—because the statement is relevant for a non-truth purpose (e.g., to show effect on listener/notice, the speaker’s bias/support or state of mind as evidenced by having spoken, the listener’s knowledge from having been told, or that the declarant was alive/conscious)—then it is not hearsay (Answer: No).\nIllustrations (not tied to the test items):\n- “X told Y, ‘The bridge is unsafe’” offered to show Y had notice (regardless of actual danger): not hearsay.\n- “I knew the bridge was unsafe” offered to prove the speaker actually knew: hearsay (truth of the assertion “I knew” is required).",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 4,
+            "broke": 4
+          }
+        },
+        {
+          "version": 2,
+          "text": "Decide whether the given statement is hearsay by following this short checklist and write your reasoning before the final answer:\n1) Out-of-court? Identify where and when the statement was made. If it was made while testifying in court, it is not hearsay (Answer: No).\n2) What fact is being proved? State the specific proposition the proponent seeks to establish with the statement.\n3) Is the content’s truth required? Ask whether the fact in step 2 is established only if the statement’s content is believed true.\n   - If yes, it is hearsay (Answer: Yes).\n   - If no—because the statement is relevant for a non-truth purpose (e.g., to show effect on listener/notice, the speaker’s bias/support or state of mind as evidenced by having spoken, the listener’s knowledge from having been told, or that the declarant was alive/conscious)—then it is not hearsay (Answer: No).\n   - Caution on “notice/effect on listener” and “rumors”: If the statement itself asserts the very fact you need to prove (e.g., “I heard/was told X,” “people were saying X”), and you rely on that assertion to establish that a communication occurred, that the listener had notice, or that rumors existed, then you must accept the statement as true to make the inference—so it is hearsay. The non-truth use applies when the communication to the listener is otherwise shown and the truth of the content is irrelevant.\nIllustrations (not tied to the test items):\n- “X told Y, ‘The bridge is unsafe’” offered to show Y had notice (regardless of actual danger): not hearsay.\n- “I knew the bridge was unsafe” offered to prove the speaker actually knew: hearsay (truth of the assertion “I knew” is required).",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "Decide whether the given statement is hearsay by following this short checklist and write your reasoning before the final answer:\n1) Out-of-court? Identify where and when the statement was made. If it was made while testifying in court, it is not hearsay (Answer: No).\n2) What fact is being proved? State the specific proposition the proponent seeks to establish with the statement.\n3) Is the content’s truth required? Ask whether the fact in step 2 is established only if the statement’s content is believed true.\n   - If yes, it is hearsay (Answer: Yes).\n   - If no—because the statement is relevant for a non-truth purpose (e.g., to show effect on listener/notice, the speaker’s bias/support or state of mind as evidenced by having spoken, the listener’s knowledge from having been told, or that the declarant was alive/conscious)—then it is not hearsay (Answer: No).\n   - Distinguish occurrence from content: It is not hearsay merely because you must believe that the words were spoken or the conduct occurred—that is always required. Hearsay turns on whether you must accept the embedded factual claim as true. Questions, commands/requests, and non-assertive conduct used circumstantially (e.g., to show interest/intent, ownership, knowledge/relationship, or bias/support) are generally not assertions and thus not hearsay when offered for those purposes. Evaluative statements used to show the speaker’s state of mind (e.g., affection, support, dislike) or familiarity with a person/topic are non-hearsay because their relevance does not depend on the evaluation being accurate.\n   - Caution on “notice/effect on listener” and “rumors”: If the statement itself asserts the very fact you need to prove (e.g., “I heard/was told X,” “people were saying X”), and you rely on that assertion to establish that a communication occurred, that the listener had notice, or that rumors existed, then you must accept the statement as true to make the inference—so it is hearsay. The non-truth use applies when the communication to the listener is otherwise shown and the truth of the content is irrelevant.\nIllustrations (not tied to the test items):\n- “X told Y, ‘The bridge is unsafe’” offered to show Y had notice (regardless of actual danger): not hearsay.\n- “I knew the bridge was unsafe” offered to prove the speaker actually knew: hearsay (truth of the assertion “I knew” is required).\n- A shopper asks, “Do you have duffel bags?” offered to show interest in obtaining a duffel bag (circumstantial of ownership/intent): not hearsay.\n- “Z is untrustworthy,” offered to show the speaker’s bias against or familiarity with Z (not to prove Z is actually untrustworthy): not hearsay.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 4,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive. Use the checklist above and keep the analysis focused on whether the proponent’s use requires the statement’s content to be true.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 4,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

@@ -16,6 +16,7 @@ from fdpo.config import ExperimentConfig, build_arg_parser, config_from_args
 from fdpo.core.loop import run_optimization
 from fdpo.core.prompt import SCHEMA_5, SCHEMA_MONOLITHIC
 from fdpo.core.registry import PromptRegistry
+from fdpo.core.reflect_loop import run_reflect_optimization
 from fdpo.core.simple_loop import (bootstrap_registry_from_markdown,
                                     run_simple_optimization)
 from fdpo.data.loaders import load_splits, synthetic_splits
@@ -43,6 +44,9 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
     if clients is None:
         clients = {role: make_client(role, cfg, ledger=ledger, guard=guard)
                    for role in ("solver", "judge", "optimizer")}
+        if cfg.dataset == "pupa":
+            clients["external"] = make_client("external", cfg, ledger=ledger,
+                                              guard=guard)
     else:  # injected (tests): wire accounting in
         for c in clients.values():
             c.ledger, c.guard = ledger, guard
@@ -63,10 +67,10 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
     # baseline eval, so the paper-faithful path measures against the human-
     # editable prompts/<dataset>.md as the true baseline.
     md_source = None
-    if cfg.method == "simple_fdpo":
+    if cfg.method in ("simple_fdpo", "reflect_fdpo"):
         md_source = bootstrap_registry_from_markdown(
             cfg.dataset, run_dir, registry, prompt_file=cfg.prompt_file or None)
-        logger.info("simple_fdpo: prompt source = %s", md_source)
+        logger.info("%s: prompt source = %s", cfg.method, md_source)
 
     eval_log = CsvAppender(run_dir / "eval_log.csv", EVAL_LOG_FIELDS)
 
@@ -85,7 +89,9 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
                                cfg.dataset, shots=shots,
                                temperature=cfg.solver_temperature,
                                max_tokens=cfg.solver_max_tokens, purpose="eval",
-                               max_workers=cfg.max_workers)
+                               max_workers=cfg.max_workers,
+                               judge=clients.get("judge"),
+                               external=clients.get("external"))
         for row in seed_result.rows:
             eval_log.append({"phase": "seed", "example_id": row.example_id,
                              "correct": row.correct, "pred": row.pred,
@@ -134,6 +140,55 @@ def run(cfg: ExperimentConfig, clients: dict | None = None) -> Path:
             }
             opt_summary["markdown_source"] = md_source
             logger.info("simple: TEST confusion matrix -- recovered %d, regressed %d, net %+d",
+                        len(opt_summary["test_confusion"]["recoveries"]),
+                        len(opt_summary["test_confusion"]["regressions"]),
+                        opt_summary["test_confusion"]["net_gain"])
+        elif cfg.method == "reflect_fdpo":
+            opt_summary = run_reflect_optimization(cfg, registry, train, cfg.dataset,
+                                                    clients["solver"], clients["optimizer"],
+                                                    run_dir, judge=clients.get("judge"),
+                                                    external=clients.get("external"))
+            if opt_summary.get("edit_status") == "committed":
+                # A round shipped -> the active prompt is genuinely different
+                # text from the seed (even if a given round's measured delta
+                # was 0 on the mining/val batch) -- a real eval on test.
+                final_result = evaluate(clients["solver"], registry.active_prompt(),
+                                        test, cfg.dataset,
+                                        temperature=cfg.solver_temperature,
+                                        max_tokens=cfg.solver_max_tokens,
+                                        purpose="eval", max_workers=cfg.max_workers,
+                                        judge=clients.get("judge"),
+                                        external=clients.get("external"))
+            else:
+                # Nothing was ever committed (not triggered / skipped for an
+                # already-high baseline) -- the active prompt is BYTE-
+                # IDENTICAL to what seed_result already evaluated. Re-running
+                # it would just burn cost and add pure sampling noise (see
+                # Docs/reflect_fdpo_report.md: the same prompt, evaluated
+                # twice, does not reliably return the same predictions) for
+                # zero information -- reuse seed_result outright.
+                final_result = seed_result
+                logger.info("reflect: no edit shipped -- reusing seed_test as "
+                           "final_test (prompt is unchanged, skipping re-eval)")
+            for row in final_result.rows:
+                eval_log.append({"phase": "final", "example_id": row.example_id,
+                                 "correct": row.correct, "pred": row.pred,
+                                 "gold": row.gold, "blocked": row.blocked})
+            logger.info("final test accuracy: %.3f", final_result.accuracy)
+            # Test-set confusion matrix: which examples flipped vs the seed_test?
+            seed_correct = seed_result.correct_ids()
+            final_correct = final_result.correct_ids()
+            seed_wrong = seed_result.wrong_ids()
+            final_wrong = final_result.wrong_ids()
+            opt_summary["test_confusion"] = {
+                "recoveries": sorted(seed_wrong & final_correct),
+                "regressions": sorted(seed_correct & final_wrong),
+                "still_wrong": sorted(seed_wrong & final_wrong),
+                "still_right_count": len(seed_correct & final_correct),
+                "net_gain": len(seed_wrong & final_correct) - len(seed_correct & final_wrong),
+            }
+            opt_summary["markdown_source"] = md_source
+            logger.info("reflect: TEST confusion matrix -- recovered %d, regressed %d, net %+d",
                         len(opt_summary["test_confusion"]["recoveries"]),
                         len(opt_summary["test_confusion"]["regressions"]),
                         opt_summary["test_confusion"]["net_gain"])

@@ -23,6 +23,7 @@ import requests
 import truststore
 
 from fdpo.data.extraction import gsm8k_gold
+from fdpo.data.ifeval_verifiers import describe_requirements
 from fdpo.data.loaders import Example
 
 truststore.inject_into_ssl()
@@ -170,10 +171,163 @@ def fetch_legalbench_contract_nli() -> tuple[list[Example], list[Example]]:
     return convert("train"), convert("test")
 
 
+def _jsonable(obj):
+    """Recursively convert numpy/pandas containers (ndarray, np.generic) to
+    plain Python types so json.dumps() accepts them -- IFEval/IFBench's
+    `kwargs` column comes back from parquet with numpy arrays nested inside
+    dicts (e.g. a forbidden-words list), which plain dict()/list() casts
+    don't reach."""
+    if isinstance(obj, dict):
+        return {k: _jsonable(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_jsonable(v) for v in obj]
+    if hasattr(obj, "tolist"):  # numpy ndarray or scalar (np.generic)
+        return _jsonable(obj.tolist())
+    return obj
+
+
+def fetch_ifeval() -> tuple[list[Example], list[Example]]:
+    """google/IFEval: 541 verifiable-instruction prompts, single upstream
+    split (no official train/test division -- like HumanEval's 0/164
+    convention, everything goes to test; --split-mode stratified re-pools
+    and re-carves train/test at experiment time, same as legalbench_hearsay).
+
+    There is no single "gold answer" for this task -- correctness means
+    every listed instruction_id passed its own verifier function against the
+    raw output, not an extracted-answer-vs-gold match. `gold` is a
+    placeholder; the real verification spec lives in `meta`. See
+    `fdpo.data.ifeval_verifiers` for the (partial -- 18 of 83 distinct
+    instruction types) checker implementation; `is_fully_covered()` filters
+    the loaded pool at load time (see loaders.py) so only examples where
+    every listed instruction has an implemented checker are ever scored."""
+    df = _read_parquet_split("google/IFEval", "train")
+    test = [
+        Example(
+            id=f"ifeval_{row['key']}",
+            question=row["prompt"],
+            gold="PASS",
+            reference=describe_requirements(
+                list(row["instruction_id_list"]), _jsonable(list(row["kwargs"]))),
+            meta=_jsonable({
+                "instruction_id_list": row["instruction_id_list"],
+                "kwargs": row["kwargs"],
+            }),
+        )
+        for _, row in df.iterrows()
+    ]
+    return [], test
+
+
+def fetch_ifbench() -> tuple[list[Example], list[Example]]:
+    """allenai/IFBench_test: 300 out-of-domain verifiable-instruction prompts
+    (58 new constraint types beyond IFEval), same single-split/no-gold
+    situation as fetch_ifeval() above -- see its docstring."""
+    df = _read_parquet_split("allenai/IFBench_test", "train")
+    test = [
+        Example(
+            id=f"ifbench_{row['key']}",
+            question=row["prompt"],
+            gold="PASS",
+            reference=describe_requirements(
+                list(row["instruction_id_list"]), _jsonable(list(row["kwargs"]))),
+            meta=_jsonable({
+                "instruction_id_list": row["instruction_id_list"],
+                "kwargs": row["kwargs"],
+            }),
+        )
+        for _, row in df.iterrows()
+    ]
+    return [], test
+
+
+def fetch_aime() -> tuple[list[Example], list[Example]]:
+    """AIME competition math, split exactly as GEPA's own protocol: train =
+    AIME 2022-2024 (AI-MO/aimo-validation-aime, 90 problems), test = AIME
+    2025 (opencompass/AIME2025, 30 problems across its I/II configs). Kept
+    as the OFFICIAL train/test boundary (no re-pooling) so numbers are
+    directly comparable to GEPA's table -- use --split-mode seeded (the
+    default), never stratified/balanced, which would pool train+test
+    together and erase that boundary.
+
+    Answers are integers 0-999; reuses gsm8k's "#### <number>" extractor
+    (see fdpo.data.extraction) rather than a new format."""
+    train_df = _read_parquet_split("AI-MO/aimo-validation-aime", "train")
+    train = [
+        Example(
+            id=f"aime_train_{row['id']}",
+            question=row["problem"],
+            gold=str(row["answer"]).strip(),
+            reference=row["solution"],
+            meta={},
+        )
+        for _, row in train_df.iterrows()
+    ]
+
+    test: list[Example] = []
+    for config in ("AIME2025-I", "AIME2025-II"):
+        test_df = _read_parquet_split("opencompass/AIME2025", "test", config=config)
+        for i, row in test_df.iterrows():
+            test.append(Example(
+                id=f"aime_test_{config}_{i}",
+                question=row["question"],
+                gold=str(row["answer"]).strip(),
+                reference=str(row["answer"]),
+                meta={},
+            ))
+    return train, test
+
+
+def fetch_pupa() -> tuple[list[Example], list[Example]]:
+    """Columbia-NLP/PUPA (PAPILLON paper): privacy-conscious delegation data.
+    Two upstream configs, each a single unsplit "train" rows-bag (no official
+    train/test division, like IFEval/IFBench above) -- PUPA-TNB (237 rows,
+    from the Trust No Bot annotations) and PUPA-New (664 rows, from WildChat).
+    All 901 rows go to `test`; --split-mode stratified/balanced re-pools and
+    re-carves train/test at experiment time.
+
+    This is data-only in the sense that no HF network access happens outside
+    this fetch step; the evaluator/optimizer pipeline for PUPA lives in
+    fdpo.data.pupa_pipeline (see reflect_loop.py's judge/external threading).
+    PUPA's task is a two-hop pipeline (redact query -> query an untrusted
+    external model -> synthesize final response), scored by a CONTINUOUS
+    composite (quality judge + mechanical PII-leakage fraction) -- not a
+    boolean pass/fail like IFEval/IFBench, and not a single
+    extracted-answer-vs-gold match. `gold` is deliberately "N/A": it is
+    unused by design, not a stand-in for a pass/fail verdict."""
+    def _str_or_empty(v) -> str:
+        # Some rows have no PII units / no redacted_query recorded upstream;
+        # pandas reads that as NaN (a float), not "" -- .split()/.lower() on
+        # a NaN crashes downstream in pupa_pipeline.compute_leakage().
+        return "" if pd.isna(v) else str(v)
+
+    test: list[Example] = []
+    for config in ("pupa_new", "pupa_tnb"):
+        df = _read_parquet_split("Columbia-NLP/PUPA", "train", config=config)
+        for i, row in df.iterrows():
+            test.append(Example(
+                id=f"pupa_{config}_{i}",
+                question=_str_or_empty(row["user_query"]),
+                gold="N/A",
+                reference=_str_or_empty(row["target_response"]),
+                meta={
+                    "subset": config,
+                    "conversation_hash": _str_or_empty(row["conversation_hash"]),
+                    "predicted_category": _str_or_empty(row["predicted_category"]),
+                    "pii_units": _str_or_empty(row["pii_units"]),
+                    "redacted_query": _str_or_empty(row["redacted_query"]),
+                },
+            ))
+    return [], test
+
+
 FETCHERS = {
     "gsm8k": fetch_gsm8k,
     "arc": fetch_arc,
     "mmlu": fetch_mmlu,
     "legalbench_hearsay": fetch_legalbench_hearsay,
     "legalbench_contract_nli": fetch_legalbench_contract_nli,
+    "ifeval": fetch_ifeval,
+    "ifbench": fetch_ifbench,
+    "aime": fetch_aime,
+    "pupa": fetch_pupa,
 }

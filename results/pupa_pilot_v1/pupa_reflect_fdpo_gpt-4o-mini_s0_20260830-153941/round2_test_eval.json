@@ -1,0 +1,34 @@
+{
+  "round": 2,
+  "n_test": 40,
+  "accuracy": 0.631578947368421,
+  "n_examples": 40,
+  "n_evaluated": 38,
+  "n_blocked": 2,
+  "extraction_failures": 0,
+  "mean_score": 0.781610275689223,
+  "cost": {
+    "total_calls": 154,
+    "total_cost_usd": 0.431637,
+    "by_role": {
+      "solver": {
+        "calls": 78,
+        "prompt_tokens": 111646,
+        "completion_tokens": 18894,
+        "cost_usd": 0.028083
+      },
+      "external": {
+        "calls": 38,
+        "prompt_tokens": 8389,
+        "completion_tokens": 11979,
+        "cost_usd": 0.11261
+      },
+      "judge": {
+        "calls": 38,
+        "prompt_tokens": 48627,
+        "completion_tokens": 23016,
+        "cost_usd": 0.290944
+      }
+    }
+  }
+}

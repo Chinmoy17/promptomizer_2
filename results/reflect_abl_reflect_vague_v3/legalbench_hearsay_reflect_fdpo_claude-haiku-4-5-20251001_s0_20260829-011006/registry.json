@@ -1,0 +1,214 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": 0.8,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You answer questions about statements.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a legal reasoning assistant. For each prompt, decide whether the described evidence is hearsay under Federal Rule of Evidence 801. Write a short, explicit reasoning chain applying the rule, then give the final Yes/No line.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 4,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "This is a legal task about hearsay.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Core definition (FRE 801):\n- Statement = an oral or written assertion, or nonverbal conduct intended as an assertion (e.g., pointing to identify someone/something).\n- Hearsay = an out-of-court statement offered to prove the truth of what it asserts.\n\nKey distinctions:\n- Not hearsay when the statement is offered for a non-truth purpose, such as:\n  - Effect on the listener/notice/knowledge (relevance is that the person was informed, regardless of whether the content is true).\n  - To show that a conversation or words occurred (existence of the speech act), irrespective of truth of its content.\n  - Circumstantial evidence of the declarant’s state of mind/attitude (e.g., support, fear), where the truth of the content is irrelevant.\n  - Questions or commands (they assert nothing).\n  - In-court testimony in this proceeding (not out-of-court).\n- Hearsay when:\n  - The relevance requires accepting the asserted proposition as true (including assertions about the speaker’s own knowledge/intent when used to prove that knowledge/intent).\n  - Written reports, emails, or other out-of-court documents are introduced to prove the facts they assert.\n  - Nonverbal conduct intended as an assertion (like pointing to identify the culprit) is offered to prove the asserted fact.\n  - A statement relays other statements to prove those other statements were made or were true (hearsay within hearsay).\n\nIllustrative examples (not from your task):\n- Doctor tells P “You have glaucoma,” offered to show P had notice of a vision problem → Non-hearsay (effect on listener).\n- Employee says “My manager is the best,” offered to show the employee’s admiration/support → Non-hearsay (state of mind circumstantially).\n- Lab report stating “DNA matches D,” offered to show D was present → Hearsay (out-of-court written assertion, offered for its truth).\n- Email saying “I knew about the scheme,” offered to prove the sender knew → Hearsay (truth of asserted knowledge).\n- Bystander points at a red car to identify the hit-and-run vehicle, offered to prove which car did it → Hearsay (assertive nonverbal conduct, offered for truth).",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 4,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "Core definition (FRE 801):\n- Statement = an oral or written assertion, or nonverbal conduct intended as an assertion (e.g., a gesture answering a question or identifying someone).\n- Hearsay = an out-of-court statement offered to prove the truth of what it asserts.\n\nKey distinctions:\n- Threshold: Hearsay requires a “statement.” If no out-of-court oral/written assertion or assertive gesture is identified (e.g., a fact, event, selection, rank, possession), it is not hearsay.\n- Do not assume an out-of-court document exists unless the prompt says so. If no document/utterance/gesture is specified, treat it as no statement → not hearsay.\n- Not hearsay when the statement is offered for a non-truth purpose, such as:\n  - Effect on the listener/notice/knowledge (relevance is that the listener was told/informed, even if the content is false).\n  - To show that a conversation or words occurred (existence of the speech act), irrespective of truth of its content.\n  - Circumstantial evidence of the declarant’s state of mind/attitude (e.g., support, fear), where truth of the content is irrelevant.\n  - Questions or commands (they assert nothing).\n  - In-court testimony or conduct in this proceeding (the hearsay rule only covers out-of-court statements).\n  - Non-assertive conduct or objects not intended to communicate a factual proposition (e.g., owning/ displaying a poster, wearing a team jersey, being selected for a role).\n- Hearsay when:\n  - The relevance requires accepting the asserted proposition as true.\n  - Written reports, emails, or other out-of-court documents are introduced to prove the facts they assert.\n  - Nonverbal conduct intended as an assertion (like a thumbs-up in response to “are you okay?” or pointing during an investigation) is offered to prove the asserted fact.\n  - A declarant asserts their own knowledge/notice (“I knew…,” “I heard…”) and it is offered to prove that they indeed had that knowledge/notice.\n  - A statement relays other statements to prove those other statements were made or were true (hearsay within hearsay).\n\nIllustrative examples (not from your task):\n- “Doctor tells P ‘You have glaucoma,’ offered to show P had notice of a vision problem” → Non-hearsay (effect on listener/notice). If offered to prove P actually had glaucoma → Hearsay.\n- “Employee says ‘My manager is the best,’ offered to show the employee’s admiration/support” → Non-hearsay (state of mind circumstantially).\n- “Lab report stating ‘DNA matches D,’ offered to show D was present” → Hearsay (out-of-court written assertion, offered for its truth).\n- “Email saying ‘I knew about the scheme,’ offered to prove the sender knew” → Hearsay (assertion of own knowledge used to prove that knowledge).\n- “B told L ‘the floor is wet,’ offered to show L had notice” → Non-hearsay (effect on listener); truth of wetness not required.\n- “D told M ‘I heard a robbery will happen,’ offered to prove D had notice” → Hearsay (assertion of own knowledge/receipt used to prove that knowledge).\n- “Witness points in court to identify the driver” → Not hearsay (in-court). “Bystander pointed during the investigation to identify the driver” → Hearsay (out-of-court assertive gesture, offered for truth).\n- “Poster with band lyrics on someone’s wall, offered to show fandom” → Not hearsay (non-assertive conduct/possession, not intended as an assertion).",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "Core definition (FRE 801):\n- Statement = an oral or written assertion, or nonverbal conduct intended as an assertion (e.g., a gesture answering a question or identifying someone).\n- Hearsay = an out-of-court statement offered to prove the truth of what it asserts.\n\nKey distinctions:\n- Threshold: Hearsay requires a “statement.” If no out-of-court oral/written assertion or assertive gesture is identified (e.g., a fact, event, selection, rank, possession), it is not hearsay.\n- Do not assume an out-of-court document exists unless the prompt says so. If no document/utterance/gesture is specified, treat it as no statement → not hearsay.\n- Not hearsay when the statement is offered for a non-truth purpose, such as:\n  - Effect on the listener/notice/knowledge (relevance is that the listener was told/informed, even if the content is false).\n  - To show that a conversation or words occurred (existence of the speech act), irrespective of truth of its content.\n  - Circumstantial evidence of the declarant’s state of mind/attitude (e.g., support, fear), where truth of the content is irrelevant.\n  - Questions or commands (they assert nothing).\n  - In-court testimony or conduct in this proceeding (the hearsay rule only covers out-of-court statements).\n  - Using the mere fact the words were spoken as circumstantial evidence of something other than their truth—e.g., that the speaker was present at a place/time, was alive/able to speak or understand a language, was familiar with or knew a person/thing (naming or describing them), or believed the addressee had a particular role/authority (speaking to them as if they did). In these uses, the content can be false and the evidence still proves the non-truth fact.\n- Hearsay when:\n  - The relevance requires accepting the asserted proposition as true.\n  - Written reports, emails, or other out-of-court documents are introduced to prove the facts they assert.\n  - Nonverbal conduct intended as an assertion (like a thumbs-up in response to “are you okay?” or pointing during an investigation) is offered to prove the asserted fact.\n  - A declarant asserts their own knowledge/notice (“I knew…,” “I heard…”) and it is offered to prove that they indeed had that knowledge/notice.\n  - A statement relays other statements to prove those other statements were made or were true (hearsay within hearsay).\n\nIllustrative examples (not from your task):\n- “Doctor tells P ‘You have glaucoma,’ offered to show P had notice of a vision problem” → Non-hearsay (effect on listener/notice). If offered to prove P actually had glaucoma → Hearsay.\n- “Employee says ‘My manager is the best,’ offered to show the employee’s admiration/support” → Non-hearsay (state of mind circumstantially).\n- “Lab report stating ‘DNA matches D,’ offered to show D was present” → Hearsay (out-of-court written assertion, offered for its truth).\n- “Email saying ‘I knew about the scheme,’ offered to prove the sender knew” → Hearsay (assertion of own knowledge used to prove that knowledge).\n- “B told L ‘the floor is wet,’ offered to show L had notice” → Non-hearsay (effect on listener); truth of wetness not required.\n- “D told M ‘I heard a robbery will happen,’ offered to prove D had notice” → Hearsay (assertion of own knowledge/receipt used to prove that knowledge).\n- “Witness points in court to identify the driver” → Not hearsay (in-court). “Bystander pointed during the investigation to identify the driver” → Hearsay (out-of-court assertive gesture, offered for truth).\n- “Customer tells a person at the counter ‘I want a refund,’ offered to show she believed that person worked there” → Non-hearsay (circumstantial belief about addressee; content truth irrelevant).\n- “Speaker exclaims ‘Help!’ after a fall, offered to show the speaker was alive at that time” → Non-hearsay (circumstantial aliveness; content truth irrelevant).",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.96,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide if the statement is hearsay or not.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this decision procedure:\n1) Identify the statement and whether it is out-of-court (oral, written, or assertive nonverbal). If it is in-court testimony in this case, it is not hearsay.\n2) Identify exactly what fact the evidence is offered to prove.\n3) Ask: Must the content of the statement be true to make that fact more or less likely?\n   - If yes, classify as hearsay (Answer: Yes).\n   - If no (because relevance is effect on listener/notice, that words were spoken, or circumstantial state of mind), classify as not hearsay (Answer: No).\n4) Special notes:\n   - Out-of-court documents/emails/reports used to prove what they say are hearsay.\n   - Nonverbal conduct intended to assert a fact counts as a statement and can be hearsay.\n   - Statements used to show a conversation occurred or that a listener was put on notice are not hearsay, but relaying layered out-of-court assertions to prove those assertions were made or true can still be hearsay unless each layer is for a non-truth purpose.\n\nWrite 2–5 sentences of reasoning applying these steps, then the final answer line.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 4,
+            "broke": 3
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this decision procedure:\n1) Is there a “statement”? Identify a specific oral/written assertion or assertive nonverbal conduct. If none is identified (it’s just a fact/event/selection/possession), classify as not hearsay (Answer: No).\n   - If the only conduct is non-assertive (not intended to communicate a factual proposition), it is not a statement.\n2) If there is a statement, was it made out of court? If it occurred in this proceeding (the witness’s words or gestures now in court), it is not hearsay. If a witness is recounting someone else’s prior words/gesture, treat the original as out-of-court.\n3) Identify exactly what fact the evidence is offered to prove, and apply the truth test:\n   - Ask: Would the evidence still be probative if the statement’s content were false?\n     - If yes (effect on listener/notice; showing a conversation occurred; circumstantial state of mind), classify as not hearsay (Answer: No).\n     - If no (you must accept the assertion as true), classify as hearsay (Answer: Yes).\n4) Special notes:\n   - Out-of-court documents/emails/reports used to prove what they say are hearsay.\n   - Nonverbal conduct intended to assert a fact can be hearsay when it occurred out of court; in-court pointing/gestures by the testifying witness are not hearsay.\n   - Statements offered to prove listener notice/knowledge are non-hearsay; but a speaker’s assertion of their own knowledge/receipt (“I knew/I heard…”) offered to prove that knowledge is hearsay.\n   - Avoid assuming a document/out-of-court statement exists when the prompt does not specify one.\n\nWrite 2–5 sentences of reasoning applying these steps, then the final answer line.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.92,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "Use this decision procedure:\n1) Is there a “statement”? Identify a specific oral/written assertion or assertive nonverbal conduct. If none is identified (it’s just a fact/event/selection/possession), classify as not hearsay (Answer: No).\n   - If the only conduct is non-assertive (not intended to communicate a factual proposition), it is not a statement.\n2) If there is a statement, was it made out of court? If it occurred in this proceeding (the witness’s words or gestures now in court), it is not hearsay. If a witness is recounting someone else’s prior words/gesture, treat the original as out-of-court.\n3) Identify exactly what fact the evidence is offered to prove, and apply the truth test:\n   - Ask: Would the evidence still be probative if the statement’s content were false?\n     - If yes (effect on listener/notice; showing a conversation occurred; circumstantial state of mind), classify as not hearsay (Answer: No).\n     - If yes because the mere speaking proves something else (e.g., the speaker’s presence at the place/time, that the speaker was alive/able to speak, that the speaker was familiar with or knew a person by naming them, or that the speaker believed the addressee had a certain role/authority), classify as not hearsay (Answer: No).\n     - If no (you must accept the assertion as true), classify as hearsay (Answer: Yes).\n4) Special notes:\n   - Out-of-court documents/emails/reports used to prove what they say are hearsay.\n   - Nonverbal conduct intended to assert a fact can be hearsay when it occurred out of court; in-court pointing/gestures by the testifying witness are not hearsay.\n   - Statements offered to prove listener notice/knowledge are non-hearsay; but a speaker’s assertion of their own knowledge/receipt (“I knew/I heard…”) offered to prove that knowledge is hearsay.\n   - Avoid assuming a document/out-of-court statement exists when the prompt does not specify one.\n\nWrite 2–5 sentences of reasoning applying these steps, then the final answer line.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.96,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer Yes or No.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Provide a brief, explicit reasoning chain before the final answer line.\n- The classification must be binary: Yes (hearsay) or No (not hearsay).",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 4,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

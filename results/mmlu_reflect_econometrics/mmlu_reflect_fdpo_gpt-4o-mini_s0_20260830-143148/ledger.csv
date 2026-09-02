@@ -1,0 +1,13 @@
+role,model,prompt_tokens,completion_tokens,cost_usd,purpose
+solver,gpt-4o-mini-2024-07-18,100,4,1.74e-05,eval
+solver,gpt-4o-mini-2024-07-18,119,4,2.0249999999999998e-05,eval
+solver,gpt-4o-mini-2024-07-18,246,4,3.93e-05,eval
+solver,gpt-4o-mini-2024-07-18,110,4,1.89e-05,eval
+solver,gpt-4o-mini-2024-07-18,164,4,2.6999999999999996e-05,eval
+solver,gpt-4o-mini-2024-07-18,201,4,3.255e-05,eval
+solver,gpt-4o-mini-2024-07-18,177,4,2.895e-05,eval
+solver,gpt-4o-mini-2024-07-18,210,4,3.39e-05,eval
+solver,gpt-4o-mini-2024-07-18,184,4,2.9999999999999997e-05,eval
+solver,gpt-4o-mini-2024-07-18,133,4,2.2349999999999998e-05,eval
+solver,gpt-4o-mini-2024-07-18,118,4,2.0099999999999997e-05,eval
+solver,gpt-4o-mini-2024-07-18,190,252,0.00017969999999999998,eval

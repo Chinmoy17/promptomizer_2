@@ -1,5 +1,10 @@
 # Related Works — Quick Reference for FDPO
 
+> **Superseded.** The consolidated literature review lives in
+> [`literature_review.md`](literature_review.md), including this file's MPO /
+> aPSF / SAMMO / Trace2Policy coverage plus ProTeGi, EvoPrompt, GEPA,
+> PromptWizard, and the 2025 survey. This file is kept as archival detail.
+
 **Scope:** Only the works directly relevant to the proposed direction (modular,
 feedback-driven, regression-gated prompt optimization). The full taxonomy and
 30+ method survey is in [literature_survey.md](literature_survey.md).

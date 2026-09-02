@@ -35,6 +35,13 @@ _TASK_DESCRIPTIONS = {
         "specific integer. The output must end with a line containing the "
         "final numeric answer."
     ),
+    "aime": (
+        "a competition-level (AIME) math problem, substantially harder than "
+        "grade-school word problems -- multi-step algebra, combinatorics, "
+        "number theory, geometry, or probability. The correct answer is "
+        "always a specific integer between 0 and 999. The output must end "
+        "with a line containing the final numeric answer."
+    ),
     "mmlu": (
         "a 4-way multiple-choice exam question (options A, B, C, D) from one "
         "academic subject. Computational subjects (mathematics, econometrics) "
@@ -43,9 +50,61 @@ _TASK_DESCRIPTIONS = {
         "forced step-by-step reasoning. The final answer is a single letter "
         "A, B, C, or D on an 'Answer:' line."
     ),
-    "arc_challenge": (
+    "arc": (
         "an ARC-Challenge science multiple-choice question (options A, B, "
         "C, D). The output is a single letter A, B, C, or D."
+    ),
+    "ifeval": (
+        "an instruction-following task: the user's request embeds one or "
+        "more mechanically VERIFIABLE constraints (e.g. exact word/sentence/"
+        "paragraph counts, forbidden or required keywords, output format "
+        "such as JSON or a title wrapped in << >>, letter case, punctuation "
+        "rules, quotation wrapping). There is no single correct 'answer' to "
+        "match against a gold label -- correctness means the CHECKED text "
+        "satisfies every listed constraint, checked by code, not by content "
+        "quality. UNLIKE every other task type: the checker scores the "
+        "solver's ENTIRE raw output, not one extracted final line -- EXCEPT "
+        "that text before a standalone 'FINAL RESPONSE:' line (if the "
+        "solver writes one) is ignored, and only the text after it is "
+        "checked. This means the solver MAY reason/plan out loud before "
+        "that marker (e.g. counting words, checking a forbidden-word list) "
+        "-- keep the Output Format section instructing the solver to use "
+        "this marker; do NOT tell it to give zero reasoning/commentary at "
+        "all, since planning genuinely helps on multi-constraint items, as "
+        "long as the planning stays before the marker so it is never "
+        "checked. A failure means one or more specific constraints were "
+        "violated in the checked text; the fix is to make the solver track "
+        "and satisfy ALL stated constraints simultaneously."
+    ),
+    "ifbench": (
+        "an instruction-following task with the same mechanically verifiable "
+        "constraint structure and the same 'FINAL RESPONSE:' marker "
+        "convention as IFEval (see that description for the full "
+        "explanation), but drawn from a broader set of constraint types "
+        "(word/consonant/vowel counts, keyword-frequency and forbidden-word "
+        "rules, formatting requirements, and more). Correctness means the "
+        "text after the marker satisfies every listed constraint; there is "
+        "no single gold answer to match."
+    ),
+    "pupa": (
+        "a privacy-conscious query-rewriting task: the input is a PRIVATE "
+        "user request (may contain names, contact info, employers, or other "
+        "personal details). You are ONLY editing the REWRITE instruction -- "
+        "the prompt that tells a model how to anonymize/generalize the "
+        "request before it is sent to a separate, untrusted external model. "
+        "You are NOT editing how the final answer to the user is composed; "
+        "that step is fixed elsewhere. A failure means the rewritten "
+        "request still leaked one or more specific private details (shown "
+        "to you as 'leaked N/M PII units') -- the fix is to make the "
+        "rewrite instruction more systematic about generalizing/abstracting "
+        "every private detail (names -> roles, specific employers -> "
+        "generic descriptions, exact locations -> broader regions, etc.) "
+        "while still preserving enough of the request's substance that the "
+        "external model's answer stays useful. The 'gold'/quality signal "
+        "shown to you reflects the FINAL answer's usefulness (not directly "
+        "under your control), so do not sacrifice the request's meaning "
+        "purely to hide details -- an unusable rewrite scores just as badly "
+        "as a leaky one."
     ),
 }
 

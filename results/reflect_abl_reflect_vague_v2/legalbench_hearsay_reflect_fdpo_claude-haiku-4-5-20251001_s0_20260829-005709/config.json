@@ -1,0 +1,54 @@
+{
+  "method": "reflect_fdpo",
+  "dataset": "legalbench_hearsay",
+  "seed": 0,
+  "n_train": 50,
+  "n_test": 49,
+  "n_shots": 4,
+  "max_rounds": 5,
+  "rho": 0.02,
+  "eps": 0.01,
+  "n_fail": 100,
+  "n_gold": 10,
+  "tau": 1,
+  "simple_max_rounds": 3,
+  "accept_margin": 0.0,
+  "skip_above_acc": 0.95,
+  "simple_val_frac": 0.5,
+  "val_size": 20,
+  "pool_cap": 200,
+  "stagnation_limit": 3,
+  "history_window": 3,
+  "prompt_file": "prompts/legalbench_hearsay_vague.md",
+  "phase": "reflect_abl_reflect_vague_v2",
+  "early_stop": true,
+  "split_mode": "stratified",
+  "subjects": [],
+  "pin_sections": [],
+  "verdict_mode": "programmatic",
+  "solver_max_tokens": 2048,
+  "solver_temperature": 0.0,
+  "optimizer_temperature": 0.7,
+  "budget_usd": 4.0,
+  "price_in": 0.0,
+  "price_out": 0.0,
+  "results_root": "results",
+  "dataset_root": "Dataset",
+  "max_workers": 8,
+  "dry_run": false,
+  "roles": {
+    "solver": {
+      "model": "claude-haiku-4-5-20251001",
+      "base_url": "https://api.anthropic.com/v1/"
+    },
+    "judge": {
+      "model": "gpt-5",
+      "base_url": "https://aifeedbackloop.openai.azure.com/"
+    },
+    "optimizer": {
+      "model": "gpt-5",
+      "base_url": "https://aifeedbackloop.openai.azure.com/"
+    }
+  },
+  "run_id": "legalbench_hearsay_reflect_fdpo_claude-haiku-4-5-20251001_s0_20260829-005709"
+}

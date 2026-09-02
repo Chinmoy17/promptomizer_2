@@ -1,0 +1,15 @@
+role,model,prompt_tokens,completion_tokens,cost_usd,purpose
+solver,claude-haiku-4-5-20251001,67,128,0.0,eval
+solver,claude-haiku-4-5-20251001,78,174,0.0,eval
+solver,claude-haiku-4-5-20251001,86,199,0.0,eval
+solver,claude-haiku-4-5-20251001,68,268,0.0,eval
+solver,claude-haiku-4-5-20251001,64,247,0.0,simple:baseline
+solver,claude-haiku-4-5-20251001,75,266,0.0,simple:baseline
+solver,claude-haiku-4-5-20251001,72,196,0.0,simple:baseline
+solver,claude-haiku-4-5-20251001,74,110,0.0,simple:baseline
+solver,claude-haiku-4-5-20251001,65,173,0.0,simple:baseline-val
+solver,claude-haiku-4-5-20251001,73,154,0.0,simple:baseline-val
+solver,claude-haiku-4-5-20251001,67,135,0.0,eval
+solver,claude-haiku-4-5-20251001,78,174,0.0,eval
+solver,claude-haiku-4-5-20251001,86,236,0.0,eval
+solver,claude-haiku-4-5-20251001,68,268,0.0,eval

@@ -1,0 +1,37 @@
+{
+  "run_id": "aime_reflect_fdpo_gpt-4.1_s0_20260830-121039",
+  "status": "budget_aborted",
+  "method": "reflect_fdpo",
+  "dataset": "aime",
+  "solver_model": "gpt-4.1",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.23333333333333334,
+    "n_examples": 30,
+    "n_evaluated": 30,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.23333333333333334,
+    "n_examples": 30,
+    "n_evaluated": 30,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "optimization": null,
+  "content_filter": null,
+  "wall_clock_s": 330.2,
+  "cost": {
+    "total_calls": 88,
+    "total_cost_usd": 2.008468,
+    "by_role": {
+      "solver": {
+        "calls": 88,
+        "prompt_tokens": 18650,
+        "completion_tokens": 246396,
+        "cost_usd": 2.008468
+      }
+    }
+  }
+}
