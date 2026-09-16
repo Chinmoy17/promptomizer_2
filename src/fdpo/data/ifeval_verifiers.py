@@ -234,10 +234,13 @@ def _consonant_clusters_ok(r: str, kw: dict) -> tuple[bool, str]:
 
 
 def _no_consecutive_repeats(r: str, kw: dict) -> tuple[bool, str]:
-    words = [w.lower() for w in _words(r)]
+    """words:no_consecutive -- no two consecutive words may share the same
+    first letter (verified against the raw dataset instruction text, not
+    literal word repetition -- see ifbench_225/227 in Dataset/ifbench)."""
+    words = _words(r)
     for a, b in zip(words, words[1:]):
-        if a == b:
-            return False, f"word '{a}' repeated consecutively"
+        if a and b and a[0].lower() == b[0].lower():
+            return False, f"words '{a}' and '{b}' share first letter '{a[0].lower()}'"
     return True, ""
 
 

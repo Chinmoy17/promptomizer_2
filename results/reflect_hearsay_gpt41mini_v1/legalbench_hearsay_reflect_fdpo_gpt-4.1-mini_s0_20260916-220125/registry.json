@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": -1.0,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted. A “statement” includes oral/written assertions and assertive conduct. The key is whether the relevance of the evidence depends on accepting as true what the statement asserts (including any embedded or intermediate assertion).",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.88,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted. A “statement” includes oral/written assertions and assertive conduct. The key is whether the relevance of the evidence depends on accepting as true what the statement asserts (including any embedded or intermediate assertion that must be true for relevance).",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.88,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Decide whether the given statement is hearsay by applying this decision procedure and explain your steps briefly before the final answer:\n- Step 1: Is there a “statement”? Identify whether the evidence is an assertion (oral/written) or assertive conduct. Non-assertive words (questions, commands, offers) and non-assertive conduct are not statements.\n- Step 2: Was it made out of court? In-court testimony in this proceeding is not hearsay for this purpose.\n- Step 3: What specific proposition is the evidence offered to prove (ultimate or intermediate)? If any proposition asserted by the statement must be true for the evidence to be relevant, it is offered for its truth.\n- Step 4: If the evidence is offered solely for a non-truth purpose, answer No. Common non-truth purposes include:\n  - Effect on the listener or to show notice/knowledge/motive where you do not need the assertion to be true (only that the words were heard).\n  - To prove a conversation or words occurred (regardless of their truth).\n  - Circumstantial use of words to show a condition or state unrelated to their truth (e.g., that the speaker was alive/able to speak, or to show the speaker’s attitude/support), without accepting the asserted external fact as true.\n- Step 5 (Guardrail): If the proponent relies on the statement to prove an intermediate fact that is itself asserted in the statement (e.g., “I heard/know/saw X,” or “people heard X”) then the statement is being used for its truth; treat as hearsay.\n- Step 6: Apply the conclusion: If out-of-court and offered for the truth of what it asserts (including embedded assertions), answer Yes; otherwise answer No.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.88,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        },
+        {
+          "version": 2,
+          "text": "Decide whether the given statement is hearsay by applying this decision procedure and explain your steps briefly before the final answer:\n- Step 1: Is there a “statement”? Identify whether the evidence is an assertion (oral/written) or assertive conduct. Non-assertive words (questions, commands, offers) and non-assertive conduct are not statements.\n- Step 2: Was it made out of court? In-court testimony in this proceeding is not hearsay for this purpose.\n- Step 3: What specific proposition is the evidence offered to prove (ultimate or intermediate)? Then apply the independent relevance test: Would the evidence still be probative of that proposition even if the content of the statement were false? \n  - If yes, it is offered for a non-truth purpose.\n  - If no, it is offered for its truth (you need at least one asserted proposition in the statement to be true for relevance).\n- Step 4: If the evidence is offered solely for a non-truth purpose, answer No. Common non-truth purposes include:\n  - Effect on the listener or to show notice/knowledge/motive where you do not need the assertion to be true (only that the words were heard).\n  - To prove a conversation or words occurred (regardless of their truth).\n  - Circumstantial use of words to show a condition or state of the speaker unrelated to their truth (e.g., that the speaker was alive/able to speak, or to show the speaker’s attitude/support), without accepting any asserted external fact as true.\n- Step 5 (Guardrail on embedded assertions): If the proponent relies on the statement to establish an intermediate fact that itself depends on the truth of an asserted proposition within the statement (e.g., “I heard/know/saw X,” or “people said/heard X”), then the statement is being used for its truth; treat as hearsay. Do not invoke this guardrail when the use is only to show the fact words were spoken or the speaker’s state (alive/ability/attitude) or mere effect on the listener where content truth is irrelevant under Step 3.\n- Step 6: Apply the conclusion: If out-of-court and offered for the truth of what it asserts (including any asserted proposition that must be true for relevance), answer Yes; otherwise answer No.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.88,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 1,
+            "broke": 3
+          }
+        },
+        {
+          "version": 3,
+          "text": "Decide whether the given statement is hearsay by applying this decision procedure and explain your steps briefly before the final answer:\n- Step 1: Is there a “statement”? Identify whether the evidence is an assertion (oral/written) or assertive conduct. Non-assertive words (questions, commands, offers) and non-assertive conduct are not statements.\n- Step 2: Was it made out of court? In-court testimony in this proceeding is not hearsay for this purpose.\n- Step 3: What specific proposition is the evidence offered to prove (ultimate or intermediate)? Use the stated purpose in the prompt as the target proposition. Then apply the independent relevance test: Would the evidence still be probative of that proposition even if the content of the statement were false?\n  - If yes, it is offered for a non-truth purpose.\n  - If no, it is offered for its truth (you need at least one asserted proposition in the statement to be true for relevance).\n- Step 4: If the evidence is offered solely for a non-truth purpose, answer No. Common non-truth purposes include:\n  - Effect on the listener or to show notice/knowledge/motive where you do not need the assertion to be true (only that the words were received).\n  - To prove a conversation or words occurred (regardless of their truth).\n  - Circumstantial use of words to show a condition or state of the speaker unrelated to their truth (e.g., that the speaker was alive/able to speak, or to show the speaker’s attitude/support), without accepting any asserted external fact as true.\n  - Use of information conveyed to a person to show the person’s awareness or state of mind because they were told it, whether or not the information was accurate.\n- Step 5 (Guardrail on embedded/chain assertions — when “effect on listener” flips back to truth use): The following require accepting an asserted proposition within the statement as true; treat as hearsay.\n  - The only evidence that the listener received the information is the declarant’s out-of-court claim “I heard/was told/saw X.” Using that claim to prove the listener actually received the information depends on the truth of “I heard/was told/saw.”\n  - The statement recounts a chain of reports (A reporting what others reported). If the proponent’s relevance theory requires accepting an inner factual claim in that chain for the evidence to matter, an embedded assertion is being used for its truth.\n  - Do NOT invoke this guardrail when the content is merely belief/suspicion/attitude, a question, or a directive; or when the use is solely to show that words reached the listener irrespective of their accuracy, as determined under Step 3.\n- Step 6: Apply the conclusion: If out-of-court and offered for the truth of what it asserts (including any asserted proposition that must be true for relevance), answer Yes; otherwise answer No.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Apply the definition strictly. Do not consider exclusions or exceptions (e.g., party-opponent statements or hearsay exceptions); classify only under the basic definition above.\n- Conduct is not hearsay unless intended as an assertion; assertive conduct counts as a statement.\n- Questions, commands, and other non-assertions are not hearsay.\n- Keep explanations concise and focused on the steps.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.88,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

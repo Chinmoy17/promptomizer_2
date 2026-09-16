@@ -1,0 +1,182 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": -1.0,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a U.S. evidence-law expert.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Under Federal Rule of Evidence 801(c), hearsay is an out-of-court statement that a party offers to prove the truth of the matter asserted. “Statement” means a person’s oral or written assertion, or nonverbal conduct intended as an assertion. Machines and animals are not declarants; but a human-authored report or record prepared outside court is a person’s statement. In-court testimony is not out-of-court.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.72,
+            "acc_new": 0.68,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 3,
+            "broke": 4
+          }
+        },
+        {
+          "version": 2,
+          "text": "Under Federal Rule of Evidence 801(c), hearsay is an out-of-court statement that a party offers to prove the truth of the matter asserted. “Statement” means a person’s oral or written assertion, or nonverbal conduct intended as an assertion. Machines and animals are not declarants; but a human-authored report or record prepared outside court is a person’s statement. If a witness repeats in court what someone said earlier, evaluate the earlier words as the “statement” and treat them as made out of court; only a statement first made on the stand in this trial is in-court.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.6799999999999999,
+            "acc_new": 0.68,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Decide whether the given statement is hearsay.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this decision procedure and show brief reasoning before the final answer:\n1) Identify the item: words, writing, or conduct.\n   - If it is a person’s oral/written assertion, or nonverbal conduct intended to assert something (e.g., a communicative gesture), it is a “statement.” Questions and commands are not assertions.\n   - Human-authored documents/reports prepared outside court are statements by their authors; raw machine output (without human assertion) is not.\n2) Was it made out of court? If it is testimony on the stand at this trial, it is not hearsay.\n3) For what purpose is it offered? Apply the “if false, would it still help?” test.\n   - If the evidence only helps if the asserted proposition is true, it is offered for its truth.\n   - If it still has probative value even if the words are false, it is not offered for truth (non-hearsay use).\n4) Common non-truth purposes (non-hearsay):\n   - Effect on listener: to show a particular person’s knowledge, notice, or motive.\n   - Circumstantial evidence of the declarant’s state of mind/attitude or familiarity (support, dislike, recognition), without relying on the literal truth of the assertion.\n   - To prove the fact that words were spoken at a particular time (e.g., that the speaker was alive then), irrespective of their truth.\n   - Verbal acts/legally operative words, where the law attaches significance to the fact the words were said (the content is operative, not offered for truth).\n   - To prove only that a conversation/communication occurred.\n5) Conclusion: If (a) out-of-court, (b) a “statement,” and (c) offered for its truth, then hearsay (Answer: Yes). Otherwise, not hearsay (Answer: No).",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.72,
+            "acc_new": 0.68,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 3,
+            "broke": 4
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this decision procedure and show brief reasoning before the final answer:\n1) Identify the item: words, writing, or conduct.\n   - If it is a person’s oral/written assertion, or nonverbal conduct intended to assert something (e.g., a communicative gesture), it is a “statement.” Questions and commands are not assertions.\n   - Human-authored documents/reports prepared outside court are statements by their authors; raw machine output (without human assertion) is not.\n2) Was it made out of court? If it is testimony on the stand at this trial, it is not hearsay. If a witness recounts someone’s prior words or conduct, treat the prior words/conduct as the statement; those were made out of court.\n3) For what purpose is it offered? Apply the “if false, would it still help?” test.\n   - If the evidence only helps if the asserted proposition is true, it is offered for its truth.\n   - If it still has probative value even if the words are false, it is not offered for truth (non-hearsay use).\n4) Common non-truth purposes (non-hearsay):\n   - Effect on listener: to show a particular person’s knowledge, notice, or motive.\n   - Circumstantial evidence of the declarant’s state of mind/attitude or familiarity (support, dislike, recognition), without relying on the literal truth of the assertion.\n   - To prove the fact that words were spoken at a particular time (e.g., that the speaker was alive then), irrespective of their truth.\n   - Verbal acts/legally operative words, where the law attaches significance to the fact the words were said (the content is operative, not offered for truth).\n   - To prove only that a conversation/communication occurred.\n5) Conclusion: If (a) out-of-court, (b) a “statement,” and (c) offered for its truth, then hearsay (Answer: Yes). Otherwise, not hearsay (Answer: No).",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.6799999999999999,
+            "acc_new": 0.68,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 2,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "Use this decision procedure and show brief reasoning before the final answer:\n1) Identify the item: words, writing, or conduct.\n   - If it is a person’s oral/written assertion, or nonverbal conduct intended to assert something (e.g., a communicative gesture), it is a “statement.” Questions and commands are not assertions.\n   - Human-authored documents/reports prepared outside court are statements by their authors; raw machine output (without human assertion) is not.\n2) Was it made out of court? If it is testimony on the stand at this trial, it is not hearsay. If a witness recounts someone’s prior words or conduct, treat the prior words/conduct as the statement; those were made out of court.\n3) For what purpose is it offered? Apply the “if false, would it still help?” test.\n   - If the evidence only helps if the asserted proposition is true, it is offered for its truth.\n   - If it still has probative value even if the words are false, it is not offered for truth (non-hearsay use).\n4) Common non-truth purposes (treat these as NOT offered for truth when that is the stated purpose; explain why they still help even if false):\n   - Effect on listener/notice: to show a particular person’s knowledge, notice, motive, or that they were put on alert. The listener’s knowledge comes from hearing the words, whether or not the content was true.\n   - Declarant’s state of mind/attitude or familiarity/relationship: using the utterance itself as circumstantial evidence of what the declarant believed, felt, supported, disliked, or whom they knew; you are not proving the literal descriptive content.\n   - To prove only that words were spoken at a particular time (e.g., that the speaker was alive/able to speak then), irrespective of their truth.\n   - Verbal acts/legally operative words, where the law attaches significance to the fact the words were said (offers/acceptances, threats, defamation, etc.).\n   - To prove only that a conversation/communication occurred.\n   - Caution on conduct: Nonassertive conduct (doing, buying, traveling, applauding) is not a “statement” at all. Assertive nonverbal gestures intended to communicate a specific fact (e.g., pointing to identify, nodding yes/no) are statements; if offered to prove the indicated fact, they are for truth and can be hearsay. Questions/commands are not assertions and thus not statements.\n5) Conclusion: If (a) out-of-court, (b) a “statement,” and (c) offered for its truth, then hearsay (Answer: Yes). Otherwise, not hearsay (Answer: No).",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.6799999999999999,
+            "acc_new": 0.76,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 8,
+            "recovered_failures": 3,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Apply the definition strictly; conduct is not hearsay unless it is assertive.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Apply Rule 801(c) strictly. Ignore all hearsay exceptions and exclusions.\n- Treat conduct as a statement only if intended as an assertion; otherwise, conduct is not hearsay.\n- Use the stated purpose in the prompt; do not invent a different purpose.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.72,
+            "acc_new": 0.68,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 3,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form:\nAnswer: Yes  (or)  Answer: No",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

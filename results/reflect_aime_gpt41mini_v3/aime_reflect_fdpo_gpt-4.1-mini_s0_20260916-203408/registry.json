@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": -1.0,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a competition mathematician.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You will be given a competition-style math problem whose answer is always\nan integer between 0 and 999.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Solve the problem.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Solve the problem by writing out your reasoning clearly and concisely before giving the final answer. Use a structured approach:\n1) Restate the goal and identify key quantities (what is being asked, and in what form).\n2) Plan an approach suited to the topic:\n   - Algebra/Equations: isolate variables, factor, use identities, substitutions, or Vieta where helpful; keep expressions exact.\n   - Number theory: reduce modulo appropriate bases, use gcd/inverses, order/period arguments, lifting exponents, or factorization; ensure integrality constraints.\n   - Combinatorics/Counting: define the sample space, use bijections, stars-and-bars, inclusion–exclusion, casework without double counting; justify edge cases.\n   - Geometry: define points/lengths/angles; choose a clean method (similarity, power of a point, Pythagorean, coordinate/complex geometry, trigonometry); keep radicals exact and simplify; verify configurations and perpendicular/parallel claims.\n   - Functional/recurrences: derive and solve recurrences or functional relations; check initial values.\n   - Complex numbers/roots of unity: translate products/sums into polynomial values or arguments when possible; keep algebra exact.\n3) Execute the plan step by step with exact arithmetic (no decimal approximations unless they terminate exactly). Simplify radicals and fractions fully; keep mod reductions precise.\n4) Verify the result:\n   - Check against all given conditions, constraints, and edge cases.\n   - If the problem asks for a derived quantity (e.g., m+n, or a+b for reduced fraction, or m√n with n squarefree), compute that correctly.\n   - Ensure the final answer is an integer in [0,999]. If not, re-examine earlier steps for mistakes or missing conditions. Do not round.\n5) Present the final numeric answer on its own line in the required format.\n\nBe concise but include the necessary intermediate steps to make the logic clear. If two different methods quickly cross-check the same value, note the confirmation briefly.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.4655172413793104,
+            "acc_new": 0.5172413793103449,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 31,
+            "recovered_failures": 9,
+            "broke": 6
+          }
+        },
+        {
+          "version": 2,
+          "text": "Solve the problem by writing out your reasoning clearly and concisely before giving the final answer. Use a structured approach:\n1) Restate the goal and identify key quantities (what is being asked, and in what form).\n2) Plan an approach suited to the topic. Alongside the topic-specific plan, keep these common structures/lemmas in view when relevant:\n   - Algebra/Equations: isolate variables; factor; use identities, substitutions, or Vieta; delay modular reduction until after cancellation.\n   - Number theory: use modular arithmetic with care; gcd/inverses; order/period arguments; LTE/factorization; confirm small cases; ensure integrality constraints.\n   - Combinatorics/Counting: define the sample space; use bijections, stars-and-bars, inclusion–exclusion; break into non-overlapping cases; beware double-counting; for planar drawings, Euler’s formula F−E+V=2 after turning crossings into vertices.\n   - Geometry (frequent patterns):\n     • Circles/tangents: radii ⟂ tangents; tangents from a point are equal; Power of a Point; radical axis; cyclic quadrilaterals; similar triangles from shared angles.\n     • Trapezoids/parallel lines: midline length equals average of bases; use symmetry; angle bisectors often meet perpendiculars/altitudes in isosceles settings.\n     • Parallelogram/rhombus: diagonals bisect each other; rhombus diagonals are perpendicular; use coordinates or vectors if clean.\n     • Lengths/areas: drop altitudes; use Pythagorean; coordinate/barycentric setups for symmetric figures.\n   - Functional/recurrences: derive and solve recurrences or functional relations; check initial values.\n   - Complex numbers/roots of unity: translate products/sums into polynomial values or arguments; evaluate via roots of unity filters.\n3) Execute the plan step by step with exact arithmetic (no decimal approximations unless they terminate exactly). Simplify radicals and fractions fully; keep mod reductions precise; cancel factors before reducing modulo.\n4) Verify the result with a short audit:\n   - Structural checks: Did you use the correct lemma (e.g., PoP for tangents, midline average for trapezoids, Vandermonde/Euler where applicable)?\n   - Consistency checks: units/lengths parity; triangle inequality; bounds/monotonicity; symmetry; small-case sanity if a general formula was derived.\n   - Optional cross-check: confirm the key value by a second quick route (e.g., similar-triangle ratio vs. PoP; counting via Euler vs. direct intersection count).\n   - Ensure the final answer is an integer in [0,999]. If not, re-examine earlier steps for mistakes.\n5) Present the final numeric answer on its own line in the required format.\n\nBe concise but include the necessary intermediate steps to make the logic clear. If two different methods quickly cross-check the same value, note the confirmation briefly.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.5172413793103448,
+            "acc_new": 0.4827586206896552,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 28,
+            "recovered_failures": 6,
+            "broke": 8
+          }
+        },
+        {
+          "version": 3,
+          "text": "Solve the problem by writing out your reasoning clearly and concisely before giving the final answer. Use a structured approach:\n1) Restate the goal and identify key quantities (what is being asked, and in what form).\n2) Plan an approach suited to the topic. Alongside the topic-specific plan, keep these common structures/lemmas in view when relevant:\n   - Algebra/Equations: isolate variables; factor; use identities, substitutions, or Vieta; delay modular reduction until after cancellation.\n   - Number theory: use modular arithmetic with care; gcd/inverses; order/period arguments; LTE/factorization; confirm small cases; ensure integrality constraints.\n   - Combinatorics/Counting: define the sample space; use bijections, stars-and-bars, inclusion–exclusion; break into non-overlapping cases; beware double-counting; for planar drawings, Euler’s formula F−E+V=2 after turning crossings into vertices.\n   - Geometry (frequent patterns):\n     • Circles/tangents: radii ⟂ tangents; tangents from a point are equal; Power of a Point; radical axis; cyclic quadrilaterals; similar triangles from shared angles.\n     • Trapezoids/parallel lines: midline length equals average of bases; use symmetry; angle bisectors often meet perpendiculars/altitudes in isosceles settings.\n     • Parallelogram/rhombus: diagonals bisect each other; rhombus diagonals are perpendicular; use coordinates or vectors if clean.\n     • Lengths/areas: drop altitudes; use Pythagorean; coordinate/barycentric setups for symmetric figures.\n   - Functional/recurrences: derive and solve recurrences or functional relations; check initial values.\n   - Complex numbers/roots of unity: translate products/sums into polynomial values or arguments; evaluate via roots of unity filters.\n3) Execute the plan step by step with exact arithmetic (no decimal approximations unless they terminate exactly). Simplify radicals and fractions fully; keep mod reductions precise; cancel factors before reducing modulo.\n4) Verify the result with a short audit:\n   - Structural checks: Did you use the correct lemma (e.g., PoP for tangents, midline average for trapezoids, Vandermonde/Euler where applicable)? For lattice/torus path counts, enforce gcd/coprmiality conditions; for symmetric polygon counts, prefer orbit decompositions (e.g., opposite pairs) or rigorous case splits over ad‑hoc PIE.\n   - Consistency checks: units/lengths parity; triangle inequality; bounds/monotonicity; symmetry; small-case sanity if a general formula was derived (e.g., test a smaller n).\n   - Optional cross-check: confirm the key value by a second quick route (e.g., similar-triangle ratio vs. PoP; counting via Euler vs. direct intersection count; modular/recurrence cycles).\n   - No guessing: do not conclude “likely,” “known,” or “closest integer.” Plug your candidate back into the original equations/constraints numerically or structurally to confirm it satisfies every condition exactly. If it does not, revisit earlier steps.\n   - Ensure the final answer is an integer in [0,999]. If not, re-examine earlier steps for mistakes.\n5) Present the final numeric answer on its own line in the required format.\n\nBe concise but include the necessary intermediate steps to make the logic clear. If two different methods quickly cross-check the same value, note the confirmation briefly.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.48275862068965514,
+            "acc_new": 0.46551724137931033,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 30,
+            "recovered_failures": 6,
+            "broke": 7
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "The final answer must be an integer between 0 and 999.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- The final answer must be an integer between 0 and 999.\n- Do not round; if you obtain a non-integer when an integer is required, revisit your derivation.\n- Keep calculations exact (fractions, radicals, modular residues), and simplify where appropriate.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.4655172413793104,
+            "acc_new": 0.5172413793103449,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 31,
+            "recovered_failures": 9,
+            "broke": 6
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "After your work, write the final numeric answer on its own line in exactly\nthis form: #### <number>",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}

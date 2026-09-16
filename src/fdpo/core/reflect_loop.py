@@ -307,8 +307,13 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
         # val split) round is tracked as the one to actually ship -- see
         # module docstring. `registry.restore_round()` reconstructs this
         # round's exact prompt at the end regardless of what committed after
-        # it.
-        if cand_val_acc > best_val_acc:
+        # it. On a validation tie, prefer the round with higher mining
+        # accuracy instead of whichever reached the tied score first -- a
+        # tie is not evidence the earlier round is better, and mining
+        # accuracy is a real, computed-anyway signal otherwise discarded.
+        if cand_val_acc > best_val_acc or (
+                cand_val_acc == best_val_acc
+                and new_eval.accuracy > best_result.accuracy):
             best_round_num = round_num
             best_val_acc = cand_val_acc
             best_wrong = new_wrong

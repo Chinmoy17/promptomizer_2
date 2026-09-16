@@ -1,0 +1,7 @@
+role,model,prompt_tokens,completion_tokens,cost_usd,purpose
+solver,gpt-4.1-mini-2025-04-14,137,938,0.0015556,eval
+solver,gpt-4.1-mini-2025-04-14,311,2048,0.0034012,eval
+solver,gpt-4.1-mini-2025-04-14,182,2048,0.0033496000000000003,reflect:baseline
+solver,gpt-4.1-mini-2025-04-14,317,2048,0.0034036000000000005,reflect:baseline
+solver,gpt-4.1-mini-2025-04-14,193,2048,0.003354,reflect:baseline
+solver,gpt-4.1-mini-2025-04-14,168,1270,0.0020992,reflect:baseline-val

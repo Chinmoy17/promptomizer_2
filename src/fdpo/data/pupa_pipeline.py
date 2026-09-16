@@ -161,7 +161,7 @@ def run_pupa_pipeline(solver: ModelClient, external: ModelClient,
 
     judge_result = judge.complete(
         _build_quality_messages(ex.question, ex.reference, synth_result.text),
-        temperature=0.0, max_tokens=2048, purpose=f"{purpose}:judge")
+        temperature=0.0, max_tokens=4096, purpose=f"{purpose}:judge")
     quality = parse_quality_score(judge_result.text)
 
     score = (quality + (1.0 - leakage)) / 2.0
