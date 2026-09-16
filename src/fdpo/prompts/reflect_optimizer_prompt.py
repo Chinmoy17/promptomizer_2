@@ -71,11 +71,14 @@ experiment, not a one-shot rewrite):
      then rewrite -- keep the edits that recovered items, revert or repair the
      edits that regressed items, and address the remaining failures. Do not
      churn wording that was not implicated by the evidence.
-  4. THERE IS NO "BEST ROUND" SELECTION. Whichever round is LAST is the one
-     that ships. A validation accuracy number is reported each round purely
-     as a diagnostic (did this edit fix what it broke), never as a score you
-     are competing to maximize by round -- optimize every round as if it were
-     the one being shipped, because eventually one will be.
+  4. There is no "last round always ships" rule. Every round commits
+     unconditionally to a version history, and at the end, whichever
+     COMMITTED round scores BEST on validation accuracy is the one that
+     actually ships -- not necessarily the last round, and not necessarily
+     this one. Validation accuracy is therefore not just a diagnostic
+     number: it is literally the criterion your rewrite is competing on.
+     Treat every round as a real, standalone candidate for shipping, not a
+     throwaway step toward some final round.
   5. Because you now see every validation item that flips, a rewrite that
      merely patches the specific items shown -- without addressing the
      underlying rule that produced them -- will look good this round and can
@@ -317,11 +320,13 @@ def build_reflect_optimizer_messages(
 
     iteration_context = (
         f"ITERATION CONTEXT: This is refinement round {round_num} of "
-        f"{max_rounds}. There is no best-round selection -- whichever round "
-        f"is last ships"
+        f"{max_rounds}. The round that ships at the end is whichever "
+        f"COMMITTED round scores best on validation accuracy -- not "
+        f"necessarily the last round, and not necessarily this one -- so "
+        f"treat this rewrite as a real, standalone candidate for shipping"
         + (", and you will be shown its full measured effect (both the "
            "working set and validation) next round"
-           if round_num < max_rounds else " and this round is the last one")
+           if round_num < max_rounds else ", and this is your final round")
         + ", so make one deliberate, testable change now.\n\n"
     )
 

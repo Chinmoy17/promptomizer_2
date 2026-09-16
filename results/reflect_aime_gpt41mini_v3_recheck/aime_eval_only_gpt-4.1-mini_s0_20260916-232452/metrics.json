@@ -1,0 +1,17 @@
+{
+  "dataset": "aime",
+  "prompt_file": "results\\reflect_aime_gpt41mini_v3\\aime_reflect_fdpo_gpt-4.1-mini_s0_20260916-203408\\prompt_current.md",
+  "prompt_source": "results\\reflect_aime_gpt41mini_v3\\aime_reflect_fdpo_gpt-4.1-mini_s0_20260916-203408\\prompt_current.md",
+  "n_train": 90,
+  "n_test": 30,
+  "seed": 0,
+  "split_mode": "seeded",
+  "solver_max_tokens": 24000,
+  "solver_temperature": 0.0,
+  "accuracy": 0.4666666666666667,
+  "n_correct": 14,
+  "n_evaluated": 30,
+  "n_blocked": 0,
+  "extraction_failures": 0,
+  "spent_usd": 0.22983
+}

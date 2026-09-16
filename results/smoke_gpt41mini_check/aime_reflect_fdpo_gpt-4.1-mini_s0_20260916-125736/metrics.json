@@ -1,0 +1,115 @@
+{
+  "run_id": "aime_reflect_fdpo_gpt-4.1-mini_s0_20260916-125736",
+  "status": "completed",
+  "method": "reflect_fdpo",
+  "dataset": "aime",
+  "solver_model": "gpt-4.1-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.5,
+    "n_examples": 2,
+    "n_evaluated": 2,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.5,
+    "n_examples": 2,
+    "n_evaluated": 2,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "reflect",
+    "edit_status": "not_triggered",
+    "triggered": false,
+    "tau": 5,
+    "skip_above_acc": 0.0,
+    "skipped_high_baseline": false,
+    "simple_max_rounds": 1,
+    "accept_margin": 1.0,
+    "shipped_structured": false,
+    "selection": "best_of_rounds",
+    "shipped_round": null,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.35,
+      "n_mining": 3,
+      "n_validation": 1
+    },
+    "baseline_val_acc": 1.0,
+    "best_structured_val_acc": null,
+    "n_failures_triggering": 3,
+    "optimizer_calls": 0,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "below_tau",
+        "n_failures_before": 3
+      }
+    ],
+    "baseline_failing_ids": [
+      "aime_train_29",
+      "aime_train_44",
+      "aime_train_8"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.0,
+      "n_correct": 0,
+      "n_wrong": 3
+    },
+    "current_train": {
+      "accuracy": 0.0,
+      "n_correct": 0,
+      "n_wrong": 3
+    },
+    "train_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "aime_train_29",
+        "aime_train_44",
+        "aime_train_8"
+      ],
+      "still_right_count": 0,
+      "net_gain": 0
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 0,
+      "rejects": 0
+    },
+    "rounds_run": 0,
+    "train_acc_per_round": [
+      0.0
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "aime_test_AIME2025-II_11"
+      ],
+      "still_right_count": 1,
+      "net_gain": 0
+    },
+    "markdown_source": "prompts\\aime.md"
+  },
+  "content_filter": null,
+  "wall_clock_s": 80.0,
+  "cost": {
+    "total_calls": 6,
+    "total_cost_usd": 0.017163,
+    "by_role": {
+      "solver": {
+        "calls": 6,
+        "prompt_tokens": 1308,
+        "completion_tokens": 10400,
+        "cost_usd": 0.017163
+      }
+    }
+  }
+}
