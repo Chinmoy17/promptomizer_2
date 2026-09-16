@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": -1.0,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a competition mathematician.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You will be given a competition-style math problem whose answer is always\nan integer between 0 and 999.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Solve the problem.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Solve the problem by writing a clear, self-contained derivation from first principles:\n- Identify what is asked and introduce any helpful notation/variables.\n- Choose appropriate methods (e.g., algebraic manipulation, counting with careful casework, standard theorems like similarity, Power of a Point, Pythagorean theorem, inclusion–exclusion, modular arithmetic, inequalities/bounds).\n- Carry out the computation step by step with justified transitions; avoid leaps and “this is known” claims. Do not guess or cite a “famous result” as the answer without deriving it.\n- If the problem asks for a derived expression (e.g., m+n), compute it explicitly.\n- Perform a brief sanity check:\n  - Verify units/constraints (e.g., counts are nonnegative integers, geometric lengths consistent, congruences satisfied).\n  - Confirm the final numeric answer is an integer in [0, 999]. If not, re-check your work.\n- Keep the reasoning concise but complete; avoid unnecessary repetition or speculation.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.4482758620689655,
+            "acc_new": 0.41379310344827586,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 32,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "The final answer must be an integer between 0 and 999.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- The final answer must be an integer between 0 and 999.\n- Do not assume or assert a known answer without derivation; show the method that leads to the result.\n- Ensure arithmetic is exact (no unwarranted rounding). If multiple candidates arise, resolve them using the problem’s conditions so that a single integer remains.\n- Before finalizing, confirm the answer satisfies all stated conditions of the problem.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.4482758620689655,
+            "acc_new": 0.41379310344827586,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 32,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        },
+        {
+          "version": 2,
+          "text": "- The final answer must be an integer between 0 and 999. Do not force an integer by rounding, truncating, or “taking the nearest/floor/ceiling” unless the problem explicitly asks for it; if your computed value is not an integer, you have misunderstood the requested quantity or made an error — revisit the derivation to obtain the correct integer (e.g., a count, a remainder, or a specified combination like m+n).\n- Do not assume or assert a known answer without derivation; show the method that leads to the result.\n- Ensure arithmetic is exact (no unwarranted rounding). If multiple candidates arise, resolve them using the problem’s conditions so that a single integer remains.\n- Before finalizing, confirm the answer satisfies all stated conditions of the problem.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.4137931034482759,
+            "acc_new": 0.41379310344827586,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 34,
+            "recovered_failures": 7,
+            "broke": 7
+          }
+        },
+        {
+          "version": 3,
+          "text": "- The final answer must be an integer between 0 and 999. Do not force an integer by rounding, truncating, or “taking the nearest/floor/ceiling” unless the problem explicitly asks for it; if your computed value is not an integer, you have misunderstood the requested quantity or made an error — revisit the derivation to obtain the correct integer (e.g., a count, a remainder, or a specified combination like m+n).\n- Do not assume or assert a known answer without derivation; show the method that leads to the result.\n- Ensure arithmetic is exact (no unwarranted rounding). If multiple candidates arise, resolve them using the problem’s conditions so that a single integer remains.\n- Before finalizing, confirm the answer satisfies all stated conditions of the problem.\n- Use exact symbolic forms (fractions, radicals, modular residues) throughout; do not introduce decimal approximations. Only at the end convert the exact result into the required integer (e.g., compute m+n, p+q, or a remainder) by exact arithmetic.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.4137931034482759,
+            "acc_new": 0.4827586206896552,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 34,
+            "recovered_failures": 11,
+            "broke": 7
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "After your work, write the final numeric answer on its own line in exactly\nthis form: #### <number>",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Show your step-by-step working first.\n- After your work, write the final numeric answer on its own line in exactly this form: #### <number>\n- The final answer line must appear exactly once, with no extra text, symbols, or lines after it.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.4482758620689655,
+            "acc_new": 0.41379310344827586,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 32,
+            "recovered_failures": 3,
+            "broke": 5
+          }
+        }
+      ]
+    }
+  }
+}
