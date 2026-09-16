@@ -1,0 +1,349 @@
+{
+  "run_id": "ifbench_reflect_fdpo_gpt-4.1-mini_s0_20260916-160801",
+  "status": "completed",
+  "method": "reflect_fdpo",
+  "dataset": "ifbench",
+  "solver_model": "gpt-4.1-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.5238095238095238,
+    "n_examples": 42,
+    "n_evaluated": 42,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.5,
+    "n_examples": 42,
+    "n_evaluated": 42,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "reflect",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 1,
+    "skip_above_acc": 0.95,
+    "skipped_high_baseline": false,
+    "simple_max_rounds": 3,
+    "accept_margin": 0.0,
+    "shipped_structured": true,
+    "selection": "best_of_rounds",
+    "shipped_round": 3,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.35,
+      "n_mining": 26,
+      "n_validation": 14
+    },
+    "baseline_val_acc": 0.6428571428571429,
+    "best_structured_val_acc": 0.7857142857142857,
+    "n_failures_triggering": 13,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "committed",
+        "n_failures_before": 13,
+        "n_failures_after": 17,
+        "train_acc_after": 0.32,
+        "val_acc_after": 0.7142857142857143,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "output_format",
+          "system_role",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "ifbench_100",
+          "ifbench_104",
+          "ifbench_172",
+          "ifbench_18",
+          "ifbench_206",
+          "ifbench_207",
+          "ifbench_208",
+          "ifbench_210",
+          "ifbench_24",
+          "ifbench_296",
+          "ifbench_43",
+          "ifbench_44",
+          "ifbench_57"
+        ],
+        "failing_ids_after": [
+          "ifbench_100",
+          "ifbench_103",
+          "ifbench_104",
+          "ifbench_17",
+          "ifbench_18",
+          "ifbench_206",
+          "ifbench_207",
+          "ifbench_208",
+          "ifbench_210",
+          "ifbench_24",
+          "ifbench_296",
+          "ifbench_34",
+          "ifbench_43",
+          "ifbench_44",
+          "ifbench_45",
+          "ifbench_57",
+          "ifbench_59"
+        ],
+        "recovered_this_round": [
+          "ifbench_172"
+        ],
+        "regressed_this_round": [
+          "ifbench_103",
+          "ifbench_17",
+          "ifbench_34",
+          "ifbench_45",
+          "ifbench_59"
+        ],
+        "val_recovered_this_round": 1,
+        "val_regressed_this_round": 0,
+        "reflection_shown": false
+      },
+      {
+        "round": 2,
+        "status": "committed",
+        "n_failures_before": 17,
+        "n_failures_after": 15,
+        "train_acc_after": 0.4,
+        "val_acc_after": 0.5714285714285714,
+        "sections_changed": [
+          "constraints",
+          "output_format",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "ifbench_100",
+          "ifbench_103",
+          "ifbench_104",
+          "ifbench_17",
+          "ifbench_18",
+          "ifbench_206",
+          "ifbench_207",
+          "ifbench_208",
+          "ifbench_210",
+          "ifbench_24",
+          "ifbench_296",
+          "ifbench_34",
+          "ifbench_43",
+          "ifbench_44",
+          "ifbench_45",
+          "ifbench_57",
+          "ifbench_59"
+        ],
+        "failing_ids_after": [
+          "ifbench_100",
+          "ifbench_103",
+          "ifbench_104",
+          "ifbench_172",
+          "ifbench_18",
+          "ifbench_206",
+          "ifbench_207",
+          "ifbench_208",
+          "ifbench_210",
+          "ifbench_226",
+          "ifbench_24",
+          "ifbench_296",
+          "ifbench_43",
+          "ifbench_45",
+          "ifbench_57"
+        ],
+        "recovered_this_round": [
+          "ifbench_17",
+          "ifbench_34",
+          "ifbench_44",
+          "ifbench_59"
+        ],
+        "regressed_this_round": [
+          "ifbench_172",
+          "ifbench_226"
+        ],
+        "val_recovered_this_round": 0,
+        "val_regressed_this_round": 2,
+        "reflection_shown": true
+      },
+      {
+        "round": 3,
+        "status": "committed",
+        "n_failures_before": 15,
+        "n_failures_after": 14,
+        "train_acc_after": 0.44,
+        "val_acc_after": 0.7857142857142857,
+        "sections_changed": [
+          "constraints",
+          "output_format",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "ifbench_100",
+          "ifbench_103",
+          "ifbench_104",
+          "ifbench_172",
+          "ifbench_18",
+          "ifbench_206",
+          "ifbench_207",
+          "ifbench_208",
+          "ifbench_210",
+          "ifbench_226",
+          "ifbench_24",
+          "ifbench_296",
+          "ifbench_43",
+          "ifbench_45",
+          "ifbench_57"
+        ],
+        "failing_ids_after": [
+          "ifbench_100",
+          "ifbench_103",
+          "ifbench_104",
+          "ifbench_17",
+          "ifbench_172",
+          "ifbench_206",
+          "ifbench_207",
+          "ifbench_208",
+          "ifbench_24",
+          "ifbench_296",
+          "ifbench_43",
+          "ifbench_44",
+          "ifbench_45",
+          "ifbench_57"
+        ],
+        "recovered_this_round": [
+          "ifbench_18",
+          "ifbench_210",
+          "ifbench_226"
+        ],
+        "regressed_this_round": [
+          "ifbench_17",
+          "ifbench_44"
+        ],
+        "val_recovered_this_round": 3,
+        "val_regressed_this_round": 0,
+        "reflection_shown": true
+      }
+    ],
+    "baseline_failing_ids": [
+      "ifbench_100",
+      "ifbench_104",
+      "ifbench_172",
+      "ifbench_18",
+      "ifbench_206",
+      "ifbench_207",
+      "ifbench_208",
+      "ifbench_210",
+      "ifbench_24",
+      "ifbench_296",
+      "ifbench_43",
+      "ifbench_44",
+      "ifbench_57"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 0.48,
+      "n_correct": 12,
+      "n_wrong": 13
+    },
+    "current_train": {
+      "accuracy": 0.44,
+      "n_correct": 11,
+      "n_wrong": 14
+    },
+    "train_confusion": {
+      "recoveries": [
+        "ifbench_18",
+        "ifbench_210"
+      ],
+      "regressions": [
+        "ifbench_103",
+        "ifbench_17",
+        "ifbench_45"
+      ],
+      "still_wrong": [
+        "ifbench_100",
+        "ifbench_104",
+        "ifbench_172",
+        "ifbench_206",
+        "ifbench_207",
+        "ifbench_208",
+        "ifbench_24",
+        "ifbench_296",
+        "ifbench_43",
+        "ifbench_44",
+        "ifbench_57"
+      ],
+      "still_right_count": 9,
+      "net_gain": -1
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 11,
+      "rejects": 0
+    },
+    "rounds_run": 3,
+    "train_acc_per_round": [
+      0.32,
+      0.4,
+      0.44
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "ifbench_126",
+        "ifbench_55"
+      ],
+      "regressions": [
+        "ifbench_225",
+        "ifbench_227",
+        "ifbench_42"
+      ],
+      "still_wrong": [
+        "ifbench_101",
+        "ifbench_105",
+        "ifbench_136",
+        "ifbench_173",
+        "ifbench_19",
+        "ifbench_20",
+        "ifbench_21",
+        "ifbench_211",
+        "ifbench_22",
+        "ifbench_23",
+        "ifbench_241",
+        "ifbench_242",
+        "ifbench_243",
+        "ifbench_244",
+        "ifbench_246",
+        "ifbench_297",
+        "ifbench_298",
+        "ifbench_299"
+      ],
+      "still_right_count": 19,
+      "net_gain": -1
+    },
+    "markdown_source": "prompts\\ifbench.md"
+  },
+  "content_filter": null,
+  "wall_clock_s": 469.0,
+  "cost": {
+    "total_calls": 247,
+    "total_cost_usd": 0.409211,
+    "by_role": {
+      "solver": {
+        "calls": 244,
+        "prompt_tokens": 172135,
+        "completion_tokens": 107762,
+        "cost_usd": 0.241273
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 22118,
+        "completion_tokens": 14029,
+        "cost_usd": 0.167937
+      }
+    }
+  }
+}

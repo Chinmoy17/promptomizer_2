@@ -371,7 +371,7 @@ single accuracy number moving up or down.
 | LegalBench-Hearsay | binary hearsay classification (FRE 801) | both | 40–50 → ~50/50 | 49–59 | GPT-4o-mini, Claude Haiku 4.5 | GPT-4.1 / GPT-5 |
 | IFEval / IFBench | mechanically-verified instruction-following | `reflect_fdpo` | 200 / 40 → 100/100, 20/20 | 200 / 42 | GPT-4o-mini | GPT-5 |
 | AIME (2022-24 → 2025) | competition math, integer answer | `reflect_fdpo` | 90 → 58/32 | 30 | GPT-4o-mini, Claude Haiku 4.5, GPT-4.1 | GPT-5 |
-| PUPA | privacy-conscious delegation (2-hop pipeline) | `reflect_fdpo` | 60 → 30/30 | 40 | GPT-4o-mini, Claude Haiku 4.5 | GPT-5 (+ GPT-4.1 as fixed untrusted external model) |
+| PUPA | privacy-conscious delegation (2-hop pipeline) | `reflect_fdpo` | 60 → 30/30 | 40 | GPT-4o-mini, Claude Haiku 4.5, GPT-4.1 Mini | GPT-5 (+ GPT-4.1 as fixed untrusted external model) |
 
 Solver, optimizer, and judge are always distinct models. §5.1 results use the earlier
 `simple_fdpo` mechanism (GPT-4.1 optimizer); §5.2–§5.4 use `reflect_fdpo` (GPT-5
@@ -489,12 +489,17 @@ because we commit to closing the model-scale gap with Qwen3-8B/Llama runs (§7).
 | MMLU | MPO: 57.21%→61.50% (LLaMA-3-8B, full ~57 subjects) | `simple_fdpo`: +0.4pp macro, task-typed (§5.1); `reflect_fdpo`: +2.0pp macro, 5/6 subjects positive (GPT-4o-mini, 6 curated subjects) | Different subject pool (6 curated vs. full MMLU), different model family and scale |
 | IFBench | GEPA: 36.90→38.61 (Qwen3-8B); 47.79→**55.95** (GPT-4.1 Mini + Merge) | `reflect_fdpo`: 0.476→0.452 across 2 runs (GPT-4o-mini), net regression, n=42 | Metric-definition equivalence not verified; our checker covers 82 of many constraint types in the raw pool |
 | AIME (2022-24→2025) | GEPA baseline 27.33 (Qwen3-8B) / 49.33 (GPT-4.1 Mini); GEPA-optimized 32.00 / 59.33 | `reflect_fdpo`: Claude Haiku 4.5 0.267→0.333 (+6.7pp, validation stayed ≥baseline every round); GPT-4o-mini and GPT-4.1 both reverted | **Verified from the GEPA paper directly:** their baseline is a DSPy `ChainOfThought`-scaffolded system, not a bare instruction. Our baseline is a deliberately bare, vague seed. This — not solver capability alone — plausibly explains most of the baseline gap; only within-method deltas are informative here |
-| PUPA | GEPA: 78.57→**94.47/96.46** (GPT-4.1 Mini) | `reflect_fdpo`: mean composite score 0.685→0.799 (GPT-4o-mini, +11.4pp), 0.805→0.843 (Claude Haiku 4.5, +3.8pp, zero test-set regressions) | The one benchmark where our scoring formula — (quality + (1−leakage))/2 — is implemented identically to the source paper's construction, so this comparison is on the same measurement scale by construction, not merely by report. Split size/composition still differs (60/40 pool vs. the official 111/111/221) |
+| PUPA | GEPA: 78.57→**94.47/96.46** (GPT-4.1 Mini) | `reflect_fdpo`: mean composite score 0.685→0.799 (GPT-4o-mini, +11.4pp), 0.805→0.843 (Claude Haiku 4.5, +3.8pp, zero test-set regressions), 0.689→0.708 (GPT-4.1 Mini, +2.0pp; accuracy 0.474→0.526; net test churn +2: 6 recovered/4 regressed) | The one benchmark where our scoring formula — (quality + (1−leakage))/2 — is implemented identically to the source paper's construction, so this comparison is on the same measurement scale by construction, not merely by report. GPT-4.1 Mini is also the first case in this paper where our solver model is literally the same model GEPA reports — yet our baseline composite (0.689) sits far below GEPA's own reported GPT-4.1 Mini baseline (0.786), most plausibly from split-size/composition differences (60/40 pool vs. the official 111/111/221) or pipeline construction, not solver capability, so even this comparison is not head-to-head |
 
-Two solver models on PUPA is itself informative: Claude Haiku 4.5's baseline is already much
-stronger out-of-the-box (composite 0.805 vs. GPT-4o-mini's 0.685), leaving less ceiling headroom
-— its optimized gain is smaller in absolute composite-score terms despite a comparable accuracy
-gain, and its test-set result is unusually clean (three items recovered, zero regressed).
+Three solver models on PUPA is itself informative: Claude Haiku 4.5's baseline is already much
+stronger out-of-the-box (composite 0.805 vs. GPT-4o-mini's 0.685 vs. GPT-4.1 Mini's 0.689),
+leaving less ceiling headroom — its optimized gain is smaller in absolute composite-score terms
+despite a comparable accuracy gain, and its test-set result is unusually clean (three items
+recovered, zero regressed). GPT-4.1 Mini's baseline is nearly identical to GPT-4o-mini's despite
+being the newer, costlier-tier model, and its optimized gain is the smallest of the three
+(+2.0pp composite; net test churn +2, i.e. 6 recovered and 4 regressed) — consistent with
+§5.2's noise-floor finding at this sample size (n=38) rather than evidence of a genuine
+per-model capability ordering on this task.
 
 ### 5.5 Qualitative analysis of committed edits (worked example; full sweep is future work)
 

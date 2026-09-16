@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": -1.0,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a competition mathematician.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You will be given a competition-style math problem whose answer is always\nan integer between 0 and 999.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Solve the problem.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Solve the problem with a clear, structured approach:\n- Parse the problem carefully. Introduce notation for given quantities and the unknown to be found. State the goal succinctly.\n- Plan the solution: choose suitable methods (e.g., algebraic manipulation, modular arithmetic, inequalities, combinatorial counting, geometric relations).\n- Execute step by step, showing key equations and logical deductions. Keep calculations exact (fractions, radicals) unless a justified approximation is required.\n- Use appropriate standard tools when helpful:\n  - Algebra: substitution, factoring, Vieta, symmetric sums, inequalities, monotonicity, AM-GM/Cauchy, quadratic/cubic solving, avoid extraneous roots by back-substitution.\n  - Number theory: gcd, modular arithmetic, order/period arguments, lifting exponents, Diophantine constraints, parity/divisibility, Chinese Remainder Theorem.\n  - Combinatorics/probability: constructive counting, stars and bars, inclusion-exclusion, bijections, symmetry/orbit counting, recursion/invariants; ensure no over/undercounting and correct sample spaces.\n  - Geometry: introduce coordinates or vectors if advantageous; otherwise use similarity, angle/length chasing, Power of a Point, intersecting chords/tangents/secants, homothety, law of sines/cosines, areas, Pythagorean relations; define auxiliary points and justify parallel/perpendicular claims.\n  - Complex numbers: convert to polar/argument form; use De Moivre’s Theorem; track arguments modulo 2π; separate real/imag parts carefully.\n  - Functional/sequence problems: identify recurrences, invariants, closed forms; check initial conditions and domains.\n- Sanity checks:\n  - Verify that intermediate constraints are met (e.g., positivity, integrality, triangle inequalities, angle ranges).\n  - If multiple candidates arise, apply all given conditions (e.g., “unique,” “greatest,” “least,” “between”) to select the correct one.\n  - If the problem requests a sum/difference/product of parameters, compute that explicitly after finding the parameters.\n  - For counting/probability, double-check by alternative reasoning or small-case validation if feasible.\n- Confirm the final result is a single integer between 0 and 999. If the natural result is not an integer (e.g., expression like p+q), ensure you computed the integer required by the problem statement (e.g., sum of numerator and denominator, sum of digits, etc.).\n- Present concise reasoning (not just the answer). Then provide the final answer on its own line in the required format.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.24137931034482762,
+            "acc_new": 0.29310344827586204,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 44,
+            "recovered_failures": 7,
+            "broke": 4
+          }
+        },
+        {
+          "version": 2,
+          "text": "Solve the problem with a clear, structured approach:\n- Parse the problem carefully. Introduce notation for given quantities and the unknown to be found. State the goal succinctly.\n- Plan the solution: choose suitable methods (e.g., algebraic manipulation, modular arithmetic, inequalities, combinatorial counting, geometric relations).\n- Execute step by step, showing key equations and logical deductions. Keep calculations exact (fractions, radicals) unless a justified approximation is required.\n- Use appropriate standard tools when helpful:\n  - Algebra: substitution, factoring, Vieta, symmetric sums, inequalities, monotonicity, AM-GM/Cauchy, quadratic/cubic solving, avoid extraneous roots by back-substitution.\n  - Number theory: gcd, modular arithmetic, order/period arguments, lifting exponents, Diophantine constraints, parity/divisibility, Chinese Remainder Theorem.\n  - Combinatorics/probability: structure the count by symmetries/invariants; decide clearly whether rotations/reflections are distinct; if needed, fix a reference element/position to break symmetry; prefer bijections/complement counting/partition into disjoint exhaustive cases over brute-force inclusion–exclusion; if using inclusion–exclusion, track terms to avoid over/undercounting and verify disjointness.\n  - Geometry: introduce coordinates or vectors if advantageous; otherwise use similarity, angle/length chasing, Power of a Point and radical axis/equal tangents, intersecting chords/tangents/secants, homothety, law of sines/cosines, areas, Pythagorean relations; define auxiliary points and justify parallel/perpendicular claims; for trapezoids use midlines; for cyclic figures use central/inscribed angle relations.\n  - Complex numbers: convert to polar/argument form; use De Moivre’s Theorem; track arguments modulo 2π; separate real/imag parts carefully; relate conjugates to sums of squares; keep exact expressions (no rounding).\n  - Functional/sequence problems: identify recurrences, invariants, closed forms; check initial conditions and domains.\n- Sanity checks:\n  - Verify that intermediate constraints are met (e.g., positivity, integrality, triangle inequalities, angle ranges, domain restrictions).\n  - If multiple candidates arise, apply all given conditions (e.g., “unique,” “greatest,” “least,” “between”) to select the correct one.\n  - If the problem requests a sum/difference/product of parameters, compute that explicitly after finding the parameters.\n  - For counting/probability, confirm cases are disjoint and exhaustive; confirm symmetry handling (e.g., cyclic rotations/reflections) by fixing a reference or normalizing when appropriate; when feasible, double-check by an alternative reasoning (e.g., complementary count or small-case validation).\n- Pre-answer checklist (do this quickly before finalizing):\n  - Units: ensure consistent units (e.g., hours/minutes) and correct conversions.\n  - Exactness: do not approximate or round unless the problem explicitly requests it. If an expression looks non-integer but the answer must be an integer, algebraically transform it to reveal the integer (e.g., via sums of squares, rationalization, identities) or re-examine earlier steps for missed structure.\n  - Integer requirement: confirm the final quantity is indeed an integer dictated by the problem (e.g., m+n, p+q, counts, residues), not a rounded real value.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.2931034482758621,
+            "acc_new": 0.2413793103448276,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 41,
+            "recovered_failures": 2,
+            "broke": 5
+          }
+        },
+        {
+          "version": 3,
+          "text": "Solve the problem with a clear, structured approach:\n- Parse the problem carefully. Introduce notation for given quantities and the unknown to be found. State the goal succinctly.\n- Structure-first plan before heavy algebra:\n  - Look for symmetry and invariants; subtract or add equations to factor simple terms (e.g., (x−y)(…)=0); test equality cases suggested by symmetry.\n  - Prefer simplifying transformations: shift/scale variables to center (e.g., x−c), parametrize constraints (e.g., |z|=const via trig), or use known identities (Vieta, Power of a Point, Pythagorean, sum over pairs).\n  - In counting, use “count the same thing two ways,” pairwise/edge counting, and inclusion–exclusion only if needed; for line/graph problems, count pairs-of-lines or intersections carefully.\n- Execute step by step, showing key equations and logical deductions. Keep calculations exact (fractions, radicals) unless a justified approximation is required.\n- Use appropriate standard tools when helpful:\n  - Algebra: substitution, factoring, Vieta, symmetric sums, inequalities, monotonicity, AM-GM/Cauchy, quadratic/cubic solving; use discriminants and integrality constraints; avoid extraneous roots by back-substitution.\n  - Number theory: gcd, modular arithmetic/parity, bounding, order/period arguments, lifting exponents, Diophantine structure, Chinese Remainder Theorem.\n  - Combinatorics/probability: structure the count by symmetries/invariants; decide clearly whether rotations/reflections are distinct; if needed, fix a reference element/position to break symmetry; prefer bijections/complement counting/pairs counting over brute-force inclusion–exclusion; if using inclusion–exclusion, track terms carefully.\n  - Geometry: introduce coordinates or vectors if advantageous; otherwise use similarity, angle/length chasing, Power of a Point and radical axis/equal tangents, intersecting chords/tangents/secants, homothety, law of sines/cosines, areas, Pythagorean relations; define auxiliary points and justify parallel/perpendicular claims; for trapezoids use midlines; for cyclic figures use central/inscribed angle relations.\n  - Complex numbers: convert to polar/argument form; use De Moivre’s Theorem; track arguments modulo 2π; separate real/imag parts carefully; relate conjugates to sums of squares; keep exact expressions (no rounding).\n  - Functional/sequence problems: identify recurrences, invariants, closed forms; check initial conditions and domains.\n- Sanity checks and cross-checks:\n  - Modular/parity and approximate size checks to rule out impossible values early; for polynomials, check discriminants and that required roots are integer/rational when stated.\n  - If multiple candidates arise, apply all given conditions (e.g., “unique,” “greatest,” “least,” “between”) to select the correct one; back-substitute to verify feasibility.\n  - For counting/probability, confirm cases are disjoint and exhaustive; confirm symmetry handling (e.g., cyclic rotations/reflections) by fixing a reference or normalizing when appropriate; when feasible, verify by an alternative count (e.g., pairs-of-lines vs. multi-line intersection contributions).\n- Pre-answer checklist (do this quickly before finalizing):\n  - Units: ensure consistent units (e.g., hours/minutes) and correct conversions.\n  - Exactness: do not approximate or round unless the problem explicitly requests it. If an expression looks non-integer but the answer must be an integer, transform it algebraically (e.g., via sums of squares, rationalization, identities) or re-examine earlier steps for missed structure.\n  - Integer requirement: confirm the final quantity is indeed an integer dictated by the problem (e.g., m+n, p+q, counts, residues), not a rounded real value.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.24137931034482762,
+            "acc_new": 0.3103448275862069,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 44,
+            "recovered_failures": 6,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "The final answer must be an integer between 0 and 999.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Show your reasoning steps before the final answer.\n- Keep computations exact when possible and avoid unjustified approximations.\n- Ensure the final answer is a single integer between 0 and 999 that satisfies all conditions.\n- Do not output multiple final candidates; resolve any ambiguity by applying the problem’s constraints.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.24137931034482762,
+            "acc_new": 0.29310344827586204,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 90,
+            "n_failures": 44,
+            "recovered_failures": 7,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "After your work, write the final numeric answer on its own line in exactly\nthis form: #### <number>",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}
