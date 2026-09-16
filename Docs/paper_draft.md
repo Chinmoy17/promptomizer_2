@@ -137,7 +137,9 @@ implying uniform confidence across all four.
 4. **A negative-results record treated as first-class evidence, not omitted noise** — an
    optimizer memorization/overfitting crash and its fix (§3.2), an abandoned mechanism version
    with a measured slightly-negative mean effect (§3.2), a permissive-gate counterexample, a
-   benchmark (IFBench) where the method regressed rather than helped (§5.4), and a corroborating,
+   benchmark (IFBench) whose outcome is solver-model-dependent — a net regression for
+   GPT-4o-mini but a substantial improvement for GPT-4.1 Mini once a checker bug and an
+   optimizer-prompt inaccuracy were fixed (§5.4) — and a corroborating,
    concretely-illustrated aside on chain-of-thought's double dissociation (§5.1).
 5. **Promptomizer** (Appendix A) — a reusable framework for both optimizing and evaluating
    prompts: the per-round recovery/regression formalism itself, an IFBench verifier, a
@@ -369,7 +371,7 @@ single accuracy number moving up or down.
 |---|---|---|---|---|---|---|
 | MMLU (6 subjects) | 4-way MCQA, task-type-diverse | `simple_fdpo` (§5.1); `reflect_fdpo` (§5.4) | 50 → 25/25 | 66 | GPT-4o-mini | GPT-4.1 (§5.1) / GPT-5 (§5.4) |
 | LegalBench-Hearsay | binary hearsay classification (FRE 801) | both | 40–50 → ~50/50 | 49–59 | GPT-4o-mini, Claude Haiku 4.5 | GPT-4.1 / GPT-5 |
-| IFEval / IFBench | mechanically-verified instruction-following | `reflect_fdpo` | 200 / 40 → 100/100, 20/20 | 200 / 42 | GPT-4o-mini | GPT-5 |
+| IFEval / IFBench | mechanically-verified instruction-following | `reflect_fdpo` | 200 / 40 → 100/100, 20/20 | 200 / 42 | GPT-4o-mini, GPT-4.1 Mini | GPT-5 |
 | AIME (2022-24 → 2025) | competition math, integer answer | `reflect_fdpo` | 90 → 58/32 | 30 | GPT-4o-mini, Claude Haiku 4.5, GPT-4.1 | GPT-5 |
 | PUPA | privacy-conscious delegation (2-hop pipeline) | `reflect_fdpo` | 60 → 30/30 | 40 | GPT-4o-mini, Claude Haiku 4.5, GPT-4.1 Mini | GPT-5 (+ GPT-4.1 as fixed untrusted external model) |
 
@@ -487,7 +489,7 @@ because we commit to closing the model-scale gap with Qwen3-8B/Llama runs (§7).
 |---|---|---|---|
 | LegalBench-Hearsay | Trace2Policy/EISR: 79.7%→93.8% (Claude Haiku 4.5, 1 of 6 models tested) | `reflect_fdpo`: single-seed range 0.735–0.857 across 4 identical-config reruns (Claude Haiku 4.5) | Trace2Policy's own appendix shows one refinement round partly diagnosed from the nominally held-out test set; our test is genuinely sealed. Our own number is dominated by §5.2's noise, not a stable point estimate |
 | MMLU | MPO: 57.21%→61.50% (LLaMA-3-8B, full ~57 subjects) | `simple_fdpo`: +0.4pp macro, task-typed (§5.1); `reflect_fdpo`: +2.0pp macro, 5/6 subjects positive (GPT-4o-mini, 6 curated subjects) | Different subject pool (6 curated vs. full MMLU), different model family and scale |
-| IFBench | GEPA: 36.90→38.61 (Qwen3-8B); 47.79→**55.95** (GPT-4.1 Mini + Merge) | `reflect_fdpo`: 0.476→0.452 across 2 runs (GPT-4o-mini), net regression, n=42 | Metric-definition equivalence not verified; our checker covers 82 of many constraint types in the raw pool |
+| IFBench | GEPA: 36.90→38.61 (Qwen3-8B); 47.79→**55.95** (GPT-4.1 Mini + Merge) | `reflect_fdpo`: 0.476→0.452 across 2 runs (GPT-4o-mini), net regression, n=42; 0.429→**0.667** (GPT-4.1 Mini, +23.8pp, net test churn +10: 12 recovered/2 regressed) | Metric-definition equivalence not verified; our checker covers 32 of 83 constraint types in the raw pool. The GPT-4.1 Mini result required fixing a checker bug (`words:no_consecutive` was not verifying its stated constraint) and an optimizer-prompt inaccuracy (a stale "last round ships" instruction) first — the GPT-4o-mini number predates both fixes and is not directly comparable to it |
 | AIME (2022-24→2025) | GEPA baseline 27.33 (Qwen3-8B) / 49.33 (GPT-4.1 Mini); GEPA-optimized 32.00 / 59.33 | `reflect_fdpo`: Claude Haiku 4.5 0.267→0.333 (+6.7pp, validation stayed ≥baseline every round); GPT-4o-mini and GPT-4.1 both reverted | **Verified from the GEPA paper directly:** their baseline is a DSPy `ChainOfThought`-scaffolded system, not a bare instruction. Our baseline is a deliberately bare, vague seed. This — not solver capability alone — plausibly explains most of the baseline gap; only within-method deltas are informative here |
 | PUPA | GEPA: 78.57→**94.47/96.46** (GPT-4.1 Mini) | `reflect_fdpo`: mean composite score 0.685→0.799 (GPT-4o-mini, +11.4pp), 0.805→0.843 (Claude Haiku 4.5, +3.8pp, zero test-set regressions), 0.689→0.708 (GPT-4.1 Mini, +2.0pp; accuracy 0.474→0.526; net test churn +2: 6 recovered/4 regressed) | The one benchmark where our scoring formula — (quality + (1−leakage))/2 — is implemented identically to the source paper's construction, so this comparison is on the same measurement scale by construction, not merely by report. GPT-4.1 Mini is also the first case in this paper where our solver model is literally the same model GEPA reports — yet our baseline composite (0.689) sits far below GEPA's own reported GPT-4.1 Mini baseline (0.786), most plausibly from split-size/composition differences (60/40 pool vs. the official 111/111/221) or pipeline construction, not solver capability, so even this comparison is not head-to-head |
 
@@ -594,7 +596,7 @@ audit conducted specifically to prevent overclaiming:
 
 ## Appendix A: Reusable infrastructure contributions
 
-- An IFBench verifier covering 82 constraint types across the raw pool's constraint taxonomy.
+- An IFBench verifier covering 32 of the raw pool's 83 distinct constraint types.
 - An AIME data pipeline matching GEPA's exact train/test temporal boundary (2022–2024 train,
   2025 test).
 - A from-scratch PUPA pipeline (redact → untrusted external call → synthesize) with a continuous
