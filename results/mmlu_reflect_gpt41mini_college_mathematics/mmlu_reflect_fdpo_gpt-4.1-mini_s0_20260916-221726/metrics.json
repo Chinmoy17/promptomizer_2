@@ -1,0 +1,105 @@
+{
+  "run_id": "mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-221726",
+  "status": "completed",
+  "method": "reflect_fdpo",
+  "dataset": "mmlu",
+  "solver_model": "gpt-4.1-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.9242424242424242,
+    "n_examples": 66,
+    "n_evaluated": 66,
+    "n_blocked": 0,
+    "extraction_failures": 1
+  },
+  "final_test": {
+    "accuracy": 0.9242424242424242,
+    "n_examples": 66,
+    "n_evaluated": 66,
+    "n_blocked": 0,
+    "extraction_failures": 1
+  },
+  "optimization": {
+    "mode": "reflect",
+    "edit_status": "skipped_high_baseline",
+    "triggered": false,
+    "tau": 1,
+    "skip_above_acc": 0.95,
+    "skipped_high_baseline": true,
+    "simple_max_rounds": 3,
+    "accept_margin": 0.0,
+    "shipped_structured": false,
+    "selection": "best_of_rounds",
+    "shipped_round": null,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.5,
+      "n_mining": 25,
+      "n_validation": 25
+    },
+    "baseline_val_acc": 1.0,
+    "best_structured_val_acc": null,
+    "n_failures_triggering": 0,
+    "optimizer_calls": 0,
+    "rounds_log": [],
+    "baseline_failing_ids": [],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "baseline_train": {
+      "accuracy": 1.0,
+      "n_correct": 25,
+      "n_wrong": 0
+    },
+    "current_train": {
+      "accuracy": 1.0,
+      "n_correct": 25,
+      "n_wrong": 0
+    },
+    "train_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [],
+      "still_right_count": 25,
+      "net_gain": 0
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 0,
+      "rejects": 0
+    },
+    "rounds_run": 0,
+    "train_acc_per_round": [
+      1.0
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [],
+      "regressions": [],
+      "still_wrong": [
+        "mmlu_college_mathematics_test_13",
+        "mmlu_college_mathematics_test_18",
+        "mmlu_college_mathematics_test_30",
+        "mmlu_college_mathematics_test_85",
+        "mmlu_college_mathematics_test_93"
+      ],
+      "still_right_count": 61,
+      "net_gain": 0
+    },
+    "markdown_source": "prompts\\mmlu_oneliner.md"
+  },
+  "content_filter": null,
+  "wall_clock_s": 102.6,
+  "cost": {
+    "total_calls": 91,
+    "total_cost_usd": 0.075091,
+    "by_role": {
+      "solver": {
+        "calls": 91,
+        "prompt_tokens": 11887,
+        "completion_tokens": 43960,
+        "cost_usd": 0.075091
+      }
+    }
+  }
+}

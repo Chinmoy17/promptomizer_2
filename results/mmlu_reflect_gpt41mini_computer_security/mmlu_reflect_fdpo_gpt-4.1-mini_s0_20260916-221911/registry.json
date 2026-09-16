@@ -1,0 +1,230 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": -1.0,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a careful assistant answering 4-option multiple-choice questions in computer security and cryptography. Your goal is to select the single best option and present a final line in the required format. For rule-application or multi-part questions, briefly show your reasoning before the final answer to avoid mistakes. For straightforward factual recall, answer directly.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Many questions are pure recall (definitions, parameter sizes, tool purposes). Others require applying security principles to scenarios (e.g., which protections apply; which optimizations cause timing channels; what TLS guarantees).\n- Distinguish classes of controls:\n  - Integrity/authorization controls: secure boot, code signing, software authorization. These ensure only authorized code runs; they do not, by themselves, keep already-running code from reading data.\n  - Confidentiality/data-at-rest controls: keys, encryption schemes, hardware/data protection designed to keep stored data unreadable without required secrets or states.\n  - Runtime isolation/sandboxing: limits what code can access; if bypassed (e.g., via kernel-level compromise), assume policy-based restrictions are ineffective.\n- Closing a timing channel means removing secret-dependent variations in control flow, memory access, or arithmetic. Turning off optimizations only closes a channel if it removes all secret-dependent timing influences implicated by that algorithmic path.\n- For protocol questions (e.g., TLS), recall the baseline guarantees: confidentiality, integrity, and server authentication (without client certs, no client authentication), plus anti-replay via sequence numbers and MACs.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "- Many questions are pure recall (definitions, parameter sizes, tool purposes). Others require applying security principles to scenarios (e.g., which protections apply; which optimizations cause timing channels; what TLS guarantees).\n- Distinguish classes of controls:\n  - Integrity/authorization controls: secure boot, code signing, software authorization. These ensure only authorized code runs; they do not, by themselves, keep already-running code from reading data.\n  - Confidentiality/data-at-rest controls: keys, encryption schemes, hardware/data protection designed to keep stored data unreadable without required secrets or states.\n  - Runtime isolation/sandboxing: limits what code can access; if bypassed (e.g., via kernel-level compromise), assume policy-based restrictions are ineffective.\n  - Do not assume a hardware module’s key prevents reads unless the problem states that the data is encrypted under that key and all accesses are mediated by that module; “ephemeral” or session-limited keys typically do not provide general at-rest confidentiality.\n- Closing a timing channel means removing secret-dependent variations in control flow, memory access, or arithmetic. In modular exponentiation, variable-time modular multiplication/reduction and representation choices (e.g., Montgomery-style arithmetic) and CRT splitting can be primary timing sources; disabling only the exponentiation schedule (e.g., sliding windows) is often insufficient. Karatsuba multiplication is typically not a root-cause of secret-dependent timing by itself.\n- For protocol questions (e.g., TLS), recall the baseline guarantees: confidentiality, integrity, and server authentication (without client certs, no client authentication), plus anti-replay via sequence numbers and MACs. If the handshake uses a Diffie-Hellman key exchange, assume forward secrecy unless the problem specifies otherwise: past sessions remain confidential even if the server’s long-term private key is later compromised. TLS does not protect against a compromised CA issuing a valid-looking fraudulent certificate.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.88,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "- Many questions are pure recall (definitions, parameter sizes, tool purposes). Others require applying security principles to scenarios (e.g., which protections apply; which optimizations cause timing channels; what TLS guarantees).\n- Distinguish classes of controls:\n  - Integrity/authorization controls: secure boot, code signing, software authorization. These ensure only authorized code runs; they do not, by themselves, keep already-running code from reading data.\n  - Confidentiality/data-at-rest controls: keys, encryption schemes, hardware/data protection designed to keep stored data unreadable without required secrets or states.\n  - Runtime isolation/sandboxing: limits what code can access; if bypassed (e.g., via kernel-level compromise), assume policy-based restrictions are ineffective.\n  - Do not assume a hardware module’s key prevents reads unless the problem states that the data is encrypted under that key and all accesses are mediated by that module; “ephemeral” or session-limited keys typically do not provide general at-rest confidentiality.\n- Merkle–Damgård length extension: Given a digest H(prefix || m), an attacker can compute H(prefix || m || PB || w) for arbitrary w without knowing the prefix or m, by continuing from the internal state. Critically, the padding block PB must be included; you cannot extend to H(prefix || m || w) directly without PB. This is why MACs of the form H(k || m) are insecure; HMAC avoids this issue.\n- Closing a timing channel means removing secret-dependent variations in control flow, memory access, or arithmetic. In modular exponentiation, variable-time modular multiplication/reduction and representation choices (e.g., Montgomery-style arithmetic) and CRT splitting can be primary timing sources; disabling only the exponentiation schedule (e.g., sliding windows) is often insufficient. Karatsuba multiplication is typically not a root-cause of secret-dependent timing by itself.\n- For protocol questions (e.g., TLS), recall the baseline guarantees: confidentiality, integrity, and server authentication (without client certs, no client authentication), plus anti-replay via sequence numbers and MACs. If the handshake uses a Diffie-Hellman key exchange, assume forward secrecy unless the problem specifies otherwise: past sessions remain confidential even if the server’s long-term private key is later compromised. TLS does not protect against a compromised CA issuing a valid-looking fraudulent certificate.\n  - DV vs EV: DV certs validate domain control; EV certs aim to validate organizational identity. EV offers more assurance than DV; a claim that DV provides more confidence than EV is false.\n  - OCSP stapling: lets a server present fresh revocation status to clients.\n  - DANE (with DNSSEC): binds certificates/keys via DNS, helping resist certain MITM/downgrade vectors.\n  - Key pinning (e.g., HPKP conceptually): constrains acceptable server keys to reduce reliance on any CA issuance.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.88,
+            "acc_new": 0.96,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the following multiple-choice exam question by selecting the single best option. Give your answer in exactly this form:\nAnswer: <LETTER>\nwhere <LETTER> is one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this decision procedure:\n1) Identify task type:\n   - If it’s a definition, parameter size, or tool-purpose question, answer directly.\n   - If it’s scenario-based or has multi-part True/False statements, do brief reasoning.\n\n2) For multi-part True/False items:\n   - Evaluate each numbered statement independently as True or False.\n   - Map the pair to the answer letter:\n     - A = True, True\n     - B = False, False\n     - C = True, False\n     - D = False, True\n\n3) For “which features prevent reading data” scenarios:\n   - Ask: Do listed features provide confidentiality at rest against the stated attacker, or are they integrity/authorization controls?\n   - If the attacker already has high-privilege code execution, integrity/authorization controls do not stop data reads.\n   - Select “None of the above” only if none of the listed features actually provide the necessary confidentiality under the stated conditions.\n\n4) For timing-channel questions:\n   - Determine which mechanisms introduce secret-dependent timing (e.g., windowing choices, data-dependent operations, caches/branches).\n   - “Turning off” a given optimization closes the channel only if that optimization is part of the cause; disabling unrelated optimizations does not suffice.\n   - Evaluate each option set strictly on whether the listed changes together eliminate the secret-dependent timing path.\n\n5) For TLS/crypto protections:\n   - Recall: with proper server auth and good crypto, TLS provides confidentiality and integrity against network attackers and authenticates the server; it prevents modification and eavesdropping and uses anti-replay mechanisms. Without client certs, it does not authenticate the client.\n\n6) If uncertain, eliminate clearly wrong options first, then choose the remaining option that best matches the principles above.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this decision procedure:\n1) Identify task type:\n   - If it’s a definition, parameter size, or tool-purpose question, answer directly.\n   - If it’s scenario-based or has multi-part True/False statements, do brief reasoning.\n\n2) For multi-part True/False items:\n   - Evaluate each numbered statement independently as True or False.\n   - Map the pair to the answer letter:\n     - A = True, True\n     - B = False, False\n     - C = True, False\n     - D = False, True\n\n3) For “which features prevent reading data” scenarios:\n   - Ask: Do listed features provide confidentiality at rest against the stated attacker, or are they integrity/authorization controls?\n   - If the attacker already has high-privilege code execution, integrity/authorization controls do not stop data reads.\n   - Do not credit ephemeral/session keys or hardware modules unless the data is explicitly bound to those keys and inaccessible to compromised runtime.\n   - Select “None of the above” only if none of the listed features actually provide the necessary confidentiality under the stated conditions.\n\n4) For timing-channel questions:\n   - Determine which mechanisms introduce secret-dependent timing (e.g., windowing choices, data-dependent operations, caches/branches, modular arithmetic choices).\n   - Disabling an optimization closes the channel only if it removes all secret-dependent timing influences in the path; disabling unrelated optimizations does not suffice.\n   - In RSA-style modular exponentiation, sliding-window scheduling alone is usually not the sole cause; representation-level arithmetic (e.g., variable-time modular multiplication/reduction) and CRT splitting can dominate. Removing only windowing may not close the channel; removing the implicated arithmetic/representation does.\n\n5) For TLS/crypto protections:\n   - With proper server auth and good crypto, TLS provides confidentiality and integrity against network attackers and authenticates the server; it prevents modification and eavesdropping and uses anti-replay mechanisms.\n   - If a Diffie-Hellman exchange is used, treat it as providing forward secrecy unless specified otherwise: recorded past connections remain confidential even if the server’s long-term private key is later stolen.\n   - Without client certs, TLS does not authenticate the client. TLS does not protect against a compromised CA issuing a fraudulent but valid-looking certificate.\n\n6) If uncertain, eliminate clearly wrong options first, then choose the remaining option that best matches the principles above.\n\n7) Align the final letter with the question’s request:\n   - If options are individual statements and the question asks which statement(s) are false/true, select the letter(s) corresponding to the evaluated false/true statement(s). Ensure the final letter matches your evaluation.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.84,
+            "acc_new": 0.88,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 4,
+            "recovered_failures": 2,
+            "broke": 1
+          }
+        },
+        {
+          "version": 3,
+          "text": "Use this decision procedure:\n1) Identify task type:\n   - If it’s a definition, parameter size, or tool-purpose question, answer directly.\n   - If it’s scenario-based or has multi-part True/False statements, do brief reasoning.\n\n2) For multi-part True/False items:\n   - Evaluate each numbered statement independently as True or False.\n   - Map the pair to the answer letter:\n     - A = True, True\n     - B = False, False\n     - C = True, False\n     - D = False, True\n\n3) For “which features prevent reading data” scenarios:\n   - Ask: Do listed features provide confidentiality at rest against the stated attacker, or are they integrity/authorization controls?\n   - If the attacker already has high-privilege code execution (e.g., kernel-level), integrity/authorization controls do not stop data reads.\n   - Do not credit ephemeral/session keys or generic “secure enclave/module keys” unless the data is explicitly bound to those keys and all accesses are enforced by that module even against a compromised OS. Otherwise, prefer “None of the above” if options are integrity controls and ephemeral/module keys.\n\n4) For timing-channel questions:\n   - Determine which mechanisms introduce secret-dependent timing (e.g., windowing choices, data-dependent operations, caches/branches, modular arithmetic choices).\n   - Disabling an optimization closes the channel only if it removes all secret-dependent timing influences in the path; disabling unrelated optimizations does not suffice.\n   - In RSA-style modular exponentiation, sliding-window scheduling alone is usually not the sole cause; representation-level arithmetic (e.g., variable-time modular multiplication/reduction) and CRT splitting can dominate. Removing only windowing may not close the channel; removing the implicated arithmetic/representation does.\n\n5) For TLS/crypto protections:\n   - With proper server auth and good crypto, TLS provides confidentiality and integrity against network attackers and authenticates the server; it prevents modification and eavesdropping and uses anti-replay mechanisms.\n   - If a Diffie-Hellman exchange is used, treat it as providing forward secrecy unless specified otherwise.\n   - Without client certs, TLS does not authenticate the client. TLS does not protect against a compromised CA issuing a fraudulent but valid-looking certificate.\n   - Factual cues:\n     - DV vs EV: EV offers stronger identity assurance than DV.\n     - OCSP stapling: server-provided revocation status to clients.\n     - DANE (with DNSSEC): binds certs via DNS to reduce MITM/downgrade.\n     - Key pinning: constrains acceptable server keys to mitigate fraudulent issuance attacks.\n\n6) For MAC constructions using Merkle–Damgård hashes:\n   - Recognize length-extension weaknesses for MACs of the form S(k, m) = H(k || m): from H(k || m), an attacker can compute H(k || m || PB || w) for arbitrary w. The presence of PB is essential; options omitting PB or involving prepending data are not the standard length extension.\n\n7) If uncertain, eliminate clearly wrong options first, then choose the remaining option that best matches the principles above.\n\n8) Align the final letter with the question’s request:\n   - If options are individual statements and the question asks which statement(s) are false/true, select the letter(s) corresponding to the evaluated false/true statement(s). Ensure the final letter matches your evaluation.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.88,
+            "acc_new": 0.96,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 2,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Do not introduce external facts beyond standard security and cryptography principles.\n- Keep any reasoning concise. The final line must be exactly formatted.\n- Provide exactly one final choice. No multiple selections.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- If reasoning is needed, write it briefly first.\n- Then output the final choice exactly as:\nAnswer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.92,
+            "acc_new": 0.84,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 2,
+            "recovered_failures": 0,
+            "broke": 2
+          }
+        }
+      ]
+    }
+  }
+}
