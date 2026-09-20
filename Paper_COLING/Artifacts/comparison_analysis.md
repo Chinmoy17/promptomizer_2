@@ -19,34 +19,38 @@ comparisons are apples-to-apples, and each table says exactly why.
 |---|---|
 | Method | The optimizer / mechanism, or "Baseline" for no optimization |
 | Model | Solver model actually executing the task |
+| Train → Mining/Val | Train pool size, and how it was split into the optimizer's working (mining) set vs. its held-out validation set, where reported |
 | Test size | Number of test items the reported score is computed over |
 | Technique | One-line mechanism category (RL, Bayesian, evolutionary, gradient-inspired, reflective, ours) |
 | Failure signal? | Y = optimizer sees raw failed examples; N = scalar score only |
 | Before → After | Baseline → final score on the metric that paper/run reports |
 | Δ | Net change, in the same units as Before/After |
+| Recovered/Regressed (test) | Sealed-test items that flipped wrong→right (recovered) or right→wrong (regressed) between baseline and final, net gain in parentheses. Only computable for our own runs (per-item `test_confusion` in `metrics.json`); prior-work papers do not publish this, so those rows read "not reported" |
+
+**On the two new columns added in this pass**: train/mining/val sizes for prior-work rows are reproduced from `Docs/datasets_and_benchmarks.md` as originally sourced, not re-derived. Recovered/regressed counts for our own current (`reflect_fdpo`) rows are read directly from each canonical run's `metrics.json` `optimization.test_confusion` block and cross-checked against `RESULTS.md`. A few of our own **historical** rows (older `simple_fdpo`-era mechanisms, flagged individually below) could not be confidently mapped to one specific saved run this pass and are marked accordingly rather than guessed.
 
 ---
 
 ## Table 1: AIME (2022-24 train → AIME-2025 test)
 
-| Method | Model | Test size | Technique | Failure signal? | Before → After | Δ |
-|---|---|---|---|---|---|---|
-| Baseline (no opt.) | Qwen3-8B | 30×5=150 | n/a | n/a | 27.33 | — |
-| GRPO (24,000 rollouts) | Qwen3-8B | 150 | RL weight update | N (scalar reward) | 27.33 → 38.00 | +10.67 |
-| MIPROv2 | Qwen3-8B | 150 | Bayesian search | N | 27.33 → 20.00 | **−7.33** |
-| GEPA | Qwen3-8B | 150 | Reflective + Pareto | Y | 27.33 → 32.00 | +4.67 |
-| GEPA+Merge | Qwen3-8B | 150 | Reflective + crossover | Y | 27.33 → 32.00 | +4.67 |
-| Baseline (no opt.) | GPT-4.1 Mini | 150 | n/a | n/a | 49.33 | — |
-| Trace (OptoPrime) | GPT-4.1 Mini | 150 | Textual graph opt. | Y | 49.33 → 45.33 | **−4.00** |
-| MIPROv2-No-Demos | GPT-4.1 Mini | 150 | Bayesian, instr.-only | N | 49.33 → 48.67 | −0.66 |
-| MIPROv2 | GPT-4.1 Mini | 150 | Bayesian, instr.+demo | N | 49.33 → 51.33 | +2.00 |
-| TextGrad | GPT-4.1 Mini | 150 | Graph backprop | Y | 49.33 → 46.67 | **−2.66** |
-| GEPA | GPT-4.1 Mini | 150 | Reflective + Pareto | Y | 49.33 → 59.33 | +10.00 |
-| GEPA+Merge | GPT-4.1 Mini | 150 | Reflective + crossover | Y | 49.33 → 59.33 | +10.00 |
-| GEPA-Qwen-Opt (transfer) | Qwen3-8B→GPT-4.1 Mini | 150 | Reflective (no re-opt.) | Y (at opt. time) | 49.33 → 52.67 | +3.34 |
-| **Ours: `reflect_fdpo`** | **GPT-4o-mini** | **30** | **Reflective (ours)** | **Y** | **13.3 → 10.0** | **−3.3** |
-| **Ours: `reflect_fdpo`** | **Claude Haiku 4.5** | **30** | **Reflective (ours)** | **Y** | **26.7 → 33.3** | **+6.7** |
-| **Ours: `reflect_fdpo`** | **GPT-4.1 Mini** | **30** | **Reflective (ours)** | **Y** | **46.7 → 53.3**$^*$ | **+6.7** |
+| Method | Model | Train → Mining/Val | Test size | Technique | Failure signal? | Before → After | Δ | Recovered/Regressed (test) |
+|---|---|---|---|---|---|---|---|---|
+| Baseline (no opt.) | Qwen3-8B | 90 → ~45/45 | 30×5=150 | n/a | n/a | 27.33 | — | n/a |
+| GRPO (24,000 rollouts) | Qwen3-8B | 90 → ~45/45 | 150 | RL weight update | N (scalar reward) | 27.33 → 38.00 | +10.67 | not reported |
+| MIPROv2 | Qwen3-8B | 90 → ~45/45 | 150 | Bayesian search | N | 27.33 → 20.00 | **−7.33** | not reported |
+| GEPA | Qwen3-8B | 90 → ~45/45 | 150 | Reflective + Pareto | Y | 27.33 → 32.00 | +4.67 | not reported |
+| GEPA+Merge | Qwen3-8B | 90 → ~45/45 | 150 | Reflective + crossover | Y | 27.33 → 32.00 | +4.67 | not reported |
+| Baseline (no opt.) | GPT-4.1 Mini | 90 → ~45/45 | 150 | n/a | n/a | 49.33 | — | n/a |
+| Trace (OptoPrime) | GPT-4.1 Mini | 90 → ~45/45 | 150 | Textual graph opt. | Y | 49.33 → 45.33 | **−4.00** | not reported |
+| MIPROv2-No-Demos | GPT-4.1 Mini | 90 → ~45/45 | 150 | Bayesian, instr.-only | N | 49.33 → 48.67 | −0.66 | not reported |
+| MIPROv2 | GPT-4.1 Mini | 90 → ~45/45 | 150 | Bayesian, instr.+demo | N | 49.33 → 51.33 | +2.00 | not reported |
+| TextGrad | GPT-4.1 Mini | 90 → ~45/45 | 150 | Graph backprop | Y | 49.33 → 46.67 | **−2.66** | not reported |
+| GEPA | GPT-4.1 Mini | 90 → ~45/45 | 150 | Reflective + Pareto | Y | 49.33 → 59.33 | +10.00 | not reported |
+| GEPA+Merge | GPT-4.1 Mini | 90 → ~45/45 | 150 | Reflective + crossover | Y | 49.33 → 59.33 | +10.00 | not reported |
+| GEPA-Qwen-Opt (transfer) | Qwen3-8B→GPT-4.1 Mini | 90 → ~45/45 | 150 | Reflective (no re-opt.) | Y (at opt. time) | 49.33 → 52.67 | +3.34 | not reported |
+| **Ours: `reflect_fdpo`** | **GPT-4o-mini** | **90 → 58/32** | **30** | **Reflective (ours)** | **Y** | **13.3 → 10.0** | **−3.3** | **0/1 (net −1)** |
+| **Ours: `reflect_fdpo`** | **Claude Haiku 4.5** | **90 → 58/32** | **30** | **Reflective (ours)** | **Y** | **26.7 → 33.3** | **+6.7** | **2/0 (net +2)** |
+| **Ours: `reflect_fdpo`** | **GPT-4.1 Mini** | **90 → 58/32** | **30** | **Reflective (ours)** | **Y** | **46.7 → 53.3**$^*$ | **+6.7** | **4/3 (net +1)**$^*$ |
 
 $^*$Corrected baseline; see `RESULTS.md` §1 footnote for the reasoning (the
 originally-logged 53.3% baseline is believed to be an anomalous single draw,
@@ -69,24 +73,24 @@ not representative across repeated reruns of the identical seed prompt).
 
 ## Table 2: PUPA (privacy-conscious delegation)
 
-| Method | Model | Test size | Technique | Failure signal? | Before → After | Δ |
-|---|---|---|---|---|---|---|
-| Baseline (no opt.) | Qwen3-8B | 221 | n/a | n/a | 80.82 | — |
-| GRPO | Qwen3-8B | 221 | RL weight update | N | 80.82 → 86.66 | +5.84 |
-| MIPROv2 | Qwen3-8B | 221 | Bayesian search | N | 80.82 → 81.55 | +0.73 |
-| GEPA | Qwen3-8B | 221 | Reflective + Pareto | Y | 80.82 → 91.85 | +11.03 |
-| GEPA+Merge | Qwen3-8B | 221 | Reflective + crossover | Y | 80.82 → 86.26 | +5.44 |
-| Baseline (no opt.) | GPT-4.1 Mini | 221 | n/a | n/a | 78.57 | — |
-| Trace (OptoPrime) | GPT-4.1 Mini | 221 | Textual graph opt. | Y | 78.57 → 74.18 | **−4.39** |
-| MIPROv2-No-Demos | GPT-4.1 Mini | 221 | Bayesian, instr.-only | N | 78.57 → 91.85 | +13.28 |
-| MIPROv2 | GPT-4.1 Mini | 221 | Bayesian, instr.+demo | N | 78.57 → 83.37 | +4.80 |
-| TextGrad | GPT-4.1 Mini | 221 | Graph backprop | Y | 78.57 → 85.68 | +7.11 |
-| GEPA | GPT-4.1 Mini | 221 | Reflective + Pareto | Y | 78.57 → 94.47 | +15.90 |
-| GEPA+Merge | GPT-4.1 Mini | 221 | Reflective + crossover | Y | 78.57 → 96.46 | +17.89 |
-| GEPA-Qwen-Opt (transfer) | Qwen3-8B→GPT-4.1 Mini | 221 | Reflective (no re-opt.) | Y (at opt. time) | 78.57 → 90.05 | +11.48 |
-| **Ours: `reflect_fdpo`** | **GPT-4o-mini** | **40** | **Reflective (ours)** | **Y** | **68.5 → 79.9** | **+11.4** |
-| **Ours: `reflect_fdpo`** | **Claude Haiku 4.5** | **40** | **Reflective (ours)** | **Y** | **80.5 → 84.3** | **+3.8** |
-| **Ours: `reflect_fdpo`** | **GPT-4.1 Mini** | **40** | **Reflective (ours)** | **Y** | **68.2 → 80.7** | **+12.5** |
+| Method | Model | Train → Mining/Val | Test size | Technique | Failure signal? | Before → After | Δ | Recovered/Regressed (test) |
+|---|---|---|---|---|---|---|---|---|
+| Baseline (no opt.) | Qwen3-8B | 111 / 111 | 221 | n/a | n/a | 80.82 | — | n/a |
+| GRPO | Qwen3-8B | 111 / 111 | 221 | RL weight update | N | 80.82 → 86.66 | +5.84 | not reported |
+| MIPROv2 | Qwen3-8B | 111 / 111 | 221 | Bayesian search | N | 80.82 → 81.55 | +0.73 | not reported |
+| GEPA | Qwen3-8B | 111 / 111 | 221 | Reflective + Pareto | Y | 80.82 → 91.85 | +11.03 | not reported |
+| GEPA+Merge | Qwen3-8B | 111 / 111 | 221 | Reflective + crossover | Y | 80.82 → 86.26 | +5.44 | not reported |
+| Baseline (no opt.) | GPT-4.1 Mini | 111 / 111 | 221 | n/a | n/a | 78.57 | — | n/a |
+| Trace (OptoPrime) | GPT-4.1 Mini | 111 / 111 | 221 | Textual graph opt. | Y | 78.57 → 74.18 | **−4.39** | not reported |
+| MIPROv2-No-Demos | GPT-4.1 Mini | 111 / 111 | 221 | Bayesian, instr.-only | N | 78.57 → 91.85 | +13.28 | not reported |
+| MIPROv2 | GPT-4.1 Mini | 111 / 111 | 221 | Bayesian, instr.+demo | N | 78.57 → 83.37 | +4.80 | not reported |
+| TextGrad | GPT-4.1 Mini | 111 / 111 | 221 | Graph backprop | Y | 78.57 → 85.68 | +7.11 | not reported |
+| GEPA | GPT-4.1 Mini | 111 / 111 | 221 | Reflective + Pareto | Y | 78.57 → 94.47 | +15.90 | not reported |
+| GEPA+Merge | GPT-4.1 Mini | 111 / 111 | 221 | Reflective + crossover | Y | 78.57 → 96.46 | +17.89 | not reported |
+| GEPA-Qwen-Opt (transfer) | Qwen3-8B→GPT-4.1 Mini | 111 / 111 | 221 | Reflective (no re-opt.) | Y (at opt. time) | 78.57 → 90.05 | +11.48 | not reported |
+| **Ours: `reflect_fdpo`** | **GPT-4o-mini** | **60 → 30/30** | **40** | **Reflective (ours)** | **Y** | **68.5 → 79.9** | **+11.4** | **7/3 (net +4)** |
+| **Ours: `reflect_fdpo`** | **Claude Haiku 4.5** | **60 → 30/30** | **40** | **Reflective (ours)** | **Y** | **80.5 → 84.3** | **+3.8** | **3/0 (net +3)** |
+| **Ours: `reflect_fdpo`** | **GPT-4.1 Mini** | **60 → 30/30** | **40** | **Reflective (ours)** | **Y** | **68.2 → 80.7** | **+12.5** | **10/0 (net +10)** |
 
 **Caveats specific to this table**: this is the one benchmark where our
 scoring formula, $(\text{quality} + (1-\text{leakage}))/2$, is implemented
@@ -105,24 +109,24 @@ best-aligned benchmark.
 
 ## Table 3: IFEval / IFBench
 
-| Method | Model | Test size | Technique | Failure signal? | Before → After | Δ |
-|---|---|---|---|---|---|---|
-| Baseline (no opt.) | Qwen3-8B | 294 | n/a | n/a | 36.90 | — |
-| GRPO | Qwen3-8B | 294 | RL weight update | N | 36.90 → 35.88 | **−1.02** |
-| MIPROv2 | Qwen3-8B | 294 | Bayesian search | N | 36.90 → 36.22 | **−0.68** |
-| GEPA | Qwen3-8B | 294 | Reflective + Pareto | Y | 36.90 → 38.61 | +1.71 |
-| GEPA+Merge | Qwen3-8B | 294 | Reflective + crossover | Y | 36.90 → 28.23 | **−8.67** |
-| Baseline (no opt.) | GPT-4.1 Mini | 294 | n/a | n/a | 47.79 | — |
-| Trace (OptoPrime) | GPT-4.1 Mini | 294 | Textual graph opt. | Y | 47.79 → 51.19 | +3.40 |
-| MIPROv2-No-Demos | GPT-4.1 Mini | 294 | Bayesian, instr.-only | N | 47.79 → 52.04 | +4.25 |
-| MIPROv2 | GPT-4.1 Mini | 294 | Bayesian, instr.+demo | N | 47.79 → 49.15 | +1.36 |
-| TextGrad | GPT-4.1 Mini | 294 | Graph backprop | Y | 47.79 → 48.64 | +0.85 |
-| GEPA | GPT-4.1 Mini | 294 | Reflective + Pareto | Y | 47.79 → 52.72 | +4.93 |
-| GEPA+Merge | GPT-4.1 Mini | 294 | Reflective + crossover | Y | 47.79 → 55.95 | +8.16 |
-| GEPA-Qwen-Opt (transfer) | Qwen3-8B→GPT-4.1 Mini | 294 | Reflective (no re-opt.) | Y (at opt. time) | 47.79 → 49.83 | +2.04 |
-| **Ours: `reflect_fdpo`** (run 1) | **GPT-4o-mini** | **42** | **Reflective (ours)** | **Y** | **47.6 → 45.2** | **−2.4** |
-| **Ours: `reflect_fdpo`** (run 2) | **GPT-4o-mini** | **42** | **Reflective (ours)** | **Y** | **47.6 → 45.2** | **−2.4** |
-| **Ours: `reflect_fdpo`** | **GPT-4.1 Mini** | **42** | **Reflective (ours)** | **Y** | **42.9 → 66.7** | **+23.8** |
+| Method | Model | Train → Mining/Val | Test size | Technique | Failure signal? | Before → After | Δ | Recovered/Regressed (test) |
+|---|---|---|---|---|---|---|---|---|
+| Baseline (no opt.) | Qwen3-8B | 150 / 300 | 294 | n/a | n/a | 36.90 | — | n/a |
+| GRPO | Qwen3-8B | 150 / 300 | 294 | RL weight update | N | 36.90 → 35.88 | **−1.02** | not reported |
+| MIPROv2 | Qwen3-8B | 150 / 300 | 294 | Bayesian search | N | 36.90 → 36.22 | **−0.68** | not reported |
+| GEPA | Qwen3-8B | 150 / 300 | 294 | Reflective + Pareto | Y | 36.90 → 38.61 | +1.71 | not reported |
+| GEPA+Merge | Qwen3-8B | 150 / 300 | 294 | Reflective + crossover | Y | 36.90 → 28.23 | **−8.67** | not reported |
+| Baseline (no opt.) | GPT-4.1 Mini | 150 / 300 | 294 | n/a | n/a | 47.79 | — | n/a |
+| Trace (OptoPrime) | GPT-4.1 Mini | 150 / 300 | 294 | Textual graph opt. | Y | 47.79 → 51.19 | +3.40 | not reported |
+| MIPROv2-No-Demos | GPT-4.1 Mini | 150 / 300 | 294 | Bayesian, instr.-only | N | 47.79 → 52.04 | +4.25 | not reported |
+| MIPROv2 | GPT-4.1 Mini | 150 / 300 | 294 | Bayesian, instr.+demo | N | 47.79 → 49.15 | +1.36 | not reported |
+| TextGrad | GPT-4.1 Mini | 150 / 300 | 294 | Graph backprop | Y | 47.79 → 48.64 | +0.85 | not reported |
+| GEPA | GPT-4.1 Mini | 150 / 300 | 294 | Reflective + Pareto | Y | 47.79 → 52.72 | +4.93 | not reported |
+| GEPA+Merge | GPT-4.1 Mini | 150 / 300 | 294 | Reflective + crossover | Y | 47.79 → 55.95 | +8.16 | not reported |
+| GEPA-Qwen-Opt (transfer) | Qwen3-8B→GPT-4.1 Mini | 150 / 300 | 294 | Reflective (no re-opt.) | Y (at opt. time) | 47.79 → 49.83 | +2.04 | not reported |
+| **Ours: `reflect_fdpo`** (run 1) | **GPT-4o-mini** | **40 → 20/20** | **42** | **Reflective (ours)** | **Y** | **47.6 → 45.2** | **−2.4** | **2/3 (net −1)** |
+| **Ours: `reflect_fdpo`** (run 2) | **GPT-4o-mini** | **40 → 20/20** | **42** | **Reflective (ours)** | **Y** | **47.6 → 45.2** | **−2.4** | **0/1 (net −1)** |
+| **Ours: `reflect_fdpo`** | **GPT-4.1 Mini** | **40 → 20/20** | **42** | **Reflective (ours)** | **Y** | **42.9 → 66.7** | **+23.8** | **12/2 (net +10)** |
 
 **Caveats specific to this table**: GEPA evaluates on **294** IFBench items
 (150 train / 300 val / 294 test); our IFBench split is 40 train / 42 test,
@@ -140,17 +144,19 @@ GPT-4o-mini number predates both fixes.
 This benchmark has the richest internal history: multiple external papers,
 plus several of our own method's earlier iterations, all on the same task.
 
-| Method | Model | Test size | Technique | Failure signal? | Before → After | Δ |
-|---|---|---|---|---|---|---|
-| Trace2Policy / **Human**-EISR | Claude Haiku 4.5 (1 of 6 models) | 64 | Human-diagnosed clustered refinement | Y (human-written) | 79.7 → 93.8 | +14.1 |
-| Trace2Policy / **Auto**-EISR (App. I, mean of 3 executors) | DeepSeek-v3.2 / Kimi-K2.5 / Kimi-K2.6 | 61 | LLM-diagnosed clustered refinement | Y | 69.4 → 72.7 | +3.3 |
-| Ours (historical), Trace2Policy-protocol replication, sealed test | Claude Haiku 4.5 | 64 | `simple_fdpo`-era, 2 rounds | Y | 68.8 → 73.4 | +4.7 |
-| Ours (historical), oracle/leak diagnostic ⚠️ **invalid** | Claude Haiku 4.5 | 64 | Same, test pool used as mining pool | Y | 68.8 → 95.3 | +26.6 |
-| Ours (historical), validation-gated 3-round, one-liner seed | GPT-4o-mini | 59 | `simple_fdpo`-era, 3 rounds | Y | 62.7 → 71.2 | +8.5 |
-| Ours (historical), permissive-gate counterexample | GPT-4o-mini | 59 | `simple_fdpo`-era, lenient accept | Y | 66.1 → 55.9 | **−10.2** |
-| Ours (historical), retired v1/v2 mechanism | GPT-4o-mini | 59 | Judge-attributed section rewrite (retired) | Y | 68.9 → 66.7 | **−2.3** |
-| **Ours (current): `reflect_fdpo`** | **GPT-4o-mini** | **49** | **Reflective (ours)** | **Y** | **71.4 → 69.4** | **−2.0** |
-| **Ours (current): `reflect_fdpo`** | **GPT-4.1 Mini** | **49** | **Reflective (ours)** | **Y** | **71.4 → 73.5** | **+2.0** |
+| Method | Model | Train → Mining/Val | Test size | Technique | Failure signal? | Before → After | Δ | Recovered/Regressed (test) |
+|---|---|---|---|---|---|---|---|---|
+| Trace2Policy / **Human**-EISR | Claude Haiku 4.5 (1 of 6 models) | 30 (iteration pool) / not specified | 64 | Human-diagnosed clustered refinement | Y (human-written) | 79.7 → 93.8 | +14.1 | not reported |
+| Trace2Policy / **Auto**-EISR (App. I, mean of 3 executors) | DeepSeek-v3.2 / Kimi-K2.5 / Kimi-K2.6 | not reported | 61 | LLM-diagnosed clustered refinement | Y | 69.4 → 72.7 | +3.3 | not reported |
+| Ours (historical), Trace2Policy-protocol replication, sealed test | Claude Haiku 4.5 | 30 → 30/0 (no val split, `simple_fdpo`-era) | 64 | `simple_fdpo`-era, 2 rounds | Y | 68.8 → 73.4 | +4.7 | 11/8 (net +3) |
+| Ours (historical), oracle/leak diagnostic ⚠️ **invalid** | Claude Haiku 4.5 | test pool (64) reused as mining pool -- no genuine train/val/test partition | 64 | Same, test pool used as mining pool | Y | 68.8 → 95.3 | +26.6 | n/a (invalid condition; no sealed set exists to compute this against) |
+| Ours (historical), validation-gated 3-round, one-liner seed | GPT-4o-mini | 40 → 26/14 | 59 | `simple_fdpo`-era, 3 rounds | Y | 62.7 → 71.2 | +8.5 | not independently re-verified this pass$^\dagger$ |
+| Ours (historical), permissive-gate counterexample | GPT-4o-mini | 40 (mining/val split not specified in source) | 59 | `simple_fdpo`-era, lenient accept | Y | 66.1 → 55.9 | **−10.2** | not independently re-verified this pass$^\dagger$ |
+| Ours (historical), retired v1/v2 mechanism | GPT-4o-mini | not specified in source | 59 | Judge-attributed section rewrite (retired) | Y | 68.9 → 66.7 | **−2.3** | not independently re-verified this pass$^\dagger$ |
+| **Ours (current): `reflect_fdpo`** | **GPT-4o-mini** | **50 → 25/25** | **49** | **Reflective (ours)** | **Y** | **71.4 → 69.4** | **−2.0** | **8/9 (net −1)** |
+| **Ours (current): `reflect_fdpo`** | **GPT-4.1 Mini** | **50 → 25/25** | **49** | **Reflective (ours)** | **Y** | **71.4 → 73.5** | **+2.0** | **7/6 (net +1)** |
+
+$^\dagger$These three historical rows predate the `_dl/extract_confusion.py` audit and could not be confidently mapped to one specific saved `metrics.json` in this pass (several `results/hearsay_gpt5/` and `results/chained/` runs share near-identical names/configs); their Before→After numbers are unchanged and still trustworthy (sourced from `Docs/datasets_and_benchmarks.md`), only the new Recovered/Regressed column is left unfilled here rather than risk mismatching it to the wrong run.
 
 **Caveats specific to this table**:
 - Trace2Policy's own appendix reports one refinement round partly diagnosed
@@ -173,15 +179,26 @@ plus several of our own method's earlier iterations, all on the same task.
 
 ## Table 5: MMLU (6 curated subjects)
 
-| Method | Model | Test size | Technique | Failure signal? | Before → After | Δ |
-|---|---|---|---|---|---|---|
-| MPO | LLaMA-3-8B-Instruct | full ~57 subjects | Section-local gradients, no gate | N | 57.21 → 61.50 | +4.29 |
-| MPO | Mistral-7B-Instruct | full ~57 subjects | Section-local gradients, no gate | N | 53.79 → 55.50 | +1.71 |
-| TextGrad (in MPO's own comparison) | LLaMA-3-8B-Instruct | full ~57 subjects | Graph backprop | Y | 57.21 → 56.40 | **−0.81** |
-| Ours (historical), 6-subject aggregate | GPT-4o-mini | 66/subject | `simple_fdpo`, GPT-4.1 optimizer | Y | ~59.3 → ~60.7 | +0.4 (macro) |
-| Ours (historical), 6-subject aggregate | GPT-4o-mini | 66/subject | `simple_fdpo`, GPT-5 optimizer | Y | (per-subject, mixed) | ~0.0 (macro) |
-| **Ours (current): `reflect_fdpo`, macro** | **GPT-4o-mini** | **66/subject** | **Reflective (ours)** | **Y** | **75.1 → 77.2** | **+2.0 (macro)** |
-| **Ours (current): `reflect_fdpo`, macro** | **GPT-4.1 Mini** | **66/subject** | **Reflective (ours)** | **Y** | **81.0 → 83.3** | **+2.3 (macro)** |
+| Method | Model | Train → Mining/Val | Test size | Technique | Failure signal? | Before → After | Δ | Recovered/Regressed (test) |
+|---|---|---|---|---|---|---|---|---|
+| MPO | LLaMA-3-8B-Instruct | not reported | full ~57 subjects | Section-local gradients, no gate | N | 57.21 → 61.50 | +4.29 | not reported |
+| MPO | Mistral-7B-Instruct | not reported | full ~57 subjects | Section-local gradients, no gate | N | 53.79 → 55.50 | +1.71 | not reported |
+| TextGrad (in MPO's own comparison) | LLaMA-3-8B-Instruct | not reported | full ~57 subjects | Graph backprop | Y | 57.21 → 56.40 | **−0.81** | not reported |
+| Ours (historical), 6-subject aggregate | GPT-4o-mini | not specified in source (likely 50→25/25, not independently verified) | 66/subject | `simple_fdpo`, GPT-4.1 optimizer | Y | ~59.3 → ~60.7 | +0.4 (macro) | not independently re-verified this pass |
+| Ours (historical), 6-subject aggregate | GPT-4o-mini | same caveat | 66/subject | `simple_fdpo`, GPT-5 optimizer | Y | (per-subject, mixed) | ~0.0 (macro) | not independently re-verified this pass |
+| **Ours (current): `reflect_fdpo`, macro** | **GPT-4o-mini** | **50 → 25/25 (per subject)** | **66/subject** | **Reflective (ours)** | **Y** | **75.1 → 77.2** | **+2.0 (macro)** | **see per-subject table below** |
+| **Ours (current): `reflect_fdpo`, macro** | **GPT-4.1 Mini** | **50 → 25/25 (per subject)** | **66/subject** | **Reflective (ours)** | **Y** | **81.0 → 83.3** | **+2.3 (macro)** | **see per-subject table below** |
+
+**Per-subject recovered/regressed (test), current `reflect_fdpo` runs only:**
+
+| Subject | GPT-4o-mini Recovered/Regressed | GPT-4.1 Mini Recovered/Regressed |
+|---|---|---|
+| college_mathematics | 6/5 (net +1) | 0/0 (net 0) |
+| computer_security | 1/2 (net −1) | 3/1 (net +2) |
+| econometrics | 10/6 (net +4) | 1/2 (net −1) |
+| high_school_biology | 2/1 (net +1) | 0/0 (net 0) |
+| philosophy | 5/3 (net +2) | 4/0 (net +4) |
+| professional_law | 7/6 (net +1) | 9/5 (net +4) |
 
 **Caveats specific to this table**: MPO reports on the **full ~57-subject**
 MMLU; we use **6 curated subjects** chosen for task-type diversity
