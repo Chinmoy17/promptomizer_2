@@ -20,10 +20,15 @@
 #                          hidden scratchpad (must write VISIBLE steps) and when
 #                          to reason (math/econ) vs answer directly (recall).
 #
-# Usage:
+# Usage (bare uv, if you are not using Docker):
 #   bash scripts/run_mmlu_handoff.sh
 #   SEEDS="0 1 2" MAXWORKERS=32 bash scripts/run_mmlu_handoff.sh
+#
+# Usage (Docker -- build the image once with `docker compose build` first):
+#   RUNNER="docker compose run --rm fdpo" bash scripts/run_mmlu_handoff.sh
 set -u
+
+RUNNER="${RUNNER:-uv run}"
 
 SEEDS="${SEEDS:-0 1 2}"
 ROUNDS="${ROUNDS:-2}"
@@ -43,7 +48,7 @@ failed=""
 for subj in $SUBJECTS; do
   for seed in $SEEDS; do
     echo "=== ${subj} seed=${seed} rounds=${ROUNDS} margin=${ACCEPTMARGIN} ==="
-    uv run python -m scripts.run_experiment --method simple_fdpo --dataset mmlu \
+    $RUNNER python -m scripts.run_experiment --method simple_fdpo --dataset mmlu \
       --prompt-file prompts/mmlu_oneliner.md --subjects "$subj" \
       --n-train "$NTRAIN" --n-test "$NTEST" \
       --simple-max-rounds "$ROUNDS" --simple-val-frac "$VALFRAC" \
@@ -63,4 +68,4 @@ done
 
 echo "=== sweep complete: ${ok} ok / ${fail} failed ==="
 if [ -n "$failed" ]; then echo "failed runs:${failed}"; fi
-uv run python -m scripts.build_results_summary
+$RUNNER python -m scripts.build_results_summary

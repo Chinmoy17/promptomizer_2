@@ -1,0 +1,16 @@
+.git/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.claude/
+results/
+Paper_COLING/
+Docs/
+_dl/
+.env
+.env.example
+image.png
+*.egg-info/
+dist/
+build/
