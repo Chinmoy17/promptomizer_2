@@ -8,7 +8,42 @@ file for the "why" behind any knob below.
 
 ---
 
+## 0. Two ways to run this: bare `uv`, or Docker
+
+Every command in this doc is written as `python -m scripts.run_experiment
+...`. You have two equally valid ways to actually execute that:
+
+**Bare `uv`** (§1 below): `uv sync` once, then run commands directly with
+`uv run` in front, e.g. `uv run python -m scripts.run_experiment ...`.
+
+**Docker** (no local Python/`uv` setup needed at all):
+```bash
+docker compose build          # once, or whenever src/scripts/Dataset/prompts change
+docker compose run --rm fdpo python -m pytest -q   # sanity check, expect 95 passed
+```
+Then prefix every `python -m scripts.run_experiment ...` command below with
+`docker compose run --rm fdpo`, e.g.:
+```bash
+docker compose run --rm fdpo python -m scripts.run_experiment \
+  --method reflect_fdpo --dataset legalbench_hearsay --n-train 50 --n-test 49 ...
+```
+**Important**: `.env` is read at container *run* time (via `env_file:` in
+`docker-compose.yml`), never baked into the image. You do not need `.env` to
+exist to `docker compose build`, only to `docker compose run`. Changing a
+model/URL in `.env` never requires a rebuild, only a fresh `run`.
+The `fdpo` container talks to your vLLM/Ollama server(s) over
+`network_mode: host` (Linux only), so `SOLVER_BASE_URL=http://localhost:8000/v1`
+in `.env` means exactly what it means in the bare-`uv` case below — no URL
+rewriting needed. `results/` is bind-mounted, so output lands on your host
+disk exactly like a bare-`uv` run, and survives `--rm`.
+
+---
+
 ## 1. Environment setup (`uv`, Linux)
+
+Skip this section entirely if you're using Docker (see §0) -- `docker compose
+build` already does the equivalent of `uv sync`, offline and pinned to the
+same `uv.lock`.
 
 ```bash
 # Requires uv (https://docs.astral.sh/uv/). Python 3.12 is pinned and
@@ -95,7 +130,9 @@ models). If the second command completes without an HTTP error, proceed.
 ## 3. The 5 benchmark commands
 
 Run each once per model configuration (`.env` swap only — commands don't
-change). `--budget-usd 0` throughout for the same reason as above.
+change). `--budget-usd 0` throughout for the same reason as above. If using
+Docker, prefix every command below with `docker compose run --rm fdpo`
+(see §0).
 
 **1. LegalBench-Hearsay** (legal classification, 50 train / 49 test, stratified):
 ```bash

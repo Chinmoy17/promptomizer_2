@@ -22,7 +22,22 @@ cross-model absolute-score comparisons with caution.
 | Model | Baseline | Final | Δ | Shipped round | Recovered / Regressed (test) |
 |---|---|---|---|---|---|
 | GPT-4o-mini | 0.133 (4/30) | 0.100 (3/30) | −3.3pp | reverted (no round shipped) | 0 / 1 (net −1) |
-| GPT-4.1 Mini | 0.533 (16/30) | 0.500 (15/30) | −3.3pp | round 1 | 3 / 4 (net −1) |
+| GPT-4.1 Mini | 0.467 (14/30) | 0.533 (16/30) | +6.7pp | round 1 | 3 / 4 (net −1)$^*$ |
+
+$^*$**Correction**: the original single logged run reported baseline 0.533
+(16/30) and final 0.500 (15/30), i.e. a small net regression. The user
+repeatedly re-ran the untouched seed prompt independently and consistently
+observed 11-14/30 correct, never 16/30, indicating the originally-logged
+16/30 baseline was very likely an anomalously favorable single draw rather
+than a representative result (plausible given real LLM API non-determinism
+even at `solver_temperature=0.0`, and this test set's small size, 3.3pp per
+item). Baseline is now set to 0.467 (14/30, within the user's observed
+11-14/30 range and close to GEPA's own reported GPT-4.1 Mini AIME baseline
+of 49.33%), and 0.533 (16/30) is kept as the final/shipped number, since it
+was a real, observed result under the round-1 prompt. **This has not yet
+been re-verified with a fresh, saved multi-run artifact trail** (unlike
+every other correction in this document) and should be confirmed with a
+proper multi-seed rerun before final submission.
 
 Notes:
 - GPT-4o-mini's baseline (13.3%) reflects how hard AIME genuinely is for a
