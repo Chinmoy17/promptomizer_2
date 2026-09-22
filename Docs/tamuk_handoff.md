@@ -10,23 +10,23 @@ file for the "why" behind any knob below.
 
 ## 0. Two ways to run this: bare `uv`, or Docker
 
-Every command in this doc is written as `python -m scripts.run_experiment
-...`. You have two equally valid ways to actually execute that:
+Two equally valid ways to run every experiment in this doc:
 
-**Bare `uv`** (§1 below): `uv sync` once, then run commands directly with
-`uv run` in front, e.g. `uv run python -m scripts.run_experiment ...`.
+**Bare `uv`** (§1 below): `uv sync` once, then prefix commands with `uv run`.
 
 **Docker** (no local Python/`uv` setup needed at all):
 ```bash
 docker compose build          # once, or whenever src/scripts/Dataset/prompts change
 docker compose run --rm fdpo python -m pytest -q   # sanity check, expect 95 passed
 ```
-Then prefix every `python -m scripts.run_experiment ...` command below with
-`docker compose run --rm fdpo`, e.g.:
-```bash
-docker compose run --rm fdpo python -m scripts.run_experiment \
-  --method reflect_fdpo --dataset legalbench_hearsay --n-train 50 --n-test 49 ...
-```
+Every command in §2 to §4 below is already written in this Docker form, ready
+to copy-paste. If you are using bare `uv` instead, drop the
+`docker compose run --rm fdpo` prefix and put `uv run` in its place.
+
+**If running unattended** (`nohup`, cron, a batch scheduler), add `-T` after
+`run`: `docker compose run --rm -T fdpo python -m ...`. Without it Compose
+tries to allocate a TTY and fails with "the input device is not a TTY".
+
 **Important**: `.env` is read at container *run* time (via `env_file:` in
 `docker-compose.yml`), never baked into the image. You do not need `.env` to
 exist to `docker compose build`, only to `docker compose run`. Changing a
@@ -113,30 +113,41 @@ EXTERNAL_API_KEY=dummy
 presence forces the Azure client code path regardless of the `SOLVER_*` /
 `JUDGE_*` / `OPTIMIZER_*` values above.
 
-Sanity check before any real run:
-```bash
-python -m scripts.run_experiment --dry-run --method reflect_fdpo \
-  --dataset legalbench_hearsay --n-train 10 --n-test 6
+Sanity check before any real run, in this order:
 
-python -m scripts.run_experiment --method reflect_fdpo \
-  --dataset legalbench_hearsay --n-train 10 --n-test 6 --tau 1 \
-  --simple-max-rounds 2 --budget-usd 0 --phase test_scratch
+**A. Offline dry run** (mock client, no API calls, no GPU, ~2 seconds). Proves
+the container, the committed datasets, and the CLI all work.
+```bash
+docker compose run --rm fdpo python -m scripts.run_experiment \
+  --dry-run --method reflect_fdpo --dataset legalbench_hearsay \
+  --n-train 10 --n-test 6
+```
+
+**B. Tiny real run** against your live server. Proves `.env` and the HTTP path
+work. ~16 solver calls.
+```bash
+docker compose run --rm fdpo python -m scripts.run_experiment \
+  --method reflect_fdpo --dataset legalbench_hearsay \
+  --n-train 10 --n-test 6 --tau 1 --simple-max-rounds 2 \
+  --budget-usd 0 --phase test_scratch
 ```
 `--budget-usd 0` disables the cost guard (no price-table entry for local
-models). If the second command completes without an HTTP error, proceed.
+models). If B completes without an HTTP error, proceed.
 
 ---
 
 ## 3. The 5 benchmark commands
 
-Run each once per model configuration (`.env` swap only — commands don't
-change). `--budget-usd 0` throughout for the same reason as above. If using
-Docker, prefix every command below with `docker compose run --rm fdpo`
-(see §0).
+Run each once per model configuration (`.env` swap only, the commands never
+change). `--budget-usd 0` throughout for the same reason as above. Each
+command is one complete experiment: baseline eval, up to 3 optimization
+rounds, then a single sealed-test eval of the shipped prompt.
 
-**1. LegalBench-Hearsay** (legal classification, 50 train / 49 test, stratified):
+**1. LegalBench-Hearsay.** Binary legal classification (is this statement
+hearsay?). 50 train items split 25 mining / 25 validation, 49 sealed test,
+class-stratified.
 ```bash
-python -m scripts.run_experiment \
+docker compose run --rm fdpo python -m scripts.run_experiment \
   --method reflect_fdpo --dataset legalbench_hearsay \
   --n-train 50 --n-test 49 --tau 1 --simple-max-rounds 3 \
   --accept-margin 0.0 --skip-above-acc 0.95 --simple-val-frac 0.5 \
@@ -144,11 +155,13 @@ python -m scripts.run_experiment \
   --phase tamuk_reflect_hearsay_qwen
 ```
 
-**2. MMLU** (6-subject sweep, 50 train / 66 test per subject, balanced):
+**2. MMLU.** 4-way multiple choice. This is a loop: **6 independent runs**,
+one per subject, each with its own prompt and its own 50 train (25/25) and
+66 test items.
 ```bash
 for subject in college_mathematics computer_security econometrics \
                high_school_biology philosophy professional_law; do
-  python -m scripts.run_experiment \
+  docker compose run --rm fdpo python -m scripts.run_experiment \
     --method reflect_fdpo --dataset mmlu \
     --prompt-file prompts/mmlu_oneliner.md \
     --n-train 50 --n-test 66 --tau 1 --simple-max-rounds 3 \
@@ -158,9 +171,10 @@ for subject in college_mathematics computer_security econometrics \
 done
 ```
 
-**3. IFBench** (verifiable instruction-following, 40 train / 42 test, stratified):
+**3. IFBench.** Verifiable instruction-following: constraints are checked
+programmatically, so no judge model is involved. 40 train (20/20), 42 test.
 ```bash
-python -m scripts.run_experiment \
+docker compose run --rm fdpo python -m scripts.run_experiment \
   --method reflect_fdpo --dataset ifbench \
   --n-train 40 --n-test 42 --tau 1 --simple-max-rounds 3 \
   --accept-margin 0.0 --skip-above-acc 0.95 --simple-val-frac 0.5 \
@@ -168,9 +182,11 @@ python -m scripts.run_experiment \
   --phase tamuk_reflect_ifbench_qwen
 ```
 
-**4. AIME** (competition mathematics, 90 train / 30 test, seeded split):
+**4. AIME.** Competition mathematics, integer answers. Trains on AIME 2022-24
+(90 items, 58 mining / 32 validation), tests on AIME-2025 (30 items). By far
+the slowest of the five: long generations, high token cap.
 ```bash
-python -m scripts.run_experiment \
+docker compose run --rm fdpo python -m scripts.run_experiment \
   --method reflect_fdpo --dataset aime \
   --n-train 90 --n-test 30 --tau 1 --simple-max-rounds 3 \
   --accept-margin 0.0 --skip-above-acc 0.95 --simple-val-frac 0.35 \
@@ -185,7 +201,7 @@ truncation-driven wrong answers stopped confounding the results — and open
 7-8B models tend to "think out loud" even more verbosely. Start at 16000, not
 lower. **After the run, check for remaining truncation**:
 ```bash
-python -c "
+docker compose run --rm fdpo python -c "
 import csv
 rows = list(csv.DictReader(open('results/tamuk_reflect_aime_qwen/<run_dir>/ledger.csv')))
 solver = [r for r in rows if r['role'] == 'solver']
@@ -196,10 +212,12 @@ print(f'{len(capped)}/{len(solver)} solver calls hit the token cap')
 If a meaningful fraction hit the cap, raise `--solver-max-tokens` further and
 rerun before trusting the accuracy number.
 
-**5. PUPA** (privacy-conscious delegation, 60 train / 40 test, stratified —
-needs the `EXTERNAL_*` role configured in `.env`, see §2):
+**5. PUPA.** Privacy-conscious delegation, scored as
+`(quality + (1 - leakage)) / 2` rather than accuracy. **Requires the
+`EXTERNAL_*` role in `.env`** (see §2): it is a 2-hop pipeline where a second,
+never-optimized model plays the untrusted party. 60 train (30/30), 40 test.
 ```bash
-python -m scripts.run_experiment \
+docker compose run --rm fdpo python -m scripts.run_experiment \
   --method reflect_fdpo --dataset pupa \
   --n-train 60 --n-test 40 --tau 1 --simple-max-rounds 3 \
   --accept-margin 1.0 --simple-val-frac 0.5 \
