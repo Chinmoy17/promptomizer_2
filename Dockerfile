@@ -7,8 +7,11 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 WORKDIR /app
 
-# Dependency layer: cached unless pyproject.toml/uv.lock change.
-COPY pyproject.toml uv.lock ./
+# Dependency layer: cached unless pyproject.toml/uv.lock/README.md change.
+# README.md must be present here too: hatchling (the build backend) reads
+# `readme = "README.md"` from pyproject.toml and fails the build if it's
+# missing, even for the --no-install-project pass.
+COPY pyproject.toml uv.lock README.md ./
 RUN uv sync --frozen --no-install-project
 
 # Source + committed data layer (Dataset/prompts baked in for offline,
