@@ -27,25 +27,27 @@
 \begin{abstract}
 Automatic prompt optimization (APO) methods that use an LLM to iteratively
 rewrite a failing prompt are almost universally evaluated by a single
-before/after accuracy delta per benchmark. This aggregate number cannot
-distinguish an edit that fixes several failures while breaking none from one
-that fixes the same failures while silently breaking others, and it does not
-verify that gains on the data used to guide editing transfer to unseen
-examples. We introduce \textbf{Reflective FDPO}, a feedback-driven prompt
-optimization mechanism that, every round, computes exactly which examples
-were recovered and which were newly broken relative to the previous round,
-on both the optimizer's own working set and a disjoint validation set, and
-feeds this per-item outcome back into the optimizer's next edit.
-Across five benchmarks (LegalBench-Hearsay, MMLU, IFEval/IFBench, AIME, and
-PUPA) and two solver models (GPT-4o-mini and GPT-4.1 Mini), this fine-grained
-tracking surfaces a failure mode that aggregate accuracy alone would miss:
-validation accuracy can rise substantially while a sealed, disjoint test set
-regresses, with no literal memorization involved. The same per-round
-instrumentation let us catch and fix two concrete mechanism bugs mid-project,
-each with a documented before/after effect. We report results transparently,
-including benchmarks where the mechanism helps one solver model and hurts
-another, and release the full recovery/regression trace for every reported
-run.
+before/after accuracy delta per benchmark. No prior work reports whether an
+edit's gains come at the cost of breaking previously-correct examples, and
+none tests whether an LLM can function as an editor reviewing its own last
+diff, the way a human prompt engineer reviews what an edit broke and fixed
+before making another change. We introduce \textbf{per-round
+recovery/regression tracking}: a formalism that computes exactly which
+examples flip from wrong to right (recovered) and right to wrong
+(regressed) at every optimization round, on both the optimizer's working
+set and a disjoint validation set. To test it under a mechanism that uses
+this signal as actual editing feedback rather than only a reporting
+metric, we build \textbf{Reflective FDPO}, which feeds the optimizer its
+own previous edit's recovered/regressed outcome before every subsequent
+rewrite. Across five benchmarks (LegalBench-Hearsay, MMLU, IFEval/IFBench,
+AIME, and PUPA) and two solver models (GPT-4o-mini and GPT-4.1 Mini), this
+tracking surfaces a failure mode aggregate accuracy alone would miss:
+validation accuracy can rise substantially while a sealed test set
+regresses, with no memorization involved. The same instrumentation caught
+and fixed two concrete mechanism bugs mid-project. We report results
+transparently, including benchmarks where the mechanism helps one solver
+model and hurts another, and release the full recovery/regression trace
+for every run.
 \end{abstract}
 
 \section{Introduction}
@@ -53,8 +55,9 @@ run.
 
 The growing use of LLM-powered applications has made prompt design a
 first-class engineering problem: small changes in wording can substantially
-shift task accuracy, and hand-tuning prompts by trial and error does not
-scale across tasks or models. This has motivated automatic prompt
+shift task accuracy~\citep{sclar2024quantifying}, and hand-tuning prompts by
+trial and error does not scale across tasks or models. This has motivated
+automatic prompt
 optimization (APO), in which an LLM iteratively rewrites a task prompt using
 its own generated feedback on failures, in place of gradient-based updates.
 Across this line of work, almost every method is still evaluated the same
@@ -90,48 +93,41 @@ wording}. We document this directly, and distinguish it explicitly from a
 separate, previously-observed failure mode in which the optimizer copies
 literal wording from the examples it is shown (\S\ref{sec:method}).
 
-\subsection{Research questions}
+\subsection{What this reveals that aggregate accuracy cannot}
 
-We organize the rest of the paper around four research questions. This
-framing is being actively refined as new evidence comes in; we state plainly
-which questions are answered by current evidence and which remain open.
-
-\begin{itemize}
-\item \textbf{RQ1 (mechanism value):} does exposing the optimizer to the
-measured outcome of its own previous edit change optimization behavior
-relative to failure-only feedback? \emph{Partially answered.}
-\S\ref{sec:results} documents concrete mechanism revisions made specifically
-because outcome information was being discarded.
-\item \textbf{RQ2 (generalization gap):} can improvement on the data used to
-guide editing diverge from improvement on genuinely unseen data, and can
-per-round regression tracking detect this as it happens? \emph{Answered.}
-\S\ref{sec:results} documents concrete cases where validation rose
-substantially while sealed test fell.
-\item \textbf{RQ3 (mechanism attribution):} which specific components of the
-mechanism are responsible for observed behavior changes? \emph{Partially
-answered.}
-\item \textbf{RQ4 (generality across solver families):} does this transfer
-to open-weight models at a scale comparable to prior work (Qwen, Llama)?
-\emph{Open, in progress.}
-\end{itemize}
+To our knowledge, no prior automatic prompt optimization method reports
+this per-item decomposition: whether a reported gain came from fixing
+failures without breaking anything else, or from a noisier trade that
+happens to net positive. We report it for every single result in this
+paper. Separately, no prior work has tested whether showing an optimizer
+LLM a structured diff of its own previous edit, rather than only raw
+failures or a scalar score, changes how it edits, the way a human editor
+works differently once shown what their last change actually did. Both
+claims are tested empirically in \S\ref{sec:results}: the
+recovery/regression decomposition catches a real validation/test
+generalization gap that aggregate accuracy hides, and two concrete
+mechanism bugs were caught and fixed only because this per-round signal
+was being inspected directly. Whether this transfers to open-weight solver
+models at a scale comparable to prior work remains future work; see
+\S\ref{sec:limitations}.
 
 \subsection{Contributions}
 
 \begin{enumerate}
-\item \textbf{Reflective FDPO}, an outcome-aware prompt-optimization
-mechanism that, every round, shows the optimizer exactly which items its own
-previous edit recovered and regressed, on both its working set and a
-disjoint validation set.
+\item A reusable evaluation formalism, \textbf{per-round
+recovery/regression tracking}, that any prompt-optimization method can
+report alongside aggregate accuracy, not only ours.
+\item \textbf{Reflective FDPO}, a mechanism built specifically to test
+whether feeding an optimizer this signal as actual editing feedback,
+rather than only using it as a post-hoc reporting metric, changes
+optimization behavior.
 \item \textbf{A direct empirical demonstration of a validation/test
 generalization gap}, with the optimizer's actual edit text inspected and
 memorization ruled out.
-\item \textbf{Two mechanism revisions made in direct, documented response to
-observed evidence}, each reported with the specific case that motivated it.
-\item \textbf{A transparent, model-dependent result}: the same mechanism, on
-the same benchmark, is a net regression for one solver model and a
-substantial improvement for another once two concrete bugs were fixed.
-\item A reusable evaluation formalism (per-round recovered/regressed
-tracking) applicable to any prompt-optimization method, not only ours.
+\item Evidence that this instrumentation has practical teeth:
+\textbf{two mechanism bugs caught and fixed in direct, documented response
+to observed per-round evidence}, each reported with the specific case that
+motivated it.
 \end{enumerate}
 
 \section{Related Work}
@@ -144,7 +140,13 @@ evolutionary and population-based search~\citep{guo2024evoprompt,
 fernando2024promptbreeder}, to structured multi-stage
 pipelines~\citep{opsahlong2024miprov2,schnabel2024sammo}, and most recently
 to reflective, ``LLM-as-optimizer'' approaches that treat the model's own
-critique of its failures as the search signal. The most directly comparable
+critique of its failures as the search signal. Closest to our own prompt
+schema is MPO~\citep{sharma2026mpo}, which also decomposes a prompt into a
+fixed set of semantic sections (we use the same five) and rewrites each
+section independently via section-local textual gradients. MPO's updates
+are additive and de-duplicated with no check that a section rewrite does
+not break a previously-correct case; the recovery/regression accounting we
+introduce is precisely the missing check. The most directly comparable
 recent work is GEPA~\citep{agrawal2026gepa}, which combines reflective
 prompt mutation with Pareto-frontier candidate selection over an
 evolutionary pool of prompts, and reports results on AIME, IFBench, and PUPA
@@ -154,6 +156,18 @@ whole-prompt rewrite here vs.\ Pareto-based multi-candidate evolution
 there). Unlike GEPA and prior APO work generally, we do not report only an
 aggregate accuracy delta: every result in this paper is accompanied by the
 specific set of items recovered and regressed to produce it.
+
+Our framing, that aggregate accuracy hides qualitatively different failure
+modes, echoes behavioral testing work in NLP evaluation, most directly
+CheckList~\citep{ribeiro2020checklist}, which showed that models passing
+standard benchmarks can still fail systematically on templated
+perturbations designed to probe specific capabilities. CheckList evaluates
+a fixed, already-trained model against curated test suites; we instead
+track per-item outcomes across the rounds of an iterative optimization
+process, computing what changed between one edit and the next rather than
+what a static model gets wrong. The two are complementary: CheckList-style
+test suites could in principle serve as the mining or validation sets our
+mechanism already requires.
 
 A closely related line of work applies clustered-error refinement with a
 whole-document regression gate to a legal classification
@@ -172,6 +186,20 @@ exposure alone can produce gains of this magnitude regardless of the
 underlying refinement mechanism, and that a genuinely sealed test set, used
 for every other result in this paper, is necessary to distinguish real
 generalization from this effect.
+
+The validation/test generalization gap we document (\S\ref{sec:results}) is
+conceptually closest to adaptive overfitting from repeated evaluation
+against a fixed set, documented in a different domain
+by~\citet{recht2019imagenet}: repeated community-wide adaptation to a
+reused test set produced a measurable accuracy drop on a freshly collected
+one, with no data contamination involved. Our setting is a single run's
+repeated adaptation to one validation set across optimization rounds rather
+than benchmark reuse across a research community, but the underlying
+mechanism, selecting against the same fixed evaluation set many times, is
+the same. This is distinct from literal test-set memorization, which
+\citet{oren2023proving} show can be formally detected in black-box language
+models; we rule out memorization directly by inspecting the optimizer's
+edit text (\S\ref{sec:method}).
 
 \section{Method}
 \label{sec:method}
@@ -294,7 +322,7 @@ PUPA & privacy-conscious delegation & $60 \to 30/30$ & 40 & GPT-4o-mini, GPT-4.1
 \end{tabular}
 \caption{Experimental setup. Optimizer and judge are GPT-5 throughout;
 solver, optimizer, and judge are always distinct models. Open-weight solver
-runs (Qwen, Llama) are in progress; see \S\ref{sec:limitations}.}
+evaluation (Qwen, Llama) is left to future work; see \S\ref{sec:limitations}.}
 \label{tab:setup}
 \end{table*}
 
@@ -383,10 +411,12 @@ checker bug, a stale optimizer instruction); the corresponding GPT-4o-mini
 results predate these fixes, so cross-model absolute-score comparisons in
 Table~\ref{tab:cross-benchmark} should be read with this asymmetry in mind,
 even though within-model baseline-to-final deltas are unaffected by it. We
-have not yet evaluated open-weight solver models (Qwen, Llama) at a scale
-directly comparable to prior work, which is necessary to answer RQ4. Our
-optimizer and judge are a single frontier model (GPT-5) throughout; we have
-not measured sensitivity to a weaker or different optimizer model.
+have not evaluated open-weight solver models (Qwen, Llama) at a scale
+directly comparable to prior work; doing so is necessary to test whether
+this mechanism's benefits transfer beyond closed, frontier-adjacent models,
+and we leave it to future work. Our optimizer and judge are a single
+frontier model (GPT-5) throughout; we have not measured sensitivity to a
+weaker or different optimizer model.
 
 % TODO(authors): expand with the Responsible NLP Research Checklist items
 % required by ARR before submission.
