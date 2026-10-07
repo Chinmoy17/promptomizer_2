@@ -1,0 +1,150 @@
+[
+  {
+    "run": "AIME / 4o-mini",
+    "shipped": false,
+    "prompt_8grams": 56,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "AIME / 4.1-mini",
+    "shipped": true,
+    "prompt_8grams": 368,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "PUPA / 4o-mini",
+    "shipped": true,
+    "prompt_8grams": 853,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "PUPA / 4.1-mini",
+    "shipped": true,
+    "prompt_8grams": 439,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "IFBench / 4o-mini",
+    "shipped": true,
+    "prompt_8grams": 867,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "IFBench / 4.1-mini",
+    "shipped": true,
+    "prompt_8grams": 366,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "Hearsay / 4o-mini",
+    "shipped": true,
+    "prompt_8grams": 573,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "Hearsay / 4.1-mini",
+    "shipped": true,
+    "prompt_8grams": 506,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "MMLU-college_mathematics / 4o-mini",
+    "shipped": true,
+    "prompt_8grams": 885,
+    "shared": 1,
+    "examples": [
+      "the set of all finite subsets of r"
+    ]
+  },
+  {
+    "run": "MMLU-college_mathematics / 4.1-mini",
+    "shipped": false,
+    "prompt_8grams": 25,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "MMLU-computer_security / 4o-mini",
+    "shipped": true,
+    "prompt_8grams": 655,
+    "shared": 5,
+    "examples": [
+      "false false c true false d false true",
+      "true b false false c true false d"
+    ]
+  },
+  {
+    "run": "MMLU-computer_security / 4.1-mini",
+    "shipped": true,
+    "prompt_8grams": 1033,
+    "shared": 5,
+    "examples": [
+      "false false c true false d false true",
+      "true b false false c true false d"
+    ]
+  },
+  {
+    "run": "MMLU-econometrics / 4o-mini",
+    "shipped": true,
+    "prompt_8grams": 863,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "MMLU-econometrics / 4.1-mini",
+    "shipped": true,
+    "prompt_8grams": 387,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "MMLU-high_school_biology / 4o-mini",
+    "shipped": true,
+    "prompt_8grams": 739,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "MMLU-high_school_biology / 4.1-mini",
+    "shipped": false,
+    "prompt_8grams": 25,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "MMLU-philosophy / 4o-mini",
+    "shipped": true,
+    "prompt_8grams": 491,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "MMLU-philosophy / 4.1-mini",
+    "shipped": true,
+    "prompt_8grams": 379,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "MMLU-professional_law / 4o-mini",
+    "shipped": true,
+    "prompt_8grams": 906,
+    "shared": 0,
+    "examples": []
+  },
+  {
+    "run": "MMLU-professional_law / 4.1-mini",
+    "shipped": true,
+    "prompt_8grams": 587,
+    "shared": 0,
+    "examples": []
+  }
+]

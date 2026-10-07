@@ -50,7 +50,7 @@ comparisons are apples-to-apples, and each table says exactly why.
 | GEPA-Qwen-Opt (transfer) | Qwen3-8B→GPT-4.1 Mini | 90 → ~45/45 | 150 | Reflective (no re-opt.) | Y (at opt. time) | 49.33 → 52.67 | +3.34 | not reported |
 | **Ours: `reflect_fdpo`** | **GPT-4o-mini** | **90 → 58/32** | **30** | **Reflective (ours)** | **Y** | **13.3 → 10.0** | **−3.3** | **0/1 (net −1)** |
 | **Ours: `reflect_fdpo`** | **Claude Haiku 4.5** | **90 → 58/32** | **30** | **Reflective (ours)** | **Y** | **26.7 → 33.3** | **+6.7** | **2/0 (net +2)** |
-| **Ours: `reflect_fdpo`** | **GPT-4.1 Mini** | **90 → 58/32** | **30** | **Reflective (ours)** | **Y** | **46.7 → 53.3**$^*$ | **+6.7** | **4/3 (net +1)**$^*$ |
+| **Ours: `reflect_fdpo`** | **GPT-4.1 Mini** | **90 → 58/32** | **30** | **Reflective (ours)** | **Y** | **46.7 → 53.3**$^*$ | **+6.7** | **net +2**$^*$ |
 
 $^*$Corrected baseline; see `RESULTS.md` §1 footnote for the reasoning (the
 originally-logged 53.3% baseline is believed to be an anomalous single draw,

@@ -1,0 +1,163 @@
+{
+  "selection": {
+    "unique_best_by_round": {
+      "1": 2,
+      "2": 6,
+      "3": 3
+    },
+    "n_unique": 11,
+    "last_was_unique_best": 3,
+    "last_rule_deficit_pp": [
+      [
+        "AIME 4o",
+        3.1
+      ],
+      [
+        "PUPA 4o",
+        10.0
+      ],
+      [
+        "IFB 4o",
+        15.8
+      ],
+      [
+        "MMLU-colleg 4o",
+        0.0
+      ],
+      [
+        "MMLU-comput 4o",
+        0.0
+      ],
+      [
+        "MMLU-econom 4o",
+        0.0
+      ],
+      [
+        "MMLU-high_s 4o",
+        0.0
+      ],
+      [
+        "MMLU-philos 4o",
+        0.0
+      ],
+      [
+        "MMLU-profes 4o",
+        4.5
+      ]
+    ],
+    "best_rule_advantage_pp": [
+      [
+        "AIME 4.1",
+        9.4
+      ],
+      [
+        "PUPA 4.1",
+        0.0
+      ],
+      [
+        "IFB 4.1",
+        0.0
+      ],
+      [
+        "Hear 4o",
+        0.0
+      ],
+      [
+        "Hear 4.1",
+        12.0
+      ],
+      [
+        "MMLU-comput 4.1",
+        0.0
+      ],
+      [
+        "MMLU-econom 4.1",
+        0.0
+      ],
+      [
+        "MMLU-philos 4.1",
+        4.0
+      ],
+      [
+        "MMLU-profes 4.1",
+        13.6
+      ]
+    ]
+  },
+  "sections": {
+    "round1_mean": 4.111111111111111,
+    "round1_n": 18,
+    "later_mean": 1.3235294117647058,
+    "later_n": 34,
+    "later_single": 23,
+    "counts": {
+      "task_details": 50,
+      "constraints": 21,
+      "context": 25,
+      "output_format": 11,
+      "system_role": 12
+    }
+  },
+  "parse": {
+    "parse failed": 0,
+    "omitted sections": 0,
+    "proposed no changes": 1,
+    "runs_with_log": 20
+  },
+  "optimizer_prompt_tokens_per_call": {
+    "AIME": [
+      166131.33333333334,
+      180396.83333333334,
+      194662.33333333334
+    ],
+    "PUPA": [
+      22840.333333333332,
+      23725.5,
+      24610.666666666668
+    ],
+    "IFB": [
+      6726.333333333333,
+      7264.333333333333,
+      7802.333333333333
+    ],
+    "Hear": [
+      4716.0,
+      5214.666666666666,
+      5713.333333333333
+    ],
+    "MMLU": [
+      4630.333333333333,
+      6794.55,
+      10935.333333333334
+    ]
+  },
+  "inflation": {
+    "mean_val_churn": 0.10779532967032969,
+    "rows": [
+      {
+        "n": 20,
+        "p": 0.7,
+        "se_pp": 10.2,
+        "f_matched": 0.26,
+        "inflation_matched_pp": 4.7,
+        "inflation_independent_pp": 8.4
+      },
+      {
+        "n": 25,
+        "p": 0.7,
+        "se_pp": 9.2,
+        "f_matched": 0.26,
+        "inflation_matched_pp": 4.2,
+        "inflation_independent_pp": 7.7
+      },
+      {
+        "n": 32,
+        "p": 0.7,
+        "se_pp": 8.1,
+        "f_matched": 0.26,
+        "inflation_matched_pp": 3.8,
+        "inflation_independent_pp": 6.7
+      }
+    ]
+  }
+}

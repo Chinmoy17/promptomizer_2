@@ -22,7 +22,7 @@ cross-model absolute-score comparisons with caution.
 | Model | Baseline | Final | Δ | Shipped round | Recovered / Regressed (test) |
 |---|---|---|---|---|---|
 | GPT-4o-mini | 0.133 (4/30) | 0.100 (3/30) | −3.3pp | reverted (no round shipped) | 0 / 1 (net −1) |
-| GPT-4.1 Mini | 0.467 (14/30) | 0.533 (16/30) | +6.7pp | round 1 | 3 / 4 (net −1)$^*$ |
+| GPT-4.1 Mini | 0.467 (14/30) | 0.533 (16/30) | +6.7pp | round 1 | net +2$^*$ |
 
 $^*$**Correction**: the original single logged run reported baseline 0.533
 (16/30) and final 0.500 (15/30), i.e. a small net regression. The user
@@ -37,7 +37,13 @@ of 49.33%), and 0.533 (16/30) is kept as the final/shipped number, since it
 was a real, observed result under the round-1 prompt. **This has not yet
 been re-verified with a fresh, saved multi-run artifact trail** (unlike
 every other correction in this document) and should be confirmed with a
-proper multi-seed rerun before final submission.
+proper multi-seed rerun before final submission. The Recovered/Regressed
+cell is **net +2**, forced by the corrected baseline/final accuracy
+(14/30 -> 16/30); the exact item-level split is not independently
+verifiable, because the saved `test_confusion` (3 recovered/4 regressed,
+net −1) was computed against the *original, now-superseded* 16/30->15/30
+run, not the corrected one, and no item-level log exists for the recheck
+runs that established the corrected baseline.
 
 Notes:
 - GPT-4o-mini's baseline (13.3%) reflects how hard AIME genuinely is for a
