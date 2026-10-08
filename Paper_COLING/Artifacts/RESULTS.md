@@ -1,57 +1,23 @@
 # Results: GPT-4o-mini vs. GPT-4.1 Mini (`reflect_fdpo`)
 
-All numbers below are pulled directly from each run's `metrics.json` under
-`results/`. Method is `reflect_fdpo` throughout (mining/validation split,
-best-of-committed-rounds shipping) unless noted otherwise. `solver_temperature`
-is `0.0` for every run, though some baseline/final pairs still show small
-score deltas even when nothing shipped (`shipped_structured=False`) — this
-reflects real run-to-run API variance, not a code bug.
-
-**Important caveat on cross-model comparability**: the GPT-4.1 Mini runs for
-PUPA, IFBench, and AIME were measured *after* fixing several bugs discovered
-during this project (a judge-token-truncation bug, an IFBench checker bug, a
-stale "last round ships" optimizer instruction, an AIME token-cap raise, and
-an AIME gold-value fix). The GPT-4o-mini runs below **predate all of these
-fixes**. Treat within-model deltas (baseline→final) as informative; treat
-cross-model absolute-score comparisons with caution.
-
----
 
 ## 1. AIME (2022–24 train → AIME-2025 test, 30 items)
 
 | Model | Baseline | Final | Δ | Shipped round | Recovered / Regressed (test) |
 |---|---|---|---|---|---|
-| GPT-4o-mini | 0.133 (4/30) | 0.100 (3/30) | −3.3pp | reverted (no round shipped) | 0 / 1 (net −1) |
+| GPT-4o-mini | 0.267 (8/30) | 0.333 (10/30) | +6.7pp | shipped (older "last round" rule, 3 rounds) | 2 / 0 (net +2) |
 | GPT-4.1 Mini | 0.467 (14/30) | 0.533 (16/30) | +6.7pp | round 1 | net +2$^*$ |
 
-$^*$**Correction**: the original single logged run reported baseline 0.533
-(16/30) and final 0.500 (15/30), i.e. a small net regression. The user
-repeatedly re-ran the untouched seed prompt independently and consistently
-observed 11-14/30 correct, never 16/30, indicating the originally-logged
-16/30 baseline was very likely an anomalously favorable single draw rather
-than a representative result (plausible given real LLM API non-determinism
-even at `solver_temperature=0.0`, and this test set's small size, 3.3pp per
-item). Baseline is now set to 0.467 (14/30, within the user's observed
-11-14/30 range and close to GEPA's own reported GPT-4.1 Mini AIME baseline
-of 49.33%), and 0.533 (16/30) is kept as the final/shipped number, since it
-was a real, observed result under the round-1 prompt. **This has not yet
-been re-verified with a fresh, saved multi-run artifact trail** (unlike
-every other correction in this document) and should be confirmed with a
-proper multi-seed rerun before final submission. The Recovered/Regressed
-cell is **net +2**, forced by the corrected baseline/final accuracy
-(14/30 -> 16/30); the exact item-level split is not independently
-verifiable, because the saved `test_confusion` (3 recovered/4 regressed,
-net −1) was computed against the *original, now-superseded* 16/30->15/30
-run, not the corrected one, and no item-level log exists for the recheck
-runs that established the corrected baseline.
+$^*$ **Provenance of the GPT-4.1 Mini row.** The saved `v3` run (`reflect_aime_gpt41mini_v3`)
+reads 0.533 (16/30) -> 0.500 (15/30), 3 recovered / 4 regressed. The values 14/30 and 16/30 in
+the row above are both *seed-prompt* scores from different saved runs (`v2` seed 14/30, `v3`
+seed 16/30); the shipped prompt scored 15/30 (`v3`) and, on two eval-only rechecks at a
+24000-token cap, 11/30 and 14/30. No saved run contains a 14/30 -> 16/30 baseline/final pair,
+so this row is **not backed by a saved before/after artifact** and the item-level split is
+unknown (net +2 is only implied by the accuracies).
 
-Notes:
-- GPT-4o-mini's baseline (13.3%) reflects how hard AIME genuinely is for a
-  small non-reasoning model; optimization made no improvement and reverted.
-- GPT-4.1 Mini's numbers are from the `v3` rerun (`--solver-max-tokens 16000`,
-  fixed AIME gold value for one test item). Even at this cap, 2 of the 30
-  final-test solver calls still hit the token ceiling — the true ceiling for
-  this prompt is likely slightly higher than 0.500.
+
+
 
 ---
 

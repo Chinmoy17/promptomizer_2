@@ -104,7 +104,7 @@ for r in rows:
         pass
 ax.set_xlim(-6, lim)
 ax.set_ylim(-9, 30)
-ax.set_xlabel("Validation gain, baseline to best round (pp)")
+ax.set_xlabel("Validation gain, baseline to shipped prompt (pp)")
 ax.set_ylabel("Sealed-test change (pp)")
 handles = [Line2D([0], [0], marker="o", color="w", markerfacecolor=c, markersize=5.5, label=k)
            for k, c in BENCH_COLORS.items()]
