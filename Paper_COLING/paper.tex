@@ -41,7 +41,7 @@
 \newtcolorbox{promptbox}[2][]{enhanced,breakable,colback=#2!40,colframe=#2!70!black,boxrule=0.5pt,
   arc=2pt,left=5pt,right=5pt,top=3pt,bottom=3pt,fontupper=\footnotesize,#1}
 
-\title{Beyond Aggregate Accuracy: Recovery and Regression Tracking\texorpdfstring{\\}{ } in Reflective Prompt Optimization}
+\title{Beyond Aggregate Accuracy: Item-Level Transitions in Prompt Optimization}
 
 % ARR review submissions must be fully anonymous.
 \author{Anonymous ACL submission}
@@ -50,17 +50,17 @@
 \maketitle
 
 \begin{abstract}
-Before/after scores in automatic prompt optimization (APO) hide which examples become correct and which become incorrect.
-We study recovery, regression, and churn through Reflective FDPO, a feedback-driven prompt optimizer that returns observed
-item-level transitions to the optimizing model before its next rewrite. Results span five benchmark families and two
-solvers. On LegalBench-Hearsay, a net change of one test item conceals 13--17 item transitions. Among 16 shipped non-AIME
-runs with matched validation and test records, validation accuracy rose in 11, but test accuracy fell in three of those 11.
-PUPA's headline composite score is distinguished from the thresholded accuracy used for selection and transition counts.
-The supplied AIME summary reports gains of 6.7 points for both solvers, but lacks matched provenance for one pair; we mark
-that gap and exclude AIME from transfer analysis. Single-seed evaluation, changing harness versions, and absent matched
-ablations preclude claims of optimizer superiority or causal attribution of transitions to edits. The supported
-contribution is a reporting protocol: pair aggregate scores with item-level transitions, evaluation-noise controls,
-provenance, and tuning-to-test comparisons.
+Language-model systems are often configured through natural-language instructions, or prompts, that specify tasks,
+relevant context, and response requirements. Automatic prompt optimization revises these instructions using feedback
+from model outputs, but an aggregate before/after score does not identify which evaluated cases improve or deteriorate.
+We present RFDPO, an auditable measurement framework that preserves prompt revisions, records item-level recoveries,
+regressions, and churn, and accounts for token consumption and API costs. We use its records to examine prompt revisions
+across five benchmark families and two solver models. Small net score changes can coexist with substantial movement
+between correct and incorrect outcomes. Validation improvements often accompany test improvements, but their magnitude
+and direction need not agree. These observations motivate evaluating prompt optimization as a sequence of measured
+behavioral changes, not only a final score. We recommend reporting paired outcome transitions alongside tuning and test
+performance, fixed-configuration evaluation controls, and resource use. This account supports inspection of what
+revisions improve, disrupt, and preserve, without attributing every observed transition to the revision itself.
 \end{abstract}
 
 \section{Introduction}
@@ -69,81 +69,64 @@ provenance, and tuning-to-test comparisons.
 \begin{figure*}[!t]
 \centering
 \includegraphics[width=\textwidth]{figures/fig_architecture.pdf}
-\caption{Reflective FDPO. Each round, the optimizer sees which mining and validation items its previous
-rewrite recovered and regressed, writes a new prompt, and the
-solver re-scores it on the mining set $M$ and validation set $V$. Every round is saved. The best
-round by validation accuracy is shipped in the current protocol; early runs used the final round.
-Within an optimization run, $T$ is evaluated with the seed and returned prompt and is not optimizer feedback.
-Harness development did inspect test-time traces, so this is not a claim of development-level isolation.}
+\caption{RFDPO's recording and evaluation loop. The solver evaluates prompts on mining set $M$ and validation set $V$. From the second round,
+the optimizer receives the observed recoveries and regressions of its previous rewrite before proposing a new prompt.
+Each changed candidate is saved. The current protocol returns the candidate with highest validation accuracy;
+equal validation scores are resolved by mining accuracy. Within a run, test set $T$ is excluded from feedback and
+selection and evaluated only with the seed and returned prompt for reporting.}
 \label{fig:arch}
 \end{figure*}
 
-Small changes in prompt wording can substantially affect task performance~\citep{sclar2024quantifying}, yet manually tuning
-prompts does not scale across tasks, datasets, and models. Consider a practical prompt-engineering workflow: an engineer is
-refining a prompt for a retrieval-augmented generation (RAG)~\citep{lewis2020rag} or structured-extraction system that extracts
-information into several fields. After each edit, the engineer does not simply ask whether the overall score improved. They inspect
-the resulting outputs: which previously failing cases now work, which previously correct cases have broken, and which failures
-remain. These observations become evidence for the next edit. \textbf{The effect of an edit is therefore part of the information
-used to make the next edit.}
+Language models are used to classify documents, extract information, answer questions, and follow instructions.
+These systems can be configured with a \emph{prompt}: natural-language instructions supplied alongside the task input
+to describe the task, relevant context, constraints, and response format. For example, an extraction prompt can specify
+which fields to return and how to represent missing values. Small changes in wording or formatting can substantially
+affect performance without changing model parameters~\citep{sclar2024quantifying}.
 
-Automatic prompt optimization (APO)~\citep{zhou2023ape,yang2024opro,pryzant2023protegi} attempts to automate this process by
-allowing an LLM to iteratively rewrite prompts using feedback from previous attempts. Many methods already inspect failures or
-execution traces; our concern is the information lost when their results are summarized only by aggregate before/after scores.
-An optimizer that only sees
-whether a score went up or down cannot distinguish between an edit that fixes several failures without side effects and one that
-fixes the same number of failures while silently breaking previously correct cases.
+Manual prompt refinement alternates between editing instructions and evaluating outputs.
+\emph{Automatic prompt optimization} (APO) automates this search~\citep{zhou2023ape,yang2024opro,pryzant2023protegi}.
+In LLM-based approaches, a \emph{solver} performs the task while an \emph{optimizer} receives the current prompt and
+evaluation feedback and proposes a revision. Candidate outputs or scores inform subsequent rewrites; solver parameters
+remain fixed. These are distinct roles, not necessarily different model architectures. Here, GPT-5 rewrites prompts
+for GPT-4o-mini and GPT-4.1 Mini solvers.
 
-This limitation is particularly important on the small evaluation sets often used in prompt optimization. A net change of a few
-percentage points can conceal substantial item-level movement. For example, a net gain of two items could arise from correcting
-two previously incorrect examples with no regressions, or from correcting ten examples while breaking eight others. These two
-outcomes have the same aggregate score but imply very different behavior for a practitioner deciding what to change next. In our
-experiments, net changes of only a few points frequently coexist with a dozen or more examples changing from correct to incorrect
-or vice versa (\S\ref{sec:results}).
+For an engineer refining document extraction or retrieval-augmented question answering, where retrieved documents
+accompany a query~\citep{lewis2020rag}, the consequences of each edit matter: which failing cases now work, which correct
+cases break, and which failures remain. \textbf{These observations can inform the next edit.} Many APO methods already
+inspect failures or execution traces, but aggregate before/after reporting hides these transitions.
 
-A second limitation concerns \textbf{where the observed improvement comes from}. Prompt optimization typically uses a validation
-set to select among candidate prompts; some methods, including ours, also expose those items as feedback. Consequently, a gain measured on the data
-that guided the optimization does not necessarily indicate an equivalent gain on unseen data. When multiple candidates are
-iteratively evaluated and the best one is selected using the same validation signal, the resulting validation improvement can
-provide an overly optimistic view of generalization. Dataset shift and noisy evaluation can also produce a validation/test gap;
-\citet{recht2019imagenet} document the difficulty of interpreting benchmark-to-new-test differences.
+A net gain of two items, for example, can mean two corrections with no regressions or ten corrections offset by eight
+regressions. The scores agree, but the changes warrant different inspection. On the small evaluation sets often used
+in prompt optimization, near-flat accuracy can conceal substantial movement between correct and incorrect outcomes
+(\S\ref{sec:results}).
 
-These observations lead to a simple question: \textbf{if a human engineer needs to see the consequences of an edit to make the
-next edit, should an optimizer LLM have access to the same evidence?} We investigate this question by making the consequences of
-each prompt edit explicit. We formalize \emph{recovery} and \emph{regression} tracking, recording which examples change from
-incorrect to correct and from correct to incorrect after each edit. We additionally define \emph{churn} as the number of examples
-whose outcomes change in either direction. Rather than using these quantities only for post-hoc analysis, we return the
-item-level evidence to the optimizer before its next rewrite.
+An additional question is \textbf{whether gains generalize}. Candidates are often compared on a \emph{validation set},
+whose examples may also provide optimizer feedback. Improvement on these tuning examples need not transfer to unseen
+data. Repeated selection can produce optimistic validation scores; evaluation noise and dataset shift can also explain
+validation/test differences~\citep{recht2019imagenet}.
 
-We build on this idea with \emph{Reflective FDPO}, a deliberately simple feedback-driven prompt optimization framework
-(Figure~\ref{fig:arch}). At each round, an optimizer LLM proposes a new prompt, a solver LLM evaluates it, and the system
-compares its item-level outcomes with those of the previous prompt. The resulting recoveries, regressions, and remaining failures
-are presented to the optimizer as structured feedback for the next rewrite. Every optimization round is retained, while the final
-prompt is selected using validation performance. A separate sealed test set is evaluated only for baseline and final reporting and
-never influences optimization or prompt selection. The resulting loop mirrors an important property of practical prompt
-engineering: \textbf{each edit exposes evidence that can inform the next edit.}
+We track \emph{recoveries} (incorrect to correct), \emph{regressions} (correct to incorrect), and \emph{churn} (all
+changed outcomes). These are measurements of paired evaluations, not new optimization objectives. We implement them
+in \emph{Reflective Feedback-Driven Prompt Optimization} (RFDPO), a framework that versions prompt revisions, records
+outcome transitions, and meters token consumption and API costs (Figure~\ref{fig:arch}). Its optimization loop returns
+transition observations to an LLM rewriter; here, that loop is the instrument used to collect evaluation records,
+not a treatment whose advantage over other feedback strategies is established.
 
-We use Reflective FDPO as an exploratory testbed for studying APO behavior rather than as a new state-of-the-art optimizer. Our
-experiments span five benchmark families (LegalBench-Hearsay, MMLU, IFBench, AIME, and PUPA) and two solver models, GPT-4o-mini
-and GPT-4.1 Mini. The experimental scale is intentionally modest: runs contain tens of evaluation items, use a single seed, and
-perform at most three optimizer iterations. Reaching state-of-the-art accuracy is not our goal: published APO results are measured on
-different splits, solver models, and baseline prompts (Table~\ref{tab:prior}), so we make no leaderboard claims. Instead, we ask
-what becomes visible when prompt optimization is examined at the item level and when
-optimization-time gains are evaluated separately from their transfer to unseen data. Our contributions are:
+We analyse recorded runs on LegalBench-Hearsay, MMLU, IFBench, AIME, and PUPA with GPT-4o-mini and GPT-4.1 Mini solvers.
+Our question is what paired outcomes reveal beyond the aggregate score, including how tuning-time gains compare with
+test changes. Within a run, test examples are excluded from optimizer feedback and candidate selection. Our contributions are:
 
 \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}\setlength{\topsep}{2pt}
-\item \textbf{Item-level accounting for APO.} We formalize recovery, regression, and churn: which examples an edit fixes, breaks,
-or leaves unchanged (\S\ref{sec:metric}).
-\item \textbf{Reflective FDPO.} We return this evidence to the optimizer before its next rewrite, so it can see the consequences of
-its previous edit (\S\ref{sec:method}).
-\item \textbf{Empirical analysis of APO behavior.} Across five benchmark families and two solvers, small aggregate changes mask
-large item-level churn; among 16 shipped non-AIME runs with matched records, validation rose in 11 but test accuracy fell
-in three of those 11 (\S\ref{sec:results}).
+\item \textbf{An auditable measurement framework.} RFDPO integrates prompt-version history, paired correctness transitions,
+and per-role token and cost accounting (\S\ref{sec:method}).
+\item \textbf{A descriptive empirical analysis.} Recorded evaluations expose recovery/regression trade-offs behind small
+net changes and differences between tuning and test gains (\S\ref{sec:results}).
+\item \textbf{Actionable reporting guidance.} We identify the outcome records, controls, and resource measurements needed
+to inspect prompt revisions beyond aggregate accuracy (\S\ref{sec:discussion}).
 \end{itemize}
 
-Taken together, our results suggest that \textbf{aggregate before/after accuracy is not sufficient to characterize automatic prompt
-optimization}. Recovery, regression, churn, and validation-to-test transfer provide complementary evidence about what an optimizer
-actually changed and whether those changes generalize. We argue that these should be treated as \textbf{first-class reporting
-dimensions for APO}, rather than information recovered only when a practitioner manually inspects individual outputs.
+Together, these observations motivate treating recovery, regression, churn, and validation-to-test transfer as
+\textbf{first-class reporting dimensions for APO}, alongside aggregate accuracy.
 
 \section{Related Work}
 \label{sec:related}
@@ -237,17 +220,25 @@ experiments). It moved accuracy from 68.8\% to 95.3\%. This diagnostic is invali
 only as a caution: a test-exposed trajectory can produce a much larger reported gain. This single diagnostic does not
 isolate exposure from trajectory or evaluation noise, and does not establish anything about another method's results.
 
-\section{Method}
+\section{Measurement Framework}
 \label{sec:method}
 
 \subsection{Setting}
-A prompt is a document with five fixed sections (System Role, Context, Task Details,
-Constraints, Output Format), so edits are always well formed and comparable across rounds. A
-\emph{solver} LLM answers items using the prompt; an \emph{optimizer} LLM rewrites the prompt. Each benchmark's
-data is split into three disjoint pools: a \emph{mining} set $M$ whose failures the optimizer may see, a
-\emph{validation} set $V$ used to select among rounds and, from round 2, also shown to the optimizer as
-feedback (so $V$ is a second tuning set, not held-out data), and a sealed \emph{test} set $T$. The solver is
-never the optimizer or the judge.
+In this study, we represent each prompt using five fixed sections: System Role, Context, Task Details, Constraints,
+and Output Format, following the structured-prompt formulation of MPO~\citep{sharma2026mpo}. This representation is an
+experimental design choice, not a general requirement for prompts. The seed prompts use the same schema and specify
+the task, required answer format, and applicable definitions or constraints. We retain the section headers throughout
+optimization and record which sections each revision changes. A shared schema makes section edits comparable, but
+does not eliminate dependence on the seed prompt's content. A solver LLM performs the task under each prompt;
+an optimizer LLM rewrites the instructions without updating the solver's parameters. In our experiments, the solver
+model is distinct from the optimizer and any LLM judge.
+
+Each benchmark's data is split into three disjoint pools: a \emph{mining} set $M$ whose outcomes provide optimizer
+feedback, a \emph{validation} set $V$ used for candidate selection and, from round 2, whose changed outcomes also
+provide feedback, and a \emph{test} set $T$. Thus $M$ and $V$ are tuning sets, not independent evidence of
+generalization. Within a run, test examples are excluded from optimizer feedback and candidate selection and are
+evaluated only with the seed and returned prompt for baseline and final reporting. This run-level protocol is
+distinct from development-time use of test traces, discussed in Limitations.
 
 \subsection{Recovery/regression tracking}
 \label{sec:metric}
@@ -273,22 +264,25 @@ MMLU counts are summed over subjects while accuracy is macro-averaged. API varia
 transitions, not proof that an edit caused a recovery or regression. AIME transition counts follow the supplied summary
 and the author's confirmation rather than matched archived logs.
 
-\subsection{Reflective FDPO}
+\subsection{RFDPO Recording Procedure}
 Algorithm~\ref{alg:reflect} gives the procedure and Figure~\ref{fig:arch} its data flow. Round
 $t=1$ has nothing to reflect on. From round 2 the optimizer is shown, in full and without sampling, the items its
 previous rewrite recovered and regressed on both $M$ and $V$ (the question, the solver's new wrong answer, and the gold
-answer), the previous text of every section it changed, and the validation accuracy before and after. It is also told
-that the best committed round by validation accuracy is the one that ships (Appendix~\ref{app:prompts}). Every round
-commits unconditionally, so a poor round cannot block a later good one, and the shipped prompt is the committed round
-with the highest validation accuracy (ties broken by mining accuracy). Nine early GPT-4o-mini runs (AIME, PUPA, IFBench, and
-all six MMLU subjects) used the historical final-round rule, with seed fallback in the archived AIME run
-(Appendix~\ref{app:gap}). Optimization is skipped when the seed scores at least 95\% on $M$ (except PUPA),
+answer), the previous text of every section it changed, and the validation accuracy before and after.
+Each valid, changed candidate is saved (\emph{committed}) and becomes the starting prompt for the next round, even
+when validation accuracy decreases. Under the current selection rule, we return the committed candidate with highest
+validation accuracy (Appendix~\ref{app:prompts}). When two candidates obtain the same validation accuracy, we select
+the candidate with higher mining accuracy. If both accuracies are equal, the earlier candidate remains selected.
+The seed is not included in this comparison once a candidate has been committed, so the returned prompt need not
+improve validation accuracy relative to the seed. If no candidate is committed, the seed is retained.
+Some archived runs instead used final-round selection; Appendix~\ref{app:gap} distinguishes the selection rules.
+Optimization is skipped when the seed scores at least 95\% on $M$ (except PUPA),
 and a round that proposes no change is skipped. The optimizer is instructed not to copy
 dataset items into the prompt (\S\ref{app:history}). Appendix~\ref{app:design} gives, for each design decision, the
 alternative we rejected and the values from our saved runs that support the choice.
 
 \begin{algorithm}[!t]
-\caption{Reflective FDPO}
+\caption{RFDPO recording and candidate selection}
 \label{alg:reflect}
 \small
 \begin{algorithmic}[1]
@@ -311,12 +305,6 @@ alternative we rejected and the values from our saved runs that support the choi
 \State \Return $p^*$, and $(R,G)(\tau_0\!\to\!\tau^*;T)$
 \end{algorithmic}
 \end{algorithm}
-
-\subsection{Sealed-test protocol}
-Within the recorded optimization loop, $T$ is evaluated with $p_0$ before optimization and $p^*$ after, and is not
-optimizer feedback or a round-selection signal. Separate AIME rechecks and harness debugging did inspect test outputs;
-we therefore distinguish run-level sealing from an untouched development test set. The AIME summary also lacks a
-matched evaluation pair for one solver, so the run-level guarantee cannot be verified for that row.
 
 \section{Experimental Setup}
 \label{sec:setup}
@@ -432,9 +420,11 @@ pairs, not estimates of a statistically established causal effect. Aggregate acc
 
 \subsection{Validation gains versus test gains}
 \label{sec:valtest}
-We compare seed-to-shipped validation and test accuracy for the 18 non-AIME records with matched provenance; 16 shipped
-an optimized prompt. PUPA uses thresholded accuracy on both sets here, not its headline composite. The current rule
-selects by validation accuracy, while eight of these shipped runs used the historical final-round rule. Table~\ref{tab:gap}
+We compare seed-to-returned validation and test accuracy for 18 non-AIME records with matched provenance. Two runs
+retained the seed and 16 returned an edited prompt. ``Shipped'' in Table~\ref{tab:gap} denotes returning an edited prompt,
+not passing an improvement threshold: validation accuracy increased in 11 of those 16 runs, remained equal in three,
+and decreased in two. PUPA uses thresholded accuracy on both sets here, not its headline composite. The current rule
+selects by validation accuracy, while eight runs that returned edited prompts used the final-round rule. Table~\ref{tab:gap}
 summarizes this restricted population; Appendix~\ref{app:gap} gives the per-run pairs.
 
 \begin{table*}[!t]
@@ -470,20 +460,22 @@ The row groups overlap and are not additive; MMLU subject records are not indepe
 \label{tab:gap}
 \end{table*}
 
-Validation accuracy rose in 11 of 16 eligible shipped runs, with a mean validation gain of 12.3 points and a mean test
-gain of 6.3. Three of those 11 had lower test accuracy: IFBench with GPT-4o-mini ($+15.8$, $-2.4$), Hearsay with GPT-4o-mini
+Improvements measured on examples used for refinement did not consistently translate into improvements on unseen
+test examples. Among the 11 runs whose returned prompt improved validation accuracy, the mean validation gain was
+12.3 points and the mean test gain was 6.3. Three of those 11 had lower test accuracy: IFBench with GPT-4o-mini ($+15.8$, $-2.4$), Hearsay with GPT-4o-mini
 ($+12.0$, $-2.0$), and MMLU computer security with GPT-4o-mini ($+8.0$, $-1.5$). Each negative test delta is one item.
-The six shipped non-MMLU runs average $+16.5$ validation and $+9.7$ test points; MMLU subjects average $+2.9$ and $+2.6$.
+The six non-MMLU runs that returned edited prompts average $+16.5$ validation and $+9.7$ test points;
+MMLU subjects average $+2.9$ and $+2.6$.
 These means weight runs equally, not items, and combine heterogeneous tasks.
 
 Since $V$ feeds the optimizer from round 2, it is a tuning set rather than held-out evidence. The gap is consistent with
 adaptive tuning, but noisy evaluation and differing item difficulty remain alternative explanations. Comparisons between
-shipping rules are confounded by benchmark and solver mix. Two shipped MMLU prompts scored below the seed on validation
-(college mathematics, GPT-4o-mini; computer security, GPT-4.1 Mini), because the seed is not a candidate in the current
-best-committed-round selection (Table~\ref{tab:pergap}).
+selection rules are confounded by benchmark and solver mix. Two returned MMLU prompts scored below the seed on
+validation (college mathematics, GPT-4o-mini; computer security, GPT-4.1 Mini). Neither return was blocked for scoring
+below the seed on validation (Table~\ref{tab:pergap}).
 
 \paragraph{Limited copying check.}
-We checked final prompts in the archived run collection (the seed when nothing shipped) for shared 8-word sequences with
+We checked final prompts in the archived run collection (the seed when no edited prompt was returned) for shared 8-word sequences with
 dataset items. Of the 18 non-AIME prompts corresponding to matched results, 15 share none. The remaining three share one
 generic mathematical phrase (MMLU college mathematics, GPT-4o-mini) and a boilerplate pattern of True/False answer
 options (MMLU computer security, both solvers). This offers no affirmative evidence of item copying, but cannot exclude
@@ -525,8 +517,9 @@ final-round rule. Even within-solver effects require fixed-harness repeats; cros
 \paragraph{Development used test-time traces.} The harness decisions described in Appendix~\ref{app:noisebugs} (the AIME token cap, the PUPA judge limit, the IFBench checker) were made after inspecting traces that included
 test items. These changed how outputs are generated or scored, not which items the optimizer could see, but $T$ was not entirely
 outside the development loop for the harness.
-\paragraph{Mechanism.} The shipped prompt need not beat the seed on validation (two of 16 eligible shipped runs did not). The optimizer sees flipped
-validation items and is told that validation accuracy decides which round ships, so $V$ is not held out and the
+\paragraph{Mechanism.} A returned edited prompt need not beat the seed on validation (two of 16 eligible edited-prompt
+returns did not). The optimizer sees flipped validation items and, under the current rule, validation accuracy determines
+the returned candidate, so $V$ is not held out and the
 validation gains in Table~\ref{tab:gap} are optimistic by construction. Our IFBench verifier implements
 a subset (32 of 83) of the constraint types in IFEval and IFBench combined, and PUPA scores depend on an LLM judge.
 \paragraph{Models.} Only two closed-weight solvers and one optimizer/judge (GPT-5) were used, and API behavior can drift. We did not evaluate open-weight solvers.

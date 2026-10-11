@@ -1,0 +1,21 @@
+# secrets
+.env
+
+# python / uv
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+
+# hf datasets cache (if pointed locally)
+.hf_cache/
+
+# results: keep metrics/config/registry/summary, drop raw call logs
+results/**/calls/
+results/**/events.jsonl
+results/**/*.log
+
+# misc
+image.png
