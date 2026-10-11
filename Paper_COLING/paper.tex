@@ -41,7 +41,7 @@
 \newtcolorbox{promptbox}[2][]{enhanced,breakable,colback=#2!40,colframe=#2!70!black,boxrule=0.5pt,
   arc=2pt,left=5pt,right=5pt,top=3pt,bottom=3pt,fontupper=\footnotesize,#1}
 
-\title{Beyond Aggregate Accuracy: Recovery and Regression Tracking\\ in Reflective Prompt Optimization}
+\title{Beyond Aggregate Accuracy: Recovery and Regression Tracking\texorpdfstring{\\}{ } in Reflective Prompt Optimization}
 
 % ARR review submissions must be fully anonymous.
 \author{Anonymous ACL submission}
@@ -50,21 +50,17 @@
 \maketitle
 
 \begin{abstract}
-Automatic prompt optimization (APO) improves task performance by iteratively rewriting prompts from model-generated
-feedback, yet its evaluation is typically reduced to a single before/after score. Such aggregate scores obscure which
-examples an edit recovers, which it regresses, and whether gains observed during optimization transfer to unseen data.
-We introduce Reflective FDPO, an auditable prompt optimization framework that records item-level recoveries and
-regressions for every candidate edit and returns this evidence to the optimizing model before subsequent rewrites. This
-lets the optimizer reason not only about whether a prompt improved, but also about where and how its behavior changed.
-Across five benchmark families and two solver models (20 optimization runs, counting MMLU subjects separately), we
-observe substantial item-level changes even when aggregate differences are small: edits frequently recover some examples
-while regressing others. Validation accuracy rose in 12 of the 17 runs that shipped a prompt, yet the sealed-test score
-fell in 4 of those 12; on the eight non-MMLU runs the mean validation gain (+15.0 points) was about twice the mean test
-gain (+7.8 points), so gains obtained during optimization do not transfer proportionally to unseen data. Outcomes also
-vary across tasks and solvers, with improvements on some and unchanged or worse test scores on others. Our experiments
-are small and single-seed, so we offer them as evidence for a reporting practice rather than a new state of the art. We
-release the optimizer and per-item optimization traces, and argue that recovery, regression, and validation-to-test
-transfer should be first-class reporting dimensions for automatic prompt optimization.
+Before/after scores in automatic prompt optimization (APO) hide which examples become correct and which become incorrect.
+We study recovery, regression, and churn through Reflective FDPO, a feedback-driven prompt optimizer that returns observed
+item-level transitions to the optimizing model before its next rewrite. Results span five benchmark families and two
+solvers. On LegalBench-Hearsay, a net change of one test item conceals 13--17 item transitions. Among 16 shipped non-AIME
+runs with matched validation and test records, validation accuracy rose in 11, but test accuracy fell in three of those 11.
+PUPA's headline composite score is distinguished from the thresholded accuracy used for selection and transition counts.
+The supplied AIME summary reports gains of 6.7 points for both solvers, but lacks matched provenance for one pair; we mark
+that gap and exclude AIME from transfer analysis. Single-seed evaluation, changing harness versions, and absent matched
+ablations preclude claims of optimizer superiority or causal attribution of transitions to edits. The supported
+contribution is a reporting protocol: pair aggregate scores with item-level transitions, evaluation-noise controls,
+provenance, and tuning-to-test comparisons.
 \end{abstract}
 
 \section{Introduction}
@@ -72,12 +68,13 @@ transfer should be first-class reporting dimensions for automatic prompt optimiz
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=\textwidth]{figures/fdpo2.png}
+\includegraphics[width=\textwidth]{figures/fig_architecture.pdf}
 \caption{Reflective FDPO. Each round, the optimizer sees which mining and validation items its previous
 rewrite recovered and regressed, writes a new prompt, and the
 solver re-scores it on the mining set $M$ and validation set $V$. Every round is saved. The best
-round by validation accuracy is shipped. The sealed test set $T$ is scored only twice, with the seed
-prompt $p_0$ (the baseline) and with the shipped prompt $p^*$, and never influences any decision.}
+round by validation accuracy is shipped in the current protocol; early runs used the final round.
+Within an optimization run, $T$ is evaluated with the seed and returned prompt and is not optimizer feedback.
+Harness development did inspect test-time traces, so this is not a claim of development-level isolation.}
 \label{fig:arch}
 \end{figure*}
 
@@ -90,9 +87,9 @@ remain. These observations become evidence for the next edit. \textbf{The effect
 used to make the next edit.}
 
 Automatic prompt optimization (APO)~\citep{zhou2023ape,yang2024opro,pryzant2023protegi} attempts to automate this process by
-allowing an LLM to iteratively rewrite prompts using feedback from previous attempts. Yet APO is commonly evaluated and driven by
-aggregate scores: one score before optimization, one after, and their difference. This creates a mismatch between how an engineer
-can reason about an edit and how an automated optimizer is typically informed about its consequences. An optimizer that only sees
+allowing an LLM to iteratively rewrite prompts using feedback from previous attempts. Many methods already inspect failures or
+execution traces; our concern is the information lost when their results are summarized only by aggregate before/after scores.
+An optimizer that only sees
 whether a score went up or down cannot distinguish between an edit that fixes several failures without side effects and one that
 fixes the same number of failures while silently breaking previously correct cases.
 
@@ -104,11 +101,11 @@ experiments, net changes of only a few points frequently coexist with a dozen or
 or vice versa (\S\ref{sec:results}).
 
 A second limitation concerns \textbf{where the observed improvement comes from}. Prompt optimization typically uses a validation
-set both to provide feedback during optimization and to select among candidate prompts. Consequently, a gain measured on the data
+set to select among candidate prompts; some methods, including ours, also expose those items as feedback. Consequently, a gain measured on the data
 that guided the optimization does not necessarily indicate an equivalent gain on unseen data. When multiple candidates are
 iteratively evaluated and the best one is selected using the same validation signal, the resulting validation improvement can
-provide an overly optimistic view of how much the optimization generalizes, an instance of the adaptive overfitting that
-\citet{recht2019imagenet} documented for repeated evaluation against a fixed set.
+provide an overly optimistic view of generalization. Dataset shift and noisy evaluation can also produce a validation/test gap;
+\citet{recht2019imagenet} document the difficulty of interpreting benchmark-to-new-test differences.
 
 These observations lead to a simple question: \textbf{if a human engineer needs to see the consequences of an edit to make the
 next edit, should an optimizer LLM have access to the same evidence?} We investigate this question by making the consequences of
@@ -125,7 +122,7 @@ prompt is selected using validation performance. A separate sealed test set is e
 never influences optimization or prompt selection. The resulting loop mirrors an important property of practical prompt
 engineering: \textbf{each edit exposes evidence that can inform the next edit.}
 
-We use Reflective FDPO as a controlled testbed for studying APO behavior rather than as a new state-of-the-art optimizer. Our
+We use Reflective FDPO as an exploratory testbed for studying APO behavior rather than as a new state-of-the-art optimizer. Our
 experiments span five benchmark families (LegalBench-Hearsay, MMLU, IFBench, AIME, and PUPA) and two solver models, GPT-4o-mini
 and GPT-4.1 Mini. The experimental scale is intentionally modest: runs contain tens of evaluation items, use a single seed, and
 perform at most three optimizer iterations. Reaching state-of-the-art accuracy is not our goal: published APO results are measured on
@@ -139,8 +136,8 @@ or leaves unchanged (\S\ref{sec:metric}).
 \item \textbf{Reflective FDPO.} We return this evidence to the optimizer before its next rewrite, so it can see the consequences of
 its previous edit (\S\ref{sec:method}).
 \item \textbf{Empirical analysis of APO behavior.} Across five benchmark families and two solvers, small aggregate changes mask
-large item-level churn, and validation gains do not carry over to unseen data: validation rose in 12 of 17 shipped runs, yet the
-test score fell in 4 of those 12 (\S\ref{sec:results}).
+large item-level churn; among 16 shipped non-AIME runs with matched records, validation rose in 11 but test accuracy fell
+in three of those 11 (\S\ref{sec:results}).
 \end{itemize}
 
 Taken together, our results suggest that \textbf{aggregate before/after accuracy is not sufficient to characterize automatic prompt
@@ -161,15 +158,14 @@ optimized jointly over instructions and demonstrations~\citep{opsahlong2024mipro
 programming frameworks such as DSPy~\citep{khattab2024dspy}.
 Closest to our prompt schema is MPO~\citep{sharma2026mpo}, which decomposes a prompt
 into the same five semantic sections and applies section-local textual gradients;
-its updates are additive and de-duplicated, without a check that a rewrite does not break a
-previously correct case. Recovery/regression accounting is that missing check, applied as
-a measurement rather than a gate. GEPA~\citep{agrawal2026gepa} combines reflective
+its updates are additive and de-duplicated. Our analysis makes observed correct-to-incorrect transitions explicit without
+using them as an acceptance gate. GEPA~\citep{agrawal2026gepa} combines reflective
 prompt mutation with Pareto-based selection over a population of prompts, and
 Trace2Policy~\citep{zha2026trace2policy} refines a rule document by clustering errors and committing
 patches that pass a regression gate. General self-feedback methods return verbal critiques to the
-model that produced an output~\citep{madaan2023selfrefine,shinn2023reflexion}. Reflective FDPO differs in
-what the optimizer is shown: a measured, item-level outcome of its own previous edit rather than a
-critique or a scalar score.
+model that produced an output~\citep{madaan2023selfrefine,shinn2023reflexion}. Reflection and regression testing are therefore
+not new here. Our focus is explicit before/after transition accounting in feedback and reporting, not priority over
+trace-based reflection or a demonstrated advantage over these methods.
 
 \paragraph{Published results use different protocols.}
 Table~\ref{tab:prior} lists how prior work set up the benchmarks we share, next to our own setup. No two rows are measured the same way.
@@ -201,7 +197,7 @@ MPO~\citep{sharma2026mpo} & 3,000 train / 1,400 test, all subjects & LLaMA-3-8B-
 \midrule
 \rowcolor{midgreen}\multicolumn{5}{l}{\textbf{AIME}} \\
 GEPA~\citep{agrawal2026gepa} & 2022--24 problems (90) split into train and validation; test: 2025, 30 problems, 5 runs each & Qwen3-8B, GPT-4.1 Mini; DSPy chain-of-thought baseline & reflective LLM, Pareto selection & $27.33\rightarrow 32.00$; $49.33\rightarrow 59.33$ \\
-\rowcolor{softblue}This paper & 58 / 32 / 30, one evaluation; bare seed prompt & GPT-4o-mini, GPT-4.1 Mini & GPT-5, item-level effect report & $13.3\rightarrow 10.0$; $53.3\rightarrow 50.0$ \\
+\rowcolor{softblue}This paper$^\dagger$ & 58 / 32 / 30 intended; bare seed prompt & GPT-4o-mini, GPT-4.1 Mini & GPT-5, item-level effect report & $26.7\rightarrow 33.3$; $46.7\rightarrow 53.3$ \\
 \midrule
 \rowcolor{midgreen}\multicolumn{5}{l}{\textbf{PUPA}} \\
 GEPA~\citep{agrawal2026gepa} & 111 / 111 / 221 & Qwen3-8B, GPT-4.1 Mini & reflective LLM, Pareto selection & $80.82\rightarrow 91.85$; $78.57\rightarrow 94.47$ \\
@@ -212,7 +208,7 @@ GEPA~\citep{agrawal2026gepa} & 111 / 111 / 221 & Qwen3-8B, GPT-4.1 Mini & reflec
 (shaded blue). Changes are before $\rightarrow$ after accuracy, except PUPA, which is a composite score; where a row lists several solvers,
 the changes follow the order of the solver column. The protocols differ in items, test-set size, solver, feedback source, and baseline
 prompt, so the changes are not comparable with one another or with ours; the table shows how the setups differ and does not rank
-them.}
+them. $^\dagger$AIME values follow the supplied results summary, with unresolved run provenance.}
 \label{tab:prior}
 \end{table*}
 
@@ -227,9 +223,8 @@ Our framing, that one aggregate number hides qualitatively different behaviors, 
 CheckList~\citep{ribeiro2020checklist}, which showed that models passing standard
 benchmarks fail systematically on targeted tests. CheckList evaluates a fixed trained
 model; we instead track per-item outcomes across the successive edits of an optimization
-process. The validation/test gap we measure is an instance of adaptive overfitting from repeated
-selection against a fixed set, which~\citet{recht2019imagenet} documented for ImageNet
-classifiers without any data contamination. It is distinct from test-set memorization, which
+process. A validation/test gap is consistent with adaptive tuning, but it does not identify adaptive overfitting separately
+from sampling noise or dataset shift~\citep{recht2019imagenet}. Test-set memorization is another concern, which
 \citet{oren2023proving} show can be detected in black-box language models; we check for
 verbatim copying directly (\S\ref{sec:valtest}).
 
@@ -239,8 +234,8 @@ result was diagnosed partly from the nominally held-out test set~\citep{zha2026t
 To measure how sensitive this task is to such exposure, we ran an earlier, simpler variant of our optimizer
 with the sealed test pool deliberately used as the mining set (Claude Haiku 4.5 \citep{anthropic2025haiku45} as solver, outside the main
 experiments). It moved accuracy from 68.8\% to 95.3\%. This diagnostic is invalid as a result and we report it
-only as a caution: exposure alone can produce gains of this size regardless of mechanism, which is
-why every other number in this paper uses a sealed test set.
+only as a caution: a test-exposed trajectory can produce a much larger reported gain. This single diagnostic does not
+isolate exposure from trajectory or evaluation noise, and does not establish anything about another method's results.
 
 \section{Method}
 \label{sec:method}
@@ -256,7 +251,7 @@ never the optimizer or the judge.
 
 \subsection{Recovery/regression tracking}
 \label{sec:metric}
-Let $c_i(p)\in\{0,1\}$ indicate whether the solver answers item $i$ correctly under prompt $p$ (for
+Let $c_i(p)\in\{0,1\}$ denote the observed scored outcome in one evaluation under prompt $p$ (for
 PUPA, whether the composite score passes a fixed threshold of 0.7). Take a prompt $p$ and an edited prompt $q$ scored on the same
 item set $D$ (Figure~\ref{fig:metric}). An item is \emph{recovered} if it was wrong under $p$ and right under $q$, and
 \emph{regressed} if it was right under $p$ and wrong under $q$. We write $R$ and $G$ for the two sets, so
@@ -272,9 +267,11 @@ items that flipped in either direction. Two edits with the same $N$ cannot be to
 \label{fig:metric}
 \end{figure}
 
-We compute $(R,G)$ between consecutive rounds on $M$ and on $V$, and once
-on $T$ between the seed prompt and the shipped prompt. All sets are stored per item, so
-any aggregate in this paper can be audited down to the individual items that moved.
+We compute $(R,G)$ between consecutive rounds on $M$ and $V$, and between seed and returned prompts on $T$, using the same
+evaluable item IDs in each pair. PUPA's $N/|D|$ equals its thresholded accuracy change, not its composite-score change.
+MMLU counts are summed over subjects while accuracy is macro-averaged. API variability means these are observed
+transitions, not proof that an edit caused a recovery or regression. AIME transition counts follow the supplied summary
+and the author's confirmation rather than matched archived logs.
 
 \subsection{Reflective FDPO}
 Algorithm~\ref{alg:reflect} gives the procedure and Figure~\ref{fig:arch} its data flow. Round
@@ -284,42 +281,42 @@ answer), the previous text of every section it changed, and the validation accur
 that the best committed round by validation accuracy is the one that ships (Appendix~\ref{app:prompts}). Every round
 commits unconditionally, so a poor round cannot block a later good one, and the shipped prompt is the committed round
 with the highest validation accuracy (ties broken by mining accuracy). Nine early GPT-4o-mini runs (AIME, PUPA, IFBench, and
-all six MMLU subjects) predate this rule and shipped the final round instead (Appendix~\ref{app:gap}). Optimization is skipped when the seed already
-exceeds 95\% accuracy on $M$, and a round that proposes no change is skipped. The optimizer is instructed not to copy
+all six MMLU subjects) used the historical final-round rule, with seed fallback in the archived AIME run
+(Appendix~\ref{app:gap}). Optimization is skipped when the seed scores at least 95\% on $M$ (except PUPA),
+and a round that proposes no change is skipped. The optimizer is instructed not to copy
 dataset items into the prompt (\S\ref{app:history}). Appendix~\ref{app:design} gives, for each design decision, the
 alternative we rejected and the values from our saved runs that support the choice.
 
 \begin{algorithm}[!t]
-\refstepcounter{algorithm}\label{alg:reflect}
-\begin{tcolorbox}[enhanced,colback=softblue,colframe=deepblue,boxrule=0.6pt,arc=2pt,left=3pt,right=3pt,top=2pt,bottom=2pt,
-  title={\textbf{Algorithm \thealgorithm}\quad Reflective FDPO},coltitle=white,colbacktitle=deepblue,fonttitle=\small]
+\caption{Reflective FDPO}
+\label{alg:reflect}
 \small
 \begin{algorithmic}[1]
-\Require seed prompt $p_0$; disjoint sets $M, V, T$; optimizer $\textsc{Opt}$; solver $\textsc{Solve}$; rounds $N$
+\Require seed $p_0$; disjoint $M,V,T$; $\textsc{Opt}$; $\textsc{Solve}$; round budget $B$
 \State $s_0,v_0 \gets \textsc{Solve}(p_0,M),\ \textsc{Solve}(p_0,V)$
 \State $\tau_0 \gets \textsc{Solve}(p_0,T)$ \Comment{baseline; measured only}
-\For{$t=1$ \textbf{to} $N$}
-  \If{$t=1$} $\rho \gets \emptyset$
-  \Else
-    \State $(R_M,G_M) \gets (R,G)(s_{t-2}\!\to\! s_{t-1};M)$
-    \State $(R_V,G_V) \gets (R,G)(v_{t-2}\!\to\! v_{t-1};V)$
-    \State $\rho \gets (R_M,G_M,R_V,G_V)$
-  \EndIf
-  \State $p_t \gets \textsc{Opt}(p_{t-1},\{i\in M: s_{t-1,i}=0\},\rho)$
-  \State $s_t,v_t \gets \textsc{Solve}(p_t,M),\ \textsc{Solve}(p_t,V)$
-  \State save $(p_t,s_t,v_t)$ \Comment{always; no gate}
+\State $\mathcal{H}\gets\emptyset$; $(p,s,v)\gets(p_0,s_0,v_0)$; $\rho\gets\emptyset$
+\For{$t=1$ \textbf{to} $B$}
+  \If{skip threshold reached, or no mining failures} \State \textbf{break} \EndIf
+  \State $q\gets\textsc{Opt}(p,s,v,\rho)$ \Comment{mining items and feedback}
+  \If{$q=p$} \State \textbf{continue} \EndIf
+  \State $s',v'\gets\textsc{Solve}(q,M),\ \textsc{Solve}(q,V)$
+  \State $\rho\gets((R,G)(s\!\to\!s'),(R,G)(v\!\to\!v'))$
+  \State append $(q,s',v')$ to $\mathcal{H}$ \Comment{no regression gate}
+  \State $(p,s,v)\gets(q,s',v')$
 \EndFor
-\State $t^*\gets \arg\max_{1\le t\le N}\mathrm{acc}(v_t)$; $\ p^*\gets p_{t^*}$
+\State $p^*\gets p_0$ if $\mathcal{H}=\emptyset$; otherwise select from $\mathcal{H}$
+\Statex \hspace{\algorithmicindent} by validation accuracy, then mining accuracy
 \State $\tau^* \gets \textsc{Solve}(p^*,T)$ \Comment{measured only}
 \State \Return $p^*$, and $(R,G)(\tau_0\!\to\!\tau^*;T)$
 \end{algorithmic}
-\end{tcolorbox}
 \end{algorithm}
 
 \subsection{Sealed-test protocol}
-$T$ is scored exactly twice per run: with $p_0$ before optimization, and with $p^*$ after. Those two scores
-define the baseline and final numbers reported everywhere in this paper. $T$ is never shown to the
-optimizer and is never used to select a round, edit a prompt, or stop a run.
+Within the recorded optimization loop, $T$ is evaluated with $p_0$ before optimization and $p^*$ after, and is not
+optimizer feedback or a round-selection signal. Separate AIME rechecks and harness debugging did inspect test outputs;
+we therefore distinguish run-level sealing from an untouched development test set. The AIME summary also lacks a
+matched evaluation pair for one solver, so the run-level guarantee cannot be verified for that row.
 
 \section{Experimental Setup}
 \label{sec:setup}
@@ -365,15 +362,15 @@ $(\text{quality} + (1-\text{leakage}))/2$.}
 \paragraph{Models.}
 Solvers are GPT-4o-mini \citep{openai2024gpt4o} and GPT-4.1 Mini \citep{openai2025gpt41} (temperature 0). The optimizer is GPT-5 \citep{openai2025gpt5} (temperature 0.7). PUPA
 additionally uses GPT-5 as its quality judge and a fixed, never-optimized GPT-4.1 \citep{openai2025gpt41} as the untrusted external model
-in its two-stage pipeline. The solver is never the optimizer or the judge, and the PUPA external model differs from the solver.
+in its rewrite--external-answer--synthesis pipeline. The solver is never the optimizer or the judge, and the PUPA external model differs from the solver.
 Scoring details are in Appendix~\ref{app:eval} and the optimizer's instructions in Appendix~\ref{app:prompts}.
 
 \paragraph{Protocol.}
-Each (benchmark, solver) pair is run once, with seed 0 and up to three optimization rounds (two optimizer calls
-in one case where mining failures ran out). Splits are class-stratified (Hearsay, IFBench, PUPA), subject-balanced (MMLU), or
-fixed by year (AIME). We hold per-benchmark configuration constant across solvers (Appendix~\ref{app:config}, Table~\ref{tab:config}).
-MMLU subjects are optimized independently, giving 12 runs. Counting those, 20 optimization runs underlie
-\S\ref{sec:valtest}. A single GPT-4.1 Mini run costs between \$0.01 and \$4.80 in API fees.
+We report one selected result per (benchmark, solver) pair, using seed 0 and at most three rounds; pilot runs and rechecks
+exist and are not independent replications of this summary. MMLU subjects are optimized independently, giving 12 subject
+records and 20 records overall. Eighteen non-AIME records support the matched transfer analysis. Splits, token budgets,
+checker versions, and shipping rules differ in some solver pairs (Appendix~\ref{app:config}); this is not a controlled
+cross-model comparison. Logged GPT-4.1 Mini run costs range from \$0.01 to \$4.80, excluding development and rechecks.
 
 \section{Results}
 \label{sec:results}
@@ -391,8 +388,8 @@ with the recovered, regressed, and churn counts from \S\ref{sec:metric}; Figure~
 \toprule
 \rowcolor{midblue}Benchmark & Solver & Baseline & Final & $\Delta$ & Recovered & Regressed & Net & Churn (\% of $T$) \\
 \midrule
-AIME & GPT-4o-mini & 13.3 & 10.0 & $-3.3$ & 0 & 1 & $-1$ & 1 (3.3) \\
-AIME & GPT-4.1 Mini & 53.3 & 50.0 & $-3.3$ & 3 & 4 & $-1$ & 7 (23.3) \\
+\rowcolor{softgreen}AIME$^\S$ & GPT-4o-mini & 26.7 & 33.3 & $+6.7$ & 2 & 0 & $+2$ & 2 (6.7) \\
+\rowcolor{softgreen}AIME$^\S$ & GPT-4.1 Mini & 46.7 & 53.3 & $+6.7$ & 2 & 0 & $+2$ & 2 (6.7) \\
 \rowcolor{softgreen}PUPA$^\dagger$ & GPT-4o-mini & 68.5 & 79.9 & $+11.4$ & 7 & 3 & $+4$ & 10 (26.3) \\
 \rowcolor{softgreen}PUPA$^\dagger$ & GPT-4.1 Mini & 68.2 & 80.7 & $+12.5$ & 10 & 0 & $+10$ & 10 (26.3) \\
 IFBench & GPT-4o-mini & 47.6 & 45.2 & $-2.4$ & 2 & 3 & $-1$ & 5 (11.9) \\
@@ -403,142 +400,145 @@ Hearsay & GPT-4o-mini & 71.4 & 69.4 & $-2.0$ & 8 & 9 & $-1$ & 17 (34.7) \\
 \rowcolor{softgreen}MMLU (macro; items summed) & GPT-4.1 Mini & 81.0 & 83.3 & $+2.3$ & 17 & 8 & $+9$ & 25 (6.4) \\
 \bottomrule
 \end{tabular}}
-\caption{Sealed-test results (\%). Green rows: the test score rose. Recovered/Regressed/Net are item counts on $T$ between the seed prompt and the shipped
+\caption{Reported test results (\%). Green rows: the reported score rose. Recovered/Regressed/Net are item counts on $T$ between the seed prompt and the returned
 prompt. $^\dagger$PUPA scores are the composite; item counts use the pass/fail threshold 0.7. Items blocked by the provider's
 content filter are excluded from every denominator: PUPA evaluates 38 of 40 test items and MMLU professional law 63 of 66 (churn
 is a percentage of evaluated items; MMLU is over 393 items).
-$^\ddagger$GPT-4.1 Mini IFBench and PUPA runs, and the GPT-4.1 Mini AIME run, were executed after the fixes described in
-Appendix~\ref{app:bugs}; the GPT-4o-mini runs predate them. Per-subject MMLU numbers are in Appendix~\ref{app:mmlu}.}
+$^\ddagger$GPT-4.1 Mini IFBench and PUPA runs postdate harness fixes; their GPT-4o-mini counterparts predate them.
+$^\S$AIME follows the supplied summary, not a verified matched pair; GPT-4.1 Mini's two
+recoveries and zero regressions are author-confirmed. Per-subject MMLU numbers are in Appendix~\ref{app:mmlu}.}
 \label{tab:main}
 \end{table*}
 
 \begin{figure*}[!t]
 \centering
 \includegraphics[width=0.94\textwidth]{figures/fig_recovered_regressed.pdf}
-\caption{Recovered (green, up) and regressed (red, down) test items per run; diamonds mark the net change. MMLU counts are
-summed over its six subjects.}
+\caption{Observed recovered (green, up) and regressed (red, down) test items; diamonds mark net change.
+MMLU counts sum its six subjects. AIME$^*$ counts are summary-based (hatched); GPT-4.1 Mini's two recoveries and zero
+regressions are author-confirmed, with matching run IDs still unavailable.}
 \label{fig:rr}
 \end{figure*}
 
-GPT-4.1 Mini improves on four of five benchmarks (PUPA $+12.5$, IFBench $+23.8$, MMLU $+2.3$, Hearsay $+2.0$) and
-does not on AIME ($-3.3$). GPT-4o-mini improves on PUPA ($+11.4$) and MMLU ($+2.0$) and falls on AIME, IFBench, and Hearsay.
-The same mechanism and configuration help one solver and hurt the other on IFBench, so we do not describe the
-mechanism as uniformly beneficial.
+The supplied summary reports positive changes for GPT-4.1 Mini on all five benchmarks and for GPT-4o-mini on AIME, PUPA,
+and MMLU, with negative changes on IFBench and Hearsay. The independently matched non-AIME records support four positive
+benchmark-level changes for GPT-4.1 Mini and two for GPT-4o-mini. Opposite IFBench directions cannot be attributed to solver
+identity: harness versions, splits, and selection rules differ. Neither tally establishes general optimizer effectiveness.
 
 The more informative columns are the item counts. Aggregate changes of $\pm 2$ points on Hearsay correspond to a
 net change of a \emph{single} item (49-item test set, 2.0 points per item), yet 13 to 17 items (27 to 35\%) flipped in
-opposite directions to produce it. Likewise, the $-3.3$ on AIME with GPT-4.1 Mini is three recoveries against four
-regressions. Improvements are not free of churn either: IFBench with GPT-4.1 Mini gained 10 items net but moved 14.
-Treating a $\pm 2$ point change on a test set this small as a measured effect would be a mistake that
-only the item counts make visible.
-
-Two caveats apply to Table~\ref{tab:main}. The AIME test set is small and noisy: the unchanged seed prompt scored 10, 14, and 16 of 30
-in three successive runs, a spread larger than every AIME delta, so we treat the AIME rows as inconclusive. And the GPT-4.1 Mini runs
-on PUPA, IFBench, and AIME were measured after fixes to our own evaluation harness that the GPT-4o-mini runs predate, so the table
-should be compared within a solver, not across solvers (Appendix~\ref{app:noisebugs}).
+opposite directions to produce it. Improvements are not free of churn either: IFBench with GPT-4.1 Mini gained 10 items
+net but moved 14. MMLU with GPT-4o-mini moved 54 items for a net gain of eight. These are descriptions of scored outcome
+pairs, not estimates of a statistically established causal effect. Aggregate accuracy alone cannot recover this distinction.
 
 \subsection{Validation gains versus test gains}
 \label{sec:valtest}
-Because the shipped round is chosen by validation accuracy, we compare each run's validation gain (seed to shipped
-prompt, on $V$) with its sealed-test change (Table~\ref{tab:gap}; per-run values in
-Appendix~\ref{app:gap}, round-by-round trajectories in Appendix~\ref{app:rounds}).
+We compare seed-to-shipped validation and test accuracy for the 18 non-AIME records with matched provenance; 16 shipped
+an optimized prompt. PUPA uses thresholded accuracy on both sets here, not its headline composite. The current rule
+selects by validation accuracy, while eight of these shipped runs used the historical final-round rule. Table~\ref{tab:gap}
+summarizes this restricted population; Appendix~\ref{app:gap} gives the per-run pairs.
 
 \begin{table*}[!t]
 \centering
 \small
 \begin{tabular}{lccccrrr}
 \toprule
-\rowcolor{midblue}Subset of shipped runs & Runs & Val.\ $\uparrow$ & Test $\downarrow$ & $\overline{\Delta V}$ & $\overline{\Delta T}$ & Gap & Carried \\
+\rowcolor{midblue}Subset of shipped runs & Runs & Val.\ $\uparrow$ & \shortstack{Val.\ $\uparrow$\\test $\downarrow$} & $\overline{\Delta V}$ & $\overline{\Delta T}$ & Gap & Gain ratio \\
 \midrule
 \multicolumn{8}{l}{\textit{By benchmark}} \\
-Non-MMLU & 7 & 7 & 3 & $+15.0$ & $+7.8$ & 7.1 & 52\% \\
+Non-MMLU (AIME excluded) & 6 & 6 & 2 & $+16.5$ & $+9.7$ & 6.7 & 59\% \\
 MMLU subjects & 10 & 5 & 1 & $+2.9$ & $+2.6$ & 0.3 & 90\% \\
-\textbf{All shipped} & \textbf{17} & \textbf{12} & \textbf{4} & $\mathbf{+7.9}$ & $\mathbf{+4.8}$ & \textbf{3.1} & \textbf{60\%} \\
+\textbf{All eligible shipped} & \textbf{16} & \textbf{11} & \textbf{3} & $\mathbf{+8.0}$ & $\mathbf{+5.3}$ & \textbf{2.7} & \textbf{66\%} \\
 \midrule
 \multicolumn{8}{l}{\textit{By validation outcome}} \\
-Validation rose & 12 & 12 & 4 & $+11.8$ & $+5.5$ & 6.4 & 46\% \\
-\rowcolor{softgreen}\quad and test rose & 8 & 8 & 0 & $+12.5$ & $+9.3$ & 3.2 & 75\% \\
-\rowcolor{softred}\quad but test fell & 4 & 4 & 4 & $+10.5$ & $-2.3$ & 12.8 & none \\
+Validation rose & 11 & 11 & 3 & $+12.3$ & $+6.3$ & 6.1 & 51\% \\
+\rowcolor{softgreen}\quad and test rose & 8 & 8 & 0 & $+12.5$ & $+9.4$ & 3.1 & 75\% \\
+\rowcolor{softred}\quad but test fell & 3 & 3 & 3 & $+11.9$ & $-2.0$ & 13.9 & none \\
 \midrule
 \multicolumn{8}{l}{\textit{By shipping rule}} \\
 Final round shipped & 8 & 7 & 2 & $+7.8$ & $+2.5$ & 5.2 & 33\% \\
-Best validation round shipped & 9 & 5 & 2 & $+8.0$ & $+6.7$ & 1.2 & 85\% \\
+Best validation round shipped & 8 & 4 & 1 & $+8.2$ & $+8.0$ & 0.2 & 98\% \\
 \bottomrule
 \end{tabular}
-\caption{How much of the validation gain reached the sealed test set. Rows split the 17 runs that shipped an optimized prompt
-(3 of the 20 kept the seed). ``Val.\ $\uparrow$'': runs whose validation accuracy rose; ``Test $\downarrow$'': runs among them whose test
-score fell. $\overline{\Delta V}$ and $\overline{\Delta T}$ are mean changes from the seed prompt, in points; Gap is
-$\overline{\Delta V}-\overline{\Delta T}$ and Carried is $\overline{\Delta T}/\overline{\Delta V}$, both computed from unrounded values.
-The validation-outcome and shipping-rule splits overlap with the benchmark split and are not additive.}
+\caption{Validation-to-test comparison for 18 matched non-AIME records: 16 shipped an optimized prompt and two kept the seed.
+Of the 16 shipped runs, 11 improved validation; eight of those improved test accuracy and three declined.
+``Val.\ $\uparrow$'' counts validation improvements; ``Val.\ $\uparrow$, test $\downarrow$'' counts test declines among those improvements.
+$\overline{\Delta V}$ and $\overline{\Delta T}$ are equally weighted mean accuracy changes from seed to shipped prompt,
+in percentage points; Gap is $\overline{\Delta V}-\overline{\Delta T}$ and Gain ratio is
+$\overline{\Delta T}/\overline{\Delta V}$, computed from unrounded values. PUPA uses thresholded accuracy on both sets.
+The ratio compares aggregate gains on different item sets, not the fraction of validation recoveries that generalize.
+The row groups overlap and are not additive; MMLU subject records are not independent benchmark replications.}
 \label{tab:gap}
 \end{table*}
 
-Validation accuracy rose in 12 of the 17 shipped runs, by 11.8 points on average, but the test score rose by only 5.5, so less than
-half of the gain (46\%) carried over. In 4 of the 12 runs the test score fell, by 2.3 points on average despite a mean validation gain of
-10.5: AIME with GPT-4.1 Mini (validation $+6.2$, test $-3.3$), IFBench with GPT-4o-mini ($+15.8$, $-2.4$), Hearsay with GPT-4o-mini
-($+12.0$, $-2.0$), and MMLU computer security with GPT-4o-mini ($+8.0$, $-1.5$). The gap is concentrated in the non-MMLU runs,
-where about half of the gain carried over ($+15.0$ on validation, $+7.8$ on test); the MMLU subjects gained little on either side
-($+2.9$, $+2.6$) and half of them did not raise validation accuracy at all. This is the expected signature of tuning against a small
-set (14 to 32 items here, so one item is 3 to 7 points): $V$ feeds the optimizer from round 2 on (\S\ref{sec:method}), so it is a
-second tuning set rather than held-out data, and in the 11 runs that used best-of-rounds selection it also chooses the shipped
-round. Selection alone does not explain the gap: it is larger for the runs that shipped the final round (5.2 points) than for the runs
-that shipped their best validation round (1.2 points), although the two groups differ in solver and benchmark mix, so we draw no
-further conclusion. The pattern matches the adaptive overfitting described by~\citet{recht2019imagenet}, scaled down to a single
-run. Two shipped MMLU prompts also scored \emph{below} the seed on validation (college mathematics with GPT-4o-mini and computer
-security with GPT-4.1 Mini), because unconditional commits do not require beating the seed (Tables~\ref{tab:pergap}
-and~\ref{tab:mmlu}).
+Validation accuracy rose in 11 of 16 eligible shipped runs, with a mean validation gain of 12.3 points and a mean test
+gain of 6.3. Three of those 11 had lower test accuracy: IFBench with GPT-4o-mini ($+15.8$, $-2.4$), Hearsay with GPT-4o-mini
+($+12.0$, $-2.0$), and MMLU computer security with GPT-4o-mini ($+8.0$, $-1.5$). Each negative test delta is one item.
+The six shipped non-MMLU runs average $+16.5$ validation and $+9.7$ test points; MMLU subjects average $+2.9$ and $+2.6$.
+These means weight runs equally, not items, and combine heterogeneous tasks.
 
-\paragraph{Not memorization.}
-We checked the final prompt of every run (the seed itself when nothing shipped) for verbatim copying by counting 8-word sequences shared with any item in the
-train or test file of the corresponding dataset. In 17 of 20 runs the overlap is zero. The remaining three share one
+Since $V$ feeds the optimizer from round 2, it is a tuning set rather than held-out evidence. The gap is consistent with
+adaptive tuning, but noisy evaluation and differing item difficulty remain alternative explanations. Comparisons between
+shipping rules are confounded by benchmark and solver mix. Two shipped MMLU prompts scored below the seed on validation
+(college mathematics, GPT-4o-mini; computer security, GPT-4.1 Mini), because the seed is not a candidate in the current
+best-committed-round selection (Table~\ref{tab:pergap}).
+
+\paragraph{Limited copying check.}
+We checked final prompts in the archived run collection (the seed when nothing shipped) for shared 8-word sequences with
+dataset items. Of the 18 non-AIME prompts corresponding to matched results, 15 share none. The remaining three share one
 generic mathematical phrase (MMLU college mathematics, GPT-4o-mini) and a boilerplate pattern of True/False answer
-options (MMLU computer security, both solvers). Copying therefore does not explain the gap (Appendix~\ref{app:overlap}). The check cannot detect
-paraphrased scenarios, which is why the optimizer is explicitly told never to reuse the scenario of any shown item
-(Appendix~\ref{app:prompts}); we claim only the absence of verbatim copying.
+options (MMLU computer security, both solvers). This offers no affirmative evidence of item copying, but cannot exclude
+shorter copying, paraphrases, semantic memorization, or pretraining contamination. An anti-copying instruction is not a
+verification of compliance (Appendix~\ref{app:overlap}).
 
 \section{Discussion}
 \label{sec:discussion}
 \paragraph{What we recommend reporting.}
-For any prompt optimizer: (i) recovered, regressed, and churn counts on the sealed test set, not only the net change;
-(ii) the validation gain next to the test change, since selection inflates the former; and (iii) the score of the
-\emph{same} prompt under repeated evaluation, so readers can see the noise floor. All three are cheap given per-item logs.
+For any prompt optimizer: (i) report recovered, regressed, and churn counts on a common evaluable item set;
+(ii) show tuning and test changes in the same metric; (iii) repeat the unchanged prompt under a fixed harness to estimate
+evaluation variability; and (iv) publish run IDs, prompt hashes, configuration versions, denominators, and exclusions.
+Transition accounting is cheap given per-item logs; repeated controls require additional inference.
 
 \paragraph{What we do not show.}
 Our results do not isolate whether showing the optimizer its own recovered/regressed record improves optimization:
 we ran no matched ablation against failure-only feedback. The recovery/regression accounting is the contribution we
-can support; Reflective FDPO is the instrument that produced the evidence, and its behavior across solvers (IFBench helps
-GPT-4.1 Mini and hurts GPT-4o-mini) is reported as observed.
+can support; Reflective FDPO is the instrument that produced the evidence. A matched comparison must hold the seed,
+solver, item IDs, harness, candidate budget, and selection rule fixed, varying only transition feedback. No such experiment
+is reported, and summary-only AIME gains do not fill that gap.
 
 \section{Conclusion}
 Per-item recovery/regression tracking turns an aggregate accuracy delta into a record of what an optimization actually
-changed. On five benchmarks and two solvers it showed large churn behind small net changes and validation gains that
-overstate test gains by about a factor of two on the non-MMLU runs. We urge future prompt-optimization work to report
-these quantities, and we release all per-item traces to make that easy (Appendix~\ref{app:artifacts}).
+changed in a scored evaluation. Matched non-AIME records show large churn behind small net changes and three cases where
+validation improved while test accuracy declined. Supplied AIME gains remain provenance-limited. The evidence supports
+more informative reporting, not a claim of superior optimization: report transition counts, fixed-harness controls,
+matched tuning/test metrics, and auditable provenance together.
 
 \section*{Limitations}
 \label{sec:limitations}
 \paragraph{Scale and noise.} Each (benchmark, solver) pair has one seed and a test set of 30 to 66 items, so one item is worth
-1.5 to 3.3 points and most deltas are within noise; we report no confidence intervals. AIME, where repeated evaluations of
-one prompt differ by five items, is the clearest case.
+1.5 to 3.3 accuracy points. We report no confidence intervals or significance claims. Archived AIME rechecks changed
+harness settings and therefore do not isolate API noise; observed transitions may include stochastic variation.
 \paragraph{Not a state-of-the-art comparison.} We do not compare numerically against published systems, whose splits, solvers, and
 baselines differ (Table~\ref{tab:prior}), and we make no state-of-the-art claim. We also ran no ablation isolating the reflection signal.
 \paragraph{Fix-state asymmetry.} GPT-4.1 Mini runs on PUPA, IFBench, and AIME were measured after harness fixes that
-GPT-4o-mini runs predate. Nine GPT-4o-mini runs also shipped the final round rather than the best-validation round, because
-they predate that rule. Compare within a solver.
+GPT-4o-mini runs predate. Archived GPT-4o-mini runs on AIME, PUPA, IFBench, and six MMLU subjects used the historical
+final-round rule. Even within-solver effects require fixed-harness repeats; cross-solver effects are not identified.
 \paragraph{Development used test-time traces.} The harness decisions described in Appendix~\ref{app:noisebugs} (the AIME token cap, the PUPA judge limit, the IFBench checker) were made after inspecting traces that included
 test items. These changed how outputs are generated or scored, not which items the optimizer could see, but $T$ was not entirely
 outside the development loop for the harness.
-\paragraph{Mechanism.} The shipped prompt need not beat the seed on validation (2 of 17 did not). The optimizer sees flipped
+\paragraph{Mechanism.} The shipped prompt need not beat the seed on validation (two of 16 eligible shipped runs did not). The optimizer sees flipped
 validation items and is told that validation accuracy decides which round ships, so $V$ is not held out and the
 validation gains in Table~\ref{tab:gap} are optimistic by construction. Our IFBench verifier implements
 a subset (32 of 83) of the constraint types in IFEval and IFBench combined, and PUPA scores depend on an LLM judge.
 \paragraph{Models.} Only two closed-weight solvers and one optimizer/judge (GPT-5) were used, and API behavior can drift. We did not evaluate open-weight solvers.
 
 \section*{Ethical Considerations}
-All data are public benchmarks used as released. PUPA is built from public user--LLM conversations and contains
-personally identifiable information by design; we use it only to score privacy-preserving behavior. Released per-item
-traces contain item identifiers and outcomes, not item text, and raw model-call logs are not released. Optimization uses
-commercial APIs, which has monetary but small environmental cost at our scale (\$0.01 to \$4.80 per run).
+Data come from public benchmarks, with resplitting and an AIME gold-label correction disclosed above. PUPA contains
+personal information in public user--LLM conversations. Hosted solver and optimizer APIs may receive the original query
+during evaluation and feedback; redaction protects only the designated external model, not the entire pipeline.
+String-matched leakage misses paraphrased or inferred information and is not a privacy guarantee. The intended public
+traces contain item IDs and outcomes only; raw inputs, predictions, gold text, and model-call bodies must be omitted or
+sanitized before release (Appendix~\ref{app:artifacts}). Logged API fees do not establish environmental impact, which
+we did not measure.
 
 \FloatBarrier
 \bibliography{custom}
@@ -583,8 +583,11 @@ commercial APIs, which has monetary but small environmental cost at our scale (\
 \section{Design Decisions and Supporting Evidence}
 \label{app:design}
 Each decision below is stated with the alternative we rejected or did not test, the values from our saved runs, and what those
-values do and do not show. All statistics are computed from each run's \texttt{metrics.json} and \texttt{run.log} by scripts
-released with the traces. Table~\ref{tab:design} summarizes them. Where a decision was not ablated we say so; we ran no matched ablation for any of them.
+values do and do not show. These are development statistics from the \emph{archived} 20-run collection, including the older
+AIME runs, not a reanalysis of the supplied AIME summary. Their selection, token, and trajectory evidence does not
+validate the replacement AIME endpoints. Scripts read \texttt{metrics.json} and \texttt{run.log}; Table~\ref{tab:design}
+summarizes the historical collection. We ran no matched design ablations, so these are motivations, not evidence that
+the chosen design is superior.
 
 \begin{table*}[t]
 \centering
@@ -593,8 +596,8 @@ released with the traces. Table~\ref{tab:design} summarizes them. Where a decisi
 \toprule
 \rowcolor{midblue}\# & Decision & Alternative & Evidence from our runs \\
 \midrule
-\ref{app:d1} & Report churn alongside net change & Net accuracy change only & Churn is unbounded by the net change (Proposition~1). Hearsay, GPT-4o-mini: net $-1$, churn 17 of 49 items. \\
-\ref{app:d2} & Commit every round & Reject a round that regresses & A retired gated design rejected over 40\% of edits. 8 of 23 rounds lowered validation accuracy; Hearsay with GPT-4o-mini fell 24 points in round 1 and shipped round 3. \\
+\ref{app:d1} & Report churn alongside net change & Net accuracy change only & Net change does not determine churn (Proposition~1). Hearsay, GPT-4o-mini: net $-1$, churn 17 of 49 items. \\
+\ref{app:d2} & Commit every round & Reject a round that regresses & A retired gated design rejected over 40\% of edits. Four of 17 matched non-MMLU rounds lowered validation accuracy; Hearsay with GPT-4o-mini fell 24 points in round 1 and shipped round 3. \\
 \ref{app:d3} & Ship the best-validation round; break ties by mining accuracy & Ship the last round & The last round is the unique best in 3 of 11 runs. Selection raised validation accuracy by 4.0 to 13.6 points in 4 of 9 runs. Validation ties in 7 of 18 runs. \\
 \ref{app:d4} & Return the whole prompt in five sections & Substring edits; judge-routed section edits & 0 of 53 optimizer calls failed to parse or omitted a section. Task Details was edited in 50 of 52 committed rounds, Output Format in 11. \\
 \ref{app:d5} & Show every failure and success, uncapped & Sample items & Optimizer input is 4.6K to 24K tokens per call, and 166K to 195K on AIME. \\
@@ -624,13 +627,13 @@ one that changed a single item.
 \subsection{Committing every round}
 \label{app:d2}
 Two retired designs used a regression gate (Appendix~\ref{app:history}): one rejected over 40\% of proposed edits with no improvement
-trend, and one rejected net-positive trades outright. In the final runs, 8 of the 23 committed rounds in Table~\ref{tab:rounds} lowered
+trend, and one rejected net-positive trades outright. Four of the 17 matched non-MMLU committed rounds in Table~\ref{tab:rounds} lowered
 validation accuracy relative to the previous round. The clearest case is Hearsay with GPT-4o-mini, where round 1 lowered validation
 accuracy from 68.0 to 44.0 (seven items regressed) and rounds 2 and 3 reached 72.0 and 80.0, the run's best. A gate that rejected
 round 1 would have discarded the lineage that produced the shipped prompt, although we cannot say what the later rounds would have
 produced from the seed.
 \finding Unconditional commits keep every lineage reachable. The cost is that the shipped prompt can score below the seed on
-validation: 2 of 17 shipped runs did.
+validation: two of the 16 eligible non-AIME shipped runs did.
 
 \subsection{Selection rule}
 \label{app:d3}
@@ -694,9 +697,9 @@ corresponds to independent re-evaluations.
 \label{tab:inflation}
 \end{table}
 
-\finding Selection among noisy rounds alone yields a validation gain of 3.8 to 4.7 points at the observed churn, about a quarter
-to a third of the +15.0 mean gain on the non-MMLU runs. The remainder is consistent with the optimizer fitting $V$ or with real improvement, and
-our data cannot separate the two because no run held $V$ out. The simulation assumes $p=0.7$ and does not model fitting.
+\finding Under this illustrative model, selecting among equal-quality noisy candidates yields an expected validation gain
+of 3.8 to 4.7 points. This is not a decomposition of the measured gap: $p=0.7$, independent item resampling, and the
+chosen churn calibration are assumptions, and the simulation does not model fitting or dataset shift.
 
 \subsection{Number of rounds}
 \label{app:d7}
@@ -765,7 +768,7 @@ rather than percentages alone and treats the AIME results as inconclusive. Secon
 as an estimate of generalization, whether it is the mining set (phase 3) or, as we show in \S\ref{sec:valtest}, the validation set
 itself. Third, an optimizer that is allowed to ship a regression will do so on near-ceiling tasks (phase 4). We responded with a skip
 threshold and unconditional commits plus best-validation selection, not with a gate against the seed, so the shipped prompt can still
-score below the seed on validation (2 of 17 shipped runs); the paper reports this rather than hiding it.
+score below the seed on validation (two of 16 eligible non-AIME shipped runs); the paper reports this rather than hiding it.
 
 \subsection{The leaked-test diagnostic}
 \label{app:oracle}
@@ -799,8 +802,9 @@ and 95.3\% is the figure from the saved final evaluation. The exposure added abo
 1.6 points. This is a single run with a different prompt trajectory, so the size of the difference is indicative only. It does not
 show that any published result is inflated, and we make no such claim; it shows that on a 64-item task, exposing the test items to an
 automated optimizer for two rounds is enough to produce a gain far larger than any we report from a sealed test set. That is why every
-number in the main text comes from a test set that is scored exactly twice and never mined, and why this result is excluded from all
-tables except Table~\ref{tab:oracle}. The run is stored separately, under a directory and log warning that mark it invalid as a result.
+matched non-AIME result uses test items that were not optimizer feedback within its run. This is not development-level
+test isolation, and the supplied AIME pairs have separate provenance limitations. The diagnostic is excluded from all
+headline comparisons and stored separately with a warning marking it invalid as a held-out result.
 
 \section{Mechanism History}
 \label{app:history}
@@ -818,12 +822,15 @@ until an explicit anti-copying instruction was added, which the final optimizer 
 
 \subsection{Evaluation noise}
 \label{app:noise}
-Item-level traces show how much of a score is noise. On IFBench, two GPT-4o-mini runs with identical configuration ended at the same
+Item-level traces reveal variation even when aggregate scores agree. On IFBench, two GPT-4o-mini runs with identical configuration ended at the same
 aggregate (47.6 $\rightarrow$ 45.2) but with different item sets: 2 recovered/3 regressed in one, 0/1 in the other. On AIME with GPT-4.1
 Mini, the unchanged seed prompt scored 10, 14, and 16 of 30 in three successive runs (which also changed the generation-token cap and
 fixed one gold label), and the final shipped prompt scored 15, 11, and 14 of 30 when evaluated three times on the same test set. A
-spread of five items (16.7 points) across evaluations of a single fixed prompt exceeds every AIME delta in Table~\ref{tab:main}, so we
-regard the AIME results as inconclusive, and we report the saved run (53.3 $\rightarrow$ 50.0) rather than a hand-selected baseline.
+spread of five items (16.7 points) exceeds the supplied AIME deltas, but changing token caps and a gold label confounds
+the baseline comparison. The archived matched GPT-4.1 Mini run is 53.3 $\rightarrow$ 50.0; it is not the 46.7
+$\rightarrow$ 53.3 pair selected from the summary for Table~\ref{tab:main}. These rechecks do not verify that pair or
+measure a fixed-harness noise floor. Proper controls must repeat seed and candidate with identical caps, labels,
+item IDs, model versions, and scoring settings.
 
 \subsection{What the tracking caught in our own harness}
 \label{app:bugs}
@@ -857,14 +864,15 @@ mining/validation split as in Table~\ref{tab:setup}. Per-benchmark settings (GPT
 \midrule
 Hearsay & 0.5 & stratified & default & 0.95 \\
 MMLU & 0.5 & balanced & default & 0.95 \\
-IFBench & 0.5 & stratified & default & 0.95 \\
+IFBench & 0.35 & stratified & default & 0.95 \\
 AIME & 0.35 & fixed by year & 16000 & 0.95 \\
 PUPA & 0.5 & stratified & 2048 & never \\
 \bottomrule
 \end{tabular}}
 \caption{Per-benchmark settings (GPT-4.1 Mini runs). ``Skip'' disables optimization when the seed already scores at least
 that on $M$. A round in which the optimizer proposes no change is skipped (once: IFBench, GPT-4.1 Mini, round 2).
-Seed prompts are in the released \texttt{prompts/} directory.}
+The IFBench 26/14 allocation evaluates 25 mining items in the saved run. AIME settings refer to the archived v3 run,
+not verified provenance for the supplied AIME summary. Seed prompts are in \texttt{prompts/}.}
 \label{tab:config}
 \end{table}
 
@@ -878,6 +886,8 @@ reasoning before that line.
 \item \textbf{AIME.} The solver writes the final integer (0 to 999) on its own line as \texttt{\#\#\#\# <number>}; scoring is exact match.
 \item \textbf{IFBench.} Programmatic verifiers check each instruction in an item; an item counts as correct only if
 every instruction is satisfied. Our verifier implements 32 of the 83 constraint types in the two benchmarks combined.
+Results are for the supported subset under our checker, not certified full-benchmark official accuracy; unsupported
+constraints and provider-blocked items require explicit exclusion records.
 \item \textbf{PUPA.} A three-step pipeline. (1) The solver, using the optimized prompt, rewrites the private user query into a
 redacted request. (2) A fixed external model (GPT-4.1) answers the redacted request. (3) The solver, using a fixed synthesis
 instruction, combines the external answer with the original query into the final response. Leakage is the fraction of annotated
@@ -887,6 +897,8 @@ Appendix~\ref{app:bugs}). The composite is $(\text{quality}+(1-\text{leakage}))/
 step-1 prompt is optimized.
 \item \textbf{Content filter.} Items whose call is refused by the provider's content filter are excluded from the denominator,
 not scored as wrong: 2 of 40 PUPA test items and 3 of 66 MMLU professional-law test items, identically for both solvers.
+Before/after transition accounting requires common evaluated IDs, not just equal denominator sizes. Excluding refusals
+conditions the result on answerability and may bias estimates; no all-items refusal-as-failure sensitivity analysis is reported.
 \end{itemize}
 
 \section{Optimizer Instructions and Seed Prompt}
@@ -911,7 +923,8 @@ NOT so you can turn them into illustrative examples.''
 \end{quote}
 The quoted shipping rule is from the current version. The nine runs that shipped the final round (\S\ref{sec:method}) used an
 earlier version that instead said there is no best-round selection and that the last round ships; validation accuracy was reported
-to the optimizer as a diagnostic only. In every reported run the optimizer saw flipped validation items in full.
+to the optimizer as a diagnostic only. In the archived optimized runs, flipped validation items were shown in full
+from the next rewrite onward; this does not establish a mapping for the replacement AIME summary.
 
 \paragraph{Effect report.} From round 2 the user message contains: the previous text of every section the optimizer changed;
 every mining item its rewrite recovered (question and gold answer); every mining item it regressed (question, the solver's new
@@ -921,6 +934,9 @@ two lists for validation items. It ends with an instruction to diagnose causes o
 \paragraph{Full optimizer system prompt.} The text below is the template used for every reported run that shipped under the
 best-validation rule; \texttt{\{task\_description\}} and \texttt{\{max\_rounds\}} are filled per benchmark and run. Line breaks
 are reflowed and the source's ASCII arrows are typeset as $\rightarrow$; the wording is unchanged.
+Assertions about a solver's ``hidden scratchpad'' and reliable reasoning gains below are instructions in the experimental
+template, not verified architectural facts or conclusions of this paper. Requests to diagnose causes do not turn
+observational transitions into causal evidence.
 
 \begin{promptbox}[title={\textbf{Optimizer system prompt} (reflect mode, current version)}]{softblue}
 You are working with an expert prompt engineer to help a smaller LLM (the ``solver'') solve \texttt{\{task\_description\}} more
@@ -1166,8 +1182,6 @@ optimized prompt for college mathematics or high school biology because the seed
 \toprule
 \rowcolor{midblue}Run & Solver & Shipped & Val.\ base $\rightarrow$ shipped & $\Delta V$ & Test base $\rightarrow$ final & $\Delta T$ \\
 \midrule
-AIME & 4o-mini & no & 15.6 $\rightarrow$ 15.6 & 0.0 & 13.3 $\rightarrow$ 10.0 & $-3.3$ \\
-AIME & 4.1 Mini & yes & 62.5 $\rightarrow$ 68.8 & $+6.2$ & 53.3 $\rightarrow$ 50.0 & $-3.3$ \\
 \rowcolor{softgreen}PUPA$^\dagger$ & 4o-mini & yes & 40.0 $\rightarrow$ 53.3 & $+13.3$ & 55.3 $\rightarrow$ 65.8 & $+10.5$ \\
 \rowcolor{softgreen}PUPA$^\dagger$ & 4.1 Mini & yes & 46.7 $\rightarrow$ 70.0 & $+23.3$ & 44.7 $\rightarrow$ 71.1 & $+26.3$ \\
 IFBench & 4o-mini & yes & 36.8 $\rightarrow$ 52.6 & $+15.8$ & 47.6 $\rightarrow$ 45.2 & $-2.4$ \\
@@ -1188,18 +1202,19 @@ MMLU high sch.\ biol. & 4.1 Mini & no & 96.0 $\rightarrow$ 96.0 & 0.0 & 87.9 $\r
 \rowcolor{softgreen}MMLU prof.\ law & 4.1 Mini & yes & 81.8 $\rightarrow$ 81.8 & 0.0 & 55.6 $\rightarrow$ 61.9 & $+6.3$ \\
 \bottomrule
 \end{tabular}}
-\caption{Validation and sealed-test accuracy (\%) for all 20 runs. Green rows: the test score rose. $^\dagger$PUPA rows use pass/fail accuracy (threshold 0.7), the
-quantity the optimizer selects on, not the composite in Table~\ref{tab:main}. The AIME GPT-4.1 Mini baseline is the saved run
-(see Appendix~\ref{app:noise}). The GPT-4o-mini runs on AIME, PUPA, IFBench, and all six MMLU subjects shipped the final round; every
-other run shipped its best-validation round, so ``shipped'' validation accuracy equals the maximum over rounds only for the latter.}
+\caption{Matched validation and test accuracy (\%) for 18 non-AIME records. Green rows: the test score rose.
+$^\dagger$PUPA uses thresholded accuracy (0.7), not the composite in Table~\ref{tab:main}. GPT-4o-mini PUPA, IFBench,
+and six MMLU runs used final-round shipping; other optimized records used best-validation shipping. AIME is excluded:
+archived validation trajectories cannot be paired with the supplied replacement test scores.}
 \label{tab:pergap}
 \end{table*}
 
 \section{Round-by-Round Trajectories}
 \label{app:rounds}
-Table~\ref{tab:rounds} lists, for the eight non-MMLU runs, mining and validation accuracy after each round and the
+Table~\ref{tab:rounds} lists, for the six matched non-MMLU runs, mining and validation accuracy after each round and the
 recovered/regressed counts against the previous round on $M$ and on $V$ (round 0 is the seed prompt). Stars mark the shipped round;
-daggers mark the final round shipped by the older rule. No prompt shipped for AIME with GPT-4o-mini.
+daggers mark the final round shipped by the older rule. Archived AIME trajectories are omitted because they do not
+establish a pairing with the replacement headline scores.
 
 \begin{table*}[t]
 \centering
@@ -1208,16 +1223,6 @@ daggers mark the final round shipped by the older rule. No prompt shipped for AI
 \begin{tabular}{llccccccl}
 \toprule
 \rowcolor{midblue}Benchmark & Solver & Round & $M$ acc. & $V$ acc. & $M$ rec./reg. & $V$ rec./reg. & Sections changed \\
-\midrule
-AIME & 4o-mini & 0 & 3.4 & 15.6 & -- & -- & -- \\
- & & 1 & 10.3 & 12.5 & 4/0 & 1/2 & TD \\
- & & 2 & 5.2 & 15.6 & 0/3 & 1/0 & TD \\
- & & 3 & 8.6 & 12.5 & 2/0 & 0/1 & TD \\
-\midrule
-AIME & 4.1 Mini & 0 & 46.6 & 62.5 & -- & -- & -- \\
- & & 1$^*$ & 51.7 & 68.8 & 9/6 & 5/3 & Con, TD \\
- & & 2 & 48.3 & 65.6 & 6/8 & 2/3 & TD \\
- & & 3 & 46.6 & 59.4 & 6/7 & 3/5 & TD \\
 \midrule
 PUPA & 4o-mini & 0 & 69.0 & 40.0 & -- & -- & -- \\
  & & 1 & 79.3 & 56.7 & 6/3 & 5/0 & Con, Ctx, TD \\
@@ -1256,19 +1261,17 @@ ships on its higher mining accuracy.}
 \label{tab:rounds}
 \end{table*}
 
-Across the 23 committed rounds in Table~\ref{tab:rounds}, 10 regressed more mining items than they recovered and 8 lowered
-validation accuracy relative to the previous round. Round 1, which has no effect report, regressed more than it recovered in
-1 of 8 runs; rounds 2 and 3, which do, did so in 9 of 15 committed rounds. This comparison is confounded: later rounds start
-from prompts with fewer failures left to recover and more correct items at risk, and validation feeds the optimizer. We do not read it as evidence about the effect
-report. It does show that single rounds often trade items rather than add them. Hearsay with GPT-4o-mini lost 24 validation points
+Across the 17 committed rounds in Table~\ref{tab:rounds}, seven regressed more mining items than they recovered and four
+lowered validation accuracy relative to the previous round. Later rounds start from different prompts and failure sets,
+so comparisons with round 1 are not ablations of reflection. Hearsay with GPT-4o-mini lost 24 validation points
 in round 1 (68.0 to 44.0, seven items regressed) and regained them in rounds 2 and 3, which is why every round is committed and
 the shipped round is chosen afterward.
 
 \section{Verbatim-Overlap Check}
 \label{app:overlap}
 For each run we lowercase the final prompt (the seed when nothing shipped), keep alphanumeric tokens, and intersect its word
-8-grams with all 8-grams in the train and test files of the dataset. Seventeen runs share none, with 25 to 906 distinct 8-grams
-in the prompt. Three share some (Table~\ref{tab:overlap}):
+8-grams with all 8-grams in the train and test files of the dataset. Fifteen of the 18 matched non-AIME prompts share none.
+Three share some (Table~\ref{tab:overlap}); checks on archived AIME prompts do not validate the replacement summary:
 
 \begin{table}[h]
 \centering
@@ -1297,17 +1300,22 @@ reuse the scenario of any shown item.
 \centering
 \includegraphics[width=0.94\textwidth]{figures/fig_dumbbell.pdf}
 \caption{Baseline (hollow) to final (filled) test score for every benchmark and solver; numbers are changes in points, as in
-Table~\ref{tab:main}.}
+Table~\ref{tab:main}. AIME$^*$ endpoints are supplied summary values with unresolved pairing, not verified matched effects.}
 \label{fig:dumbbell}
 \end{figure*}
 
-\section{Released Artifacts}
+\section{Artifact Provenance and Release Plan}
 \label{app:artifacts}
-Each run directory contains: \texttt{config.json} (all settings); \texttt{metrics.json} (baseline and final test scores,
-per-round recovered/regressed item identifiers on $M$ and counts on $V$, test-set recovered/regressed item identifiers, and
-token and cost totals); \texttt{eval\_log.csv} (prediction, gold answer, and correctness for every evaluated item);
-\texttt{ledger.csv} (tokens and cost per model call); and \texttt{prompt\_baseline.md}, \texttt{prompt\_current.md}, and
-\texttt{registry.json} (the prompt of every round). Raw request and response bodies are not released. The analysis scripts that produce
-the validation/test, overlap, and trajectory tables from these files are included.
+The working repository stores configurations, \texttt{metrics.json}, evaluation logs, token/cost ledgers, baseline/current
+prompts, and round registries. These files are not automatically a privacy-safe anonymous release: evaluation logs
+include predictions and gold text, and prompts can contain examples. The intended review bundle is limited to sanitized
+configuration and prompt files, per-item IDs/outcomes, transition counts, costs, and analysis scripts; publication of an
+audited anonymous archive is not verified here.
+
+\texttt{reported\_results.json} records the supplied headline values, denominators, author-confirmed transition counts, and
+provenance status. \texttt{val\_test\_gap.json} preserves archived matched accuracy records; analysis excludes its AIME
+entries rather than replacing their test scores while retaining unrelated validation scores. The overlap and design
+artifacts describe their archived prompt collection. Matching run IDs, prompt hashes, and per-item logs for the two
+supplied AIME gains are still required before those gains can support a reproducibility claim.
 
 \end{document}

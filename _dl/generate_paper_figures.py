@@ -1,12 +1,11 @@
-"""Generate paper-ready figures from RESULTS.md / comparison_analysis.md
-numbers (hardcoded here, matching those two files exactly -- the project's
-established convention, see _dl/extract_confusion.py for precedent).
+"""Generate artifact figures using the shared author-confirmed result manifest.
 
 Outputs PNG (300dpi) + PDF (vector, for \\includegraphics) into
 Paper_COLING/Artifacts/figures/.
 """
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -45,18 +44,12 @@ def save(fig, name: str) -> None:
 # ---------------------------------------------------------------------------
 # Figure 1: baseline -> final accuracy, dumbbell plot, all 5 benchmarks x 2 models
 # ---------------------------------------------------------------------------
-results = [
-    ("AIME",             "GPT-4o-mini",  13.3, 10.0),
-    ("AIME",             "GPT-4.1 Mini", 46.7, 53.3),
-    ("PUPA (composite)", "GPT-4o-mini",  68.5, 79.9),
-    ("PUPA (composite)", "GPT-4.1 Mini", 68.2, 80.7),
-    ("IFBench",          "GPT-4o-mini",  47.6, 45.2),
-    ("IFBench",          "GPT-4.1 Mini", 42.9, 66.7),
-    ("Hearsay",          "GPT-4o-mini",  71.4, 69.4),
-    ("Hearsay",          "GPT-4.1 Mini", 71.4, 73.5),
-    ("MMLU (macro)",     "GPT-4o-mini",  75.1, 77.2),
-    ("MMLU (macro)",     "GPT-4.1 Mini", 81.0, 83.3),
-]
+source = json.loads((OUT.parent / "reported_results.json").read_text(encoding="utf-8"))
+benchmark_labels = {"PUPA": "PUPA (composite)", "MMLU": "MMLU (macro)"}
+results = [(benchmark_labels.get(row["benchmark"], row["benchmark"]), row["solver"],
+            row["baseline_pct"], row["final_pct"]) for row in source["results"]]
+deltas = {(benchmark_labels.get(row["benchmark"], row["benchmark"]), row["solver"]):
+          row["delta_pp"] for row in source["results"]}
 
 fig, ax = plt.subplots(figsize=(6.6, 5.0))
 benchmarks = ["AIME", "PUPA (composite)", "IFBench", "Hearsay", "MMLU (macro)"]
@@ -78,7 +71,7 @@ for bench, model, base, final in results:
                s=55, zorder=3)
     ax.scatter([final], [yy], color=color, edgecolor=color, linewidth=1.2,
                s=55, zorder=3)
-    delta = final - base
+    delta = deltas[(bench, model)]
     ax.annotate(f"{delta:+.1f}", (max(base, final) + 2.5, yy),
                 va="center", fontsize=8, color=line_color, fontweight="bold")
 
@@ -110,18 +103,9 @@ save(fig, "fig1_cross_benchmark_accuracy")
 # Figure 2: recovered vs regressed (test), diverging bars, 5 benchmarks x 2 models
 # MMLU is the sum across its 6 subjects (matches RESULTS.md's "Macro" framing).
 # ---------------------------------------------------------------------------
-confusion = [
-    ("AIME -- GPT-4o-mini",        0,  1, -1),
-    ("AIME -- GPT-4.1 Mini",    None, None,  2),  # item split not verifiable, see footnote
-    ("PUPA -- GPT-4o-mini",        7,  3,  4),
-    ("PUPA -- GPT-4.1 Mini",      10,  0, 10),
-    ("IFBench -- GPT-4o-mini",     2,  3, -1),
-    ("IFBench -- GPT-4.1 Mini",   12,  2, 10),
-    ("Hearsay -- GPT-4o-mini",     8,  9, -1),
-    ("Hearsay -- GPT-4.1 Mini",    7,  6,  1),
-    ("MMLU (sum) -- GPT-4o-mini", 31, 23,  8),
-    ("MMLU (sum) -- GPT-4.1 Mini", 17,  8,  9),
-]
+confusion = [(f"{'MMLU (sum)' if row['benchmark'] == 'MMLU' else row['benchmark']} -- {row['solver']}",
+              row["recovered"], row["regressed"], row["recovered"] - row["regressed"])
+             for row in source["results"]]
 
 fig, ax = plt.subplots(figsize=(6.6, 5.2))
 labels = [c[0] for c in confusion]

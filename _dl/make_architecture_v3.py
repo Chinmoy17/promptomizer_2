@@ -10,9 +10,8 @@ OUT = Path(__file__).resolve().parent.parent / "Paper_COLING" / "figures"
 OUT.mkdir(parents=True, exist_ok=True)
 
 plt.rcParams.update({
-    "font.family": ["Segoe UI", "Arial", "DejaVu Sans"],
-    "mathtext.fontset": "custom", "mathtext.rm": "Segoe UI", "mathtext.it": "Segoe UI:italic",
-    "mathtext.bf": "Segoe UI:bold", "pdf.fonttype": 42, "savefig.dpi": 300,
+    "font.family": ["Times New Roman", "DejaVu Serif"],
+    "mathtext.fontset": "dejavuserif", "pdf.fonttype": 42, "savefig.dpi": 300,
 })
 W, H = 7.4, 3.62
 fig = plt.figure(figsize=(W, H))
@@ -176,7 +175,7 @@ Y0, Y1 = 12, 72
 panel(0.5, 36, Y0, Y1, 1, "Inputs", BLUE)
 item(2.5, 23.5, 51, 65, ic_doc, "Seed prompt $p_0$", "five fixed sections")
 item(2.5, 23.5, 33, 47, ic_db, "Mining set $M$", "failures shown\nto the optimizer")
-item(2.5, 23.5, 15, 29, ic_db, "Validation set $V$", "selects best round")
+item(2.5, 23.5, 15, 29, ic_db, "Validation set $V$", "feedback + selection")
 rbox(25.2, 34.3, 15, 65, dict(fill="#CFE3F5", edge="#1F5F99"), lw=1.5)
 ic_lock(29.75, 56, "#1F5F99", 6.0)
 put(29.75, 47.0, "Sealed", 6.3, maxw=7.6, weight="bold")
@@ -233,7 +232,7 @@ for a, b in ((36, 38.5), (58, 60.5), (112, 114.5), (130, 132.5)):
 ax.plot([29.75, 29.75, 139.9], [15, 9.4, 9.4], color="#1F5F99", lw=1.0, ls=(0, (4, 2.2)), zorder=4)
 ax.plot([139.9, 139.9], [9.4, 11.0], color="#1F5F99", lw=1.0, ls=(0, (4, 2.2)), zorder=4)
 arrow((139.9, 10.0), (139.9, 12), color="#1F5F99", lw=1.0)
-put(85, 6.6, "$T$ is measured with $p_0$ and $p^*$ only; it never influences choosing, editing, or stopping",
+put(85, 6.6, "Current run-level protocol; historical shipping rules and test-informed harness development differ (see text)",
     5.4, color="#1F5F99", style="italic")
 
 # legend --------------------------------------------------------------------------------------

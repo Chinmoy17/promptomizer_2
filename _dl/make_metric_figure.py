@@ -7,8 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
 OUT = Path(__file__).resolve().parent.parent / "Paper_COLING" / "figures"
-plt.rcParams.update({"font.family": ["Segoe UI", "Arial", "DejaVu Sans"], "mathtext.fontset": "custom",
-                     "mathtext.rm": "Segoe UI", "mathtext.it": "Segoe UI:italic", "mathtext.bf": "Segoe UI:bold",
+plt.rcParams.update({"font.family": ["Times New Roman", "DejaVu Serif"], "mathtext.fontset": "dejavuserif",
                      "pdf.fonttype": 42, "savefig.dpi": 300})
 fig = plt.figure(figsize=(3.2, 2.55))
 ax = fig.add_axes([0, 0, 1, 1])
@@ -24,6 +23,8 @@ REG_F, REG_E = "#FBDAD7", "#D9534F"
 
 # (correct under p, correct under q) for ten items
 items = [(1, 1), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (0, 1)]
+assert sum(before == 0 and after == 1 for before, after in items) == 3
+assert sum(before == 1 and after == 0 for before, after in items) == 2
 S, GAP, X0 = 7.0, 1.3, 23.0
 YP, YQ = 62, 41
 
@@ -31,7 +32,7 @@ YP, YQ = 62, 41
 def square(x, y, ok, fill, edge):
     ax.add_patch(FancyBboxPatch((x, y), S, S, boxstyle="round,pad=0,rounding_size=1.2", fc=fill, ec=edge, lw=1.0, zorder=2))
     ax.text(x + S / 2, y + S / 2 - 0.2, "\u2713" if ok else "\u2717", ha="center", va="center", fontsize=6.5,
-            color=edge if ok else "#8794A1", fontweight="bold", zorder=3)
+            color=edge if ok else "#8794A1", fontweight="bold", fontfamily="DejaVu Sans", zorder=3)
 
 
 ax.text(X0, 78.5, "ten test items", fontsize=5.4, color=GREY, ha="left", va="center", style="italic")

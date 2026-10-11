@@ -6,15 +6,16 @@
 | Model | Baseline | Final | Δ | Shipped round | Recovered / Regressed (test) |
 |---|---|---|---|---|---|
 | GPT-4o-mini | 0.267 (8/30) | 0.333 (10/30) | +6.7pp | shipped (older "last round" rule, 3 rounds) | 2 / 0 (net +2) |
-| GPT-4.1 Mini | 0.467 (14/30) | 0.533 (16/30) | +6.7pp | round 1 | net +2$^*$ |
+| GPT-4.1 Mini | 0.467 (14/30) | 0.533 (16/30) | +6.7pp | round 1 | 2 / 0 (net +2)$^*$ |
 
 $^*$ **Provenance of the GPT-4.1 Mini row.** The saved `v3` run (`reflect_aime_gpt41mini_v3`)
 reads 0.533 (16/30) -> 0.500 (15/30), 3 recovered / 4 regressed. The values 14/30 and 16/30 in
 the row above are both *seed-prompt* scores from different saved runs (`v2` seed 14/30, `v3`
 seed 16/30); the shipped prompt scored 15/30 (`v3`) and, on two eval-only rechecks at a
 24000-token cap, 11/30 and 14/30. No saved run contains a 14/30 -> 16/30 baseline/final pair,
-so this row is **not backed by a saved before/after artifact** and the item-level split is
-unknown (net +2 is only implied by the accuracies).
+so this row is **not backed by a saved before/after artifact**. The author has confirmed
+the reported item-level split as **2 recovered / 0 regressed (net +2)**; matching run IDs
+and paired item logs are still needed for independent artifact verification.
 
 
 

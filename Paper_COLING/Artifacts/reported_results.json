@@ -1,0 +1,17 @@
+{
+  "source": "Paper_COLING/Artifacts/RESULTS.md, displayed rows selected by the author",
+  "validation_excluded_prefixes": ["AIME"],
+  "provenance_note": "The author confirms 2 recoveries and 0 regressions for GPT-4.1 Mini AIME. AIME summary endpoints conflict with archived runs; matching run IDs are not supplied. AIME remains excluded from matched validation-transfer analysis.",
+  "results": [
+    {"benchmark": "AIME", "solver": "GPT-4o-mini", "baseline_pct": 26.6666666667, "final_pct": 33.3333333333, "delta_pp": 6.7, "recovered": 2, "regressed": 0, "n_test": 30, "provenance": "summary_only"},
+    {"benchmark": "AIME", "solver": "GPT-4.1 Mini", "baseline_pct": 46.6666666667, "final_pct": 53.3333333333, "delta_pp": 6.7, "recovered": 2, "regressed": 0, "n_test": 30, "provenance": "author_confirmed_summary"},
+    {"benchmark": "PUPA", "solver": "GPT-4o-mini", "baseline_pct": 68.5, "final_pct": 79.9, "delta_pp": 11.4, "recovered": 7, "regressed": 3, "n_test": 38, "provenance": "saved", "run_group": "pupa_pilot_v1"},
+    {"benchmark": "PUPA", "solver": "GPT-4.1 Mini", "baseline_pct": 68.2, "final_pct": 80.7, "delta_pp": 12.5, "recovered": 10, "regressed": 0, "n_test": 38, "provenance": "saved", "run_group": "pupa_pilot_gpt41mini_v2"},
+    {"benchmark": "IFBench", "solver": "GPT-4o-mini", "baseline_pct": 47.6, "final_pct": 45.2, "delta_pp": -2.4, "recovered": 2, "regressed": 3, "n_test": 42, "provenance": "saved", "run_group": "reflect_ifbench_v1"},
+    {"benchmark": "IFBench", "solver": "GPT-4.1 Mini", "baseline_pct": 42.9, "final_pct": 66.7, "delta_pp": 23.8, "recovered": 12, "regressed": 2, "n_test": 42, "provenance": "saved", "run_group": "reflect_ifbench_gpt41mini_v2"},
+    {"benchmark": "Hearsay", "solver": "GPT-4o-mini", "baseline_pct": 71.4, "final_pct": 69.4, "delta_pp": -2.0, "recovered": 8, "regressed": 9, "n_test": 49, "provenance": "saved", "run_group": "reflect_hearsay_gpt4omini_v1"},
+    {"benchmark": "Hearsay", "solver": "GPT-4.1 Mini", "baseline_pct": 71.4, "final_pct": 73.5, "delta_pp": 2.0, "recovered": 7, "regressed": 6, "n_test": 49, "provenance": "saved", "run_group": "reflect_hearsay_gpt41mini_v1"},
+    {"benchmark": "MMLU", "solver": "GPT-4o-mini", "baseline_pct": 75.1, "final_pct": 77.2, "delta_pp": 2.0, "recovered": 31, "regressed": 23, "n_test": 393, "provenance": "saved", "run_group": "mmlu_reflect_*"},
+    {"benchmark": "MMLU", "solver": "GPT-4.1 Mini", "baseline_pct": 81.0, "final_pct": 83.3, "delta_pp": 2.3, "recovered": 17, "regressed": 8, "n_test": 393, "provenance": "saved", "run_group": "mmlu_reflect_gpt41mini_*"}
+  ]
+}
