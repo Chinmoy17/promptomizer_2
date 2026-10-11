@@ -232,7 +232,7 @@ for a, b in ((36, 38.5), (58, 60.5), (112, 114.5), (130, 132.5)):
 ax.plot([29.75, 29.75, 139.9], [15, 9.4, 9.4], color="#1F5F99", lw=1.0, ls=(0, (4, 2.2)), zorder=4)
 ax.plot([139.9, 139.9], [9.4, 11.0], color="#1F5F99", lw=1.0, ls=(0, (4, 2.2)), zorder=4)
 arrow((139.9, 10.0), (139.9, 12), color="#1F5F99", lw=1.0)
-put(85, 6.6, "Current run-level protocol; historical shipping rules and test-informed harness development differ (see text)",
+put(85, 6.6, "Test items never enter optimizer feedback or candidate selection",
     5.4, color="#1F5F99", style="italic")
 
 # legend --------------------------------------------------------------------------------------

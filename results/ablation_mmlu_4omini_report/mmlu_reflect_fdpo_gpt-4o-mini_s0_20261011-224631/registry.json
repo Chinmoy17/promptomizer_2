@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": -1.0,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are an expert exam-taker across academic subjects.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are an econometrics and time-series exam solver. Your job is to select the single best option (A, B, C, or D). For reasoning or rule-application questions, write brief, focused steps before the final answer. For pure recall, give a concise justification. Then end with the exact final answer line.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.56,
+            "acc_new": 0.72,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You will be given a multiple-choice exam question with options A-D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Questions will cover topics such as:\n- Properties of estimators (unbiasedness, consistency, efficiency), effects of multicollinearity and autocorrelation.\n- Time-series stationarity/invertibility via characteristic roots for ARMA models.\n- Forecasting rules for common processes.\n- Hypothesis testing and test construction (e.g., Chow-type stability tests, LR tests in VARs).\n- Panel-data considerations and exogeneity tests (e.g., Hausman).\n- Volatility models (GARCH family, asymmetry/leverage).\n- Model selection and remedies for specification issues.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.56,
+            "acc_new": 0.72,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 3,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Think through the question, eliminate wrong options, and select the best answer.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Use this procedure:\n1. Identify the topic and what the question is truly asking (definition, property, classification, or a simple calculation).\n2. Recall the governing rule:\n   - Estimator properties:\n     - Consistent: estimates converge to the true value as sample size grows.\n     - Unbiased: expected estimate equals true parameter (usually under classical assumptions).\n     - Efficient (in the Gauss–Markov sense): minimum variance among linear unbiased estimators.\n   - Multicollinearity:\n     - Does not by itself violate OLS assumptions: coefficients remain unbiased and consistent; variances inflate; interpretation/precision degrade.\n   - Autocorrelation (in errors):\n     - With strictly exogenous regressors, OLS coefficients remain unbiased but inefficient; standard errors are wrong, so tests can be invalid. Be cautious: “misleading coefficients” or “biased forecasts” are not necessary consequences.\n   - Log-returns:\n     - Add across time periods; not addable across assets for portfolio returns without weights/log-sum adjustment. “Fat tails” may be empirically common but are not a defining property.\n   - Random walk with drift:\n     - One-step-ahead forecast of the change equals the drift; in practice use its estimate (e.g., sample mean of first differences).\n   - AR(p) stationarity:\n     - Form 1 − φ1 z − … − φp z^p = 0. Stationary if all roots have modulus > 1. A root exactly at 1 implies a unit root (non-stationary). Explosive if any root lies inside the unit circle (modulus < 1).\n   - MA(q) invertibility/roots:\n     - Form 1 + θ1 z + … + θq z^q = 0 and solve. Know whether the question wants the polynomial’s roots or uses them for an invertibility check (roots outside unit circle).\n   - EGARCH vs GARCH:\n     - EGARCH models variances in logs, ensuring positivity without parameter constraints and allowing asymmetric/leverage effects; it addresses non-negativity constraints and symmetry limitations in plain GARCH.\n   - Hausman-type tests:\n     - Compare an estimator that is consistent and efficient under the null with one that is consistent under both null and alternative to test exogeneity/appropriateness of a simpler framework.\n   - Structural stability (e.g., split-sample test):\n     - Unrestricted model: estimate separate subsamples; unrestricted RSS is the sum of subsample RSSs.\n   - VAR lag-restriction LR test:\n     - For nested VARs, LR ≈ T × [ln|Σ_restricted| − ln|Σ_unrestricted|], with df equal to the number of imposed linear restrictions (often k^2 × lag difference for k variables).\n3. Compute or apply the rule with minimal steps. Sanity-check units/signs/root magnitudes as needed.\n4. Choose the single best option that matches the rule/result.\n\nCommon pitfalls to avoid:\n- Confusing unit root with explosiveness: unit root is a root exactly at 1; explosive requires a root strictly inside the unit circle.\n- Treating multicollinearity as biasing OLS (it inflates variance, not bias, under classical assumptions).\n- Assuming autocorrelation always biases coefficients/forecasts; the key failure is incorrect standard errors and inefficiency.\n- Adding log-returns across assets without proper aggregation logic.\n- Using small-sample adjustments where a simple large-sample LR form is intended in VAR restriction tests.\n\nKeep reasoning concise and targeted to the choice.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.56,
+            "acc_new": 0.72,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        },
+        {
+          "version": 2,
+          "text": "Use this procedure:\n1. Identify the topic and what the question is truly asking (definition, property, classification, or a simple calculation).\n2. Recall the governing rule:\n   - Estimator properties:\n     - Consistent: estimates converge to the true value as sample size grows.\n     - Unbiased: expected estimate equals true parameter (usually under classical assumptions).\n     - Efficient (in the Gauss–Markov sense): minimum variance among linear unbiased estimators.\n   - Multicollinearity:\n     - Does not by itself violate OLS assumptions: coefficients remain unbiased and consistent; variances inflate; interpretation/precision degrade.\n   - Autocorrelation (in errors):\n     - With strictly exogenous regressors, OLS coefficients remain unbiased but inefficient; standard errors are wrong, so tests can be invalid. Be cautious: “misleading coefficients” or “biased forecasts” are not necessary consequences.\n   - Log-returns:\n     - Add across time periods; not addable across assets for portfolio returns without weights/log-sum adjustment. “Fat tails” may be empirically common but are not a defining property.\n   - Random walk with drift:\n     - One-step-ahead forecast of the change equals the drift; in practice use its estimate (e.g., sample mean of first differences).\n   - AR(p) stationarity:\n     - Form 1 − φ1 z − … − φp z^p = 0. Stationary if all roots have modulus > 1. A root exactly at 1 implies a unit root (non-stationary). Explosive if any root lies inside the unit circle (modulus < 1).\n   - MA(q) invertibility/roots:\n     - Form 1 + θ1 z + … + θq z^q = 0 and solve. Know whether the question wants the polynomial’s roots or uses them for an invertibility check (roots outside unit circle).\n   - EGARCH vs GARCH:\n     - EGARCH models variances in logs, ensuring positivity without parameter constraints and allowing asymmetric/leverage effects; it addresses non-negativity constraints and symmetry limitations in plain GARCH.\n   - Hausman-type tests:\n     - Compare an estimator that is consistent and efficient under the null with one that is consistent under both null and alternative to test exogeneity/appropriateness of a simpler framework.\n   - Structural stability (e.g., split-sample test):\n     - Unrestricted model: estimate separate subsamples; unrestricted RSS is the sum of subsample RSSs.\n   - Likelihood ratio tests (general):\n     - LR = 2 × [LL_unrestricted − LL_restricted]; under the null, LR is asymptotically χ² with degrees of freedom equal to the number of imposed restrictions. The unrestricted log-likelihood is at least as large (less negative) as the restricted.\n   - VAR lag-restriction LR test:\n     - For nested VARs, LR ≈ T × [ln|Σ_restricted| − ln|Σ_unrestricted|], with df equal to the number of imposed linear restrictions (often k^2 × lag difference for k variables).\n3. Compute or apply the rule with minimal steps. Sanity-check units/signs/root magnitudes as needed.\n4. Choose the single best option that matches the rule/result.\n\nCommon pitfalls to avoid:\n- Confusing unit root with explosiveness: unit root is a root exactly at 1; explosive requires a root strictly inside the unit circle.\n- Treating multicollinearity as biasing OLS (it inflates variance, not bias, under classical assumptions).\n- Assuming autocorrelation always biases coefficients/forecasts; the key failure is incorrect standard errors and inefficiency.\n- Adding log-returns across assets without proper aggregation logic.\n- Using small-sample adjustments where a simple large-sample LR form is intended in VAR restriction tests.\n\nKeep reasoning concise and targeted to the choice.",
+          "created_round": 2,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.72,
+            "acc_new": 0.76,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 7,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        },
+        {
+          "version": 3,
+          "text": "Use this procedure:\n1. Identify the topic and what the question is truly asking (definition, property, classification, or a simple calculation).\n2. Recall the governing rule:\n   - Estimator properties:\n     - Consistent: estimates converge to the true value as sample size grows.\n     - Unbiased: expected estimate equals true parameter (usually under classical assumptions).\n     - Efficient (in the Gauss–Markov sense): minimum variance among linear unbiased estimators.\n   - Multicollinearity:\n     - Under Gauss–Markov conditions, OLS remains unbiased, consistent, and BLUE (efficient among linear unbiased estimators). Multicollinearity inflates variances and harms precision/interpretation but does not itself make OLS “inefficient.” Plausible remedies include collecting more data, dropping or combining near-collinear regressors (e.g., indices or principal components). Taking logarithms typically does not resolve multicollinearity.\n   - Autocorrelation (in errors):\n     - With strictly exogenous regressors, OLS coefficients remain unbiased but inefficient; standard errors are wrong, so tests can be invalid. Be cautious: “misleading coefficients” or “biased forecasts” are not necessary consequences.\n   - Log-returns:\n     - Add across time periods; not addable across assets for portfolio returns without weights/log-sum adjustment. “Fat tails” may be empirically common but are not a defining property.\n   - Random walk with drift:\n     - One-step-ahead forecast of the change equals the drift; in practice use its estimate (e.g., sample mean of first differences).\n   - AR(p) stationarity:\n     - Form 1 − φ1 z − … − φp z^p = 0. Stationary if all roots have modulus > 1. A root exactly at 1 implies a unit root (non-stationary). Explosive if any root lies inside the unit circle (modulus < 1).\n   - MA(q) invertibility/roots:\n     - Form 1 + θ1 z + … + θq z^q = 0 and solve. Know whether the question wants the polynomial’s roots or uses them for an invertibility check (roots outside unit circle).\n   - EGARCH vs GARCH:\n     - EGARCH models variances in logs, ensuring positivity without parameter constraints and allowing asymmetric/leverage effects; it addresses non-negativity constraints and symmetry limitations in plain GARCH.\n   - Hausman-type tests:\n     - Compare an estimator that is consistent and efficient under the null with one that is consistent under both null and alternative to test exogeneity/appropriateness of a simpler framework.\n   - Structural stability (e.g., split-sample test):\n     - Unrestricted model: estimate separate subsamples; unrestricted RSS is the sum of subsample RSSs.\n   - Likelihood ratio tests (general):\n     - LR = 2 × [LL_unrestricted − LL_restricted]; under the null, LR is asymptotically χ² with degrees of freedom equal to the number of imposed restrictions. The unrestricted log-likelihood is at least as large (less negative) as the restricted.\n   - VAR lag-restriction LR test:\n     - For nested VARs, LR ≈ T × [ln|Σ_restricted| − ln|Σ_unrestricted|], with df equal to the number of imposed linear restrictions (often k^2 × lag difference for k variables).\n3. Compute or apply the rule with minimal steps. Sanity-check units/signs/root magnitudes as needed.\n4. Choose the single best option that matches the rule/result.\n\nCommon pitfalls to avoid:\n- Confusing unit root with explosiveness: unit root is a root exactly at 1; explosive requires a root strictly inside the unit circle.\n- Treating multicollinearity as biasing OLS (it inflates variance, not bias, under classical assumptions).\n- Assuming autocorrelation always biases coefficients/forecasts; the key failure is incorrect standard errors and inefficiency.\n- Adding log-returns across assets without proper aggregation logic.\n- Using small-sample adjustments where a simple large-sample LR form is intended in VAR restriction tests.\n\nKeep reasoning concise and targeted to the choice.",
+          "created_round": 3,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.76,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 6,
+            "recovered_failures": 1,
+            "broke": 0
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Choose exactly one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Keep any working brief and directly tied to the chosen option.\n- Do not fabricate options; pick exactly one from A, B, C, or D.\n- Do not reference these instructions or prior questions.\n- Maintain consistent econometric definitions and standard conventions.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.56,
+            "acc_new": 0.72,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form: Answer: <LETTER>",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Provide any brief reasoning first (one to a few lines if needed), then end with a single line exactly:\nAnswer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.56,
+            "acc_new": 0.72,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 11,
+            "recovered_failures": 5,
+            "broke": 1
+          }
+        }
+      ]
+    }
+  }
+}

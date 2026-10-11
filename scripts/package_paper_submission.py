@@ -14,7 +14,7 @@ from build_anonymous_bundle import build_bundle
 
 MANUSCRIPT_INPUTS = (
     "paper.tex", "custom.bib", "acl.sty", "acl_natbib.bst",
-    "figures/fig_architecture.pdf", "figures/fig_metric.pdf",
+    "figures/fig_metric.pdf",
     "figures/fig_recovered_regressed.pdf",
     "Artifacts/reported_results.json", "Artifacts/val_test_gap.json",
     "Artifacts/resource_usage.json",

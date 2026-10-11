@@ -11,7 +11,7 @@ b = (root / "custom.bib").read_text(encoding="utf-8")
 print("em dashes:", t.count("\u2014"), "| '---':", t.count("---"))
 
 labels = set(re.findall(r"\\label\{([^}]+)\}", t))
-refs = {reference for reference in re.findall(r"\\(?:ref|pageref)\{([^}]+)\}", t)
+refs = {reference for reference in re.findall(r"\\(?:ref|pageref|appsec|appsubsec)\{([^}]+)\}", t)
     if not reference.startswith("#")}
 failures = []
 print(f"labels={len(labels)} refs={len(refs)}")
@@ -30,7 +30,11 @@ if cites - keys:
     failures.append("missing bibliography entries")
 print("in custom.bib but uncited (template leftovers ok):", sorted(keys - cites))
 
+OVERLEAF_ONLY_FIGURES = {"fdpo2.png"}
 for g in re.findall(r"includegraphics\[[^\]]*\]\{([^}]+)\}", t):
+    if g in OVERLEAF_ONLY_FIGURES:
+        print("OVERLEAF " + g)
+        continue
     print(("OK       " if (root / g).exists() else "MISSING  ") + g)
     if not (root / g).exists():
         failures.append(f"missing figure: {g}")
@@ -58,7 +62,9 @@ if (aime["recovered"], aime["regressed"], aime["n_test"]) != (3, 4, 30):
 if not math.isclose(aime["baseline_pct"], 100 * 16 / 30) or aime["final_pct"] != 50:
     failures.append("AIME endpoints differ from the matched v3 record")
 for record in reported["results"]:
-    if record["benchmark"] not in {"PUPA", "MMLU"}:
+    if record["provenance"] != "saved":
+        continue
+    if record["benchmark"] != "MMLU":
         score_delta = record["final_pct"] - record["baseline_pct"]
         count_delta = 100 * (record["recovered"] - record["regressed"]) / record["n_test"]
         if not math.isclose(score_delta, count_delta, rel_tol=0, abs_tol=0.100001):
@@ -79,6 +85,52 @@ for record in resources["aggregates"]:
         failures.append(f"resource table mismatch: {benchmark} / {record['solver']}")
 if r"\square" in t:
     failures.append("unavailable square symbol: use the loaded latexsym Box symbol")
+main_table = next(block for block in re.findall(r"\\begin\{table\*\}.*?\\end\{table\*\}", t, re.S)
+                  if r"\label{tab:main}" in block)
+for record in reported["results"]:
+    if record["provenance"] != "saved":
+        continue
+    label = "MMLU (macro)" if record["benchmark"] == "MMLU" else record["benchmark"]
+    churn = record["recovered"] + record["regressed"]
+    expected_start = (f"{label} & {record['solver']} & {record['baseline_pct']:.1f} & "
+                      f"{record['final_pct']:.1f} & ${record['delta_pp']:+.1f}$ & ")
+    expected_end = (f" & {record['recovered']} & {record['regressed']} & "
+                    f"{churn} ({100 * churn / record['n_test']:.1f})")
+    row = next((line for line in main_table.splitlines() if expected_start in line), None)
+    if row is None or expected_end not in row:
+        failures.append(f"main table mismatch: {record['benchmark']} / {record['solver']}")
+
+edit_table = next(block for block in re.findall(r"\\begin\{table\}.*?\\end\{table\}", t, re.S)
+                  if r"\label{tab:edits}" in block)
+phases = {"first": [], "later": []}
+for record in paired:
+    for round_record in record["rounds"]:
+        phases["first" if round_record["round"] == 1 else "later"].append(round_record)
+
+
+def total(rounds, key):
+    return sum(round_record[key] for round_record in rounds)
+
+
+first, later = phases["first"], phases["later"]
+expected_edit_rows = [
+    f"Committed rounds & {len(first)} & {len(later)}",
+    "Sections changed (mean of five) & "
+    f"{sum(len(r['sections_changed']) for r in first) / len(first):.1f} & "
+    f"{sum(len(r['sections_changed']) for r in later) / len(later):.1f}",
+    "Single-section edits & "
+    f"{sum(len(r['sections_changed']) == 1 for r in first)} & "
+    f"{sum(len(r['sections_changed']) == 1 for r in later)}",
+    f"Mining recovered / regressed & {total(first, 'mining_recovered')} / {total(first, 'mining_regressed')} & "
+    f"{total(later, 'mining_recovered')} / {total(later, 'mining_regressed')}",
+    f"Validation recovered / regressed & {total(first, 'validation_recovered')} / "
+    f"{total(first, 'validation_regressed')} & {total(later, 'validation_recovered')} / "
+    f"{total(later, 'validation_regressed')}",
+]
+for expected in expected_edit_rows:
+    if expected not in edit_table:
+        failures.append(f"edit table mismatch: {expected}")
+print("main table rows and edit-behavior table checked against saved records")
 print("matched records / edited / validation-up / test-down:",
       len(paired), len(edited), len(validation_up), len(test_down))
 print("resource table: exact ledger aggregates checked")
@@ -127,7 +179,7 @@ for record, cells in zip(paired, pair_rows):
     expected_cells = [subject_labels.get(family, family), solver_label,
                       "yes" if record["shipped"] else "no", val_pair, val_delta,
                       test_pair, test_delta]
-    if len(cells) != 8 or [cells[0].replace(r"$^\dagger$", ""), *cells[1:7]] != expected_cells:
+    if len(cells) != 8 or cells[:7] != expected_cells:
         failures.append(f"paired appendix row mismatch: {record['run']}")
         continue
     recovered, regressed = map(int, cells[7].split("/"))

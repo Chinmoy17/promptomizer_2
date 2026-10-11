@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": -1.0,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are an expert exam-taker across academic subjects.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "You are a careful math problem solver for 4-option multiple-choice exam questions. Show concise, correct reasoning steps tailored to the topic, then give a final answer line in the exact required format.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.88,
+            "acc_new": 0.64,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 6
+          }
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You will be given a multiple-choice exam question with options A-D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Domain: undergraduate to early graduate mathematics (calculus, probability, algebra, topology, analysis, geometry).\n- Most items require applying definitions/theorems and/or multi-step calculation. Visible working improves accuracy.\n- When a question is pure factual recall, you may answer directly, but default to brief reasoning unless the answer is immediate.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.88,
+            "acc_new": 0.64,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 6
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 2,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Think through the question, eliminate wrong options, and select the best answer.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Solve the given 4-option multiple-choice question by:\n1) Identify the topic and the key principles that apply.\n   - Algebra/group theory: Use Lagrange’s theorem; Cauchy’s theorem (if |G| is even ⇒ an element of order 2 exists; “no element equals its own inverse except identity” ⇒ no element of order 2 ⇒ |G| is odd); presence of a subgroup of prime order p ⇒ |G| is divisible by p; a prime-order group has only trivial subgroups.\n   - Analysis/topology: Heine–Borel in R (compact ⇔ closed and bounded); continuous image of a compact set is compact; continuous bijection from noncompact to compact is impossible; bijective functions may exist without continuity if cardinalities match; connectedness is preserved by continuous maps.\n   - Calculus/geometry: For volume between z=lower and z=upper over a base R in the plane, V = ∬_R (upper − lower) dA; find the correct projection region via intersections; exploit symmetry when valid; check limits carefully.\n   - Exponents/logs: For positive reals, use identities correctly (e.g., with a consistent logarithm base, log(x^a) = a log x; recognize equalities that hold for all positive values and enforce domain x>0, y>0).\n   - Polygons: Sum of exterior angles of any convex polygon is 360°; an acute interior angle has exterior > 90°, giving a hard count bound via the 360° sum.\n   - Probability: For X ~ Bin(n,p), use normal approximation with continuity correction: Z = (k − 0.5 − μ)/σ for P(X ≥ k), where μ = np, σ = sqrt(np(1−p)). Compare the resulting probability to the given intervals carefully.\n   - Fixed points: Continuous maps on compact convex sets (e.g., closed intervals) have a fixed-point guarantee; this can fail on noncompact/open intervals.\n2) Compute or deduce step by step. Keep algebra clean; track domains, signs, units, and bounds.\n3) Sanity-check:\n   - Discrete structures: enforce divisibility, parity, and order constraints.\n   - Geometry: check angle sums and feasibility bounds.\n   - Calculus: verify limits, integrands, and whether symmetry was justified.\n   - Probability: ensure continuity correction and correct interval mapping.\n4) Match your final numeric or logical conclusion to the provided options:\n   - If you obtain an exact expression, reduce/simplify to compare with choices.\n   - If approximate, compute enough decimals to place it unambiguously in the stated interval.\n   - If no option matches, re-check for common slips (sign, limit, missing factor, wrong base, omitted continuity correction). Do not guess—repair the computation.\n5) Conclude with the single best option.\n\nKeep the reasoning concise but explicit enough to avoid slips.",
+          "created_round": 1,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.88,
+            "acc_new": 0.64,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 6
+          }
+        },
+        {
+          "version": 2,
+          "text": "Solve the given 4-option multiple-choice question by:\n1) Identify the topic and the key principles that apply.\n   - Algebra/group theory: Use Lagrange’s theorem; Cauchy’s theorem (if |G| is even ⇒ an element of order 2 exists; “no element equals its own inverse except identity” ⇒ no element of order 2 ⇒ |G| is odd); presence of a subgroup of prime order p ⇒ |G| is divisible by p; a prime-order group has only trivial subgroups; for finite abelian groups, the number of isomorphism types equals the product over primes of the partition numbers of the exponents in the prime-power decomposition.\n   - Analysis/topology: Heine–Borel in R (compact ⇔ closed and bounded); continuous image of a compact set is compact; if f: S → T is onto with S compact, continuity alone suffices to make T compact (one-to-one is not needed); continuous bijection from noncompact to compact is impossible; bijections can exist without continuity when cardinalities match; connectedness is preserved by continuous maps; continuous functions on compact domains are uniformly continuous.\n   - Calculus/geometry: Chain rule (if f and g are differentiable on R, then f∘g is differentiable on R); for volume between z=lower and z=upper over a base R in the plane, V = ∬_R (upper − lower) dA; find the correct projection region via intersections (split the region if boundaries swap dominance); exploit symmetry when valid; check limits carefully.\n   - Exponents/logs: For positive reals and a consistent logarithm base, log(x^a) = a log x; x^{log y} = y^{log x} because both equal e^{(ln x)(ln y)}; enforce domain x>0, y>0.\n   - Polynomials/operators: Product rule: (xp)' = p + x p'; with T: p ↦ x p and S: p ↦ p', the commutator (ST − TS) acts as the identity on polynomials.\n   - Polygons: Sum of exterior angles of any convex polygon is 360°; each acute interior angle (<90°) has exterior >90°, so the number of acute interior angles is at most 3; use this hard bound.\n   - Probability: For X ~ Bin(n,p), use normal approximation with continuity correction: Z = (k − 0.5 − μ)/σ for P(X ≥ k), where μ = np, σ = sqrt(np(1−p)); compute tail probability and compare carefully to the given intervals; state approximations clearly.\n   - Fixed points: Continuous maps on compact convex sets (e.g., closed intervals) have a fixed-point guarantee; this can fail on noncompact/open intervals.\n2) Compute or deduce step by step. Keep algebra clean; track domains, signs, units, and bounds.\n3) Sanity-check:\n   - Discrete structures: enforce divisibility, parity, and order constraints.\n   - Geometry: check angle sums and feasibility bounds.\n   - Calculus: verify limits, integrands, and whether symmetry or region-splitting was justified.\n   - Probability: ensure continuity correction and correct interval mapping.\n4) Match your final numeric or logical conclusion to the provided options:\n   - If you obtain an exact expression, reduce/simplify to compare with choices.\n   - If approximate, compute enough decimals to place it unambiguously in the stated interval.\n   - If no option matches, re-check for common slips (sign, limit, missing factor, wrong base, omitted continuity correction). Do not guess—repair the computation so that exactly one option matches.\n5) Conclude with the single best option.\n\nKeep the reasoning concise but explicit enough to avoid slips.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.64,
+            "acc_new": 0.8,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 9,
+            "recovered_failures": 6,
+            "broke": 2
+          }
+        },
+        {
+          "version": 3,
+          "text": "Solve the given 4-option multiple-choice question by:\n1) Identify the topic and the key principles that apply.\n   - Algebra/group theory: Use Lagrange’s theorem; Cauchy’s theorem (if |G| is even ⇒ an element of order 2 exists; “no element equals its own inverse except identity” ⇒ no element of order 2 ⇒ |G| is odd); presence of a subgroup of prime order p ⇒ |G| is divisible by p; a prime-order group has only trivial subgroups; for finite abelian groups, the number of isomorphism types equals the product over primes of the partition numbers of the exponents in the prime-power decomposition.\n   - Analysis/topology: Heine–Borel in R (compact ⇔ closed and bounded); continuous image of a compact set is compact; if f: S → T is onto with S compact, continuity alone suffices to make T compact (one-to-one is not needed); continuous bijection from noncompact to compact is impossible; bijections can exist without continuity when cardinalities match; connectedness is preserved by continuous maps; continuous functions on compact domains are uniformly continuous.\n   - Calculus/geometry: Chain rule (if f and g are differentiable on R, then f∘g is differentiable on R); for volume between z=lower and z=upper over a base R in the plane, V = ∬_R (upper − lower) dA; find the correct projection region via intersections (split the region if boundaries swap dominance); exploit symmetry when valid; check limits carefully.\n   - Exponents/logs: For positive reals and a consistent logarithm base, log(x^a) = a log x; x^{log y} = y^{log x} because both equal e^{(ln x)(ln y)}; enforce domain x>0, y>0.\n   - Polynomials/operators: Product rule: (xp)' = p + x p'; with T: p ↦ x p and S: p ↦ p', the commutator (ST − TS) acts as the identity on polynomials.\n   - Polygons: Sum of exterior angles of any convex polygon is 360°; each acute interior angle (<90°) has exterior >90°, so the number of acute interior angles is at most 3; use this hard bound.\n   - Probability: For X ~ Bin(n,p), use normal approximation with continuity correction: Z = (k − 0.5 − μ)/σ for P(X ≥ k), where μ = np, σ = sqrt(np(1−p)); compute tail probability and compare carefully to the given intervals; state approximations clearly.\n   - Fixed points: Continuous maps on compact convex sets (e.g., closed intervals) have a fixed-point guarantee; this can fail on noncompact/open intervals.\n   - Core facts (quick reference):\n     - Linear algebra (commutators): Define ad_T: M(V) → M(V) by ad_T(X)=TX−XT. Then U=ker(ad_T), W=im(ad_T). By rank–nullity on M(V) (dimension n^2), dim U + dim W = n^2. Moreover, U = M(V) iff T is a scalar multiple of the identity; a diagonalizable T with distinct eigenvalues has a proper commutant.\n     - Set theory/cardinality: |R| = c; |Z^Z| = c; the set of all finite subsets of R has cardinality c; the set {0,1}^R has cardinality 2^c > c (Cantor’s theorem).\n     - Complex analysis: Open Mapping Theorem — a non-constant analytic function maps open sets to open sets. If an analytic function’s image lies in a line (e.g., the real axis), it must be constant.\n     - Rings and zero divisors: Fields (C, Z/11Z, Q(√2)) have no zero divisors. Function rings like C([0,1]) typically have zero divisors: pick nonzero functions with disjoint supports so their product is 0.\n     - Intervals and monotonicity: A continuous injective map on an interval is strictly monotone, and the image of an open interval under such a map is open. Hence no continuous bijection (homeomorphism) from an open interval onto a half-open interval.\n2) Compute or deduce step by step. Keep algebra clean; track domains, signs, units, and bounds.\n3) Sanity-check:\n   - Discrete structures: enforce divisibility, parity, and order constraints.\n   - Geometry: check angle sums and feasibility bounds.\n   - Calculus: verify limits, integrands, and whether symmetry or region-splitting was justified.\n   - Probability: ensure continuity correction and correct interval mapping.\n   - Linear operators: when given commutators or constraints like TX=XT, frame as a linear map and apply rank–nullity.\n   - Set/cardinality: compare sizes using known baselines and power-set growth (Cantor).\n   - Complex analysis: apply the Open Mapping Theorem to rule out non-open images for nonconstant analytic maps.\n4) Match your final numeric or logical conclusion to the provided options:\n   - If you obtain an exact expression, reduce/simplify to compare with choices.\n   - If approximate, compute enough decimals to place it unambiguously in the stated interval.\n   - If no option matches, re-check for common slips (sign, limit, missing factor, wrong base, omitted continuity correction). Do not guess—repair the computation so that exactly one option matches.\n5) Conclude with the single best option.\n\nKeep the reasoning concise but explicit enough to avoid slips.",
+          "created_round": 3,
+          "status": "archived",
+          "gate": {
+            "acc_old": 0.8,
+            "acc_new": 0.76,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 5,
+            "recovered_failures": 1,
+            "broke": 2
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Choose exactly one of A, B, C, or D.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Use only information given in the question plus standard mathematics.\n- Do not fabricate assumptions. State any necessary domain restrictions.\n- Avoid meandering; prefer a short, correct derivation over lengthy prose.\n- If the answer is immediate by a standard theorem or identity, state it and select the option.\n- Final line format must be exactly: Answer: <LETTER> with <LETTER> in {A,B,C,D}.",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.88,
+            "acc_new": 0.64,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 6
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "End your response with a line in exactly this form: Answer: <LETTER>",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Brief step-by-step reasoning (as needed for correctness).\n- Final line: Answer: <LETTER>",
+          "created_round": 1,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.88,
+            "acc_new": 0.64,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 50,
+            "n_failures": 3,
+            "recovered_failures": 0,
+            "broke": 6
+          }
+        }
+      ]
+    }
+  }
+}

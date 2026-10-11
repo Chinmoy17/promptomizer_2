@@ -184,10 +184,67 @@ standard section headers. No other prose, no code fences, nothing after the
 last section."""
 
 
-def _build_system_prompt(dataset: str, max_rounds: int) -> str:
+def _build_no_report_template() -> str:
+    """System prompt for the no-effect-report ablation arm: the reflect prompt
+    minus every instruction that depends on the report (points 2, 3, 5, the
+    EFFECT REPORT bullet, validation items, causal diagnosis). The shared
+    middle (solver facts, task-type guidance, what a good rewrite is) is taken
+    verbatim from the reflect template."""
+    full = _REFLECT_OPTIMIZER_SYSTEM_TEMPLATE
+    _, rest = full.split("CRITICAL RULE ABOUT EXAMPLES", 1)
+    middle, fmt = rest.split("RESPONSE FORMAT:", 1)
+    for old, new in (
+        ("every failure, every success, and every validation item",
+         "every failure and every success"),
+        ("failure, gold, or validation item", "failure or gold item"),
+    ):
+        if old not in middle:
+            raise ValueError(f"reflect template changed; cannot derive: {old!r}")
+        middle = middle.replace(old, new)
+    fmt_tail = fmt.split("The `## Analysis` section is discarded", 1)[1]
+    head = '''You are working with an expert prompt
+engineer to help a smaller LLM (the "solver") solve {task_description} more
+reliably.
+
+HOW THIS PROCESS WORKS (read carefully -- this is a measured, multi-round
+experiment, not a one-shot rewrite):
+  1. You get up to {max_rounds} rewrite rounds. After each round, your
+     rewritten prompt is run on a WORKING SET of examples and on a
+     VALIDATION set -- a second, disjoint batch meant to approximate unseen
+     data.
+  2. There is no "last round always ships" rule. Every round commits
+     unconditionally to a version history, and at the end, whichever
+     COMMITTED round scores BEST on validation accuracy is the one that
+     actually ships -- not necessarily the last round, and not necessarily
+     this one. Treat every round as a real, standalone candidate for
+     shipping, not a throwaway step toward some final round.
+
+You will see:
+  - the solver's current markdown-formatted prompt,
+  - EVERY question the solver currently gets wrong on the working set, with
+    the solver's answer and the correct answer alongside (not a sample --
+    all of them),
+  - EVERY question the current prompt already gets right on the working set
+    (not a sample -- all of them), so you know exactly what must not break.
+
+'''
+    response_format = (
+        "RESPONSE FORMAT: you MAY begin your reply with a short `## Analysis` section\n"
+        "(2-6 sentences stating your hypothesis about what is causing the failures"
+        " -- state the cause before the fix). The `## Analysis` section is discarded"
+        + fmt_tail)
+    return head + "CRITICAL RULE ABOUT EXAMPLES" + middle + response_format
+
+
+_NO_REPORT_SYSTEM_TEMPLATE = _build_no_report_template()
+
+
+def _build_system_prompt(dataset: str, max_rounds: int,
+                         effect_report: bool = True) -> str:
     task_desc = _TASK_DESCRIPTIONS.get(dataset, _DEFAULT_TASK_DESCRIPTION)
-    return _REFLECT_OPTIMIZER_SYSTEM_TEMPLATE.format(
-        task_description=task_desc, max_rounds=max_rounds)
+    template = (_REFLECT_OPTIMIZER_SYSTEM_TEMPLATE if effect_report
+                else _NO_REPORT_SYSTEM_TEMPLATE)
+    return template.format(task_description=task_desc, max_rounds=max_rounds)
 
 
 def _render_item_list(items: list[dict], heading: str, empty_note: str,
@@ -281,6 +338,7 @@ def build_reflect_optimizer_messages(
     round_num: int = 1,
     max_rounds: int = 1,
     reflection: dict | None = None,
+    effect_report: bool = True,
 ) -> list[dict]:
     """Build the two-message optimizer call for reflect mode.
 
@@ -300,7 +358,13 @@ def build_reflect_optimizer_messages(
     `failures` is expected to contain ALL currently-wrong mining items (no
     sampling cap) -- reflect_fdpo's caller passes the full list, unlike
     simple_fdpo which samples up to `n_fail`.
+
+    `effect_report=False` is the ablation arm: the report is never rendered
+    (even if `reflection` is passed), the next-round promise is dropped, and
+    the report-free system prompt is used.
     """
+    if not effect_report:
+        reflection = None
     fail_blocks = []
     for i, f in enumerate(failures, 1):
         fail_blocks.append(
@@ -324,8 +388,8 @@ def build_reflect_optimizer_messages(
         f"COMMITTED round scores best on validation accuracy -- not "
         f"necessarily the last round, and not necessarily this one -- so "
         f"treat this rewrite as a real, standalone candidate for shipping"
-        + (", and you will be shown its full measured effect (both the "
-           "working set and validation) next round"
+        + ((", and you will be shown its full measured effect (both the "
+            "working set and validation) next round" if effect_report else "")
            if round_num < max_rounds else ", and this is your final round")
         + ", so make one deliberate, testable change now.\n\n"
     )
@@ -357,5 +421,5 @@ def build_reflect_optimizer_messages(
         "`## Analysis` section (it is discarded), then the full new markdown."
     )
     return [{"role": "system",
-             "content": _build_system_prompt(dataset, max_rounds)},
+             "content": _build_system_prompt(dataset, max_rounds, effect_report)},
             {"role": "user", "content": user}]
