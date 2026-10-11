@@ -1,10 +1,10 @@
 {
-  "source": "Paper_COLING/Artifacts/RESULTS.md, displayed rows selected by the author",
-  "validation_excluded_prefixes": ["AIME"],
-  "provenance_note": "The author confirms 2 recoveries and 0 regressions for GPT-4.1 Mini AIME. AIME summary endpoints conflict with archived runs; matching run IDs are not supplied. AIME remains excluded from matched validation-transfer analysis.",
+  "source": "Matched saved runs, except the retained summary-only GPT-4o-mini AIME row",
+  "validation_excluded_prefixes": ["AIME / 4o-mini"],
+  "provenance_note": "GPT-4.1 Mini AIME uses the completed v3 run, 16/30 to 15/30 with 3 recoveries and 4 regressions. The retained GPT-4o-mini AIME summary lacks an identified matched run and is excluded from transfer and resource analysis.",
   "results": [
     {"benchmark": "AIME", "solver": "GPT-4o-mini", "baseline_pct": 26.6666666667, "final_pct": 33.3333333333, "delta_pp": 6.7, "recovered": 2, "regressed": 0, "n_test": 30, "provenance": "summary_only"},
-    {"benchmark": "AIME", "solver": "GPT-4.1 Mini", "baseline_pct": 46.6666666667, "final_pct": 53.3333333333, "delta_pp": 6.7, "recovered": 2, "regressed": 0, "n_test": 30, "provenance": "author_confirmed_summary"},
+    {"benchmark": "AIME", "solver": "GPT-4.1 Mini", "baseline_pct": 53.33333333333333, "final_pct": 50.0, "delta_pp": -3.3, "recovered": 3, "regressed": 4, "n_test": 30, "provenance": "saved", "run_group": "reflect_aime_gpt41mini_v3", "run_id": "aime_reflect_fdpo_gpt-4.1-mini_s0_20260916-203408"},
     {"benchmark": "PUPA", "solver": "GPT-4o-mini", "baseline_pct": 68.5, "final_pct": 79.9, "delta_pp": 11.4, "recovered": 7, "regressed": 3, "n_test": 38, "provenance": "saved", "run_group": "pupa_pilot_v1"},
     {"benchmark": "PUPA", "solver": "GPT-4.1 Mini", "baseline_pct": 68.2, "final_pct": 80.7, "delta_pp": 12.5, "recovered": 10, "regressed": 0, "n_test": 38, "provenance": "saved", "run_group": "pupa_pilot_gpt41mini_v2"},
     {"benchmark": "IFBench", "solver": "GPT-4o-mini", "baseline_pct": 47.6, "final_pct": 45.2, "delta_pp": -2.4, "recovered": 2, "regressed": 3, "n_test": 42, "provenance": "saved", "run_group": "reflect_ifbench_v1"},

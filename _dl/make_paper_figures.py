@@ -2,8 +2,8 @@
 reads from, so the Overleaf upload is self-contained).
 
 Numbers: reported_results.json mirrors the author-selected RESULTS.md rows.
-AIME provenance is unresolved; missing transitions are not imputed. Matched
-validation-vs-test analysis excludes AIME and uses saved accuracy records.
+GPT-4.1 Mini AIME uses its matched v3 run. The retained GPT-4o-mini AIME
+summary is marked separately and excluded from matched transfer analysis.
 """
 from __future__ import annotations
 
@@ -45,6 +45,8 @@ SOURCE = json.loads((ROOT / "Paper_COLING/Artifacts/reported_results.json").read
 DATA = [(row["benchmark"], row["solver"], row["baseline_pct"], row["final_pct"],
          row["recovered"], row["regressed"]) for row in SOURCE["results"]]
 DELTA = {(row["benchmark"], row["solver"]): row["delta_pp"] for row in SOURCE["results"]}
+SUMMARY_ONLY = {(row["benchmark"], row["solver"]) for row in SOURCE["results"]
+                if row["provenance"] != "saved"}
 
 # ---- Figure: recovered vs regressed (main text, full width) ----------------
 fig, ax = plt.subplots(figsize=(6.3, 2.75))
@@ -52,7 +54,7 @@ for i, (b, m, _, _, rec, reg) in enumerate(DATA):
     if rec is None or reg is None:
         ax.text(i, 5, "R/G\nunknown", ha="center", fontsize=6.5, color="#555555")
         continue
-    reported_only = b == "AIME"
+    reported_only = (b, m) in SUMMARY_ONLY
     ax.bar(i, rec, color=C_REC, width=0.62, zorder=2,
            hatch="///" if reported_only else None, edgecolor="white")
     ax.bar(i, -reg, color=C_REG, width=0.62, zorder=2)
@@ -63,7 +65,7 @@ for i, (b, m, _, _, rec, reg) in enumerate(DATA):
         ax.text(i + 0.36, -reg - 0.2, f"-{reg}", ha="left", va="top", fontsize=7, color=C_REG)
 ax.axhline(0, color="black", lw=0.7)
 ax.set_xticks(range(len(DATA)))
-ax.set_xticklabels([f"{b}{'*' if b == 'AIME' else ''}\n{'4o-mini' if '4o' in m else '4.1 Mini'}"
+ax.set_xticklabels([f"{b}{'*' if (b, m) in SUMMARY_ONLY else ''}\n{'4o-mini' if '4o' in m else '4.1 Mini'}"
                     for b, m, *_ in DATA], fontsize=7)
 ax.set_ylabel("Test items")
 ax.set_ylim(-30, 38)
@@ -75,7 +77,7 @@ ax.legend(handles=[
     Line2D([0], [0], marker="D", color="w", markerfacecolor="black", markersize=5,
            label="Net change")], loc="upper left", frameon=False, ncol=3,
     bbox_to_anchor=(0.0, 1.16))
-fig.text(0.01, 0.01, "* AIME: summary results; GPT-4.1 Mini counts confirmed by the author. Matched run IDs not supplied.", fontsize=6.2)
+fig.text(0.01, 0.01, "* GPT-4o-mini AIME: retained summary; excluded from matched transfer and resource analyses.", fontsize=6.2)
 fig.tight_layout(rect=(0, 0.06, 1, 1))
 save(fig, "fig_recovered_regressed")
 
@@ -89,7 +91,7 @@ for gi, b in enumerate(order):
         x = gi + off
         lc = C_REC if fin >= base else C_REG
         ax.plot([x, x], [base, fin], color=lc, lw=2.0, zorder=1, solid_capstyle="round",
-            linestyle="--" if b == "AIME" else "-")
+                linestyle="--" if (b, m) in SUMMARY_ONLY else "-")
         ax.scatter([x], [base], facecolor="white", edgecolor=col, s=34, lw=1.4, zorder=3)
         ax.scatter([x], [fin], facecolor=col, edgecolor=col, s=34, zorder=3)
         ax.text(x, max(base, fin) + 3, f"{DELTA[(b, m)]:+.1f}", ha="center", fontsize=6.8,
@@ -104,7 +106,7 @@ ax.legend(handles=[
     Line2D([0], [0], color=C_REC, lw=2, label="improved"),
     Line2D([0], [0], color=C_REG, lw=2, label="regressed")],
     loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.5, 1.15))
-fig.text(0.01, 0.01, "* AIME: supplied summary endpoints; matched before/after provenance unresolved.", fontsize=6.5)
+fig.text(0.01, 0.01, "* Only GPT-4o-mini AIME is summary-based; GPT-4.1 Mini uses the matched v3 record.", fontsize=6.5)
 fig.tight_layout(rect=(0, 0.06, 1, 1))
 save(fig, "fig_dumbbell")
 

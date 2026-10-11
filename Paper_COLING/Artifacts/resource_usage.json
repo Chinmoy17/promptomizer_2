@@ -1,0 +1,688 @@
+{
+  "scope": "matched saved runs; all logged roles; development and rechecks excluded",
+  "ledger_verified": true,
+  "cost_tolerance_usd": 1e-06,
+  "runs": [
+    {
+      "run": "AIME / 4.1-mini",
+      "run_id": "aime_reflect_fdpo_gpt-4.1-mini_s0_20260916-203408",
+      "metrics_path": "results/reflect_aime_gpt41mini_v3/aime_reflect_fdpo_gpt-4.1-mini_s0_20260916-203408/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 498394,
+      "optimizer_output_tokens": 5356,
+      "total_tokens": 2666552,
+      "total_cost_usd": 3.813559,
+      "by_role": {
+        "solver": {
+          "calls": 420,
+          "prompt_tokens": 269564,
+          "completion_tokens": 1893238,
+          "cost_usd": 3.137006
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 498394,
+          "completion_tokens": 5356,
+          "cost_usd": 0.676553
+        }
+      },
+      "model_identifiers": [
+        "gpt-4.1-mini-2025-04-14",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "PUPA / 4o-mini",
+      "run_id": "pupa_reflect_fdpo_gpt-4o-mini_s0_20260830-153941",
+      "metrics_path": "results/pupa_pilot_v1/pupa_reflect_fdpo_gpt-4o-mini_s0_20260830-153941/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 73832,
+      "optimizer_output_tokens": 13710,
+      "total_tokens": 1651170,
+      "total_cost_usd": 4.437325,
+      "by_role": {
+        "solver": {
+          "calls": 632,
+          "prompt_tokens": 643400,
+          "completion_tokens": 153632,
+          "cost_usd": 0.188689
+        },
+        "external": {
+          "calls": 312,
+          "prompt_tokens": 53239,
+          "completion_tokens": 116986,
+          "cost_usd": 1.042366
+        },
+        "judge": {
+          "calls": 312,
+          "prompt_tokens": 341352,
+          "completion_tokens": 255019,
+          "cost_usd": 2.97688
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 73832,
+          "completion_tokens": 13710,
+          "cost_usd": 0.22939
+        }
+      },
+      "model_identifiers": [
+        "gpt-4.1",
+        "gpt-4.1-2025-04-14",
+        "gpt-4o-mini",
+        "gpt-4o-mini-2024-07-18",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "PUPA / 4.1-mini",
+      "run_id": "pupa_reflect_fdpo_gpt-4.1-mini_s0_20260916-170119",
+      "metrics_path": "results/pupa_pilot_gpt41mini_v2/pupa_reflect_fdpo_gpt-4.1-mini_s0_20260916-170119/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 68521,
+      "optimizer_output_tokens": 15590,
+      "total_tokens": 1570400,
+      "total_cost_usd": 4.800378,
+      "by_role": {
+        "solver": {
+          "calls": 632,
+          "prompt_tokens": 537314,
+          "completion_tokens": 164920,
+          "cost_usd": 0.478798
+        },
+        "external": {
+          "calls": 312,
+          "prompt_tokens": 55922,
+          "completion_tokens": 122426,
+          "cost_usd": 1.091252
+        },
+        "judge": {
+          "calls": 312,
+          "prompt_tokens": 350662,
+          "completion_tokens": 255045,
+          "cost_usd": 2.988778
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 68521,
+          "completion_tokens": 15590,
+          "cost_usd": 0.241551
+        }
+      },
+      "model_identifiers": [
+        "gpt-4.1",
+        "gpt-4.1-2025-04-14",
+        "gpt-4.1-mini",
+        "gpt-4.1-mini-2025-04-14",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "IFBench / 4o-mini",
+      "run_id": "ifbench_reflect_fdpo_gpt-4o-mini_s0_20260829-134611",
+      "metrics_path": "results/reflect_ifbench_v1/ifbench_reflect_fdpo_gpt-4o-mini_s0_20260829-134611/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 23407,
+      "optimizer_output_tokens": 12046,
+      "total_tokens": 300900,
+      "total_cost_usd": 0.209525,
+      "by_role": {
+        "solver": {
+          "calls": 244,
+          "prompt_tokens": 221026,
+          "completion_tokens": 44421,
+          "cost_usd": 0.059806
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 23407,
+          "completion_tokens": 12046,
+          "cost_usd": 0.149719
+        }
+      },
+      "model_identifiers": [
+        "gpt-4o-mini",
+        "gpt-4o-mini-2024-07-18",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "IFBench / 4.1-mini",
+      "run_id": "ifbench_reflect_fdpo_gpt-4.1-mini_s0_20260916-163821",
+      "metrics_path": "results/reflect_ifbench_gpt41mini_v2/ifbench_reflect_fdpo_gpt-4.1-mini_s0_20260916-163821/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 20179,
+      "optimizer_output_tokens": 10107,
+      "total_tokens": 240148,
+      "total_cost_usd": 0.347726,
+      "by_role": {
+        "solver": {
+          "calls": 204,
+          "prompt_tokens": 95289,
+          "completion_tokens": 114573,
+          "cost_usd": 0.221432
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 20179,
+          "completion_tokens": 10107,
+          "cost_usd": 0.126294
+        }
+      },
+      "model_identifiers": [
+        "gpt-4.1-mini",
+        "gpt-4.1-mini-2025-04-14",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "Hearsay / 4o-mini",
+      "run_id": "legalbench_hearsay_reflect_fdpo_gpt-4o-mini_s0_20260916-233319",
+      "metrics_path": "results/reflect_hearsay_gpt4omini_v1/legalbench_hearsay_reflect_fdpo_gpt-4o-mini_s0_20260916-233319/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 17140,
+      "optimizer_output_tokens": 14924,
+      "total_tokens": 241292,
+      "total_cost_usd": 0.222319,
+      "by_role": {
+        "solver": {
+          "calls": 298,
+          "prompt_tokens": 164183,
+          "completion_tokens": 45045,
+          "cost_usd": 0.051654
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 17140,
+          "completion_tokens": 14924,
+          "cost_usd": 0.170665
+        }
+      },
+      "model_identifiers": [
+        "gpt-4o-mini-2024-07-18",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "Hearsay / 4.1-mini",
+      "run_id": "legalbench_hearsay_reflect_fdpo_gpt-4.1-mini_s0_20260916-220125",
+      "metrics_path": "results/reflect_hearsay_gpt41mini_v1/legalbench_hearsay_reflect_fdpo_gpt-4.1-mini_s0_20260916-220125/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 14148,
+      "optimizer_output_tokens": 20481,
+      "total_tokens": 246562,
+      "total_cost_usd": 0.370724,
+      "by_role": {
+        "solver": {
+          "calls": 298,
+          "prompt_tokens": 159053,
+          "completion_tokens": 52880,
+          "cost_usd": 0.148229
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 14148,
+          "completion_tokens": 20481,
+          "cost_usd": 0.222495
+        }
+      },
+      "model_identifiers": [
+        "gpt-4.1-mini-2025-04-14",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "MMLU-college_mathematics / 4o-mini",
+      "run_id": "mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-144018",
+      "metrics_path": "results/mmlu_reflect_college_mathematics/mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-144018/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 21341,
+      "optimizer_output_tokens": 17649,
+      "total_tokens": 491188,
+      "total_cost_usd": 0.344054,
+      "by_role": {
+        "solver": {
+          "calls": 332,
+          "prompt_tokens": 289846,
+          "completion_tokens": 162352,
+          "cost_usd": 0.140888
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 21341,
+          "completion_tokens": 17649,
+          "cost_usd": 0.203166
+        }
+      },
+      "model_identifiers": [
+        "gpt-4o-mini-2024-07-18",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "MMLU-computer_security / 4o-mini",
+      "run_id": "mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-151324",
+      "metrics_path": "results/mmlu_reflect_computer_security/mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-151324/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 17824,
+      "optimizer_output_tokens": 9128,
+      "total_tokens": 251630,
+      "total_cost_usd": 0.15432,
+      "by_role": {
+        "solver": {
+          "calls": 332,
+          "prompt_tokens": 208992,
+          "completion_tokens": 15686,
+          "cost_usd": 0.04076
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 17824,
+          "completion_tokens": 9128,
+          "cost_usd": 0.11356
+        }
+      },
+      "model_identifiers": [
+        "gpt-4o-mini-2024-07-18",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "MMLU-econometrics / 4o-mini",
+      "run_id": "mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-145654",
+      "metrics_path": "results/mmlu_reflect_econometrics/mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-145654/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 20658,
+      "optimizer_output_tokens": 15401,
+      "total_tokens": 382601,
+      "total_cost_usd": 0.245693,
+      "by_role": {
+        "solver": {
+          "calls": 332,
+          "prompt_tokens": 315700,
+          "completion_tokens": 30842,
+          "cost_usd": 0.06586
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 20658,
+          "completion_tokens": 15401,
+          "cost_usd": 0.179833
+        }
+      },
+      "model_identifiers": [
+        "gpt-4o-mini-2024-07-18",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "MMLU-high_school_biology / 4o-mini",
+      "run_id": "mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-150241",
+      "metrics_path": "results/mmlu_reflect_high_school_biology/mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-150241/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 16359,
+      "optimizer_output_tokens": 13688,
+      "total_tokens": 301943,
+      "total_cost_usd": 0.209716,
+      "by_role": {
+        "solver": {
+          "calls": 332,
+          "prompt_tokens": 246112,
+          "completion_tokens": 25784,
+          "cost_usd": 0.052387
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 16359,
+          "completion_tokens": 13688,
+          "cost_usd": 0.157329
+        }
+      },
+      "model_identifiers": [
+        "gpt-4o-mini-2024-07-18",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "MMLU-philosophy / 4o-mini",
+      "run_id": "mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-145252",
+      "metrics_path": "results/mmlu_reflect_philosophy/mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-145252/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 14083,
+      "optimizer_output_tokens": 8528,
+      "total_tokens": 201362,
+      "total_cost_usd": 0.134567,
+      "by_role": {
+        "solver": {
+          "calls": 332,
+          "prompt_tokens": 167928,
+          "completion_tokens": 10823,
+          "cost_usd": 0.031683
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 14083,
+          "completion_tokens": 8528,
+          "cost_usd": 0.102884
+        }
+      },
+      "model_identifiers": [
+        "gpt-4o-mini-2024-07-18",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "MMLU-professional_law / 4o-mini",
+      "run_id": "mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-150810",
+      "metrics_path": "results/mmlu_reflect_professional_law/mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-150810/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 32693,
+      "optimizer_output_tokens": 12708,
+      "total_tokens": 385484,
+      "total_cost_usd": 0.230804,
+      "by_role": {
+        "solver": {
+          "calls": 332,
+          "prompt_tokens": 313759,
+          "completion_tokens": 26324,
+          "cost_usd": 0.062858
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 32693,
+          "completion_tokens": 12708,
+          "cost_usd": 0.167946
+        }
+      },
+      "model_identifiers": [
+        "gpt-4o-mini",
+        "gpt-4o-mini-2024-07-18",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "MMLU-college_mathematics / 4.1-mini",
+      "run_id": "mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-221726",
+      "metrics_path": "results/mmlu_reflect_gpt41mini_college_mathematics/mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-221726/metrics.json",
+      "optimizer_calls": 0,
+      "optimizer_input_tokens": 0,
+      "optimizer_output_tokens": 0,
+      "total_tokens": 55847,
+      "total_cost_usd": 0.075091,
+      "by_role": {
+        "solver": {
+          "calls": 91,
+          "prompt_tokens": 11887,
+          "completion_tokens": 43960,
+          "cost_usd": 0.075091
+        }
+      },
+      "model_identifiers": [
+        "gpt-4.1-mini-2025-04-14"
+      ]
+    },
+    {
+      "run": "MMLU-computer_security / 4.1-mini",
+      "run_id": "mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-221911",
+      "metrics_path": "results/mmlu_reflect_gpt41mini_computer_security/mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-221911/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 18535,
+      "optimizer_output_tokens": 10516,
+      "total_tokens": 342894,
+      "total_cost_usd": 0.283342,
+      "by_role": {
+        "solver": {
+          "calls": 332,
+          "prompt_tokens": 289280,
+          "completion_tokens": 24563,
+          "cost_usd": 0.155013
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 18535,
+          "completion_tokens": 10516,
+          "cost_usd": 0.128329
+        }
+      },
+      "model_identifiers": [
+        "gpt-4.1-mini-2025-04-14",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "MMLU-econometrics / 4.1-mini",
+      "run_id": "mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-222331",
+      "metrics_path": "results/mmlu_reflect_gpt41mini_econometrics/mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-222331/metrics.json",
+      "optimizer_calls": 2,
+      "optimizer_input_tokens": 10431,
+      "optimizer_output_tokens": 4350,
+      "total_tokens": 185886,
+      "total_cost_usd": 0.171555,
+      "by_role": {
+        "solver": {
+          "calls": 282,
+          "prompt_tokens": 132293,
+          "completion_tokens": 38812,
+          "cost_usd": 0.115016
+        },
+        "optimizer": {
+          "calls": 2,
+          "prompt_tokens": 10431,
+          "completion_tokens": 4350,
+          "cost_usd": 0.056539
+        }
+      },
+      "model_identifiers": [
+        "gpt-4.1-mini-2025-04-14",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "MMLU-high_school_biology / 4.1-mini",
+      "run_id": "mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-222802",
+      "metrics_path": "results/mmlu_reflect_gpt41mini_high_school_biology/mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-222802/metrics.json",
+      "optimizer_calls": 0,
+      "optimizer_input_tokens": 0,
+      "optimizer_output_tokens": 0,
+      "total_tokens": 17424,
+      "total_cost_usd": 0.013973,
+      "by_role": {
+        "solver": {
+          "calls": 91,
+          "prompt_tokens": 11588,
+          "completion_tokens": 5836,
+          "cost_usd": 0.013973
+        }
+      },
+      "model_identifiers": [
+        "gpt-4.1-mini-2025-04-14"
+      ]
+    },
+    {
+      "run": "MMLU-philosophy / 4.1-mini",
+      "run_id": "mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-222836",
+      "metrics_path": "results/mmlu_reflect_gpt41mini_philosophy/mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-222836/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 13891,
+      "optimizer_output_tokens": 8732,
+      "total_tokens": 182584,
+      "total_cost_usd": 0.189343,
+      "by_role": {
+        "solver": {
+          "calls": 332,
+          "prompt_tokens": 142732,
+          "completion_tokens": 17229,
+          "cost_usd": 0.084659
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 13891,
+          "completion_tokens": 8732,
+          "cost_usd": 0.104684
+        }
+      },
+      "model_identifiers": [
+        "gpt-4.1-mini-2025-04-14",
+        "gpt-5-2025-08-07"
+      ]
+    },
+    {
+      "run": "MMLU-professional_law / 4.1-mini",
+      "run_id": "mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-223205",
+      "metrics_path": "results/mmlu_reflect_gpt41mini_professional_law/mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-223205/metrics.json",
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 32806,
+      "optimizer_output_tokens": 10641,
+      "total_tokens": 386131,
+      "total_cost_usd": 0.368609,
+      "by_role": {
+        "solver": {
+          "calls": 332,
+          "prompt_tokens": 272586,
+          "completion_tokens": 70098,
+          "cost_usd": 0.221191
+        },
+        "optimizer": {
+          "calls": 3,
+          "prompt_tokens": 32806,
+          "completion_tokens": 10641,
+          "cost_usd": 0.147418
+        }
+      },
+      "model_identifiers": [
+        "gpt-4.1-mini",
+        "gpt-4.1-mini-2025-04-14",
+        "gpt-5-2025-08-07"
+      ]
+    }
+  ],
+  "aggregates": [
+    {
+      "benchmark": "AIME",
+      "solver": "GPT-4.1 Mini",
+      "runs": 1,
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 498394,
+      "optimizer_output_tokens": 5356,
+      "total_tokens": 2666552,
+      "total_cost_usd": 3.813559,
+      "run_ids": [
+        "aime_reflect_fdpo_gpt-4.1-mini_s0_20260916-203408"
+      ]
+    },
+    {
+      "benchmark": "PUPA",
+      "solver": "GPT-4o-mini",
+      "runs": 1,
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 73832,
+      "optimizer_output_tokens": 13710,
+      "total_tokens": 1651170,
+      "total_cost_usd": 4.437325,
+      "run_ids": [
+        "pupa_reflect_fdpo_gpt-4o-mini_s0_20260830-153941"
+      ]
+    },
+    {
+      "benchmark": "PUPA",
+      "solver": "GPT-4.1 Mini",
+      "runs": 1,
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 68521,
+      "optimizer_output_tokens": 15590,
+      "total_tokens": 1570400,
+      "total_cost_usd": 4.800378,
+      "run_ids": [
+        "pupa_reflect_fdpo_gpt-4.1-mini_s0_20260916-170119"
+      ]
+    },
+    {
+      "benchmark": "IFBench",
+      "solver": "GPT-4o-mini",
+      "runs": 1,
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 23407,
+      "optimizer_output_tokens": 12046,
+      "total_tokens": 300900,
+      "total_cost_usd": 0.209525,
+      "run_ids": [
+        "ifbench_reflect_fdpo_gpt-4o-mini_s0_20260829-134611"
+      ]
+    },
+    {
+      "benchmark": "IFBench",
+      "solver": "GPT-4.1 Mini",
+      "runs": 1,
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 20179,
+      "optimizer_output_tokens": 10107,
+      "total_tokens": 240148,
+      "total_cost_usd": 0.347726,
+      "run_ids": [
+        "ifbench_reflect_fdpo_gpt-4.1-mini_s0_20260916-163821"
+      ]
+    },
+    {
+      "benchmark": "Hearsay",
+      "solver": "GPT-4o-mini",
+      "runs": 1,
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 17140,
+      "optimizer_output_tokens": 14924,
+      "total_tokens": 241292,
+      "total_cost_usd": 0.222319,
+      "run_ids": [
+        "legalbench_hearsay_reflect_fdpo_gpt-4o-mini_s0_20260916-233319"
+      ]
+    },
+    {
+      "benchmark": "Hearsay",
+      "solver": "GPT-4.1 Mini",
+      "runs": 1,
+      "optimizer_calls": 3,
+      "optimizer_input_tokens": 14148,
+      "optimizer_output_tokens": 20481,
+      "total_tokens": 246562,
+      "total_cost_usd": 0.370724,
+      "run_ids": [
+        "legalbench_hearsay_reflect_fdpo_gpt-4.1-mini_s0_20260916-220125"
+      ]
+    },
+    {
+      "benchmark": "MMLU",
+      "solver": "GPT-4o-mini",
+      "runs": 6,
+      "optimizer_calls": 18,
+      "optimizer_input_tokens": 122958,
+      "optimizer_output_tokens": 77102,
+      "total_tokens": 2014208,
+      "total_cost_usd": 1.3191540000000002,
+      "run_ids": [
+        "mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-144018",
+        "mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-151324",
+        "mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-145654",
+        "mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-150241",
+        "mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-145252",
+        "mmlu_reflect_fdpo_gpt-4o-mini_s0_20260830-150810"
+      ]
+    },
+    {
+      "benchmark": "MMLU",
+      "solver": "GPT-4.1 Mini",
+      "runs": 6,
+      "optimizer_calls": 11,
+      "optimizer_input_tokens": 75663,
+      "optimizer_output_tokens": 34239,
+      "total_tokens": 1170766,
+      "total_cost_usd": 1.1019130000000001,
+      "run_ids": [
+        "mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-221726",
+        "mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-221911",
+        "mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-222331",
+        "mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-222802",
+        "mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-222836",
+        "mmlu_reflect_fdpo_gpt-4.1-mini_s0_20260916-223205"
+      ]
+    }
+  ]
+}

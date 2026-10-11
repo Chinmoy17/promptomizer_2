@@ -1,4 +1,4 @@
-"""Generate artifact figures using the shared author-confirmed result manifest.
+"""Generate artifact figures using the shared result manifest.
 
 Outputs PNG (300dpi) + PDF (vector, for \\includegraphics) into
 Paper_COLING/Artifacts/figures/.
@@ -21,6 +21,7 @@ C_GEPA = "#9E9E9E"     # neutral gray, de-emphasized (not the paper's own method
 
 plt.rcParams.update({
     "font.size": 10,
+    "pdf.fonttype": 42,
     "axes.titlesize": 11,
     "axes.labelsize": 10,
     "legend.fontsize": 9,
@@ -46,6 +47,8 @@ def save(fig, name: str) -> None:
 # ---------------------------------------------------------------------------
 source = json.loads((OUT.parent / "reported_results.json").read_text(encoding="utf-8"))
 benchmark_labels = {"PUPA": "PUPA (composite)", "MMLU": "MMLU (macro)"}
+summary_only = {(benchmark_labels.get(row["benchmark"], row["benchmark"]), row["solver"])
+                for row in source["results"] if row["provenance"] != "saved"}
 results = [(benchmark_labels.get(row["benchmark"], row["benchmark"]), row["solver"],
             row["baseline_pct"], row["final_pct"]) for row in source["results"]]
 deltas = {(benchmark_labels.get(row["benchmark"], row["benchmark"]), row["solver"]):
@@ -66,7 +69,7 @@ for bench, model, base, final in results:
     color = C_41MINI if model == "GPT-4.1 Mini" else C_4OMINI
     line_color = C_RECOV if final >= base else C_REGR
     ax.plot([base, final], [yy, yy], color=line_color, linewidth=2.2, zorder=1,
-            solid_capstyle="round")
+            solid_capstyle="round", linestyle="--" if (bench, model) in summary_only else "-")
     ax.scatter([base], [yy], color="white", edgecolor=color, linewidth=1.6,
                s=55, zorder=3)
     ax.scatter([final], [yy], color=color, edgecolor=color, linewidth=1.2,
@@ -95,7 +98,8 @@ legend_handles = [
 ]
 ax.legend(handles=legend_handles, loc="upper center", bbox_to_anchor=(0.5, -0.08),
           ncol=2, frameon=False)
-fig.tight_layout()
+fig.text(0.01, 0.01, "Dashed: GPT-4o-mini AIME summary; no identified matched run.", fontsize=6.5)
+fig.tight_layout(rect=[0, 0.04, 1, 1])
 save(fig, "fig1_cross_benchmark_accuracy")
 
 
@@ -103,8 +107,10 @@ save(fig, "fig1_cross_benchmark_accuracy")
 # Figure 2: recovered vs regressed (test), diverging bars, 5 benchmarks x 2 models
 # MMLU is the sum across its 6 subjects (matches RESULTS.md's "Macro" framing).
 # ---------------------------------------------------------------------------
-confusion = [(f"{'MMLU (sum)' if row['benchmark'] == 'MMLU' else row['benchmark']} -- {row['solver']}",
-              row["recovered"], row["regressed"], row["recovered"] - row["regressed"])
+confusion = [(f"{'MMLU (sum)' if row['benchmark'] == 'MMLU' else row['benchmark']}"
+              f"{'*' if row['provenance'] != 'saved' else ''} -- {row['solver']}",
+              row["recovered"], row["regressed"], row["recovered"] - row["regressed"],
+              row["provenance"] != "saved")
              for row in source["results"]]
 
 fig, ax = plt.subplots(figsize=(6.6, 5.2))
@@ -112,16 +118,18 @@ labels = [c[0] for c in confusion]
 ys = list(range(len(labels)))[::-1]
 NET_X = 36  # fixed column for every "net" annotation, regardless of bar length
 
-for yy, (label, rec, reg, net) in zip(ys, confusion):
+for yy, (label, rec, reg, net, provisional) in zip(ys, confusion):
     if rec is None:
         ax.text(-25, yy, "item split not verifiable (see text)",
                 va="center", ha="left", fontsize=7.5, color="#555555", style="italic")
         ax.text(NET_X, yy, f"net {net:+d}", va="center", ha="left", fontsize=8,
                 fontweight="bold", color=C_RECOV)
         continue
-    ax.barh(yy, rec, color=C_RECOV, height=0.6, zorder=2)
+    ax.barh(yy, rec, color=C_RECOV, height=0.6, zorder=2,
+            hatch="//" if provisional else None)
     if reg > 0:
-        ax.barh(yy, -reg, color=C_REGR, height=0.6, zorder=2)
+        ax.barh(yy, -reg, color=C_REGR, height=0.6, zorder=2,
+                hatch="//" if provisional else None)
         ax.text(-reg - 1.0, yy, f"-{reg}", va="center", ha="right", fontsize=7.5, color=C_REGR)
     ax.text(rec + 1.0, yy, f"+{rec}", va="center", ha="left", fontsize=7.5, color=C_RECOV)
     ax.text(NET_X, yy, f"net {net:+d}", va="center", ha="left", fontsize=8,
@@ -140,7 +148,8 @@ legend_handles = [
 ]
 ax.legend(handles=legend_handles, loc="upper center", bbox_to_anchor=(0.35, -0.08),
           ncol=1, frameon=False, fontsize=8)
-fig.tight_layout()
+fig.text(0.01, 0.01, "* GPT-4o-mini AIME summary; excluded from matched transfer and resource analysis.", fontsize=6.5)
+fig.tight_layout(rect=[0, 0.04, 1, 1])
 save(fig, "fig2_recovered_regressed")
 
 

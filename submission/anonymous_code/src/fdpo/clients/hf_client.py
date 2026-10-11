@@ -1,4 +1,4 @@
-"""HuggingFace-transformers client — STUB for the anonymous team.
+"""HuggingFace-transformers client — STUB for the TAMU team.
 
 The preferred path for open models (Llama-3-8B, Qwen3-8B, DeepSeek) is to
 serve them with vLLM and use OpenAICompatClient unchanged:

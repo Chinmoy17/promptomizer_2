@@ -6,7 +6,7 @@ services:
       - .env
     # Linux-only: makes the container share the host's network namespace, so
     # SOLVER_BASE_URL=http://localhost:8000/v1 etc. in .env keep working
-    # completely unchanged, exactly as documented in Docs/anonymous_handoff.md.
+    # completely unchanged, exactly as documented in Docs/tamuk_handoff.md.
     # Does not work as-is on Docker Desktop for Mac/Windows.
     network_mode: host
     volumes:

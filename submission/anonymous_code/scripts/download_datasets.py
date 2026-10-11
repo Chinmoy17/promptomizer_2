@@ -43,7 +43,7 @@ def main(argv: list[str] | None = None) -> int:
         logger.info("%s: wrote %d train / %d test examples -> %s",
                     name, len(train), len(test), out_dir)
 
-    logger.info("done. Commit the Dataset/ folder so anonymous gets identical data.")
+    logger.info("done. Commit the Dataset/ folder so TAMU gets identical data.")
     return 0
 
 

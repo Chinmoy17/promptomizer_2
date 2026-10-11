@@ -91,7 +91,7 @@ instead hits the HF `datasets-server` parquet API directly via plain
 `requests` + `truststore` (bridges the OS trust store into Python's SSL
 context). Every experiment run reads ONLY the committed `Dataset/*.jsonl`
 files (`src/fdpo/data/loaders.py`) — zero HuggingFace calls at run time, so
-a fresh `git clone` (e.g. on anonymous's cluster) works offline and both sites see
+a fresh `git clone` (e.g. on TAMU's cluster) works offline and both sites see
 byte-identical examples.
 
 Currently committed:
@@ -348,7 +348,7 @@ uv run python -m pytest
 Model/endpoint/key are **never** flags — they live only in `.env`
 (`SOLVER_MODEL`/`JUDGE_MODEL`/`OPTIMIZER_MODEL` + `_BASE_URL`/`_API_KEY`/
 `_API_VERSION`, or the shared `AZURE_OPENAI_*` fallback), so the exact same
-command runs identically at anonymous with only `.env` changed.
+command runs identically at TAMU with only `.env` changed.
 
 ## 12. File map (annotated)
 

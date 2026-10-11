@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# MMLU 6-subject simple_fdpo sweep for the open-model (anonymous) handoff.
+# MMLU 6-subject simple_fdpo sweep for the open-model (TAMUK) handoff.
 #
 # Model roles come from .env (NOT this script). Set them there:
 #   SOLVER_MODEL    = the ~7B model under test         (e.g. Qwen2.5-7B-Instruct)

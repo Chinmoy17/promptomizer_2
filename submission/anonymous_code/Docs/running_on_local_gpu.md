@@ -1,6 +1,6 @@
 # Running FDPO on your own GPU / server
 
-**Audience**: Prof. Tarek Mahmud's group at anonymous, or anyone running
+**Audience**: Prof. Tarek Mahmud's group at Texas A&M, or anyone running
 this codebase on their own hardware with Llama, Mistral, or another
 open-weight model.
 
@@ -33,11 +33,11 @@ Three concrete choices, in decreasing order of throughput:
 | **Text Generation Inference (TGI)** | If you already use HuggingFace's stack | Medium |
 
 Pick one. This document walks through **vLLM** as the primary path
-(recommended for anonymous) and **Ollama** as a fallback for quick experimentation.
+(recommended for TAMU) and **Ollama** as a fallback for quick experimentation.
 
 ---
 
-## 2. Path A — vLLM (recommended for anonymous)
+## 2. Path A — vLLM (recommended for TAMU)
 
 ### 2.1 Prerequisites on your GPU node
 

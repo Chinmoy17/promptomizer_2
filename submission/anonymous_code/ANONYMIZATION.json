@@ -11,16 +11,12 @@
   ],
   "redacted_files": [
     {
-      "path": "Codebase.md",
-      "matches": 2
-    },
-    {
       "path": "docker-compose.yml",
-      "matches": 2
+      "matches": 1
     },
     {
       "path": "Docs/running_on_local_gpu.md",
-      "matches": 14
+      "matches": 11
     },
     {
       "path": "Docs/running_reflect_fdpo_local.md",
@@ -31,16 +27,8 @@
       "matches": 6
     },
     {
-      "path": "scripts/download_datasets.py",
-      "matches": 1
-    },
-    {
-      "path": "scripts/run_mmlu_handoff.sh",
-      "matches": 1
-    },
-    {
       "path": "src/fdpo/clients/hf_client.py",
-      "matches": 2
+      "matches": 1
     },
     {
       "path": "src/fdpo/config.py",
@@ -48,10 +36,6 @@
     },
     {
       "path": "src/fdpo/data/hf_fetch.py",
-      "matches": 2
-    },
-    {
-      "path": "src/fdpo/data/loaders.py",
       "matches": 1
     },
     {
@@ -102,7 +86,7 @@
     },
     {
       "path": "_dl/check_paper.py",
-      "sha256": "fcd30af1c12750eace77d2a8b583dd00da2ec524724e15cbe45f03c4d5d79280"
+      "sha256": "79881d63c73938b51e8878efc9a5827afa8d35e410b5c8dbc6027a19d9d73b23"
     },
     {
       "path": "_dl/check_selection.py",
@@ -150,7 +134,7 @@
     },
     {
       "path": "_dl/generate_paper_figures.py",
-      "sha256": "6a3e65af62f6fee24e8980a306f1f5bb241c789cda7a069c1ed558e8e34f8311"
+      "sha256": "1c6926061008f0b82b1895b25a698a84ffafa7edc01ca71b23cb1a26a833e501"
     },
     {
       "path": "_dl/law_cf_compare.py",
@@ -174,11 +158,11 @@
     },
     {
       "path": "_dl/make_paper_figures.py",
-      "sha256": "2d904dfeaf43f2edbb0ad6d04cb59e2e1aec793bffc17702ae47fb43bf32a656"
+      "sha256": "d7a4000313710bd4fe37687eb2f00460f079f058a14b0d3d2cebdccc4364f913"
     },
     {
       "path": "_dl/make_transfer_figure.py",
-      "sha256": "e8b5cc105f4800cf1b3b64571d7e57376b412ca0141d2d41c6807f289fcf0e62"
+      "sha256": "08750a30ce027de1a1bb411b4edfe93e8caeb37ffa378079539e530f517a172a"
     },
     {
       "path": "_dl/make_val_test_figure.py",
@@ -210,7 +194,7 @@
     },
     {
       "path": "_dl/val_test_gap.py",
-      "sha256": "027484d4a94101adf36f635342778ad65e084e3e23abec25b07a7d5b3221e53b"
+      "sha256": "a2b3bff6603e25a1be37c1b6abd805fbeb8b3bf35aa44d3801ca355ce1ea7d3f"
     },
     {
       "path": "_dl/verify_blocked.py",
@@ -218,7 +202,7 @@
     },
     {
       "path": "Codebase.md",
-      "sha256": "3406b177fe21eb323d16b921551228a157ba3ed7d3406b42ccd3ff47c52e04eb"
+      "sha256": "c12316fb88ce46b57307231bd164e4927389f728ea883ea67e95064082bcd70b"
     },
     {
       "path": "Dataset/README.md",
@@ -226,7 +210,7 @@
     },
     {
       "path": "docker-compose.yml",
-      "sha256": "d60442e60e309f7df5e257f2231d851975f3b5354593f4788c9272b5a9546ba1"
+      "sha256": "52dedc44aabc0b98b1bcba18ce85c21752bea314323fcb1ff2bdeab7f5326298"
     },
     {
       "path": "Dockerfile",
@@ -238,7 +222,7 @@
     },
     {
       "path": "Docs/running_on_local_gpu.md",
-      "sha256": "4611d72653b722952e8dc7f429703db9ce79b4e434aba07b9a5d577e310e7779"
+      "sha256": "4649ce0cca7bec709d25f556861eeb51874832bf0b2ee7c3919308c3d7ffd852"
     },
     {
       "path": "Docs/running_reflect_fdpo_local.md",
@@ -334,7 +318,7 @@
     },
     {
       "path": "scripts/download_datasets.py",
-      "sha256": "3ca9dfd133d16025bfc1b2e65c2be29684dc9776d792091af54301984cad863d"
+      "sha256": "7d51b1934dec3f03384b442650a82dc5530429ea2f6d205e5c712be74ef7fd6c"
     },
     {
       "path": "scripts/eval_prompt_on_test.py",
@@ -358,7 +342,7 @@
     },
     {
       "path": "scripts/run_mmlu_handoff.sh",
-      "sha256": "fe805a68a2fafbb0ea209372f79ae48f4ab3bdd121cdcbe647888736b39875e6"
+      "sha256": "423d7af283611d16ef6d99da04e9e14f1ccb622d78138dc00a4f0fbef23b9d45"
     },
     {
       "path": "scripts/run_mmlu_reflect_sweep.ps1",
@@ -402,7 +386,7 @@
     },
     {
       "path": "src/fdpo/clients/hf_client.py",
-      "sha256": "354496418d952abcdaec9d72acb13010643a6538b288ccb7a9f6e76e69a40bd5"
+      "sha256": "bdfcbd918044452103be441ff5403761382560f4726105207852a412b910a2c1"
     },
     {
       "path": "src/fdpo/clients/mock_client.py",
@@ -462,7 +446,7 @@
     },
     {
       "path": "src/fdpo/data/hf_fetch.py",
-      "sha256": "6a9621b65855db4104af8be970a8102c679b4f956d8269f7b3e11256602044a9"
+      "sha256": "6e905ad72e45faf42ad3b19a47b6c6daf3a11fec63f00ea0a9e21c24194211ae"
     },
     {
       "path": "src/fdpo/data/ifeval_verifiers.py",
@@ -470,7 +454,7 @@
     },
     {
       "path": "src/fdpo/data/loaders.py",
-      "sha256": "ae4536ea2e192ec1c9081bb6ea523547437a0a53a32533ed6690f8c105623800"
+      "sha256": "f29f6fef08ab512223e8c5441923eab0f52fa5a98cde419c1f209636c98efb83"
     },
     {
       "path": "src/fdpo/data/md_prompt.py",

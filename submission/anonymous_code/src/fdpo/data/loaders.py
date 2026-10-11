@@ -5,7 +5,7 @@ Datasets are fetched ONCE via `python -m scripts.download_datasets` and
 committed to Dataset/<name>/{train,test}.jsonl (mirroring this project's
 convention of shipping raw data in-repo). Experiment runs never touch
 HuggingFace — this keeps runs fast, offline-capable, and byte-identical
-between this machine and the anonymous cluster (both read the same committed
+between this machine and the TAMU cluster (both read the same committed
 files instead of two independent HF downloads).
 """
 

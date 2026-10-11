@@ -2,7 +2,7 @@
 
 Experiment runs never import this module — they read the committed files
 under Dataset/ (see loaders.py). This keeps HF network access off the runtime
-path entirely, so a fresh clone (e.g. on the anonymous cluster) works with zero
+path entirely, so a fresh clone (e.g. on the TAMU cluster) works with zero
 network access as long as Dataset/ was cloned too.
 
 Deliberately does NOT use the `datasets` library's load_dataset(): on networks

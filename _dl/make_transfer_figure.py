@@ -1,4 +1,4 @@
-"""Matched non-AIME outcome funnel and paired accuracy means for the paper."""
+"""Matched outcome funnel and paired accuracy means for the paper."""
 from __future__ import annotations
 
 import json
@@ -27,7 +27,12 @@ for row in rows:
 shipped = [r for r in rows if r["shipped"]]
 up = [r for r in shipped if r["val_gain_pp"] > 0]
 fell = [r for r in up if r["test_delta_pp"] < 0]
-assert (len(rows), len(shipped), len(up), len(fell)) == (18, 16, 11, 3)
+assert (len(rows), len(shipped), len(up), len(fell)) == (19, 17, 12, 4)
+record_count = len(rows)
+edited_count = len(shipped)
+up_count = len(up)
+fell_count = len(fell)
+both_up_count = len(up) - len(fell)
 
 
 def mean(group, key):
@@ -59,9 +64,11 @@ def txt(x, y, s, fs, color=INK, weight="normal", ha="center", style="normal", z=
 txt(2, 108, "A", 7.5, BLUE, "bold", "left")
 txt(7, 108, "Validation/test outcome counts", 6.6, INK, "bold", "left")
 CX, W = 37, 68
-rowsA = [(94, 18, W, "18 matched non-AIME records", BLUE_L, BLUE),
-         (80, 16, W * 16 / 18, "16 shipped an optimized prompt", BLUE_L, BLUE),
-         (66, 11, W * 11 / 18, "11 raised validation accuracy", BLUE_M, BLUE)]
+rowsA = [(94, record_count, W, f"{record_count} matched records", BLUE_L, BLUE),
+         (80, edited_count, W * edited_count / record_count,
+          f"{edited_count} returned an edited prompt", BLUE_L, BLUE),
+         (66, up_count, W * up_count / record_count,
+          f"{up_count} raised validation accuracy", BLUE_M, BLUE)]
 for y, n, w, label, fc, ec in rowsA:
     bar(CX - w / 2, CX + w / 2, y - 5, y + 5, fc, ec)
     txt(CX, y, label, 5.8, INK, "bold")
@@ -69,17 +76,17 @@ for (y0, y1), note in (((89, 85), "2 kept the\nseed prompt"), ((75, 71), "5 did 
     ax.plot([CX, CX], [y0, y1 + 0.2], color=BLUE, lw=0.8, zorder=1)
 for y, note in ((87, "2 kept the\nseed prompt"), ((73), "5 did not raise\nvalidation")):
     txt(76, y, note, 5.0, GREY, ha="left", style="italic")
-wu = W * 8 / 18
-wf = W * 3 / 18
-x0 = CX - W * 11 / 18 / 2
+wu = W * both_up_count / record_count
+wf = W * fell_count / record_count
+x0 = CX - W * up_count / record_count / 2
 bar(x0, x0 + wu - 0.6, 46, 58, GREEN_L, GREEN)
 bar(x0 + wu + 0.6, x0 + wu + wf, 46, 58, RED_L, RED)
-txt(x0 + wu / 2, 54.2, "8", 8, GREEN, "bold")
+txt(x0 + wu / 2, 54.2, str(both_up_count), 8, GREEN, "bold")
 txt(x0 + wu / 2, 49.4, "test went up", 5.0, INK)
-txt(x0 + wu + wf / 2 + 0.3, 54.2, "3", 8, RED, "bold")
+txt(x0 + wu + wf / 2 + 0.3, 54.2, str(fell_count), 8, RED, "bold")
 txt(x0 + wu + wf / 2 + 0.3, 49.4, "test fell", 5.0, INK)
 ax.plot([CX, CX], [60.8, 59.0], color=BLUE, lw=0.8, zorder=1)
-txt(76, 52, "IFBench,\nHearsay, MMLU\nsecurity", 5.0, GREY, ha="left", style="italic")
+txt(76, 52, "AIME, IFBench,\nHearsay, MMLU\nsecurity", 5.0, GREY, ha="left", style="italic")
 ax.plot([x0 + wu + 1, 75.5], [52, 52], color="#C9D3DD", lw=0.5, zorder=1)
 
 # ---- panel B: gain budget ---------------------------------------------------------------------
