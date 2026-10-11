@@ -1,0 +1,343 @@
+{
+  "benchmark": "LegalBench-Hearsay",
+  "solver": "gpt-4o-mini",
+  "optimizer": "gpt-5",
+  "seed": 0,
+  "round1_prompt": "prompts/ablation/hearsay_round1_4omini.md",
+  "runs_per_arm": {
+    "report": 5,
+    "noreport": 5
+  },
+  "test": "exact two-sided permutation test on run-level means; uncorrected",
+  "rounds": {
+    "2": {
+      "report": {
+        "rounds": 5,
+        "sections_mean": 2,
+        "single_section": 1,
+        "mining_recovered": 12,
+        "mining_regressed": 7,
+        "validation_recovered": 26,
+        "validation_regressed": 2
+      },
+      "noreport": {
+        "rounds": 5,
+        "sections_mean": 1.6,
+        "single_section": 3,
+        "mining_recovered": 17,
+        "mining_regressed": 14,
+        "validation_recovered": 26,
+        "validation_regressed": 6
+      }
+    },
+    "3": {
+      "report": {
+        "rounds": 5,
+        "sections_mean": 1,
+        "single_section": 5,
+        "mining_recovered": 5,
+        "mining_regressed": 7,
+        "validation_recovered": 10,
+        "validation_regressed": 3
+      },
+      "noreport": {
+        "rounds": 5,
+        "sections_mean": 2,
+        "single_section": 0,
+        "mining_recovered": 10,
+        "mining_regressed": 11,
+        "validation_recovered": 18,
+        "validation_regressed": 12
+      }
+    },
+    "2-3": {
+      "report": {
+        "rounds": 10,
+        "sections_mean": 1.5,
+        "single_section": 6,
+        "mining_recovered": 17,
+        "mining_regressed": 14,
+        "validation_recovered": 36,
+        "validation_regressed": 5
+      },
+      "noreport": {
+        "rounds": 10,
+        "sections_mean": 1.8,
+        "single_section": 3,
+        "mining_recovered": 27,
+        "mining_regressed": 25,
+        "validation_recovered": 44,
+        "validation_regressed": 18
+      }
+    }
+  },
+  "sections_p": {
+    "2": 0.6825396825396826,
+    "3": 0.007936507936507936,
+    "2-3": 0.48412698412698413
+  },
+  "run_level": [
+    {
+      "metric": "mining_churn_per_round",
+      "report": 3.1,
+      "noreport": 5.2,
+      "p": 0.023809523809523808,
+      "report_runs": [
+        3.5,
+        3.5,
+        2.5,
+        3,
+        3
+      ],
+      "noreport_runs": [
+        4.5,
+        5.5,
+        6.5,
+        6,
+        3.5
+      ]
+    },
+    {
+      "metric": "mining_net_gain_per_round",
+      "report": 0.3,
+      "noreport": 0.2,
+      "p": 1.0,
+      "report_runs": [
+        0.5,
+        0.5,
+        -1.5,
+        1,
+        1
+      ],
+      "noreport_runs": [
+        -0.5,
+        1.5,
+        -0.5,
+        2,
+        -1.5
+      ]
+    },
+    {
+      "metric": "mining_regressions_per_round",
+      "report": 1.4,
+      "noreport": 2.5,
+      "p": 0.023809523809523808,
+      "report_runs": [
+        1.5,
+        1.5,
+        2,
+        1,
+        1
+      ],
+      "noreport_runs": [
+        2.5,
+        2,
+        3.5,
+        2,
+        2.5
+      ]
+    },
+    {
+      "metric": "validation_churn_per_round",
+      "report": 4.1,
+      "noreport": 6.2,
+      "p": 0.20634920634920634,
+      "report_runs": [
+        4,
+        3,
+        4,
+        6,
+        3.5
+      ],
+      "noreport_runs": [
+        7.5,
+        5,
+        10.5,
+        4,
+        4
+      ]
+    },
+    {
+      "metric": "validation_gain_points",
+      "report": 4.799999999999998,
+      "noreport": 2.3999999999999955,
+      "p": 0.5714285714285714,
+      "report_runs": [
+        7.9999999999999964,
+        0.0,
+        7.9999999999999964,
+        0.0,
+        7.9999999999999964
+      ],
+      "noreport_runs": [
+        3.9999999999999925,
+        3.9999999999999925,
+        0.0,
+        7.9999999999999964,
+        -4.0000000000000036
+      ]
+    },
+    {
+      "metric": "test_churn_per_run",
+      "report": 14.2,
+      "noreport": 17.2,
+      "p": 0.2698412698412698,
+      "report_runs": [
+        14,
+        17,
+        13,
+        14,
+        13
+      ],
+      "noreport_runs": [
+        20,
+        13,
+        23,
+        18,
+        12
+      ]
+    },
+    {
+      "metric": "test_regressions_per_run",
+      "report": 8.4,
+      "noreport": 10,
+      "p": 0.12698412698412698,
+      "report_runs": [
+        9,
+        8,
+        9,
+        8,
+        8
+      ],
+      "noreport_runs": [
+        11,
+        10,
+        12,
+        9,
+        8
+      ]
+    },
+    {
+      "metric": "test_change_points",
+      "report": -5.306122448979593,
+      "noreport": -5.714285714285718,
+      "p": 1.0,
+      "report_runs": [
+        -8.163265306122447,
+        2.0408163265306145,
+        -10.204081632653061,
+        -4.081632653061229,
+        -6.1224489795918435
+      ],
+      "noreport_runs": [
+        -4.081632653061229,
+        -14.28571428571429,
+        -2.0408163265306145,
+        0.0,
+        -8.163265306122458
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "arm": "report",
+      "run_id": "legalbench_hearsay_reflect_fdpo_gpt-4o-mini_s0_20261011-212936",
+      "shipped_round": 3,
+      "best_validation_accuracy": 0.76,
+      "test_seed_accuracy": 0.7142857142857143,
+      "test_final_accuracy": 0.6326530612244898,
+      "test_recovered": 5,
+      "test_regressed": 9
+    },
+    {
+      "arm": "report",
+      "run_id": "legalbench_hearsay_reflect_fdpo_gpt-4o-mini_s0_20261011-214119",
+      "shipped_round": 3,
+      "best_validation_accuracy": 0.68,
+      "test_seed_accuracy": 0.6938775510204082,
+      "test_final_accuracy": 0.7142857142857143,
+      "test_recovered": 9,
+      "test_regressed": 8
+    },
+    {
+      "arm": "report",
+      "run_id": "legalbench_hearsay_reflect_fdpo_gpt-4o-mini_s0_20261011-214430",
+      "shipped_round": 3,
+      "best_validation_accuracy": 0.76,
+      "test_seed_accuracy": 0.7346938775510204,
+      "test_final_accuracy": 0.6326530612244898,
+      "test_recovered": 4,
+      "test_regressed": 9
+    },
+    {
+      "arm": "report",
+      "run_id": "legalbench_hearsay_reflect_fdpo_gpt-4o-mini_s0_20261011-215504",
+      "shipped_round": 2,
+      "best_validation_accuracy": 0.68,
+      "test_seed_accuracy": 0.6938775510204082,
+      "test_final_accuracy": 0.6530612244897959,
+      "test_recovered": 6,
+      "test_regressed": 8
+    },
+    {
+      "arm": "report",
+      "run_id": "legalbench_hearsay_reflect_fdpo_gpt-4o-mini_s0_20261011-215835",
+      "shipped_round": 3,
+      "best_validation_accuracy": 0.76,
+      "test_seed_accuracy": 0.7346938775510204,
+      "test_final_accuracy": 0.673469387755102,
+      "test_recovered": 5,
+      "test_regressed": 8
+    },
+    {
+      "arm": "noreport",
+      "run_id": "legalbench_hearsay_reflect_fdpo_gpt-4o-mini_s0_20261011-213332",
+      "shipped_round": 3,
+      "best_validation_accuracy": 0.72,
+      "test_seed_accuracy": 0.6938775510204082,
+      "test_final_accuracy": 0.6530612244897959,
+      "test_recovered": 9,
+      "test_regressed": 11
+    },
+    {
+      "arm": "noreport",
+      "run_id": "legalbench_hearsay_reflect_fdpo_gpt-4o-mini_s0_20261011-213747",
+      "shipped_round": 3,
+      "best_validation_accuracy": 0.72,
+      "test_seed_accuracy": 0.7142857142857143,
+      "test_final_accuracy": 0.5714285714285714,
+      "test_recovered": 3,
+      "test_regressed": 10
+    },
+    {
+      "arm": "noreport",
+      "run_id": "legalbench_hearsay_reflect_fdpo_gpt-4o-mini_s0_20261011-214814",
+      "shipped_round": 2,
+      "best_validation_accuracy": 0.68,
+      "test_seed_accuracy": 0.7142857142857143,
+      "test_final_accuracy": 0.6938775510204082,
+      "test_recovered": 11,
+      "test_regressed": 12
+    },
+    {
+      "arm": "noreport",
+      "run_id": "legalbench_hearsay_reflect_fdpo_gpt-4o-mini_s0_20261011-215148",
+      "shipped_round": 2,
+      "best_validation_accuracy": 0.76,
+      "test_seed_accuracy": 0.7142857142857143,
+      "test_final_accuracy": 0.7142857142857143,
+      "test_recovered": 9,
+      "test_regressed": 9
+    },
+    {
+      "arm": "noreport",
+      "run_id": "legalbench_hearsay_reflect_fdpo_gpt-4o-mini_s0_20261011-220249",
+      "shipped_round": 3,
+      "best_validation_accuracy": 0.64,
+      "test_seed_accuracy": 0.7346938775510204,
+      "test_final_accuracy": 0.6530612244897959,
+      "test_recovered": 4,
+      "test_regressed": 8
+    }
+  ]
+}

@@ -17,7 +17,7 @@ MANUSCRIPT_INPUTS = (
     "figures/fig_metric.pdf",
     "figures/fig_recovered_regressed.pdf",
     "Artifacts/reported_results.json", "Artifacts/val_test_gap.json",
-    "Artifacts/resource_usage.json",
+    "Artifacts/resource_usage.json", "Artifacts/ablation_hearsay.json",
 )
 
 

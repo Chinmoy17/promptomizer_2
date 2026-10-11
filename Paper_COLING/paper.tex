@@ -59,9 +59,10 @@ every revision, the prompt version, paired recoveries and regressions on tuning 
 Across five benchmarks and two solver models, aggregate scores substantially understate behavioral change: on
 LegalBench-Hearsay, single-item net changes conceal 13--17 changed outcomes, and in five configurations the number of
 changed outcomes is at least five times the net change. Validation gains average 7.9 points, against 4.8 points on
-held-out test items. Once it receives item-level effect reports, the optimizer narrows its edits from 4.3 of five
-prompt sections to 1.3, yet later rounds still break nearly as many items as they fix. We argue that recovery,
-regression, churn, and tuning-to-test transfer should be standard reporting dimensions for APO.
+held-out test items. Across rounds the optimizer narrows its edits from 4.3 of five prompt sections to 1.3, yet later
+rounds still break nearly as many items as they fix. In a controlled ablation on LegalBench-Hearsay (five runs per
+arm), the item-level effect report leaves the net gain unchanged but cuts the items that flip per round by 40\%. We
+argue that recovery, regression, churn, and tuning-to-test transfer should be standard reporting dimensions for APO.
 \end{abstract}
 
 \section{Introduction}
@@ -112,7 +113,8 @@ which items its own previous edit recovered and which it regressed, with the sol
 replaced, on both tuning sets. Existing optimizers condition on scored prompt histories or on the current candidate's
 errors or traces, or use regressions only to accept or reject a candidate (\S\ref{sec:related}); RFDPO returns the
 item-level consequences of an edit to the editor. It also versions every prompt and meters token use and cost by role,
-so each revision can be audited.
+so each revision can be audited. A controlled ablation shows what the report changes: at equal net gain, it cuts the
+items that flip per round by 40\% (\S\ref{sec:edits}).
 
 We apply RFDPO to LegalBench-Hearsay, MMLU, IFBench, AIME, and PUPA with GPT-4o-mini and GPT-4.1 Mini solvers and ask
 what paired outcomes reveal beyond aggregate scores; test examples never enter optimizer feedback or candidate
@@ -125,7 +127,7 @@ records prompt versions, paired transitions on tuning and test data, and per-rol
 (\S\ref{sec:method}).
 \item \textbf{Evidence that aggregate scores hide behavioral change.} Across five benchmarks, a one-item net change can
 conceal 17 changed outcomes, and held-out test gains reach about three-fifths of validation gains (\S\ref{sec:results}).
-\item \textbf{A characterization of reflective editing.} With item-level feedback, the optimizer shifts from rewriting
+\item \textbf{A characterization of reflective editing.} Across rounds, the optimizer shifts from rewriting
 most of the prompt to single-section edits while regressions persist (\S\ref{sec:edits}); we derive reporting practices
 for APO from these findings (\S\ref{sec:discussion}).
 \end{itemize}
@@ -424,13 +426,20 @@ configured prices. MMLU sums six subject runs, two of which (GPT-4.1 Mini) skipp
 
 \subsection{How the optimizer edits}
 \label{sec:edits}
-Table~\ref{tab:edits} compares the optimizer's edits before and after it receives item-level feedback. In round 1, with
-only the current failures and successes, every rewrite changed several sections, 4.3 of five on average. Once shown
-which items its previous edit recovered and regressed, the optimizer changed 1.3 sections on average, and 21 of 32
-rewrites touched a single section, consistent with the report's instruction to keep edits that helped and repair
-those that broke items. Targeted edits did not remove side effects: later rounds regressed 54 mining items while
-recovering 56, compared with 27 regressions for 59 recoveries in round 1. Each revision keeps trading cases, so
-per-item tracking is needed throughout optimization, not only for the first rewrite.
+Table~\ref{tab:edits} compares round 1, where the optimizer sees only the current failures and successes, with later
+rounds. In round 1 every rewrite changed several sections, 4.3 of five on average; in later rounds it changed 1.3 on
+average, and 21 of 32 rewrites touched a single section. Targeted edits did not remove side effects: later rounds
+regressed 54 mining items while recovering 56, compared with 27 regressions for 59 recoveries in round 1. Each revision
+keeps trading cases, so per-item tracking is needed throughout optimization, not only for the first rewrite.
+
+\paragraph{Effect-report ablation.}
+Round and report are confounded in Table~\ref{tab:edits}, so we separated them on LegalBench-Hearsay with the
+GPT-4o-mini solver. Both arms replay the same round-1 prompt and then run rounds 2 and 3; they differ only in whether
+the optimizer sees the item-level effect of its previous edit. We ran five runs per arm (Appendix~\ref{app:ablation}).
+Without the report, round-2 edits already change 1.6 of five sections (2.0 with it), so most of the narrowing from
+round 1 comes from the round, not the report. The report changes how many items flip: per round, 3.1 mining items
+change outcome with it and 5.2 without ($p=0.024$, exact permutation test over runs), at the same net gain (0.3 and 0.2
+items per round). Test accuracy changes by $-5.3$ and $-5.7$ points.
 
 \begin{table}[!t]
 \centering
@@ -448,8 +457,8 @@ Mining recovered / regressed & 59 / 27 & 56 / 54 \\
 Validation recovered / regressed & 39 / 22 & 43 / 37 \\
 \bottomrule
 \end{tabular}
-\caption{Optimizer edits before and after it receives the item-level effect of its previous edit, over all committed
-rounds of the 19 records. Recoveries and regressions compare each round with its parent prompt.}
+\caption{Optimizer edits in round 1 and in later rounds, over all committed rounds of the 19 records. The effect report
+exists only from round 2. Recoveries and regressions compare each round with its parent prompt.}
 \label{tab:edits}
 \end{table}
 
@@ -475,23 +484,24 @@ a tuning gain reaches new items and how much churn evaluation alone produces.
 
 \paragraph{Report transitions and cost by default.}
 Transition accounting reuses existing evaluations at no extra inference cost. Every aggregate score in APO should be
-accompanied by transition counts on common item IDs, prompt versions, exclusions, and per-role token use. RFDPO records
+accompanied by transition counts on common item IDs, prompt versions, exclusions, and per-role token use. The ablation
+shows why: arms with the same net gain differ by 40\% in the items that flip. RFDPO records
 all of these automatically, and its source accompanies this submission (Appendix~\ref{app:artifacts}).
 
 \section{Conclusion}
 Aggregate scores report the net result of prompt optimization but not the cases gained and lost. RFDPO returns the
 item-level effect of each edit to the optimizer and records every transition, prompt version, and token it consumes.
 Across five benchmarks, these records show that one-item net changes can conceal up to 17 changed outcomes, that
-held-out test gains reach about three-fifths of validation gains, and that a reflective optimizer narrows its edits yet
-keeps trading cases. Recovery, regression, churn, and tuning-to-test transfer should become standard reporting
+held-out test gains reach about three-fifths of validation gains, and that later rounds keep trading cases as edits
+narrow; in a Hearsay ablation, the effect report cuts the items that flip per round by 40\% at equal net gain.
+Recovery, regression, churn, and tuning-to-test transfer should become standard reporting
 dimensions for APO.
 
 \section*{Limitations}
 \label{sec:limitations}
 Each configuration is evaluated with a single seed, and the study uses two closed-weight solver models. We did not
-evaluate open-weight solvers, which would have required GPU resources beyond our compute and budget. A controlled
-ablation that holds a round-1 prompt fixed and varies only the item-level effect report would isolate the report's
-contribution to the editing behavior we observe; we leave it to future work.
+evaluate open-weight solvers, which would have required GPU resources beyond our compute and budget. The effect-report
+ablation uses one benchmark, LegalBench-Hearsay, with five independent runs per arm.
 
 \section*{Ethical Considerations}
 Data come from public benchmarks, resplit as described in Table~\ref{tab:setup}. PUPA contains personal information from
@@ -524,6 +534,7 @@ gold text (Appendix~\ref{app:artifacts}).
 \appsubsec{app:gap}{Paired Accuracy and Test Transitions}
 \appsubsec{app:rounds}{Round-by-Round Trajectories}
 \appsubsec{app:evolution}{Worked Prompt Changes}
+\appsubsec{app:ablation}{Effect-Report Ablation}
 \appsec{app:noisebugs}{Evaluation Checks and Artifacts}
 \appsubsec{app:noise}{Re-evaluation of an Unchanged Prompt}
 \appsubsec{app:oracle}{Test-Exposure Diagnostic}
@@ -711,6 +722,13 @@ edit caused which regression or recovery -- state the cause before the fix; in r
 The \texttt{\#\# Analysis} section is discarded automatically by the parser. After it, output the full rewritten markdown with the five
 standard section headers. No other prose, no code fences, nothing after the last section.
 \end{promptbox}
+
+\paragraph{No-report variant.}
+In the ablation of Appendix~\ref{app:ablation}, the no-report arm receives the same prompt without points 2, 3, and 5,
+without the effect-report entry in the list of inputs, and without the references to validation items in the example
+rule. Point 4 keeps its shipping rule without the remark on validation accuracy, and the response-format note asks for
+a hypothesis about the failures instead of a diagnosis of the previous edit. The user message contains no effect
+report and no promise of one. Everything else is identical.
 
 \subsection{Task-Specific Insertions}
 \label{app:insertions}
@@ -929,6 +947,65 @@ exactly; verify counts and formats on your draft before producing the final resp
 tasks: write your working steps before the final answer line so you can check and fix issues. Only the content after the final marker is
 scored.
 \end{promptbox}
+
+\FloatBarrier
+\subsection{Effect-Report Ablation}
+\label{app:ablation}
+Both arms use the seed prompt, splits (25 mining, 25 validation, and 49 test items), solver, optimizer, and selection
+rule of the main Hearsay GPT-4o-mini run. Each run replays that run's round-1 prompt, which changes Context, Task
+Details, and Constraints, and then runs rounds 2 and 3. The arms differ only in what the optimizer is shown: with the
+report it receives the item-level effect of its previous edit; without it, it receives the current failures and
+successes only, and the report-specific instructions are removed from its system prompt (Appendix~\ref{app:sysprompt}).
+We ran five runs per arm and alternated which arm ran first. Table~\ref{tab:ablation_rounds} gives edit sizes and item
+transitions per round; Table~\ref{tab:ablation_runs} gives run-level means.
+
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{llcccc}
+\toprule
+\rowcolor{midblue}Round & Arm & Sections changed & Single-section & \shortstack{Mining\\rec./reg.} & \shortstack{Validation\\rec./reg.} \\
+\midrule
+2 & report & 2.00 & 1/5 & 12/7 & 26/2 \\
+ & no report & 1.60 & 3/5 & 17/14 & 26/6 \\
+\midrule
+3 & report & 1.00 & 5/5 & 5/7 & 10/3 \\
+ & no report & 2.00 & 0/5 & 10/11 & 18/12 \\
+\midrule
+2--3 & report & 1.50 & 6/10 & 17/14 & 36/5 \\
+ & no report & 1.80 & 3/10 & 27/25 & 44/18 \\
+\bottomrule
+\end{tabular}
+\caption{Edit sizes and item transitions of the five runs per arm, summed over runs. Round 3 starts from different
+round-2 prompts in the two arms, so only round 2 compares edits from an identical parent prompt.}
+\label{tab:ablation_rounds}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrr}
+\toprule
+\rowcolor{midblue}Run-level mean & Report & No report & $p$ \\
+\midrule
+Mining items changing outcome, per round & 3.1 & 5.2 & 0.024 \\
+Mining net gain, per round & 0.3 & 0.2 & 1.000 \\
+Mining regressions, per round & 1.4 & 2.5 & 0.024 \\
+Validation items changing outcome, per round & 4.1 & 6.2 & 0.206 \\
+Validation gain (points) & 4.8 & 2.4 & 0.571 \\
+Test items changing outcome, per run & 14.2 & 17.2 & 0.270 \\
+Test regressions, per run & 8.4 & 10.0 & 0.127 \\
+Test change from seed (points) & $-5.3$ & $-5.7$ & 1.000 \\
+\bottomrule
+\end{tabular}
+\caption{Run-level means over five runs per arm. Per-round metrics average the two optimizer rounds of a run. $p$ is an
+exact two-sided permutation test on run means, uncorrected for multiple comparisons.}
+\label{tab:ablation_runs}
+\end{table}
+
+Validation and test differences between the arms are within run-to-run variation.
 
 \FloatBarrier
 \section{Evaluation Checks and Artifacts}

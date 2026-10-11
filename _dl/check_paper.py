@@ -131,6 +131,65 @@ for expected in expected_edit_rows:
     if expected not in edit_table:
         failures.append(f"edit table mismatch: {expected}")
 print("main table rows and edit-behavior table checked against saved records")
+
+ablation = json.loads((artifacts / "ablation_hearsay.json").read_text(encoding="utf-8"))
+ablation_tables = {
+    label: next(block for block in re.findall(r"\\begin\{table\}.*?\\end\{table\}", t, re.S)
+                if "\\label{" + label + "}" in block)
+    for label in ("tab:ablation_rounds", "tab:ablation_runs")}
+if ablation["runs_per_arm"] != {"report": 5, "noreport": 5}:
+    failures.append("ablation run count changed")
+for key, label in (("2", "2"), ("3", "3"), ("2-3", "2--3")):
+    for arm, name in (("report", "report"), ("noreport", "no report")):
+        s = ablation["rounds"][key][arm]
+        prefix = f"{label} & report" if arm == "report" else " & no report"
+        expected = (f"{prefix} & {s['sections_mean']:.2f} & {s['single_section']}/{s['rounds']} & "
+                    f"{s['mining_recovered']}/{s['mining_regressed']} & "
+                    f"{s['validation_recovered']}/{s['validation_regressed']}")
+        if expected not in ablation_tables["tab:ablation_rounds"]:
+            failures.append(f"ablation round table mismatch: round {key}, {arm}")
+metric_labels = {
+    "mining_churn_per_round": "Mining items changing outcome, per round",
+    "mining_net_gain_per_round": "Mining net gain, per round",
+    "mining_regressions_per_round": "Mining regressions, per round",
+    "validation_churn_per_round": "Validation items changing outcome, per round",
+    "validation_gain_points": "Validation gain (points)",
+    "test_churn_per_run": "Test items changing outcome, per run",
+    "test_regressions_per_run": "Test regressions, per run",
+    "test_change_points": "Test change from seed (points)",
+}
+by_metric = {row["metric"]: row for row in ablation["run_level"]}
+
+
+def signed(value):
+    return f"${value:.1f}$" if value < 0 else f"{value:.1f}"
+
+
+for metric, label in metric_labels.items():
+    row = by_metric[metric]
+    expected = f"{label} & {signed(row['report'])} & {signed(row['noreport'])} & {row['p']:.3f}"
+    if expected not in ablation_tables["tab:ablation_runs"]:
+        failures.append(f"ablation run-level table mismatch: {metric}")
+flat = re.sub(r"\s+", " ", t)
+churn, net = by_metric["mining_churn_per_round"], by_metric["mining_net_gain_per_round"]
+change = by_metric["test_change_points"]
+sec2 = ablation["rounds"]["2"]
+quoted = [
+    f"round-2 edits already change {sec2['noreport']['sections_mean']:.1f} of five sections "
+    f"({sec2['report']['sections_mean']:.1f} with it)",
+    f"per round, {churn['report']:.1f} mining items change outcome with it and {churn['noreport']:.1f} "
+    f"without (${'p'}={churn['p']:.3f}$",
+    f"at the same net gain ({net['report']:.1f} and {net['noreport']:.1f} items per round)",
+    f"Test accuracy changes by {signed(change['report'])} and {signed(change['noreport'])} points",
+]
+for sentence in quoted:
+    if sentence not in flat:
+        failures.append(f"ablation claim differs from the saved summary: {sentence[:48]}")
+if round(100 * (1 - churn["report"] / churn["noreport"])) != 40 or flat.count(r"40\%") != 4:
+    failures.append("churn-reduction claim differs from the saved summary")
+if flat.count("five runs per arm") < 3 or "five independent runs per arm" not in flat:
+    failures.append("ablation run count missing from the text")
+print("ablation tables and quoted numbers checked against ablation_hearsay.json")
 print("matched records / edited / validation-up / test-down:",
       len(paired), len(edited), len(validation_up), len(test_down))
 print("resource table: exact ledger aggregates checked")
