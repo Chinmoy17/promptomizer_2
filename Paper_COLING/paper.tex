@@ -95,7 +95,12 @@ For an engineer refining document extraction or retrieval-augmented question ans
 accompany a query~\citep{lewis2020rag}, the consequences of each edit matter: which failing cases now work, which correct
 cases break, and which failures remain. \textbf{These observations can inform the next edit.} APO methods inspect
 failures or execution traces to propose revisions, yet they are typically reported through aggregate before/after
-scores that hide these transitions.
+scores that hide these transitions. The cost of hidden transitions is documented for deployed LLM applications: across
+hosted-API updates for toxicity detection, 10.9\% of individual predictions regressed, and when overall accuracy
+improved, at least one previously correct prediction broke in 87.9\% of cases~\citep{ma2024regression}. Developers likewise
+report that debugging LLM behavior that is inconsistent across prompt variations is difficult~\citep{errica2025wrong}. A
+prompt revision that raises a score while breaking previously correct cases can silently undo behavior that users and
+downstream tests rely on.
 
 A net gain of two items, for example, can mean two corrections with no regressions or ten corrections offset by eight
 regressions. The scores agree, but the changes warrant different inspection. On the small evaluation sets often used
@@ -128,7 +133,7 @@ records prompt versions, paired transitions on tuning and test data, and per-rol
 \item \textbf{Evidence that aggregate scores hide behavioral change.} Across five benchmarks, a one-item net change can
 conceal 17 changed outcomes, and held-out test gains reach about three-fifths of validation gains (\S\ref{sec:results}).
 \item \textbf{A characterization of reflective editing.} Across rounds, the optimizer shifts from rewriting
-most of the prompt to single-section edits while regressions persist (\S\ref{sec:edits}); we derive reporting practices
+most of the prompt to edits of about one section while regressions persist (\S\ref{sec:edits}); we derive reporting practices
 for APO from these findings (\S\ref{sec:discussion}).
 \end{itemize}
 
@@ -164,9 +169,15 @@ than which optimizer has the highest published score.
 
 \paragraph{Evaluation beyond accuracy.}
 Paired binary-outcome tables are classical~\citep{mcnemar1947sampling}. In model updating, negative flips, cases the old
-model classifies correctly and the new one does not, motivate regression-free training~\citep{yan2021positive}. Our
-regressions apply the same definition to prompt revisions, where they have not been tracked across optimization
-trajectories. CheckList~\citep{ribeiro2020checklist} likewise shows that aggregate accuracy misses important behaviors of
+model classifies correctly and the new one does not, motivate regression-free training~\citep{yan2021positive}. For LLM
+applications, \citet{ma2024regression} argue that regression testing is needed because silent API updates can break
+prompts that previously worked. Our regressions apply the same definition to prompt revisions, where they have not been
+tracked across optimization trajectories. Work on prompt robustness makes a related point: small prompt perturbations
+can flip a model's answers~\citep{salinas2024butterfly}, and sensitivity and consistency metrics complement task
+accuracy as diagnostics for prompt engineering~\citep{errica2025wrong}. These measures capture variation across
+rephrasings of a prompt, whereas we track labeled recoveries and regressions between deliberately edited prompt
+versions. Because some apparent sensitivity reflects evaluation artifacts~\citep{hua2025flaw}, we define regressions
+through each benchmark's scoring rule (\S\ref{sec:metric}). CheckList~\citep{ribeiro2020checklist} likewise shows that aggregate accuracy misses important behaviors of
 a fixed model, and held-out accuracy can fall on fresh samples~\citep{recht2019imagenet}, which motivates measuring
 tuning-to-test transfer item by item. \citet{oren2023proving} detect test-set contamination in black-box language
 models; we check returned prompts for verbatim dataset overlap (\S\ref{sec:valtest}).
@@ -399,32 +410,9 @@ We also checked whether returned prompts contained eight-word sequences copied f
 \subsection{Prompt Revision Behavior}
 \label{sec:edits}
 
-We analyze how the optimizer modifies prompts across successive rounds. Table~\ref{tab:edits} compares the initial revision, where no previous edit-effect report is available, with later revisions that receive recovery and regression feedback.
+We analyze how the optimizer modifies prompts across successive rounds. In round 1, where no effect report of a previous edit is available, the optimizer modified an average of 4.3 of the five prompt sections, compared with 1.3 in rounds 2--3, where it receives recovery and regression feedback on its previous edit. Revisions thus became more localized after the initial round.
 
-\begin{table}[!t]
-\centering
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{lrr}
-\toprule
-\rowcolor{midblue}
-& Round 1 & Rounds 2--3 \\
-\midrule
-Effect report of previous edit & no & yes \\
-Committed rounds & 17 & 32 \\
-Sections changed (mean of five) & 4.3 & 1.3 \\
-Single-section edits & 0 & 21 \\
-Mining recovered / regressed & 59 / 27 & 56 / 54 \\
-Validation recovered / regressed & 39 / 22 & 43 / 37 \\
-\bottomrule
-\end{tabular}
-\caption{Prompt revision characteristics across optimization rounds. From round 2, the optimizer receives the effect report of its previous edit. Recovery and regression counts compare each revision with its parent prompt.}
-\label{tab:edits}
-\end{table}
-
-The optimizer modified an average of 4.3 prompt sections in round 1, compared with 1.3 in rounds 2--3. Among 32 later revisions, 21 modified only one section. Thus, revisions became more localized after the initial round.
-
-Nevertheless, smaller edits did not eliminate regressions. Later rounds recovered 56 mining examples while regressing 54, compared with 59 recoveries and 27 regressions in round 1. This indicates that revisions continued to introduce new failures even when fewer prompt sections were modified.
+% Nevertheless, smaller edits did not eliminate regressions. Later rounds recovered 56 mining examples while regressing 54, compared with 59 recoveries and 27 regressions in round 1. This indicates that revisions continued to introduce new failures even when fewer prompt sections were modified.
 
 \paragraph{Effect-report ablation.}
 To distinguish the effect of feedback from that of the optimization round, we conducted a controlled ablation on LegalBench-Hearsay using GPT-4o-mini. Both conditions replayed the same round-1 prompt and continued through rounds 2 and 3, differing only in whether the optimizer received the item-level effect report. We performed five runs per condition (Appendix~\ref{app:ablation}).
@@ -433,7 +421,7 @@ Without the report, round-2 revisions already modified only 1.6 prompt sections 
 
 However, the feedback affected the number of changed outcomes. With the report, an average of 3.1 mining examples changed correctness per round, compared with 5.2 without it ($p=0.024$, exact permutation test over runs). Both conditions achieved similar net gains of 0.3 and 0.2 mining examples per round, respectively.
 
-On the test set, accuracy changed by $-5.3$ and $-5.7$ percentage points with and without the report, respectively. These results suggest that item-level feedback can reduce outcome churn in this setting, although the ablation does not demonstrate improved test accuracy.
+On the test set, accuracy changed by $-5.3$ and $-5.7$ percentage points with and without the report, respectively. These results suggest that item-level feedback can reduce outcome churn in this setting, although the ablation does not demonstrate substantial improved test accuracy.
 
 \subsection{Resource Consumption}
 \label{sec:resources}
@@ -549,7 +537,7 @@ gold text (Appendix~\ref{app:artifacts}).
 \label{app:config}
 \subsection{Analysis Population and Settings}
 \label{app:population}
-The analysis uses 19 completed seed-0 records: seven non-MMLU runs and twelve independently optimized MMLU
+The analysis uses 19 completed records: seven non-MMLU runs and twelve independently optimized MMLU
 subjects, taking the latest completed record within each fixed run group.
 
 All recorded solvers use temperature 0.0 and the GPT-5 optimizer uses 0.7, with at most three rounds and one optimizer
@@ -904,7 +892,7 @@ is returned on its higher mining accuracy.}
 \end{table}
 
 Across the 20 committed rounds in Table~\ref{tab:rounds}, nine regressed more mining items than they recovered and six
-lowered validation accuracy; Table~\ref{tab:edits} summarizes edit sizes over all committed rounds.
+lowered validation accuracy.
 
 \FloatBarrier
 \subsection{Worked Prompt Changes}

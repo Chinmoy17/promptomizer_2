@@ -100,8 +100,9 @@ for record in reported["results"]:
     if row is None or expected_end not in row:
         failures.append(f"main table mismatch: {record['benchmark']} / {record['solver']}")
 
-edit_table = next(block for block in re.findall(r"\\begin\{table\}.*?\\end\{table\}", t, re.S)
-                  if r"\label{tab:edits}" in block)
+flat = re.sub(r"\s+", " ", t)
+if "tab:edits" in t:
+    failures.append("removed edit-size table is still referenced")
 phases = {"first": [], "later": []}
 for record in paired:
     for round_record in record["rounds"]:
@@ -113,24 +114,18 @@ def total(rounds, key):
 
 
 first, later = phases["first"], phases["later"]
-expected_edit_rows = [
-    f"Committed rounds & {len(first)} & {len(later)}",
-    "Sections changed (mean of five) & "
-    f"{sum(len(r['sections_changed']) for r in first) / len(first):.1f} & "
-    f"{sum(len(r['sections_changed']) for r in later) / len(later):.1f}",
-    "Single-section edits & "
-    f"{sum(len(r['sections_changed']) == 1 for r in first)} & "
-    f"{sum(len(r['sections_changed']) == 1 for r in later)}",
-    f"Mining recovered / regressed & {total(first, 'mining_recovered')} / {total(first, 'mining_regressed')} & "
-    f"{total(later, 'mining_recovered')} / {total(later, 'mining_regressed')}",
-    f"Validation recovered / regressed & {total(first, 'validation_recovered')} / "
-    f"{total(first, 'validation_regressed')} & {total(later, 'validation_recovered')} / "
-    f"{total(later, 'validation_regressed')}",
+expected_edit_claims = [
+    "the optimizer modified an average of "
+    f"{sum(len(r['sections_changed']) for r in first) / len(first):.1f} of the five prompt sections, "
+    f"compared with {sum(len(r['sections_changed']) for r in later) / len(later):.1f} in rounds 2--3",
+    f"Later rounds recovered {total(later, 'mining_recovered')} mining examples while regressing "
+    f"{total(later, 'mining_regressed')}, compared with {total(first, 'mining_recovered')} recoveries and "
+    f"{total(first, 'mining_regressed')} regressions in round 1",
 ]
-for expected in expected_edit_rows:
-    if expected not in edit_table:
-        failures.append(f"edit table mismatch: {expected}")
-print("main table rows and edit-behavior table checked against saved records")
+for expected in expected_edit_claims:
+    if expected not in flat:
+        failures.append(f"revision-behavior claim differs from the saved records: {expected[:48]}")
+print("main table rows and revision-behavior claims checked against saved records")
 
 ablation = json.loads((artifacts / "ablation_hearsay.json").read_text(encoding="utf-8"))
 ablation_tables = {
@@ -175,12 +170,12 @@ churn, net = by_metric["mining_churn_per_round"], by_metric["mining_net_gain_per
 change = by_metric["test_change_points"]
 sec2 = ablation["rounds"]["2"]
 quoted = [
-    f"round-2 edits already change {sec2['noreport']['sections_mean']:.1f} of five sections "
-    f"({sec2['report']['sections_mean']:.1f} with it)",
-    f"per round, {churn['report']:.1f} mining items change outcome with it and {churn['noreport']:.1f} "
-    f"without (${'p'}={churn['p']:.3f}$",
-    f"at the same net gain ({net['report']:.1f} and {net['noreport']:.1f} items per round)",
-    f"Test accuracy changes by {signed(change['report'])} and {signed(change['noreport'])} points",
+    f"round-2 revisions already modified only {sec2['noreport']['sections_mean']:.1f} prompt sections on average, "
+    f"compared with {sec2['report']['sections_mean']:.1f} when the report was included",
+    f"an average of {churn['report']:.1f} mining examples changed correctness per round, compared with "
+    f"{churn['noreport']:.1f} without it (${'p'}={churn['p']:.3f}$",
+    f"similar net gains of {net['report']:.1f} and {net['noreport']:.1f} mining examples per round",
+    f"accuracy changed by {signed(change['report'])} and {signed(change['noreport'])} percentage points",
 ]
 for sentence in quoted:
     if sentence not in flat:
