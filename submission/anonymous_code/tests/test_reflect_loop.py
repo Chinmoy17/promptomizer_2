@@ -99,6 +99,43 @@ def test_builder_reflection_block_content_and_placement():
     assert effect.count("Model's new wrong answer: Answer: Yes") == 2
 
 
+def test_cli_accepts_ablation_flags():
+    args = build_arg_parser().parse_args(
+        ["--method", "reflect_fdpo", "--no-effect-report",
+         "--round1-prompt-file", "x.md"])
+    assert args.no_effect_report is True
+    assert args.round1_prompt_file == "x.md"
+    defaults = build_arg_parser().parse_args(["--method", "reflect_fdpo"])
+    assert defaults.no_effect_report is False and defaults.round1_prompt_file == ""
+
+
+def test_builder_no_effect_report_drops_every_report_instruction():
+    messages = build_reflect_optimizer_messages(
+        "## System Role\nSolve the task.", [], [], dataset="legalbench_hearsay",
+        round_num=2, max_rounds=3, reflection=REFLECTION, effect_report=False)
+    system, user = messages[0]["content"], messages[1]["content"]
+    assert "EFFECT OF YOUR PREVIOUS REWRITE" not in user
+    assert "V-regressed-1?" not in user
+    assert "next round" not in user
+    for phrase in ("EFFECT", "RECOVERED", "REGRESSED", "validation item",
+                   "VALIDATION item", "From round 2 on"):
+        assert phrase not in system, phrase
+    # Everything not about the report is carried over unchanged.
+    for phrase in ("HOW THIS PROCESS WORKS", "CRITICAL RULE ABOUT EXAMPLES",
+                   "CRITICAL FACT ABOUT THE SOLVER", "A good rewrite",
+                   "RESPONSE FORMAT"):
+        assert phrase in system, phrase
+    assert "{task_description}" not in system and "{max_rounds}" not in system
+
+
+def test_builder_default_keeps_report_instructions():
+    messages = build_reflect_optimizer_messages(
+        "## System Role\nSolve.", [], [], dataset="legalbench_hearsay",
+        round_num=1, max_rounds=3)
+    assert "EFFECT REPORT of your previous rewrite" in messages[0]["content"]
+    assert "next round" in messages[1]["content"]
+
+
 def test_builder_truncates_long_solver_output():
     """A verbose completion (e.g. GPT-4.1 on AIME writing thousands of tokens
     of working) must not be pasted into the optimizer request in full -- only
@@ -193,3 +230,62 @@ def test_reflect_fdpo_end_to_end_dry_run(tmp_path):
             assert opt["best_structured_val_acc"] == best["val_acc_after"]
             assert opt["shipped_round"] == best["round"]
             assert opt["current_train"]["accuracy"] == best["train_acc_after"]
+
+
+ROUND1_MD = """## System Role
+You are a careful evidence-law analyst.
+
+## Context
+Replayed round-one context.
+
+## Task Details
+Replayed round-one task details.
+
+## Constraints
+Replayed round-one constraints.
+
+## Output Format
+Answer: Yes or No
+"""
+
+
+def _committed(opt):
+    return [r for r in opt["rounds_log"] if r["status"] == "committed"]
+
+
+def test_no_effect_report_never_shows_reflection(tmp_path):
+    run_dir = run(make_cfg(tmp_path, effect_report=False, tau=1))
+    opt = read_json(run_dir / "metrics.json")["optimization"]
+    assert opt["effect_report"] is False
+    committed = _committed(opt)
+    assert committed
+    assert all(r["reflection_shown"] is False for r in committed)
+
+
+def test_round1_replay_fixes_the_parent_and_skips_the_optimizer_call(tmp_path):
+    md = tmp_path / "round1.md"
+    md.write_text(ROUND1_MD, encoding="utf-8")
+    run_dir = run(make_cfg(tmp_path, round1_prompt_file=str(md), tau=1))
+    opt = read_json(run_dir / "metrics.json")["optimization"]
+    committed = _committed(opt)
+    first = committed[0]
+    assert first["round"] == 1 and first["replayed"] is True
+    assert first["reflection_shown"] is False
+    assert first["sections_changed"]
+    assert all(r["replayed"] is False for r in committed[1:])
+    assert opt["optimizer_calls"] <= 2          # rounds 2 and 3 only
+    assert opt["round1_prompt_file"] == str(md)
+    # Round 2 is the first round that can show the report of the replayed edit.
+    second = [r for r in committed if r["round"] == 2]
+    assert not second or second[0]["reflection_shown"] is True
+
+
+def test_round1_replay_without_effect_report_matches_the_ablation_arm(tmp_path):
+    md = tmp_path / "round1.md"
+    md.write_text(ROUND1_MD, encoding="utf-8")
+    run_dir = run(make_cfg(tmp_path, round1_prompt_file=str(md), tau=1,
+                           effect_report=False))
+    opt = read_json(run_dir / "metrics.json")["optimization"]
+    committed = _committed(opt)
+    assert committed[0]["replayed"] is True
+    assert all(r["reflection_shown"] is False for r in committed)

@@ -13,6 +13,7 @@
     "test_base": 0.5333333333333333,
     "test_final": 0.5,
     "test_delta_pp": -3.3333333333333326,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -69,6 +70,7 @@
     "test_base": 0.5526315789473685,
     "test_final": 0.6578947368421053,
     "test_delta_pp": 10.526315789473683,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -126,6 +128,7 @@
     "test_base": 0.4473684210526316,
     "test_final": 0.7105263157894737,
     "test_delta_pp": 26.31578947368421,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -180,9 +183,10 @@
     "val_best": 0.5263157894736842,
     "val_measured": true,
     "val_gain_pp": 15.789473684210526,
-    "test_base": 0.47619047619047616,
+    "test_base": 0.40476190476190477,
     "test_final": 0.4523809523809524,
-    "test_delta_pp": -2.380952380952378,
+    "test_delta_pp": 4.761904761904762,
+    "test_source": "test_scores",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -242,6 +246,7 @@
     "test_base": 0.42857142857142855,
     "test_final": 0.6666666666666666,
     "test_delta_pp": 23.809523809523807,
+    "test_source": "run",
     "rounds_run": 2,
     "optimizer_calls": 3,
     "rounds": [
@@ -288,6 +293,7 @@
     "test_base": 0.7142857142857143,
     "test_final": 0.6938775510204082,
     "test_delta_pp": -2.0408163265306145,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -346,6 +352,7 @@
     "test_base": 0.7142857142857143,
     "test_final": 0.7346938775510204,
     "test_delta_pp": 2.0408163265306145,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -404,6 +411,7 @@
     "test_base": 0.7575757575757576,
     "test_final": 0.7727272727272727,
     "test_delta_pp": 1.5151515151515138,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -463,6 +471,7 @@
     "test_base": 0.9090909090909091,
     "test_final": 0.8939393939393939,
     "test_delta_pp": -1.5151515151515138,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -524,6 +533,7 @@
     "test_base": 0.6666666666666666,
     "test_final": 0.7272727272727273,
     "test_delta_pp": 6.060606060606066,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -584,6 +594,7 @@
     "test_base": 0.8787878787878788,
     "test_final": 0.8939393939393939,
     "test_delta_pp": 1.5151515151515138,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -644,6 +655,7 @@
     "test_base": 0.7727272727272727,
     "test_final": 0.803030303030303,
     "test_delta_pp": 3.0303030303030276,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -704,6 +716,7 @@
     "test_base": 0.5238095238095238,
     "test_final": 0.5396825396825397,
     "test_delta_pp": 1.5873015873015817,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -764,6 +777,7 @@
     "test_base": 0.9242424242424242,
     "test_final": 0.9242424242424242,
     "test_delta_pp": 0.0,
+    "test_source": "run",
     "rounds_run": 0,
     "optimizer_calls": 0,
     "rounds": []
@@ -782,6 +796,7 @@
     "test_base": 0.8787878787878788,
     "test_final": 0.9090909090909091,
     "test_delta_pp": 3.0303030303030276,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -843,6 +858,7 @@
     "test_base": 0.8181818181818182,
     "test_final": 0.803030303030303,
     "test_delta_pp": -1.515151515151525,
+    "test_source": "run",
     "rounds_run": 2,
     "optimizer_calls": 2,
     "rounds": [
@@ -891,6 +907,7 @@
     "test_base": 0.8787878787878788,
     "test_final": 0.8787878787878788,
     "test_delta_pp": 0.0,
+    "test_source": "run",
     "rounds_run": 0,
     "optimizer_calls": 0,
     "rounds": []
@@ -909,6 +926,7 @@
     "test_base": 0.803030303030303,
     "test_final": 0.8636363636363636,
     "test_delta_pp": 6.060606060606066,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [
@@ -968,6 +986,7 @@
     "test_base": 0.5555555555555556,
     "test_final": 0.6190476190476191,
     "test_delta_pp": 6.349206349206349,
+    "test_source": "run",
     "rounds_run": 3,
     "optimizer_calls": 3,
     "rounds": [

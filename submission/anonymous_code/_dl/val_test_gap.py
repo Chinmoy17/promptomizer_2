@@ -1,7 +1,8 @@
 """Produce matched tuning/test and resource records from the paper's saved runs.
 
-The reported-results manifest controls exclusions. No accuracy overrides are
-used; optimizer and whole-run token totals are checked against per-call ledgers.
+The reported-results manifest controls exclusions. Test accuracies come from each
+run's metrics, except IFBench / 4o-mini, which reads ifbench_test_scores.json.
+Optimizer and whole-run token totals are checked against per-call ledgers.
 """
 from __future__ import annotations
 
@@ -34,6 +35,7 @@ for s in SUBJECTS:
 ARTIFACTS = ROOT / "Paper_COLING" / "Artifacts"
 manifest = json.loads((ARTIFACTS / "reported_results.json").read_text(encoding="utf-8"))
 excluded = tuple(manifest["validation_excluded_prefixes"])
+scores = json.loads((ARTIFACTS / "ifbench_test_scores.json").read_text(encoding="utf-8"))
 rows = []
 resources = []
 for label, subdir in RUNS:
@@ -49,6 +51,11 @@ for label, subdir in RUNS:
     val_returned = optimization.get("best_structured_val_acc") if returned_edit else val_base
     test_base = metrics["seed_test"]["accuracy"]
     test_final = metrics["final_test"]["accuracy"]
+    test_source = "run"
+    if label == scores["run"]:
+        test_base = scores["seed_correct"] / scores["n_evaluated"]
+        test_final = scores["final_correct"] / scores["n_evaluated"]
+        test_source = "test_scores"
     rows.append({
         "run": label,
         "run_id": metrics["run_id"],
@@ -63,6 +70,7 @@ for label, subdir in RUNS:
         "test_base": test_base,
         "test_final": test_final,
         "test_delta_pp": 100 * (test_final - test_base),
+        "test_source": test_source,
         "rounds_run": optimization.get("rounds_run"),
         "optimizer_calls": optimization.get("optimizer_calls"),
         "rounds": [{

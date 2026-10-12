@@ -41,15 +41,22 @@ Notes:
 
 | Model | Baseline | Final | Δ | Recovered / Regressed (test) |
 |---|---|---|---|---|
-| GPT-4o-mini (run 1) | 0.476 | 0.452 | −2.4pp (net regression) | 2 / 3 (net −1) |
+| GPT-4o-mini (run 1, paper) | 0.405 | 0.452 | +4.8pp | 6 / 4 (net +2) |
+| GPT-4o-mini (run 1, as first scored) | 0.476 | 0.452 | −2.4pp | 2 / 3 (net −1) |
 | GPT-4o-mini (run 2) | 0.476 | 0.452 | −2.4pp (net regression) | 0 / 1 (net −1) |
 | GPT-4.1 Mini | 0.429 | 0.667 | +23.8pp | 12 / 2 (net +10) |
 
 Notes:
-- GPT-4o-mini's regression was confirmed consistent across 2 identical-config
-  reruns (`reflect_ifbench_v1`, `v2`) — both landed at 0.452 final accuracy,
-  though the exact recovered/regressed item sets differ between the two runs
-  (item-level API variance even at identical accuracy).
+- Run 1 was first scored before the `words:no_consecutive` checker fix. Three of
+  the 42 test items carry that constraint and were scored as passes under both
+  prompts. Its seed and returned prompts were scored again on the same 42 test
+  items with the fixed checker (`results/reflect_ifbench_v1_test_scores`); the
+  paper's numbers are those (`ifbench_test_scores.json`). Validation numbers are
+  from the original run (2 of the 40 training items carry the constraint).
+- GPT-4o-mini's accuracy was identical (0.452 final) across 2 identical-config
+  reruns (`reflect_ifbench_v1`, `v2`), though the exact recovered/regressed item
+  sets differ between the two runs (item-level API variance even at identical
+  accuracy).
 - GPT-4.1 Mini's number is post-fix: a real checker bug (`words:no_consecutive`
   wasn't checking its stated constraint) and a stale "last round ships"
   optimizer instruction were both fixed before this run.

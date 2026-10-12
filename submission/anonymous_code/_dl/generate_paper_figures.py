@@ -46,16 +46,17 @@ def save(fig, name: str) -> None:
 # Figure 1: baseline -> final accuracy, dumbbell plot, all 5 benchmarks x 2 models
 # ---------------------------------------------------------------------------
 source = json.loads((OUT.parent / "reported_results.json").read_text(encoding="utf-8"))
-benchmark_labels = {"PUPA": "PUPA (composite)", "MMLU": "MMLU (macro)"}
+reported = [row for row in source["results"] if row["baseline_pct"] is not None]
+benchmark_labels = {"MMLU": "MMLU (macro)"}
 summary_only = {(benchmark_labels.get(row["benchmark"], row["benchmark"]), row["solver"])
-                for row in source["results"] if row["provenance"] != "saved"}
+                for row in reported if row["provenance"] != "saved"}
 results = [(benchmark_labels.get(row["benchmark"], row["benchmark"]), row["solver"],
-            row["baseline_pct"], row["final_pct"]) for row in source["results"]]
+            row["baseline_pct"], row["final_pct"]) for row in reported]
 deltas = {(benchmark_labels.get(row["benchmark"], row["benchmark"]), row["solver"]):
-          row["delta_pp"] for row in source["results"]}
+          row["delta_pp"] for row in reported}
 
 fig, ax = plt.subplots(figsize=(6.6, 5.0))
-benchmarks = ["AIME", "PUPA (composite)", "IFBench", "Hearsay", "MMLU (macro)"]
+benchmarks = ["AIME", "PUPA", "IFBench", "Hearsay", "MMLU (macro)"]
 y_positions = {}
 y = 0
 for b in benchmarks:
@@ -89,7 +90,7 @@ for b in benchmarks:
     ax.text(-15, y_positions[(b, "GPT-4o-mini")], "GPT-4o-mini", fontsize=7.5,
             color=C_4OMINI, va="center", ha="right")
 ax.set_xlim(-2, 108)
-ax.set_xlabel("Accuracy / composite score (%)")
+ax.set_xlabel("Accuracy (%)")
 ax.set_title("Baseline $\\rightarrow$ Final, all five benchmarks\n(hollow = baseline, filled = final)")
 ax.invert_yaxis()
 legend_handles = [
@@ -98,7 +99,6 @@ legend_handles = [
 ]
 ax.legend(handles=legend_handles, loc="upper center", bbox_to_anchor=(0.5, -0.08),
           ncol=2, frameon=False)
-fig.text(0.01, 0.01, "Dashed: GPT-4o-mini AIME summary; no identified matched run.", fontsize=6.5)
 fig.tight_layout(rect=[0, 0.04, 1, 1])
 save(fig, "fig1_cross_benchmark_accuracy")
 
@@ -109,9 +109,10 @@ save(fig, "fig1_cross_benchmark_accuracy")
 # ---------------------------------------------------------------------------
 confusion = [(f"{'MMLU (sum)' if row['benchmark'] == 'MMLU' else row['benchmark']}"
               f"{'*' if row['provenance'] != 'saved' else ''} -- {row['solver']}",
-              row["recovered"], row["regressed"], row["recovered"] - row["regressed"],
+              row["recovered"], row["regressed"],
+              None if row["regressed"] is None else row["recovered"] - row["regressed"],
               row["provenance"] != "saved")
-             for row in source["results"]]
+             for row in reported]
 
 fig, ax = plt.subplots(figsize=(6.6, 5.2))
 labels = [c[0] for c in confusion]
@@ -127,11 +128,13 @@ for yy, (label, rec, reg, net, provisional) in zip(ys, confusion):
         continue
     ax.barh(yy, rec, color=C_RECOV, height=0.6, zorder=2,
             hatch="//" if provisional else None)
-    if reg > 0:
+    if reg:
         ax.barh(yy, -reg, color=C_REGR, height=0.6, zorder=2,
                 hatch="//" if provisional else None)
         ax.text(-reg - 1.0, yy, f"-{reg}", va="center", ha="right", fontsize=7.5, color=C_REGR)
     ax.text(rec + 1.0, yy, f"+{rec}", va="center", ha="left", fontsize=7.5, color=C_RECOV)
+    if net is None:
+        continue
     ax.text(NET_X, yy, f"net {net:+d}", va="center", ha="left", fontsize=8,
             fontweight="bold", color=C_RECOV if net >= 0 else C_REGR)
 
@@ -148,7 +151,6 @@ legend_handles = [
 ]
 ax.legend(handles=legend_handles, loc="upper center", bbox_to_anchor=(0.35, -0.08),
           ncol=1, frameon=False, fontsize=8)
-fig.text(0.01, 0.01, "* GPT-4o-mini AIME summary; excluded from matched transfer and resource analysis.", fontsize=6.5)
 fig.tight_layout(rect=[0, 0.04, 1, 1])
 save(fig, "fig2_recovered_regressed")
 

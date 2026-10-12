@@ -126,6 +126,18 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
         baseline_val_acc = baseline.accuracy
     logger.info("reflect: baseline validation accuracy %.3f", baseline_val_acc)
 
+    # Ablation hook: round 1 replays a fixed prompt (evaluated and committed
+    # like any rewrite, but with no optimizer call), so later rounds start
+    # from the same parent across arms.
+    round1_sections: dict[str, str] | None = None
+    if cfg.round1_prompt_file:
+        round1_sections = parse_markdown(
+            Path(cfg.round1_prompt_file).read_text(encoding="utf-8"))
+        for k in registry.schema:
+            round1_sections.setdefault(k, registry.active_prompt()[k])
+        logger.info("reflect: round 1 replays %s (no optimizer call)",
+                    cfg.round1_prompt_file)
+
     save_markdown_prompt(registry.active_prompt(), run_dir / "prompt_baseline.md",
                          schema=registry.schema)
 
@@ -197,29 +209,35 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
         e_gold = list(corrects)   # ALL currently-correct mining items, not a sample
         logger.info("reflect: round %d — |F|=%d, showing ALL %d failures + "
                     "ALL %d golds%s", round_num, len(failures), len(e_fail),
-                    len(e_gold), " (with effect report)" if reflection else "")
+                    len(e_gold),
+                    " (with effect report)" if reflection and cfg.effect_report else "")
 
-        current_md = to_markdown(registry.active_prompt(), schema=registry.schema)
-        messages = build_reflect_optimizer_messages(
-            current_md, e_fail, e_gold, dataset=dataset,
-            round_num=round_num, max_rounds=effective_rounds,
-            reflection=reflection)
-        result = optimizer.complete(messages, temperature=cfg.optimizer_temperature,
-                                    max_tokens=8000,
-                                    purpose=f"reflect:rewrite-r{round_num}")
-        optimizer_calls += 1
+        replay = round_num == 1 and round1_sections is not None
+        if replay:
+            new_sections = dict(round1_sections)
+        else:
+            current_md = to_markdown(registry.active_prompt(), schema=registry.schema)
+            messages = build_reflect_optimizer_messages(
+                current_md, e_fail, e_gold, dataset=dataset,
+                round_num=round_num, max_rounds=effective_rounds,
+                reflection=reflection if cfg.effect_report else None,
+                effect_report=cfg.effect_report)
+            result = optimizer.complete(messages, temperature=cfg.optimizer_temperature,
+                                        max_tokens=8000,
+                                        purpose=f"reflect:rewrite-r{round_num}")
+            optimizer_calls += 1
 
-        try:
-            new_sections = parse_markdown(result.text)
-        except ValueError as e:
-            logger.warning("reflect: round %d parse failed (%s); continuing to next round",
-                           round_num, e)
-            rounds_log.append({
-                "round": round_num,
-                "status": "parse_failed",
-                "n_failures_before": len(failures),
-            })
-            continue
+            try:
+                new_sections = parse_markdown(result.text)
+            except ValueError as e:
+                logger.warning("reflect: round %d parse failed (%s); continuing to next round",
+                               round_num, e)
+                rounds_log.append({
+                    "round": round_num,
+                    "status": "parse_failed",
+                    "n_failures_before": len(failures),
+                })
+                continue
 
         missing = set(registry.schema) - set(new_sections)
         if missing:
@@ -334,7 +352,8 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
             "regressed_this_round": regressed_ids,
             "val_recovered_this_round": len(val_recovered_ids),
             "val_regressed_this_round": len(val_regressed_ids),
-            "reflection_shown": reflection is not None,
+            "reflection_shown": reflection is not None and cfg.effect_report,
+            "replayed": replay,
         })
         logger.info(
             "reflect: round %d COMMITTED -- |F| %d -> %d, mining acc %.3f -> %.3f, "
@@ -459,6 +478,8 @@ def run_reflect_optimization(cfg: ExperimentConfig, registry: PromptRegistry,
         "baseline_failing_ids": sorted(baseline_wrong),
         "solver_temperature": cfg.solver_temperature,
         "optimizer_temperature": cfg.optimizer_temperature,
+        "effect_report": cfg.effect_report,
+        "round1_prompt_file": cfg.round1_prompt_file or None,
         "baseline_train": {
             "accuracy": baseline.accuracy,
             "n_correct": len(baseline_correct),

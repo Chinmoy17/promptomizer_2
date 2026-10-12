@@ -53,7 +53,7 @@ resources = json.loads((artifacts / "resource_usage.json").read_text(encoding="u
 edited = [record for record in paired if record["shipped"]]
 validation_up = [record for record in edited if record["val_best"] > record["val_base"]]
 test_down = [record for record in validation_up if record["test_final"] < record["test_base"]]
-if (len(paired), len(edited), len(validation_up), len(test_down)) != (19, 17, 12, 4):
+if (len(paired), len(edited), len(validation_up), len(test_down)) != (19, 17, 12, 3):
     failures.append("matched analysis population changed")
 aime = next(record for record in reported["results"]
             if record["benchmark"] == "AIME" and record["solver"] == "GPT-4.1 Mini")
@@ -207,7 +207,7 @@ if any(r["benchmark"] == "AIME" and r["solver"] == "GPT-4o-mini" for r in report
 for stale in ("GPT-4o-mini & 26.7", r"26.7\rightarrow 33.33"):
     if stale in flat:
         failures.append(f"stale AIME GPT-4o-mini text remains: {stale}")
-number_words = {5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine"}
+number_words = {3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten"}
 positive = sum(r["final_pct"] > r["baseline_pct"] for r in reported["results"])
 if f"increased in {number_words[positive]} of the {number_words[len(reported['results'])]} reported configurations" not in flat:
     failures.append("count of improved configurations differs from the results manifest")
@@ -316,6 +316,58 @@ for solver_name, counts in mmlu_counts.items():
     if counts != [headline["recovered"], headline["regressed"]]:
         failures.append(f"appendix MMLU transition totals differ: {solver_name}")
 print("appendix: four ordered sections; matched accuracy rows, transitions, and output limits checked")
+
+scores = json.loads((artifacts / "ifbench_test_scores.json").read_text(encoding="utf-8"))
+ifbench_4o = next(row for row in reported["results"]
+                  if row["benchmark"] == "IFBench" and row["solver"] == "GPT-4o-mini")
+if ((ifbench_4o["recovered"], ifbench_4o["regressed"]) != (scores["recovered"], scores["regressed"])
+        or not math.isclose(ifbench_4o["baseline_pct"], 100 * scores["seed_correct"] / scores["n_evaluated"])
+        or not math.isclose(ifbench_4o["final_pct"], 100 * scores["final_correct"] / scores["n_evaluated"])):
+    failures.append("IFBench GPT-4o-mini row differs from ifbench_test_scores.json")
+changed = scores["recovered"] + scores["regressed"]
+if (f"changed {number_words[changed]} outcomes ({number_words[scores['recovered']]} recoveries, "
+        f"{number_words[scores['regressed']]} regressions)") not in flat:
+    failures.append("appendix IFBench transition counts differ from ifbench_test_scores.json")
+
+mean_val = sum(r["val_gain_pp"] for r in edited) / len(edited)
+mean_test = sum(r["test_delta_pp"] for r in edited) / len(edited)
+group_stats = {}
+for name, members in (("Non-MMLU", [r for r in edited if not r["run"].startswith("MMLU")]),
+                      ("MMLU subjects", [r for r in edited if r["run"].startswith("MMLU")])):
+    up = [r for r in members if r["val_best"] > r["val_base"]]
+    group_stats[name] = (len(members), len(up), len([r for r in up if r["test_final"] < r["test_base"]]),
+                         sum(r["val_gain_pp"] for r in members) / len(members),
+                         sum(r["test_delta_pp"] for r in members) / len(members))
+gap_table = re.sub(r"\s+", " ", next(block for block in table_blocks if r"\label{tab:gap}" in block))
+gap_rows = [f"{name} & {n} & {up} & {down} & ${mv:+.1f}$ & ${mt:+.1f}$"
+            for name, (n, up, down, mv, mt) in group_stats.items()]
+gap_rows.append(f"\\textbf{{{len(edited)}}} & \\textbf{{{len(validation_up)}}} & \\textbf{{{len(test_down)}}} & "
+                f"$\\mathbf{{{mean_val:+.1f}}}$ & $\\mathbf{{{mean_test:+.1f}}}$")
+transfer_claims = [
+    f"Validation gains average {mean_val:.1f} points, against {mean_test:.1f} on held-out",
+    f"validation accuracy improved by {mean_val:.1f} percentage points on average, compared with "
+    f"{mean_test:.1f} points on test data",
+    f"approximately {round(100 * mean_test / mean_val)}\\% of the average validation gain",
+    f"approximately {round(100 * mean_test / mean_val)}\\% of average validation gains, and "
+    f"{number_words[len(test_down)]} runs experienced test declines",
+    f"{number_words[len(validation_up) - len(test_down)]} also improved test accuracy, while "
+    f"{number_words[len(test_down)]} lost one test example each",
+    f"than for the other benchmarks (${group_stats['Non-MMLU'][3]:+.1f}$ versus ${group_stats['Non-MMLU'][4]:+.1f}$)",
+]
+for expected in gap_rows:
+    if expected not in gap_table:
+        failures.append(f"validation-to-test table differs from the paired records: {expected[:30]}")
+for claim in transfer_claims:
+    if claim not in flat:
+        failures.append(f"validation-to-test claim differs from the paired records: {claim[:48]}")
+for record in test_down:
+    seed_test = json.loads((root.parent / record["metrics_path"]).read_text(encoding="utf-8"))["seed_test"]
+    evaluated = seed_test.get("n_evaluated", seed_test["n_examples"])
+    if round((record["test_base"] - record["test_final"]) * evaluated) != 1:
+        failures.append(f"test decline is not one example: {record['run']}")
+if not 0.62 <= mean_test / mean_val <= 0.71 or flat.count("two-thirds of validation gains") != 2 or "three-fifths" in flat:
+    failures.append("test-to-validation ratio wording differs from the paired records")
+print("validation-to-test table and claims checked against val_test_gap.json")
 
 print("GEPA mentions:", len(re.findall("GEPA", t)))
 print("TODO/FIXME markers:", re.findall(r"TODO[^\n]*|FIXME[^\n]*", t))

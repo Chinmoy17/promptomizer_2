@@ -116,6 +116,10 @@ class ExperimentConfig:
                                 # prompts/<dataset>.md. Set to run one dataset with an
                                 # alternative seed (e.g. a deliberately vague prompt, to
                                 # test whether the optimizer can bootstrap structure).
+    effect_report: bool = True  # reflect_fdpo: False withholds the item-level effect report
+                                # (and the report-specific system-prompt text) from the optimizer.
+    round1_prompt_file: str = ""  # reflect_fdpo: replay this prompt as round 1 (no optimizer
+                                # call) so rounds 2+ start from a fixed parent prompt.
 
     # bookkeeping
     phase: str = "smoke"       # results/<phase>/<run_id>/. Default `smoke` is for
@@ -232,6 +236,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help="simple_fdpo: override seed prompt path (default "
                         "prompts/<dataset>.md). Use to run a dataset with an "
                         "alternative seed, e.g. a deliberately vague prompt.")
+    p.add_argument("--no-effect-report", action="store_true",
+                   help="reflect_fdpo ablation: never show the optimizer the effect of "
+                        "its previous edit; it still sees the current failures and "
+                        "successes.")
+    p.add_argument("--round1-prompt-file", default=d.round1_prompt_file,
+                   help="reflect_fdpo ablation: markdown prompt replayed as round 1 "
+                        "(evaluated and committed without calling the optimizer).")
     p.add_argument("--no-early-stop", action="store_true")
     p.add_argument("--verdict-mode", choices=("programmatic", "llm"),
                    default=d.verdict_mode)
@@ -295,6 +306,8 @@ def config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         stagnation_limit=args.stagnation_limit,
         history_window=args.history_window,
         prompt_file=args.prompt_file,
+        effect_report=not args.no_effect_report,
+        round1_prompt_file=args.round1_prompt_file,
         early_stop=not args.no_early_stop,
         verdict_mode=args.verdict_mode,
         solver_max_tokens=args.solver_max_tokens,

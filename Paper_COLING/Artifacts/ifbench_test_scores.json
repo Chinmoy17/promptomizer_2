@@ -1,0 +1,26 @@
+{
+  "run": "IFBench / 4o-mini",
+  "n_evaluated": 42,
+  "seed_correct": 17,
+  "final_correct": 19,
+  "recovered": 6,
+  "regressed": 4,
+  "recovered_ids": [
+    "ifbench_42",
+    "ifbench_20",
+    "ifbench_224",
+    "ifbench_58",
+    "ifbench_90",
+    "ifbench_297"
+  ],
+  "regressed_ids": [
+    "ifbench_23",
+    "ifbench_21",
+    "ifbench_31",
+    "ifbench_5"
+  ],
+  "run_dirs": {
+    "seed": "results/reflect_ifbench_v1_test_scores/ifbench_eval_only_gpt-4o-mini_s0_20261013-012648",
+    "final": "results/reflect_ifbench_v1_test_scores/ifbench_eval_only_gpt-4o-mini_s0_20261013-012721"
+  }
+}

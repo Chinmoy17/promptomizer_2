@@ -1,12 +1,12 @@
 {
   "source": "Saved seed-0 runs",
   "validation_excluded_prefixes": ["AIME / 4o-mini"],
-  "provenance_note": "GPT-4.1 Mini AIME uses the completed v3 run, 16/30 to 15/30 with 3 recoveries and 4 regressions. PUPA reports test accuracy (composite >= 0.7). Earlier AIME runs with GPT-4o-mini and Claude Haiku 4.5 are summarized in aime_additional_runs.json and are not part of this table or the matched analyses.",
+  "provenance_note": "GPT-4.1 Mini AIME uses the completed v3 run, 16/30 to 15/30 with 3 recoveries and 4 regressions. PUPA reports test accuracy (composite >= 0.7). IFBench GPT-4o-mini test accuracy and transitions are read from ifbench_test_scores.json; its validation accuracy is from the run's metrics. Earlier AIME runs with GPT-4o-mini and Claude Haiku 4.5 are summarized in aime_additional_runs.json and are not part of this table or the matched analyses.",
   "results": [
     {"benchmark": "AIME", "solver": "GPT-4.1 Mini", "baseline_pct": 53.33333333333333, "final_pct": 50.0, "delta_pp": -3.3, "recovered": 3, "regressed": 4, "n_test": 30, "provenance": "saved", "run_group": "reflect_aime_gpt41mini_v3", "run_id": "aime_reflect_fdpo_gpt-4.1-mini_s0_20260916-203408"},
     {"benchmark": "PUPA", "solver": "GPT-4o-mini", "baseline_pct": 55.26315789473684, "final_pct": 65.78947368421053, "delta_pp": 10.5, "recovered": 7, "regressed": 3, "n_test": 38, "provenance": "saved", "run_group": "pupa_pilot_v1"},
     {"benchmark": "PUPA", "solver": "GPT-4.1 Mini", "baseline_pct": 44.73684210526316, "final_pct": 71.05263157894737, "delta_pp": 26.3, "recovered": 10, "regressed": 0, "n_test": 38, "provenance": "saved", "run_group": "pupa_pilot_gpt41mini_v2"},
-    {"benchmark": "IFBench", "solver": "GPT-4o-mini", "baseline_pct": 47.6, "final_pct": 45.2, "delta_pp": -2.4, "recovered": 2, "regressed": 3, "n_test": 42, "provenance": "saved", "run_group": "reflect_ifbench_v1"},
+    {"benchmark": "IFBench", "solver": "GPT-4o-mini", "baseline_pct": 40.476190476190474, "final_pct": 45.23809523809524, "delta_pp": 4.8, "recovered": 6, "regressed": 4, "n_test": 42, "provenance": "saved", "run_group": "reflect_ifbench_v1", "test_source": "ifbench_test_scores.json"},
     {"benchmark": "IFBench", "solver": "GPT-4.1 Mini", "baseline_pct": 42.9, "final_pct": 66.7, "delta_pp": 23.8, "recovered": 12, "regressed": 2, "n_test": 42, "provenance": "saved", "run_group": "reflect_ifbench_gpt41mini_v2"},
     {"benchmark": "Hearsay", "solver": "GPT-4o-mini", "baseline_pct": 71.4, "final_pct": 69.4, "delta_pp": -2.0, "recovered": 8, "regressed": 9, "n_test": 49, "provenance": "saved", "run_group": "reflect_hearsay_gpt4omini_v1"},
     {"benchmark": "Hearsay", "solver": "GPT-4.1 Mini", "baseline_pct": 71.4, "final_pct": 73.5, "delta_pp": 2.0, "recovered": 7, "regressed": 6, "n_test": 49, "provenance": "saved", "run_group": "reflect_hearsay_gpt41mini_v1"},

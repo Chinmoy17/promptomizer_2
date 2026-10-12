@@ -11,7 +11,7 @@ b = (root / "custom.bib").read_text(encoding="utf-8")
 print("em dashes:", t.count("\u2014"), "| '---':", t.count("---"))
 
 labels = set(re.findall(r"\\label\{([^}]+)\}", t))
-refs = {reference for reference in re.findall(r"\\(?:ref|pageref)\{([^}]+)\}", t)
+refs = {reference for reference in re.findall(r"\\(?:ref|pageref|appsec|appsubsec)\{([^}]+)\}", t)
     if not reference.startswith("#")}
 failures = []
 print(f"labels={len(labels)} refs={len(refs)}")
@@ -30,7 +30,11 @@ if cites - keys:
     failures.append("missing bibliography entries")
 print("in custom.bib but uncited (template leftovers ok):", sorted(keys - cites))
 
+OVERLEAF_ONLY_FIGURES = {"fdpo2.png"}
 for g in re.findall(r"includegraphics\[[^\]]*\]\{([^}]+)\}", t):
+    if g in OVERLEAF_ONLY_FIGURES:
+        print("OVERLEAF " + g)
+        continue
     print(("OK       " if (root / g).exists() else "MISSING  ") + g)
     if not (root / g).exists():
         failures.append(f"missing figure: {g}")
@@ -49,7 +53,7 @@ resources = json.loads((artifacts / "resource_usage.json").read_text(encoding="u
 edited = [record for record in paired if record["shipped"]]
 validation_up = [record for record in edited if record["val_best"] > record["val_base"]]
 test_down = [record for record in validation_up if record["test_final"] < record["test_base"]]
-if (len(paired), len(edited), len(validation_up), len(test_down)) != (19, 17, 12, 4):
+if (len(paired), len(edited), len(validation_up), len(test_down)) != (19, 17, 12, 3):
     failures.append("matched analysis population changed")
 aime = next(record for record in reported["results"]
             if record["benchmark"] == "AIME" and record["solver"] == "GPT-4.1 Mini")
@@ -58,7 +62,9 @@ if (aime["recovered"], aime["regressed"], aime["n_test"]) != (3, 4, 30):
 if not math.isclose(aime["baseline_pct"], 100 * 16 / 30) or aime["final_pct"] != 50:
     failures.append("AIME endpoints differ from the matched v3 record")
 for record in reported["results"]:
-    if record["benchmark"] not in {"PUPA", "MMLU"}:
+    if record["provenance"] != "saved":
+        continue
+    if record["benchmark"] != "MMLU":
         score_delta = record["final_pct"] - record["baseline_pct"]
         count_delta = 100 * (record["recovered"] - record["regressed"]) / record["n_test"]
         if not math.isclose(score_delta, count_delta, rel_tol=0, abs_tol=0.100001):
@@ -79,9 +85,289 @@ for record in resources["aggregates"]:
         failures.append(f"resource table mismatch: {benchmark} / {record['solver']}")
 if r"\square" in t:
     failures.append("unavailable square symbol: use the loaded latexsym Box symbol")
+main_table = next(block for block in re.findall(r"\\begin\{table\*\}.*?\\end\{table\*\}", t, re.S)
+                  if r"\label{tab:main}" in block)
+for record in reported["results"]:
+    if record["provenance"] != "saved":
+        continue
+    label = "MMLU (macro)" if record["benchmark"] == "MMLU" else record["benchmark"]
+    churn = record["recovered"] + record["regressed"]
+    expected_start = (f"{label} & {record['solver']} & {record['baseline_pct']:.1f} & "
+                      f"{record['final_pct']:.1f} & ${record['delta_pp']:+.1f}$ & ")
+    expected_end = (f" & {record['recovered']} & {record['regressed']} & "
+                    f"{churn} ({100 * churn / record['n_test']:.1f})")
+    row = next((line for line in main_table.splitlines() if expected_start in line), None)
+    if row is None or expected_end not in row:
+        failures.append(f"main table mismatch: {record['benchmark']} / {record['solver']}")
+
+flat = re.sub(r"\s+", " ", t)
+if "tab:edits" in t:
+    failures.append("removed edit-size table is still referenced")
+phases = {"first": [], "later": []}
+for record in paired:
+    for round_record in record["rounds"]:
+        phases["first" if round_record["round"] == 1 else "later"].append(round_record)
+
+
+def total(rounds, key):
+    return sum(round_record[key] for round_record in rounds)
+
+
+first, later = phases["first"], phases["later"]
+expected_edit_claims = [
+    "the optimizer modified an average of "
+    f"{sum(len(r['sections_changed']) for r in first) / len(first):.1f} of the five prompt sections, "
+    f"compared with {sum(len(r['sections_changed']) for r in later) / len(later):.1f} in rounds 2--3",
+    f"Later rounds recovered {total(later, 'mining_recovered')} mining examples while regressing "
+    f"{total(later, 'mining_regressed')}, compared with {total(first, 'mining_recovered')} recoveries and "
+    f"{total(first, 'mining_regressed')} regressions in round 1",
+]
+for expected in expected_edit_claims:
+    if expected not in flat:
+        failures.append(f"revision-behavior claim differs from the saved records: {expected[:48]}")
+print("main table rows and revision-behavior claims checked against saved records")
+
+ablation = json.loads((artifacts / "ablation_hearsay.json").read_text(encoding="utf-8"))
+ablation_tables = {
+    label: next(block for block in re.findall(r"\\begin\{table\}.*?\\end\{table\}", t, re.S)
+                if "\\label{" + label + "}" in block)
+    for label in ("tab:ablation_rounds", "tab:ablation_runs")}
+if ablation["runs_per_arm"] != {"report": 5, "noreport": 5}:
+    failures.append("ablation run count changed")
+for key, label in (("2", "2"), ("3", "3"), ("2-3", "2--3")):
+    for arm, name in (("report", "report"), ("noreport", "no report")):
+        s = ablation["rounds"][key][arm]
+        prefix = f"{label} & report" if arm == "report" else " & no report"
+        expected = (f"{prefix} & {s['sections_mean']:.2f} & {s['single_section']}/{s['rounds']} & "
+                    f"{s['mining_recovered']}/{s['mining_regressed']} & "
+                    f"{s['validation_recovered']}/{s['validation_regressed']}")
+        if expected not in ablation_tables["tab:ablation_rounds"]:
+            failures.append(f"ablation round table mismatch: round {key}, {arm}")
+metric_labels = {
+    "mining_churn_per_round": "Mining items changing outcome, per round",
+    "mining_net_gain_per_round": "Mining net gain, per round",
+    "mining_regressions_per_round": "Mining regressions, per round",
+    "validation_churn_per_round": "Validation items changing outcome, per round",
+    "validation_gain_points": "Validation gain (points)",
+    "test_churn_per_run": "Test items changing outcome, per run",
+    "test_regressions_per_run": "Test regressions, per run",
+    "test_change_points": "Test change from seed (points)",
+}
+by_metric = {row["metric"]: row for row in ablation["run_level"]}
+
+
+def signed(value):
+    return f"${value:.1f}$" if value < 0 else f"{value:.1f}"
+
+
+for metric, label in metric_labels.items():
+    row = by_metric[metric]
+    expected = f"{label} & {signed(row['report'])} & {signed(row['noreport'])} & {row['p']:.3f}"
+    if expected not in ablation_tables["tab:ablation_runs"]:
+        failures.append(f"ablation run-level table mismatch: {metric}")
+flat = re.sub(r"\s+", " ", t)
+churn, net = by_metric["mining_churn_per_round"], by_metric["mining_net_gain_per_round"]
+change = by_metric["test_change_points"]
+sec2 = ablation["rounds"]["2"]
+quoted = [
+    f"round-2 revisions already modified only {sec2['noreport']['sections_mean']:.1f} prompt sections on average, "
+    f"compared with {sec2['report']['sections_mean']:.1f} when the report was included",
+    f"an average of {churn['report']:.1f} mining examples changed correctness per round, compared with "
+    f"{churn['noreport']:.1f} without it (${'p'}={churn['p']:.3f}$",
+    f"similar net gains of {net['report']:.1f} and {net['noreport']:.1f} mining examples per round",
+    f"Test accuracy fell in both conditions, by {abs(change['report']):.1f} and {abs(change['noreport']):.1f} "
+    "percentage points with and without the report",
+]
+if change["report"] >= 0 or change["noreport"] >= 0:
+    failures.append("test accuracy no longer fell in both ablation arms; revise the wording")
+for sentence in quoted:
+    if sentence not in flat:
+        failures.append(f"ablation claim differs from the saved summary: {sentence[:48]}")
+if round(100 * (1 - churn["report"] / churn["noreport"])) != 40 or flat.count(r"40\%") < 1:
+    failures.append("churn-reduction claim differs from the saved summary")
+if flat.count("five runs per arm") < 3 or "five independent runs per arm" not in flat:
+    failures.append("ablation run count missing from the text")
+print("ablation tables and quoted numbers checked against ablation_hearsay.json")
+
+churn_rows = [(r["recovered"] + r["regressed"], abs(r["recovered"] - r["regressed"])) for r in reported["results"]]
+if sum(c >= 5 * n for c, n in churn_rows) != 5 or "five of nine configurations" not in flat.replace("five of the nine", "five of nine"):
+    failures.append("churn-versus-net count differs from the results manifest")
+if max(c for c, n in churn_rows if n == 1) != 17 or "up to 17 changed outcomes" not in flat:
+    failures.append("largest one-item-net churn differs from the results manifest")
+if by_metric["validation_gain_points"]["report"] <= 0 or by_metric["validation_gain_points"]["noreport"] <= 0:
+    failures.append("validation did not rise on average in both ablation arms; revise the Discussion")
+print("churn-versus-net claims checked against reported_results.json")
+
+extra = json.loads((artifacts / "aime_additional_runs.json").read_text(encoding="utf-8"))
+haiku, gpt4o = extra["optimization_runs"]
+reeval_2k, reeval_16k, transfer = extra["reevaluations"]
+if any(r["benchmark"] == "AIME" and r["solver"] == "GPT-4o-mini" for r in reported["results"]) \
+        or any(r["provenance"] != "saved" for r in reported["results"]) or len(reported["results"]) != 9:
+    failures.append("results manifest must hold exactly nine saved-run rows")
+for stale in ("GPT-4o-mini & 26.7", r"26.7\rightarrow 33.33"):
+    if stale in flat:
+        failures.append(f"stale AIME GPT-4o-mini text remains: {stale}")
+number_words = {3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten"}
+positive = sum(r["final_pct"] > r["baseline_pct"] for r in reported["results"])
+if f"increased in {number_words[positive]} of the {number_words[len(reported['results'])]} reported configurations" not in flat:
+    failures.append("count of improved configurations differs from the results manifest")
+if (haiku["recovered"], haiku["regressed"], reeval_16k["correct"] - reeval_2k["correct"],
+        transfer["recovered"], transfer["regressed"]) != (2, 0, 1, 0, 3):
+    failures.append("additional AIME run counts changed; revise the appendix wording")
+haiku_pct = [100 * haiku["seed_correct"] / extra["n_test"], 100 * haiku["returned_correct"] / extra["n_test"]]
+aime_extra_claims = [
+    f"validation accuracy rose from {haiku['val_base_pct']}\\% to {haiku['val_returned_pct']}\\%",
+    f"test accuracy from {haiku_pct[0]:.1f}\\% to {haiku_pct[1]:.1f}\\% ({haiku['seed_correct']}/30 to "
+    f"{haiku['returned_correct']}/30, two recoveries and no regressions)",
+    f"last round's validation accuracy ({gpt4o['val_round_pct'][-1]}\\%) fell below the baseline's ({gpt4o['val_base_pct']}\\%)",
+    f"Claude Haiku 4.5 & seed & {haiku['solver_max_tokens']:,} & {haiku['seed_correct']}/30",
+    f"& returned (round {haiku['returned_round']}) & {haiku['solver_max_tokens']:,} & {haiku['returned_correct']}/30",
+    f"GPT-4o-mini & seed & {gpt4o['solver_max_tokens']:,} & {gpt4o['seed_correct']}/30",
+    f"& returned (the seed, unchanged) & {gpt4o['solver_max_tokens']:,} & {gpt4o['returned_correct']}/30",
+    f"& seed, re-evaluated & {reeval_2k['solver_max_tokens']:,} & {reeval_2k['correct']}/30",
+    f"& seed, re-evaluated & {reeval_16k['solver_max_tokens']:,} & {reeval_16k['correct']}/30",
+    f"& GPT-4.1 Mini round-1 prompt & {transfer['solver_max_tokens']:,} & {transfer['correct']}/30",
+    r"GPT-4.1 Mini & GPT-5, item-level effect report & $53.3\rightarrow 50.0$",
+]
+for claim in aime_extra_claims:
+    if claim not in flat:
+        failures.append(f"additional AIME run text differs from aime_additional_runs.json: {claim[:48]}")
+if flat.count(f"solved {gpt4o['seed_correct']} and {gpt4o['returned_correct']} of 30 problems") != 2:
+    failures.append("identical-prompt AIME re-evaluation counts are missing from the appendix")
+print("additional AIME runs checked against aime_additional_runs.json")
 print("matched records / edited / validation-up / test-down:",
       len(paired), len(edited), len(validation_up), len(test_down))
 print("resource table: exact ledger aggregates checked")
+
+appendix_text = t.split(r"\appendix", 1)[1]
+appendix_sections = re.findall(r"\\section\{([^}]+)\}", appendix_text)
+expected_sections = ["Run Configuration and Scoring", "Prompt and Feedback Specification",
+                     "Detailed Results and Trajectories", "Evaluation Checks and Artifacts"]
+if appendix_sections != expected_sections:
+    failures.append("appendix section order differs from the reader-facing outline")
+if appendix_text.count(r"\label{tab:prior}") != 1:
+    failures.append("related-work protocol table missing or duplicated")
+if r"\resizebox" in appendix_text:
+    failures.append("appendix tables should not be scaled to the full single-column width")
+
+table_blocks = re.findall(r"\\begin\{table\*?\}.*?\\end\{table\*?\}", t, re.S)
+pair_table = next(block for block in table_blocks if r"\label{tab:pergap}" in block)
+config_table = next(block for block in table_blocks if r"\label{tab:config}" in block)
+pair_rows = [re.sub(r"^\\rowcolor\{[^}]+\}", "", line).strip().removesuffix(r"\\").strip()
+             .split(" & ") for line in pair_table.splitlines()
+             if re.search(r" & (?:4o-mini|4\.1 Mini) & (?:yes|no) & ", line)]
+config_rows = [line.strip().removesuffix(r"\\").strip().split(" & ")
+               for line in config_table.splitlines()
+               if re.search(r" & (?:4o-mini|4\.1 Mini|both) & ", line)]
+subject_labels = {
+    "MMLU-college_mathematics": "MMLU college math.",
+    "MMLU-computer_security": "MMLU computer sec.",
+    "MMLU-econometrics": "MMLU econometrics",
+    "MMLU-high_school_biology": r"MMLU high sch.\ biol.",
+    "MMLU-philosophy": "MMLU philosophy",
+    "MMLU-professional_law": r"MMLU prof.\ law",
+}
+mmlu_counts = {"GPT-4o-mini": [0, 0], "GPT-4.1 Mini": [0, 0]}
+if len(pair_rows) != len(paired):
+    failures.append("paired appendix table does not contain all matched records")
+for record, cells in zip(paired, pair_rows):
+    family, solver_suffix = record["run"].split(" / ")
+    solver_label = "4o-mini" if solver_suffix == "4o-mini" else "4.1 Mini"
+    solver_name = "GPT-4o-mini" if solver_suffix == "4o-mini" else "GPT-4.1 Mini"
+    val_pair = (f"{100 * record['val_base']:.1f} " + r"$\rightarrow$ "
+                + f"{100 * record['val_best']:.1f}") if record["val_measured"] else "--"
+    test_pair = (f"{100 * record['test_base']:.1f} " + r"$\rightarrow$ "
+                 + f"{100 * record['test_final']:.1f}")
+    val_delta = "0.0" if record["val_gain_pp"] == 0 else f"${record['val_gain_pp']:+.1f}$"
+    test_delta = "0.0" if record["test_delta_pp"] == 0 else f"${record['test_delta_pp']:+.1f}$"
+    expected_cells = [subject_labels.get(family, family), solver_label,
+                      "yes" if record["shipped"] else "no", val_pair, val_delta,
+                      test_pair, test_delta]
+    if len(cells) != 8 or cells[:7] != expected_cells:
+        failures.append(f"paired appendix row mismatch: {record['run']}")
+        continue
+    recovered, regressed = map(int, cells[7].split("/"))
+    metrics_path = root.parent / record["metrics_path"]
+    metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+    config = json.loads(metrics_path.with_name("config.json").read_text(encoding="utf-8"))
+    evaluated = metrics["seed_test"].get("n_evaluated", metrics["seed_test"]["n_examples"])
+    if not math.isclose(100 * (recovered - regressed) / evaluated,
+                        record["test_delta_pp"], rel_tol=0, abs_tol=1e-6):
+        failures.append(f"paired transition identity mismatch: {record['run']}")
+    if family.startswith("MMLU-"):
+        mmlu_counts[solver_name][0] += recovered
+        mmlu_counts[solver_name][1] += regressed
+        config_family = "MMLU (per subject)"
+    else:
+        headline = next(row for row in reported["results"]
+                        if row["benchmark"] == family and row["solver"] == solver_name)
+        if (recovered, regressed) != (headline["recovered"], headline["regressed"]):
+            failures.append(f"appendix/headline transitions differ: {record['run']}")
+        config_family = family
+    settings = next(row for row in config_rows if row[0] == config_family
+                    and row[1] in {solver_label, "both"})
+    if len(settings) != 5 or int(settings[4].replace(",", "")) != config["solver_max_tokens"]:
+        failures.append(f"appendix configuration mismatch: {record['run']}")
+    if metrics["status"] != "completed":
+        failures.append(f"incomplete record in matched population: {record['run']}")
+for solver_name, counts in mmlu_counts.items():
+    headline = next(row for row in reported["results"]
+                    if row["benchmark"] == "MMLU" and row["solver"] == solver_name)
+    if counts != [headline["recovered"], headline["regressed"]]:
+        failures.append(f"appendix MMLU transition totals differ: {solver_name}")
+print("appendix: four ordered sections; matched accuracy rows, transitions, and output limits checked")
+
+scores = json.loads((artifacts / "ifbench_test_scores.json").read_text(encoding="utf-8"))
+ifbench_4o = next(row for row in reported["results"]
+                  if row["benchmark"] == "IFBench" and row["solver"] == "GPT-4o-mini")
+if ((ifbench_4o["recovered"], ifbench_4o["regressed"]) != (scores["recovered"], scores["regressed"])
+        or not math.isclose(ifbench_4o["baseline_pct"], 100 * scores["seed_correct"] / scores["n_evaluated"])
+        or not math.isclose(ifbench_4o["final_pct"], 100 * scores["final_correct"] / scores["n_evaluated"])):
+    failures.append("IFBench GPT-4o-mini row differs from ifbench_test_scores.json")
+changed = scores["recovered"] + scores["regressed"]
+if (f"changed {number_words[changed]} outcomes ({number_words[scores['recovered']]} recoveries, "
+        f"{number_words[scores['regressed']]} regressions)") not in flat:
+    failures.append("appendix IFBench transition counts differ from ifbench_test_scores.json")
+
+mean_val = sum(r["val_gain_pp"] for r in edited) / len(edited)
+mean_test = sum(r["test_delta_pp"] for r in edited) / len(edited)
+group_stats = {}
+for name, members in (("Non-MMLU", [r for r in edited if not r["run"].startswith("MMLU")]),
+                      ("MMLU subjects", [r for r in edited if r["run"].startswith("MMLU")])):
+    up = [r for r in members if r["val_best"] > r["val_base"]]
+    group_stats[name] = (len(members), len(up), len([r for r in up if r["test_final"] < r["test_base"]]),
+                         sum(r["val_gain_pp"] for r in members) / len(members),
+                         sum(r["test_delta_pp"] for r in members) / len(members))
+gap_table = re.sub(r"\s+", " ", next(block for block in table_blocks if r"\label{tab:gap}" in block))
+gap_rows = [f"{name} & {n} & {up} & {down} & ${mv:+.1f}$ & ${mt:+.1f}$"
+            for name, (n, up, down, mv, mt) in group_stats.items()]
+gap_rows.append(f"\\textbf{{{len(edited)}}} & \\textbf{{{len(validation_up)}}} & \\textbf{{{len(test_down)}}} & "
+                f"$\\mathbf{{{mean_val:+.1f}}}$ & $\\mathbf{{{mean_test:+.1f}}}$")
+transfer_claims = [
+    f"Validation gains average {mean_val:.1f} points, against {mean_test:.1f} on held-out",
+    f"validation accuracy improved by {mean_val:.1f} percentage points on average, compared with "
+    f"{mean_test:.1f} points on test data",
+    f"approximately {round(100 * mean_test / mean_val)}\\% of the average validation gain",
+    f"approximately {round(100 * mean_test / mean_val)}\\% of average validation gains, and "
+    f"{number_words[len(test_down)]} runs experienced test declines",
+    f"{number_words[len(validation_up) - len(test_down)]} also improved test accuracy, while "
+    f"{number_words[len(test_down)]} lost one test example each",
+    f"than for the other benchmarks (${group_stats['Non-MMLU'][3]:+.1f}$ versus ${group_stats['Non-MMLU'][4]:+.1f}$)",
+]
+for expected in gap_rows:
+    if expected not in gap_table:
+        failures.append(f"validation-to-test table differs from the paired records: {expected[:30]}")
+for claim in transfer_claims:
+    if claim not in flat:
+        failures.append(f"validation-to-test claim differs from the paired records: {claim[:48]}")
+for record in test_down:
+    seed_test = json.loads((root.parent / record["metrics_path"]).read_text(encoding="utf-8"))["seed_test"]
+    evaluated = seed_test.get("n_evaluated", seed_test["n_examples"])
+    if round((record["test_base"] - record["test_final"]) * evaluated) != 1:
+        failures.append(f"test decline is not one example: {record['run']}")
+if not 0.62 <= mean_test / mean_val <= 0.71 or flat.count("two-thirds of validation gains") != 2 or "three-fifths" in flat:
+    failures.append("test-to-validation ratio wording differs from the paired records")
+print("validation-to-test table and claims checked against val_test_gap.json")
 
 print("GEPA mentions:", len(re.findall("GEPA", t)))
 print("TODO/FIXME markers:", re.findall(r"TODO[^\n]*|FIXME[^\n]*", t))
