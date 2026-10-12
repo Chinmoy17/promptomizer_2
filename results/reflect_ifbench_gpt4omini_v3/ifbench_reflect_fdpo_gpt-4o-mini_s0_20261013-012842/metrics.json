@@ -1,0 +1,248 @@
+{
+  "run_id": "ifbench_reflect_fdpo_gpt-4o-mini_s0_20261013-012842",
+  "status": "completed",
+  "method": "reflect_fdpo",
+  "dataset": "ifbench",
+  "solver_model": "gpt-4o-mini",
+  "seed": 0,
+  "seed_test": {
+    "accuracy": 0.40476190476190477,
+    "n_examples": 42,
+    "n_evaluated": 42,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "final_test": {
+    "accuracy": 0.40476190476190477,
+    "n_examples": 42,
+    "n_evaluated": 42,
+    "n_blocked": 0,
+    "extraction_failures": 0
+  },
+  "optimization": {
+    "mode": "reflect",
+    "edit_status": "committed",
+    "triggered": true,
+    "tau": 1,
+    "skip_above_acc": 0.95,
+    "skipped_high_baseline": false,
+    "simple_max_rounds": 3,
+    "accept_margin": 0.0,
+    "shipped_structured": true,
+    "selection": "best_of_rounds",
+    "shipped_round": 2,
+    "val_split": {
+      "enabled": true,
+      "val_frac": 0.35,
+      "n_mining": 26,
+      "n_validation": 14
+    },
+    "baseline_val_acc": 0.5,
+    "best_structured_val_acc": 0.35714285714285715,
+    "n_failures_triggering": 14,
+    "optimizer_calls": 3,
+    "rounds_log": [
+      {
+        "round": 1,
+        "status": "no_change",
+        "n_failures_before": 14
+      },
+      {
+        "round": 2,
+        "status": "committed",
+        "n_failures_before": 14,
+        "n_failures_after": 17,
+        "train_acc_after": 0.32,
+        "val_acc_after": 0.35714285714285715,
+        "sections_changed": [
+          "constraints",
+          "context",
+          "task_details"
+        ],
+        "failing_ids_before": [
+          "ifbench_100",
+          "ifbench_103",
+          "ifbench_104",
+          "ifbench_172",
+          "ifbench_206",
+          "ifbench_207",
+          "ifbench_208",
+          "ifbench_226",
+          "ifbench_24",
+          "ifbench_296",
+          "ifbench_34",
+          "ifbench_43",
+          "ifbench_45",
+          "ifbench_57"
+        ],
+        "failing_ids_after": [
+          "ifbench_100",
+          "ifbench_103",
+          "ifbench_104",
+          "ifbench_17",
+          "ifbench_172",
+          "ifbench_18",
+          "ifbench_206",
+          "ifbench_207",
+          "ifbench_208",
+          "ifbench_226",
+          "ifbench_24",
+          "ifbench_296",
+          "ifbench_34",
+          "ifbench_43",
+          "ifbench_56",
+          "ifbench_57",
+          "ifbench_59"
+        ],
+        "recovered_this_round": [
+          "ifbench_45"
+        ],
+        "regressed_this_round": [
+          "ifbench_17",
+          "ifbench_18",
+          "ifbench_56",
+          "ifbench_59"
+        ],
+        "val_recovered_this_round": 0,
+        "val_regressed_this_round": 2,
+        "reflection_shown": false,
+        "replayed": false
+      },
+      {
+        "round": 3,
+        "status": "no_change",
+        "n_failures_before": 17
+      }
+    ],
+    "baseline_failing_ids": [
+      "ifbench_100",
+      "ifbench_103",
+      "ifbench_104",
+      "ifbench_172",
+      "ifbench_206",
+      "ifbench_207",
+      "ifbench_208",
+      "ifbench_226",
+      "ifbench_24",
+      "ifbench_296",
+      "ifbench_34",
+      "ifbench_43",
+      "ifbench_45",
+      "ifbench_57"
+    ],
+    "solver_temperature": 0.0,
+    "optimizer_temperature": 0.7,
+    "effect_report": true,
+    "round1_prompt_file": null,
+    "baseline_train": {
+      "accuracy": 0.44,
+      "n_correct": 11,
+      "n_wrong": 14
+    },
+    "current_train": {
+      "accuracy": 0.32,
+      "n_correct": 8,
+      "n_wrong": 17
+    },
+    "train_confusion": {
+      "recoveries": [
+        "ifbench_45"
+      ],
+      "regressions": [
+        "ifbench_17",
+        "ifbench_18",
+        "ifbench_56",
+        "ifbench_59"
+      ],
+      "still_wrong": [
+        "ifbench_100",
+        "ifbench_103",
+        "ifbench_104",
+        "ifbench_172",
+        "ifbench_206",
+        "ifbench_207",
+        "ifbench_208",
+        "ifbench_226",
+        "ifbench_24",
+        "ifbench_296",
+        "ifbench_34",
+        "ifbench_43",
+        "ifbench_57"
+      ],
+      "still_right_count": 7,
+      "net_gain": -3
+    },
+    "rewrites": [],
+    "registry_counts": {
+      "commits": 3,
+      "rejects": 0
+    },
+    "rounds_run": 1,
+    "train_acc_per_round": [
+      0.32,
+      0.32,
+      0.32
+    ],
+    "time_to_stabilization": null,
+    "judge_parse_failures": 0,
+    "test_confusion": {
+      "recoveries": [
+        "ifbench_20",
+        "ifbench_42",
+        "ifbench_5"
+      ],
+      "regressions": [
+        "ifbench_128",
+        "ifbench_134",
+        "ifbench_54"
+      ],
+      "still_wrong": [
+        "ifbench_101",
+        "ifbench_105",
+        "ifbench_136",
+        "ifbench_173",
+        "ifbench_19",
+        "ifbench_21",
+        "ifbench_211",
+        "ifbench_22",
+        "ifbench_224",
+        "ifbench_225",
+        "ifbench_227",
+        "ifbench_23",
+        "ifbench_241",
+        "ifbench_242",
+        "ifbench_243",
+        "ifbench_244",
+        "ifbench_246",
+        "ifbench_297",
+        "ifbench_298",
+        "ifbench_299",
+        "ifbench_55",
+        "ifbench_58"
+      ],
+      "still_right_count": 14,
+      "net_gain": 0
+    },
+    "markdown_source": "results\\reflect_ifbench_gpt41mini_v2\\ifbench_reflect_fdpo_gpt-4.1-mini_s0_20260916-163821\\prompt_baseline.md"
+  },
+  "content_filter": null,
+  "wall_clock_s": 202.8,
+  "cost": {
+    "total_calls": 167,
+    "total_cost_usd": 0.138497,
+    "by_role": {
+      "solver": {
+        "calls": 164,
+        "prompt_tokens": 67211,
+        "completion_tokens": 28202,
+        "cost_usd": 0.027003
+      },
+      "optimizer": {
+        "calls": 3,
+        "prompt_tokens": 18947,
+        "completion_tokens": 8781,
+        "cost_usd": 0.111494
+      }
+    }
+  }
+}

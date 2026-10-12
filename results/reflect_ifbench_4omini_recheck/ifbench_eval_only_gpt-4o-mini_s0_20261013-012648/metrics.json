@@ -1,0 +1,17 @@
+{
+  "dataset": "ifbench",
+  "prompt_file": "results\\reflect_ifbench_v1\\ifbench_reflect_fdpo_gpt-4o-mini_s0_20260829-134611\\prompt_baseline.md",
+  "prompt_source": "results\\reflect_ifbench_v1\\ifbench_reflect_fdpo_gpt-4o-mini_s0_20260829-134611\\prompt_baseline.md",
+  "n_train": 40,
+  "n_test": 42,
+  "seed": 0,
+  "split_mode": "stratified",
+  "solver_max_tokens": 2048,
+  "solver_temperature": 0.0,
+  "accuracy": 0.40476190476190477,
+  "n_correct": 17,
+  "n_evaluated": 42,
+  "n_blocked": 0,
+  "extraction_failures": 0,
+  "spent_usd": 0.0084738
+}

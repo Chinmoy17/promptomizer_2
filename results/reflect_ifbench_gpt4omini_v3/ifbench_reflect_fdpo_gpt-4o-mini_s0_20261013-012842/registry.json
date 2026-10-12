@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "schema": [
+    "system_role",
+    "context",
+    "task_details",
+    "constraints",
+    "output_format"
+  ],
+  "run_stagnant_rounds": 0,
+  "run_best_acc": -1.0,
+  "run_best_versions": {
+    "system_role": 0,
+    "context": 0,
+    "task_details": 0,
+    "constraints": 0,
+    "output_format": 0
+  },
+  "sections": {
+    "system_role": {
+      "name": "system_role",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "You are a helpful assistant.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    },
+    "context": {
+      "name": "context",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "The user's request may include one or more specific requirements about the\nformat, length, wording, or content of your response.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "The user's request may include one or more specific requirements about the format, length, wording, or content of your response. These constraints are mechanically checked, so exact compliance is required.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.43999999999999995,
+            "acc_new": 0.32,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 14,
+            "recovered_failures": 1,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "task_details": {
+      "name": "task_details",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Answer the user's request.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "Answer the user's request. When constraints are present, plan to satisfy each one exactly. Use brief, visible reasoning to verify counts, formats, and lexical rules before producing the final content.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.43999999999999995,
+            "acc_new": 0.32,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 14,
+            "recovered_failures": 1,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "name": "constraints",
+      "active_version": 1,
+      "versions": [
+        {
+          "version": 0,
+          "text": "Follow any requirements stated in the request.",
+          "created_round": 0,
+          "status": "archived",
+          "gate": null
+        },
+        {
+          "version": 1,
+          "text": "- Extract and list the constraints you must satisfy before writing the final content. Prioritize exact-format constraints.\n- Compliance checklist to apply before finalizing:\n  - Exact-option answers: If the user restricts answers to specific strings (e.g., a), b), c), d) or yes/no/maybe), output exactly one allowed token, matching punctuation and case, with no extra characters.\n  - No-whitespace outputs: If whitespace is forbidden, ensure the final content has no spaces, tabs, or newlines.\n  - Counts: For word counts, unique-word counts, pronoun counts, or numbers, draft, then count explicitly; adjust until the target is met exactly.\n  - Forbidden/required words: Verify inclusion/exclusion precisely.\n  - Special lexical rules: For “no two consecutive words share the same first letter,” ensure adjacent initial letters differ; for “consonant clusters,” ensure every word contains at least one cluster (e.g., “strength,” “craft,” “blends”) and avoid words like “a,” “I,” “on,” “data,” “final.”\n  - Stop-word ratio: Prefer content words; minimize articles and simple conjunctions; estimate percentage and adjust.\n- Do not include any reasoning, notes, or extra characters in the final content.",
+          "created_round": 2,
+          "status": "active",
+          "gate": {
+            "acc_old": 0.43999999999999995,
+            "acc_new": 0.32,
+            "rho": 0.0,
+            "passed": true,
+            "batch_size": 40,
+            "n_failures": 14,
+            "recovered_failures": 1,
+            "broke": 4
+          }
+        }
+      ]
+    },
+    "output_format": {
+      "name": "output_format",
+      "active_version": 0,
+      "versions": [
+        {
+          "version": 0,
+          "text": "If reasoning or planning would help you satisfy the constraints (for example,\ncounting words, checking a forbidden-word list, or tracking a format rule),\nthink it through first. Then write a line containing exactly\n`FINAL RESPONSE:` on its own, followed immediately by ONLY the content that\nmust satisfy every stated constraint. Everything before that line is ignored\nwhen checking constraints; everything after it, verbatim, is what gets\nchecked -- so nothing after `FINAL RESPONSE:` may contain your reasoning,\nnotes, or extra commentary. If no reasoning is needed, `FINAL RESPONSE:` may\nbe the very first line.",
+          "created_round": 0,
+          "status": "active",
+          "gate": null
+        }
+      ]
+    }
+  }
+}
