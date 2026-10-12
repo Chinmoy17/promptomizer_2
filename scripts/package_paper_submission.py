@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import shutil
 import tempfile
 import zipfile
 
@@ -18,6 +19,7 @@ MANUSCRIPT_INPUTS = (
     "figures/fig_recovered_regressed.pdf",
     "Artifacts/reported_results.json", "Artifacts/val_test_gap.json",
     "Artifacts/resource_usage.json", "Artifacts/ablation_hearsay.json",
+    "Artifacts/aime_additional_runs.json",
 )
 
 
@@ -62,11 +64,15 @@ def main() -> None:
     with tempfile.TemporaryDirectory(prefix=".paper-package-", dir=output) as staging:
         upload = Path(staging) / "overleaf_upload.zip"
         build_manuscript(root, upload)
-        source_archive = build_bundle(root, Path(staging) / "code",
-                                      tuple(arguments.redact_term))[1]
+        source_dir, source_archive = build_bundle(root, Path(staging) / "code",
+                                                  tuple(arguments.redact_term))
         source_count = verify_source(source_archive)
         upload.replace(output / "overleaf_upload.zip")
         source_archive.replace(output / "anonymous_code.zip")
+        unzipped = output / "anonymous_code"
+        if unzipped.exists():
+            shutil.rmtree(unzipped)
+        shutil.copytree(source_dir, unzipped)
     print(f"PASS: Overleaf ZIP has {len(MANUSCRIPT_INPUTS)} hash-verified current files")
     print(f"PASS: anonymous source ZIP has {source_count} audited, hash-verified files")
     print("The manuscript is at the upload root. PDF compilation remains an Overleaf check.")

@@ -37,6 +37,23 @@ def test_export_excludes_private_files_and_preserves_originals(tmp_path):
                        for entry in zipped.namelist())
 
 
+def test_export_ships_only_the_runner_scripts_and_no_docs(tmp_path):
+    source = tmp_path / "source"
+    (source / "scripts").mkdir(parents=True)
+    for name in ("__init__.py", "download_datasets.py", "run_experiment.py",
+                 "launch_run.ps1", "run_smoke.py"):
+        (source / "scripts" / name).write_text("", encoding="utf-8")
+    (source / "Docs").mkdir()
+    (source / "Docs" / "fdpo_mechanism.md").write_text("notes", encoding="utf-8")
+    (source / "tests").mkdir()
+    (source / "tests" / "test_summary.py").write_text("", encoding="utf-8")
+    bundle, _ = build_bundle(source, tmp_path / "export")
+    assert sorted(path.name for path in (bundle / "scripts").iterdir()) == [
+        "__init__.py", "download_datasets.py", "run_experiment.py"]
+    assert not (bundle / "Docs").exists()
+    assert not (bundle / "tests" / "test_summary.py").exists()
+
+
 def test_sanitization_replaces_identity_but_keeps_example_addresses(tmp_path):
     private_address = "person@" + "researchlab.edu"
     private_endpoint = "https://private-resource" + ".openai.azure.com/"

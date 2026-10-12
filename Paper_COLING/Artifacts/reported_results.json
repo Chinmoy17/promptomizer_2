@@ -1,9 +1,8 @@
 {
-  "source": "Saved seed-0 runs; the GPT-4o-mini AIME row is author-reported",
+  "source": "Saved seed-0 runs",
   "validation_excluded_prefixes": ["AIME / 4o-mini"],
-  "provenance_note": "GPT-4.1 Mini AIME uses the completed v3 run, 16/30 to 15/30 with 3 recoveries and 4 regressions. PUPA reports test accuracy (composite >= 0.7). GPT-4o-mini AIME values are author-reported (Table 2: 26.7 -> 33.33, delta 6.63, validation change 0, 2 recoveries, 0 regressions, churn 2).",
+  "provenance_note": "GPT-4.1 Mini AIME uses the completed v3 run, 16/30 to 15/30 with 3 recoveries and 4 regressions. PUPA reports test accuracy (composite >= 0.7). Earlier AIME runs with GPT-4o-mini and Claude Haiku 4.5 are summarized in aime_additional_runs.json and are not part of this table or the matched analyses.",
   "results": [
-    {"benchmark": "AIME", "solver": "GPT-4o-mini", "baseline_pct": 26.7, "final_pct": 33.33, "delta_pp": 6.63, "recovered": 2, "regressed": 0, "n_test": 30, "provenance": "author_reported"},
     {"benchmark": "AIME", "solver": "GPT-4.1 Mini", "baseline_pct": 53.33333333333333, "final_pct": 50.0, "delta_pp": -3.3, "recovered": 3, "regressed": 4, "n_test": 30, "provenance": "saved", "run_group": "reflect_aime_gpt41mini_v3", "run_id": "aime_reflect_fdpo_gpt-4.1-mini_s0_20260916-203408"},
     {"benchmark": "PUPA", "solver": "GPT-4o-mini", "baseline_pct": 55.26315789473684, "final_pct": 65.78947368421053, "delta_pp": 10.5, "recovered": 7, "regressed": 3, "n_test": 38, "provenance": "saved", "run_group": "pupa_pilot_v1"},
     {"benchmark": "PUPA", "solver": "GPT-4.1 Mini", "baseline_pct": 44.73684210526316, "final_pct": 71.05263157894737, "delta_pp": 26.3, "recovered": 10, "regressed": 0, "n_test": 38, "provenance": "saved", "run_group": "pupa_pilot_gpt41mini_v2"},

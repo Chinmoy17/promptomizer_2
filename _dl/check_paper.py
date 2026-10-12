@@ -175,16 +175,66 @@ quoted = [
     f"an average of {churn['report']:.1f} mining examples changed correctness per round, compared with "
     f"{churn['noreport']:.1f} without it (${'p'}={churn['p']:.3f}$",
     f"similar net gains of {net['report']:.1f} and {net['noreport']:.1f} mining examples per round",
-    f"accuracy changed by {signed(change['report'])} and {signed(change['noreport'])} percentage points",
+    f"Test accuracy fell in both conditions, by {abs(change['report']):.1f} and {abs(change['noreport']):.1f} "
+    "percentage points with and without the report",
 ]
+if change["report"] >= 0 or change["noreport"] >= 0:
+    failures.append("test accuracy no longer fell in both ablation arms; revise the wording")
 for sentence in quoted:
     if sentence not in flat:
         failures.append(f"ablation claim differs from the saved summary: {sentence[:48]}")
-if round(100 * (1 - churn["report"] / churn["noreport"])) != 40 or flat.count(r"40\%") != 4:
+if round(100 * (1 - churn["report"] / churn["noreport"])) != 40 or flat.count(r"40\%") < 1:
     failures.append("churn-reduction claim differs from the saved summary")
 if flat.count("five runs per arm") < 3 or "five independent runs per arm" not in flat:
     failures.append("ablation run count missing from the text")
 print("ablation tables and quoted numbers checked against ablation_hearsay.json")
+
+churn_rows = [(r["recovered"] + r["regressed"], abs(r["recovered"] - r["regressed"])) for r in reported["results"]]
+if sum(c >= 5 * n for c, n in churn_rows) != 5 or "five of nine configurations" not in flat.replace("five of the nine", "five of nine"):
+    failures.append("churn-versus-net count differs from the results manifest")
+if max(c for c, n in churn_rows if n == 1) != 17 or "up to 17 changed outcomes" not in flat:
+    failures.append("largest one-item-net churn differs from the results manifest")
+if by_metric["validation_gain_points"]["report"] <= 0 or by_metric["validation_gain_points"]["noreport"] <= 0:
+    failures.append("validation did not rise on average in both ablation arms; revise the Discussion")
+print("churn-versus-net claims checked against reported_results.json")
+
+extra = json.loads((artifacts / "aime_additional_runs.json").read_text(encoding="utf-8"))
+haiku, gpt4o = extra["optimization_runs"]
+reeval_2k, reeval_16k, transfer = extra["reevaluations"]
+if any(r["benchmark"] == "AIME" and r["solver"] == "GPT-4o-mini" for r in reported["results"]) \
+        or any(r["provenance"] != "saved" for r in reported["results"]) or len(reported["results"]) != 9:
+    failures.append("results manifest must hold exactly nine saved-run rows")
+for stale in ("GPT-4o-mini & 26.7", r"26.7\rightarrow 33.33"):
+    if stale in flat:
+        failures.append(f"stale AIME GPT-4o-mini text remains: {stale}")
+number_words = {5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine"}
+positive = sum(r["final_pct"] > r["baseline_pct"] for r in reported["results"])
+if f"increased in {number_words[positive]} of the {number_words[len(reported['results'])]} reported configurations" not in flat:
+    failures.append("count of improved configurations differs from the results manifest")
+if (haiku["recovered"], haiku["regressed"], reeval_16k["correct"] - reeval_2k["correct"],
+        transfer["recovered"], transfer["regressed"]) != (2, 0, 1, 0, 3):
+    failures.append("additional AIME run counts changed; revise the appendix wording")
+haiku_pct = [100 * haiku["seed_correct"] / extra["n_test"], 100 * haiku["returned_correct"] / extra["n_test"]]
+aime_extra_claims = [
+    f"validation accuracy rose from {haiku['val_base_pct']}\\% to {haiku['val_returned_pct']}\\%",
+    f"test accuracy from {haiku_pct[0]:.1f}\\% to {haiku_pct[1]:.1f}\\% ({haiku['seed_correct']}/30 to "
+    f"{haiku['returned_correct']}/30, two recoveries and no regressions)",
+    f"last round's validation accuracy ({gpt4o['val_round_pct'][-1]}\\%) fell below the baseline's ({gpt4o['val_base_pct']}\\%)",
+    f"Claude Haiku 4.5 & seed & {haiku['solver_max_tokens']:,} & {haiku['seed_correct']}/30",
+    f"& returned (round {haiku['returned_round']}) & {haiku['solver_max_tokens']:,} & {haiku['returned_correct']}/30",
+    f"GPT-4o-mini & seed & {gpt4o['solver_max_tokens']:,} & {gpt4o['seed_correct']}/30",
+    f"& returned (the seed, unchanged) & {gpt4o['solver_max_tokens']:,} & {gpt4o['returned_correct']}/30",
+    f"& seed, re-evaluated & {reeval_2k['solver_max_tokens']:,} & {reeval_2k['correct']}/30",
+    f"& seed, re-evaluated & {reeval_16k['solver_max_tokens']:,} & {reeval_16k['correct']}/30",
+    f"& GPT-4.1 Mini round-1 prompt & {transfer['solver_max_tokens']:,} & {transfer['correct']}/30",
+    r"GPT-4.1 Mini & GPT-5, item-level effect report & $53.3\rightarrow 50.0$",
+]
+for claim in aime_extra_claims:
+    if claim not in flat:
+        failures.append(f"additional AIME run text differs from aime_additional_runs.json: {claim[:48]}")
+if flat.count(f"solved {gpt4o['seed_correct']} and {gpt4o['returned_correct']} of 30 problems") != 2:
+    failures.append("identical-prompt AIME re-evaluation counts are missing from the appendix")
+print("additional AIME runs checked against aime_additional_runs.json")
 print("matched records / edited / validation-up / test-down:",
       len(paired), len(edited), len(validation_up), len(test_down))
 print("resource table: exact ledger aggregates checked")

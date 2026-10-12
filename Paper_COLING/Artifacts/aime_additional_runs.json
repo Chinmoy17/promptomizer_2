@@ -1,0 +1,87 @@
+{
+  "source": "Saved AIME runs and prompt re-evaluations on the 30 test problems; none enters the matched analyses",
+  "n_test": 30,
+  "optimization_runs": [
+    {
+      "label": "Claude Haiku 4.5, earlier protocol",
+      "solver": "claude-haiku-4-5-20251001",
+      "metrics_path": "results/reflect_aime_haiku_v1/aime_reflect_fdpo_claude-haiku-4-5-20251001_s0_20260829-225120/metrics.json",
+      "solver_max_tokens": 2048,
+      "selection": "last_round",
+      "committed_rounds": 3,
+      "returned_edited_prompt": true,
+      "returned_round": 3,
+      "val_base_pct": 62.5,
+      "val_round_pct": [
+        65.6,
+        65.6,
+        78.1
+      ],
+      "val_returned_pct": 78.1,
+      "n_test": 30,
+      "seed_correct": 8,
+      "returned_correct": 10,
+      "recovered": 2,
+      "regressed": 0,
+      "seed_prompt_equals_returned": false
+    },
+    {
+      "label": "GPT-4o-mini, earlier protocol",
+      "solver": "gpt-4o-mini",
+      "metrics_path": "results/reflect_aime_v1/aime_reflect_fdpo_gpt-4o-mini_s0_20260829-223614/metrics.json",
+      "solver_max_tokens": 2048,
+      "selection": "last_round",
+      "committed_rounds": 3,
+      "returned_edited_prompt": false,
+      "returned_round": null,
+      "val_base_pct": 15.6,
+      "val_round_pct": [
+        12.5,
+        15.6,
+        12.5
+      ],
+      "val_returned_pct": 15.6,
+      "n_test": 30,
+      "seed_correct": 4,
+      "returned_correct": 3,
+      "recovered": 0,
+      "regressed": 1,
+      "seed_prompt_equals_returned": true
+    }
+  ],
+  "reevaluations": [
+    {
+      "label": "GPT-4o-mini seed prompt, re-evaluated",
+      "solver": "gpt-4o-mini",
+      "metrics_path": "results/aime_4o_shipped_rerun_2k/aime_eval_only_gpt-4o-mini_s0_20261012-170650/metrics.json",
+      "prompt_source": "seed",
+      "prompt_sha256": "6da080702387524cda54787304c22dbbfe8ff64ee43e536a8713e62c31d1a08d",
+      "solver_max_tokens": 2048,
+      "n_test": 30,
+      "correct": 4
+    },
+    {
+      "label": "GPT-4o-mini seed prompt, re-evaluated",
+      "solver": "gpt-4o-mini",
+      "metrics_path": "results/aime_4o_shipped_rerun_16k/aime_eval_only_gpt-4o-mini_s0_20261012-170341/metrics.json",
+      "prompt_source": "seed",
+      "prompt_sha256": "6da080702387524cda54787304c22dbbfe8ff64ee43e536a8713e62c31d1a08d",
+      "solver_max_tokens": 16000,
+      "n_test": 30,
+      "correct": 5
+    },
+    {
+      "label": "GPT-4o-mini with the GPT-4.1 Mini round-1 prompt",
+      "solver": "gpt-4o-mini",
+      "metrics_path": "results/aime_gpt41r1_prompt_on_4omini/aime_eval_only_gpt-4o-mini_s0_20261012-170022/metrics.json",
+      "prompt_source": "gpt-4.1-mini returned prompt (round 1)",
+      "prompt_sha256": "06514d57c2ccd2f88371c1fee6b03b1bd6fc0df8acc705944f039b3f39aa47d6",
+      "solver_max_tokens": 16000,
+      "n_test": 30,
+      "correct": 2,
+      "against": "aime_4o_shipped_rerun_16k",
+      "recovered": 0,
+      "regressed": 3
+    }
+  ]
+}
