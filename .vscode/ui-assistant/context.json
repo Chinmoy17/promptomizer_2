@@ -1,0 +1,40 @@
+{
+  "version": "1.1",
+  "project_name": "",
+  "stack": "",
+  "audience": "",
+  "industry": "",
+  "design_system": "",
+  "brand": {
+    "primary_color": "",
+    "font": "",
+    "theme": "light",
+    "tone": []
+  },
+  "device_targets": [],
+  "custom_rules": [],
+  "preferences": {
+    "working_mode": "preview_redesign",
+    "change_behavior": "preview_then_ask",
+    "density_preference": "balanced",
+    "explanation_level": "developer_detailed"
+  },
+  "constraints": {
+    "must_keep": [],
+    "must_not_change": [],
+    "design_system": "existing",
+    "input_preference": [
+      "prompt",
+      "json",
+      "markdown",
+      "tsx",
+      "jsx",
+      "html",
+      "dom"
+    ]
+  },
+  "knowledge_state": {
+    "ingested_modules": [],
+    "last_updated_at": ""
+  }
+}

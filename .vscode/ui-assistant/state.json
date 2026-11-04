@@ -1,0 +1,118 @@
+{
+  "current_stage": "INIT",
+  "last_tool": "",
+  "updated_at": "",
+  "active_page": {
+    "page_id": "",
+    "last_analyzed_at": "",
+    "page_model": {
+      "schema_version": "1.0",
+      "page_id": "",
+      "page_name": "",
+      "mode": "existing",
+      "source_types": [],
+      "confidence": 0,
+      "intent": {
+        "primary_goal": "clarity",
+        "secondary_goals": [],
+        "user_task": "",
+        "journey_stage": ""
+      },
+      "product_context": {
+        "product_name": "",
+        "industry": "",
+        "audience": [],
+        "device_targets": [],
+        "brand_tone": [],
+        "density_preference": "balanced"
+      },
+      "surface": {
+        "page_type": "other",
+        "template_type": "",
+        "route_or_entry": "",
+        "platform": "web",
+        "viewport_priority": "balanced"
+      },
+      "structure": {
+        "sections": [],
+        "primary_cta": {
+          "label": "",
+          "location": "",
+          "prominence": "low"
+        },
+        "secondary_actions": [],
+        "navigation_depth": 0
+      },
+      "content_profile": {
+        "information_density": "unknown",
+        "copy_tone": "",
+        "visual_complexity": "unknown",
+        "data_heaviness": "unknown",
+        "form_complexity": "unknown"
+      },
+      "design_signals": {
+        "visual_hierarchy": {
+          "score": 0,
+          "issues": []
+        },
+        "contrast": {
+          "score": 0,
+          "issues": []
+        },
+        "spacing": {
+          "score": 0,
+          "issues": []
+        },
+        "alignment": {
+          "score": 0,
+          "issues": []
+        },
+        "affordance": {
+          "score": 0,
+          "issues": []
+        },
+        "feedback": {
+          "score": 0,
+          "issues": []
+        }
+      },
+      "interaction_signals": {
+        "choice_load": "unknown",
+        "fitts_risk": [],
+        "hicks_risk": [],
+        "cognitive_load_risk": [],
+        "trust_risk": []
+      },
+      "system_constraints": {
+        "must_keep": [],
+        "must_not_change": [],
+        "tech_constraints": [],
+        "business_constraints": []
+      },
+      "evidence": {
+        "files": [],
+        "dom_summary": "",
+        "prompt_summary": "",
+        "screenshot_used": false,
+        "brief_sources": []
+      },
+      "recommendations": [],
+      "open_questions": []
+    },
+    "analysis_confidence": 0,
+    "resolved_domains": []
+  },
+  "session": {
+    "current_mode": "idle",
+    "session_mode": "full",
+    "last_tool": "",
+    "pending_questions": [],
+    "pending_recommendations": [],
+    "last_applied_change_id": ""
+  },
+  "watch": {
+    "enabled": true,
+    "auto_refresh_on_agent_action": true,
+    "last_trigger_source": ""
+  }
+}
