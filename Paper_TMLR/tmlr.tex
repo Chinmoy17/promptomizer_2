@@ -243,7 +243,7 @@ We report test accuracy, validation accuracy changes, recovery, regression, and 
 We first examine how prompt optimization affects individual test examples. Table~\ref{tab:main} reports test accuracy before and after optimization, validation accuracy changes, and the number of recovered and regressed examples. Figure~\ref{fig:rr} visualizes these transitions, while Appendix~\ref{app:gap} provides the individual accuracy records.
 
 \begin{table}[!htbp]
-\caption{Seed-to-returned test accuracy, validation accuracy change, and item-level transitions. Green rows indicate positive test changes. Churn percentages use evaluated test items. MMLU accuracy is macro-averaged across six subjects, while transitions sum 393 items. PUPA (38 items) and professional law (63 items) exclude provider-blocked examples. Earlier AIME runs with other solvers are described in Appendix~\ref{app:aime_extra}.}
+\caption{Seed-to-returned test accuracy, validation accuracy change, and item-level transitions. Green rows indicate positive test changes. Churn percentages use evaluated test items. Accuracy changes are computed from unrounded accuracies, so they can differ by 0.1 from the difference of the displayed values. MMLU accuracy is macro-averaged across six subjects, while transitions sum 393 items. PUPA (38 items) and professional law (63 items) exclude provider-blocked examples. Earlier AIME runs with other solvers are described in Appendix~\ref{app:aime_extra}.}
 \label{tab:main}
 \centering
 \vspace{4pt}
@@ -252,11 +252,11 @@ We first examine how prompt optimization affects individual test examples. Table
 \begin{tabular}{llrrrrrrr}
 \toprule
 \rowcolor{midblue}
-Benchmark & Solver & \multicolumn{3}{c}{Test accuracy (\%)} &
-\shortstack{$\Delta V$\\(pp)} &
+ &  & \multicolumn{3}{c}{Test accuracy (\%)} & &
 \multicolumn{3}{c}{Test transitions} \\
 \cmidrule(lr){3-5}\cmidrule(lr){7-9}
-& & Seed & Final & $\Delta T$ & & $|R|$ & $|G|$ & Churn (\%) \\
+\rowcolor{midblue}
+Benchmark & Solver & Seed & Final & $\Delta T$ & $\Delta V$ (pp) & $|R|$ & $|G|$ & Churn (\%) \\
 \midrule
 AIME & GPT-4.1 Mini & 53.3 & 50.0 & $-3.3$ & $+6.2$ & 3 & 4 & 7 (23.3) \\
 \rowcolor{softgreen}
@@ -337,9 +337,19 @@ To see what the effect report contributes beyond the optimization round, we ran 
 
 Without the report, round-2 revisions already modified only 1.6 prompt sections on average, compared with 2.0 when the report was included. Thus, narrower edits also occur without the report.
 
-The report did change the number of changed outcomes. With it, an average of 3.1 mining examples changed correctness per round, compared with 5.2 without it ($p=0.024$, exact permutation test over runs, uncorrected). This average pools rounds 2 and 3, and round 3 starts from different parent prompts in the two conditions. Both conditions achieved similar net gains of 0.3 and 0.2 mining examples per round, respectively.
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig3_ablation_mechanics}
+\caption{Effect-report ablation on LegalBench-Hearsay with GPT-4o-mini (five runs per arm; both arms replay the same round-1 prompt). Left: items changing correctness per round on mining and validation together, averaged over rounds 2--3; dots are runs and bars are means ($p=0.024$, exact permutation test over runs, uncorrected). Right: mining flips in rounds 2--3, summed over runs, split into flips that undo the previous round's change and new flips on items the previous round left unchanged.}
+\label{fig:ablation}
+\end{figure}
 
-Test accuracy fell in both conditions, by 5.3 and 5.7 percentage points with and without the report, respectively, so neither condition improved test accuracy. We therefore treat the churn difference as exploratory evidence about what item-level feedback changes in this setting, not as evidence that it improves accuracy.
+\paragraph{What the report changes.}
+The report reduced the number of changed outcomes. With it, an average of 7.2 items per round changed correctness on mining and validation together, compared with 11.4 without it (Figure~\ref{fig:ablation}, left). On mining alone the averages were 3.1 and 5.2 ($p=0.024$, exact permutation test over runs, uncorrected). These averages pool rounds 2 and 3, and round 3 starts from different parent prompts in the two conditions.
+
+Splitting the mining flips of rounds 2--3 by their relation to the previous round shows where the difference arises (Figure~\ref{fig:ablation}, right; computed from the item identifiers saved for each round). Flips that undo the previous round's change were identical in the two conditions (19 and 19, summed over five runs). New flips on items the previous round had left unchanged fell from 33 without the report to 12 with it (6.6 versus 2.4 per run, $p=0.016$). The report did not improve repair: items flagged as having just regressed were recovered in the next round 10 of 26 times with the report and 14 of 28 times without it (Fisher exact $p=0.43$). Regressions on mining and validation together were lower with the report (1.9 versus 4.3 per round, $p=0.048$), at similar net gain (3.4 versus 2.8 items per round, $p=0.68$; on mining alone, 0.3 versus 0.2).
+
+Test accuracy fell in both conditions, by 5.3 and 5.7 percentage points with and without the report, respectively, so neither condition improved test accuracy. Held-out regressions (8.4 versus 10.0 per run) and held-out changed items (14.2 versus 17.2 per run) pointed in the same direction as on the tuning sets but did not differ significantly ($p=0.13$ and $p=0.27$). We therefore read the effect report as making revisions more conservative: it left repair and net gain unchanged while reducing collateral change on the sets the optimizer sees. We do not read it as improving accuracy. These comparisons cover one benchmark and one solver, are not corrected for multiple comparisons, and the main experiments contain no condition without the report.
 
 \subsection{Resource Consumption}
 \label{sec:resources}
@@ -718,7 +728,7 @@ accuracy pairs with the test recoveries and regressions. Summing the subject cou
 Table~\ref{tab:main}. ``Edited'' distinguishes returned candidates from retained seeds, not an improvement gate.
 
 \begin{table}[htbp]
-\caption{All matched accuracy pairs and test transition counts. Deltas are percentage points computed before rounding;
+\caption{All matched accuracy pairs and test transition counts. Deltas are percentage points computed from unrounded accuracies, so a delta can differ by 0.1 from the difference of the displayed values (for example, econometrics with GPT-4o-mini: 44/66 to 48/66 is $+6.06$, shown as $+6.1$);
 green rows have positive test deltas. MMLU subjects have 66 assigned test items (63 evaluated for professional law).
 Dashes denote unmeasured validation after a high-baseline skip; zero $\Delta V$ denotes the retained seed.}
 \label{tab:pergap}

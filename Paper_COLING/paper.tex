@@ -42,16 +42,16 @@
 \newtcolorbox{promptbox}[2][]{enhanced,breakable,colback=#2!40,colframe=#2!70!black,boxrule=0.5pt,
   arc=2pt,left=5pt,right=5pt,top=3pt,bottom=3pt,fontupper=\footnotesize,#1}
 
-\title{Beyond Aggregate Accuracy: Item-Level Transitions in Prompt Optimization}
+\title{What Did the Prompt Edit Break? Item-Level Regression Tracking\texorpdfstring{\\}{ }for Automatic Prompt Optimization}
 
-% ARR review submissions must be fully anonymous.
-\author{Anonymous ACL submission}
+% Submissions must be fully anonymous.
+\author{Anonymous submission}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Automatic prompt optimization (APO) uses feedback from model responses to improve prompts automatically. However, its effectiveness is usually measured through overall scores, which do not reveal which questions become correct, which previously correct answers become wrong, or whether improvements extend to unseen questions. We introduce Reflective Feedback-Driven Prompt Optimization (RFDPO), a tool that tracks recoveries (incorrect to correct), regressions (correct to incorrect), and churn (all changed outcomes). RFDPO uses this feedback to guide subsequent revisions and records prompt changes throughout optimization. We evaluate RFDPO across five benchmarks covering law, knowledge, instruction following, mathematics, and privacy, using GPT-5 as the optimizer and GPT-4o-mini and GPT-4.1 Mini as solvers. Our results show that overall accuracy can hide substantial changes: in five of nine configurations, churn was at least five times the absolute net change, and a single-item net change concealed up to 17 changed outcomes. Average validation gains were 7.9 percentage points, compared with 5.2 points on held-out tests. An exploratory ablation showed that item-level feedback reduced churn but did not improve test accuracy. These findings motivate reporting recovery, regression, churn, and performance on unseen data alongside overall accuracy.
+Prompts in production LLM pipelines are revised repeatedly, and a revision that fixes some inputs can silently break others. Automatic prompt optimization (APO) automates such revisions but is usually judged by overall scores, which do not reveal which answers become correct, which correct answers become wrong, or whether gains extend to unseen questions. Motivated by this problem in an industrial document-processing pipeline, we ask whether repeatedly feeding back the observed effect of each revision can reduce regressions while keeping accuracy gains. We introduce Reflective Feedback-Driven Prompt Optimization (RFDPO), which tracks recoveries (incorrect to correct), regressions (correct to incorrect), and churn (all changed outcomes), returns them to the optimizer, and records every prompt change, so each optimizer action can be traced to its effect. We evaluate RFDPO on five benchmarks with GPT-5 as optimizer and GPT-4o-mini and GPT-4.1 Mini as solvers. In five of nine configurations, churn was at least five times the absolute net change, and a single-item net change concealed up to 17 changed outcomes. Average validation gains were 7.9 points, against 5.2 on held-out tests. In an ablation, item-level feedback reduced churn and regressions at similar net gains.
 \end{abstract}
 
 \section{Introduction}
@@ -59,75 +59,63 @@ Automatic prompt optimization (APO) uses feedback from model responses to improv
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=\textwidth]{fdpo2.png}
-\caption{The RFDPO loop. The solver evaluates prompts on mining set $M$ and validation set $V$. From the second round,
-the optimizer receives the item-level effect of its previous edit before proposing a new prompt. Every changed
-candidate is committed, and RFDPO returns the candidate with the highest validation accuracy, breaking ties by mining
-accuracy. Test set $T$ is excluded from feedback and selection and evaluated only for the seed and the returned prompt.}
+\includegraphics[width=\textwidth]{figures/RFDPO.drawio.pdf}
+\caption{Overview of RFDPO. (1)~Inputs: a five-section seed prompt $p_0$, mining set $M$, and validation set $V$.
+(2)~Baseline: the solver scores $p_0$ on $M$ and $V$, and its mining errors feed round~1. (3)~Reflective loop: in up
+to three rounds, the optimizer (GPT-5) rewrites the prompt and the solver scores it on $M$ and $V$; from round~2, the
+optimizer also sees what changed, i.e., the examples recovered and regressed on $M$ and $V$ and the edited sections.
+Every round's prompt is saved. (4)~Pick best: RFDPO returns the saved prompt $p^*$ with the highest $V$ accuracy; when two rounds tie
+on $V$, it returns the one with higher $M$ accuracy (eight runs used an earlier final-round rule; \S\ref{sec:method}). (5)~Held-out test: $T$ stays
+sealed during the loop and is scored once for $p_0$ and $p^*$, reporting fixed and broken examples, accuracy, and churn.}
 \label{fig:arch}
 \end{figure*}
 
-Large language models (LLMs) are increasingly used for document classification, information extraction, question answering, and instruction-following tasks. Their behavior is commonly controlled through natural-language prompts that specify task instructions, relevant context, constraints, and expected output formats. However, even minor changes in prompt wording or structure can substantially affect model performance~\citep{sclar2024quantifying}. Developing effective prompts therefore often requires repeated revisions and evaluations. Automatic prompt optimization (APO) seeks to automate this process by iteratively refining prompts using feedback from model outputs~\citep{zhou2023ape,yang2024opro,pryzant2023protegi}. In LLM-based APO, an optimizer proposes prompt revisions based on evaluation feedback, while a solver executes the task using the revised instructions.
+Prompts in deployed LLM applications are maintained like code: they are revised when a new input type fails, a model version changes, or an output format must be tightened. In machine-learning systems such changes rarely stay local~\citep{sculley2015debt}; engineers who build LLM products describe prompt revision as trial and error and name testing as a main difficulty~\citep{parnin2023copilot}, most prompt changes in open-source repositories are not documented in commit messages~\citep{tafreshipour2025prompting}, and hosted models change behavior across versions and repeated runs~\citep{chen2023drift,atil2025nondeterminism}.
 
-Despite advances in APO, evaluating optimization effectiveness remains challenging. Existing studies primarily report aggregate performance before and after optimization, such as accuracy improvements on benchmark datasets. Although these metrics indicate whether a revised prompt performs better overall, they do not reveal which previously incorrect examples were fixed or which correct examples became incorrect. This distinction is important for practical LLM applications, where prompt revisions may introduce unexpected failures even when overall performance improves. For example, \citet{ma2024regression} found that 10.9\% of individual predictions regressed across hosted LLM API updates for toxicity detection, and previously correct predictions broke in 87.9\% of cases where aggregate accuracy improved. Developers have also reported difficulties debugging inconsistent LLM behavior across prompt variations~\citep{errica2025wrong}. These observations highlight the importance of examining behavioral changes beyond aggregate scores.
+This work began with that problem in an industrial document-processing pipeline, where LLM prompts extract fields from scanned documents. Revisions that fixed one class of documents could change answers, or break the required output format~\citep{liu2024structured}, on documents that had been processed correctly, and an aggregate score did not show which. Automatic prompt optimization (APO), in which an optimizer LLM revises a solver's prompt from evaluation feedback~\citep{zhou2023ape,yang2024opro,pryzant2023protegi}, shares this blind spot: methods are compared by accuracy before and after optimization. For hosted-model updates, \citet{ma2024regression} found that previously correct predictions broke in 87.9\% of cases where aggregate accuracy improved.
 
-Consider two prompt revisions that each improve accuracy by two examples. The first may correct two previously incorrect examples without introducing new failures, while the second may correct ten examples but break eight previously correct ones. Although both revisions achieve the same net improvement, their effects on individual examples differ substantially. Aggregate accuracy alone cannot distinguish these outcomes, making it difficult to assess the trade-offs introduced by optimization or identify which changes should inform subsequent revisions.
+Consider two prompt revisions that each improve accuracy by two examples: the first corrects two examples without new failures, while the second corrects ten but breaks eight. Aggregate accuracy cannot distinguish them or show which changes should inform subsequent revisions. Gains on tuning examples may also fail to transfer to held-out data~\citep{recht2019imagenet}, especially when validation examples serve as optimization feedback.
 
-Another concern is whether improvements observed during optimization generalize to unseen examples. APO methods commonly select prompts using validation performance, and some also expose validation examples as optimization feedback. Consequently, improvements on these tuning examples may not translate into comparable improvements on held-out data~\citep{recht2019imagenet}. Understanding prompt optimization therefore requires examining both item-level behavioral changes and the relationship between tuning and test performance.
+These observations raise a practical question: if the optimizer is repeatedly shown which examples its previous revision fixed and which it broke, can it reduce regressions while keeping its accuracy gains? To study it, we introduce \emph{Reflective Feedback-Driven Prompt Optimization} (RFDPO; Figure~\ref{fig:arch}), which identifies \emph{recoveries} (incorrect to correct), \emph{regressions} (correct to incorrect), and \emph{churn} (all changed outcomes) and, from the second round, returns them to the optimizer with the prompt sections it modified. Unlike approaches that guide revisions with aggregate scores, current errors, or execution traces, RFDPO feeds back the observed consequences of the preceding edit. Because RFDPO records every prompt version, outcome, and cost, it acts as a scanner for prompt optimization: each optimizer action can be traced to its effect on individual examples. \textcolor{red}{RFDPO is not yet deployed; because the pipeline's documents cannot be released, we evaluate it on public benchmarks.}
 
-To address these concerns, we introduce \emph{Reflective Feedback-Driven Prompt Optimization} (RFDPO), an auditable prompt optimization tool that explicitly tracks the effects of individual prompt revisions (Figure~\ref{fig:arch}). RFDPO identifies \emph{recoveries} (incorrect-to-correct transitions), \emph{regressions} (correct-to-incorrect transitions), and \emph{churn} (the total number of changed outcomes). Unlike approaches that primarily use aggregate scores, current errors, or execution traces to guide revisions, RFDPO returns the observed consequences of the preceding edit to the optimizer. Beginning with the second round, this feedback identifies recovered and regressed examples, their associated outputs, and the prompt sections modified by the previous revision. RFDPO also records prompt versions, evaluation outcomes, and resource consumption to support analysis of optimization trajectories.
-
-We evaluate RFDPO on five benchmarks---LegalBench-Hearsay, MMLU, IFBench, AIME, and PUPA---using GPT-4o-mini and GPT-4.1 Mini as solver models. Our results show that aggregate accuracy can conceal substantial behavioral changes: in five of nine configurations, churn was at least five times the absolute net change, and a single-item net change concealed up to 17 changed outcomes. Across edited-prompt returns, average held-out test improvements were approximately 61\% of average validation improvements. We further examine how prompt revisions evolve across optimization rounds. An exploratory ablation on LegalBench-Hearsay shows that providing item-level feedback is associated with approximately 40\% lower mining-set churn at similar net gains, although it does not improve test accuracy.
-
-Our main contributions are:
+On five benchmarks with GPT-4o-mini and GPT-4.1 Mini as solvers, churn was at least five times the absolute net change in five of nine configurations, and a single-item net change concealed up to 17 changed outcomes. Average test gains were about 66\% of validation gains. In an ablation, item-level feedback was associated with about 40\% lower mining-set churn and fewer regressions at similar net gains. Our contributions are:
 
 \begin{itemize}
-\setlength{\itemsep}{2pt}
+\setlength{\itemsep}{1pt}
 \setlength{\parskip}{0pt}
-\setlength{\topsep}{2pt}
+\setlength{\topsep}{1pt}
 
-\item \textbf{An auditable prompt optimization tool.}
-We develop RFDPO, which incorporates item-level recovery and regression feedback into iterative prompt revision and records prompt versions, evaluation outcomes, and resource consumption (\S\ref{sec:method}).
+\item \textbf{An auditable prompt optimization tool} that feeds item-level recoveries and regressions back into prompt revision and records every revision with its effect (\S\ref{sec:method}).
 
-\item \textbf{An empirical characterization of prompt revisions.}
-We analyze recovery, regression, and churn across five benchmarks, demonstrating how aggregate accuracy conceals changes in individual outcomes and how validation improvements differ from held-out test performance (\S\ref{sec:results}).
+\item \textbf{An empirical characterization of prompt revisions}, showing how aggregate accuracy conceals changes in individual outcomes and how validation gains differ from test gains (\S\ref{sec:results}).
 
-\item \textbf{An analysis of feedback and editing behavior.}
-We examine prompt modifications across optimization rounds and conduct an exploratory ablation to investigate how item-level feedback affects outcome churn. Based on these findings, we discuss implications for evaluating and reporting APO behavior (\S\ref{sec:edits}, \S\ref{sec:discussion}).
+\item \textbf{An analysis of feedback and editing behavior}, including an ablation in which item-level feedback reduces churn and regressions at similar net gains (\S\ref{sec:edits}, \S\ref{sec:discussion}).
 
 \end{itemize}
-
-Overall, our findings motivate incorporating recovery, regression, churn, and validation-to-test transfer into the evaluation of automatic prompt optimization, alongside conventional aggregate performance metrics.
 
 \section{Related Work}
 \label{sec:related}
 
 \paragraph{Automatic prompt optimization.}
-Automatic prompt optimization (APO) has been explored through discrete token search~\citep{shin2020autoprompt}, instruction generation and selection~\citep{zhou2023ape}, LLM-based optimization~\citep{yang2024opro}, textual gradients~\citep{pryzant2023protegi,yuksekgonul2025textgrad}, and evolutionary approaches~\citep{guo2024evoprompt,fernando2024promptbreeder}. Other methods optimize multi-stage pipelines or structured prompts~\citep{opsahlong2024miprov2,schnabel2024sammo,khattab2024dspy}. Among these, MPO~\citep{sharma2026mpo} uses the same five-section prompt structure as RFDPO and applies section-local textual gradients. More closely related to our feedback mechanism, GEPA~\citep{agrawal2026gepa} uses reflective prompt mutation and Pareto-based selection, while Trace2Policy~\citep{zha2026trace2policy} clusters errors and applies a regression gate when refining decision rules. Self-feedback methods also guide revisions through verbal critiques~\citep{madaan2023selfrefine,shinn2023reflexion}. While existing methods use scored histories, execution traces, or regression checks to guide optimization, RFDPO explicitly returns the observed item-level consequences of the preceding edit to the optimizer, identifying recovered and regressed examples and the prompt sections modified. Unlike regression-gated approaches, RFDPO retains changed candidates even when validation performance decreases, allowing subsequent revisions to build on earlier edits while recording their effects.
+APO has been explored through discrete token search~\citep{shin2020autoprompt}, instruction generation and selection~\citep{zhou2023ape}, LLM-based optimization~\citep{yang2024opro}, textual gradients~\citep{pryzant2023protegi,yuksekgonul2025textgrad}, evolutionary approaches~\citep{guo2024evoprompt,fernando2024promptbreeder}, and the optimization of multi-stage pipelines or structured prompts~\citep{opsahlong2024miprov2,schnabel2024sammo,khattab2024dspy}. MPO~\citep{sharma2026mpo} uses the same five-section prompt structure as RFDPO. GEPA~\citep{agrawal2026gepa} uses reflective prompt mutation and Pareto-based selection, Trace2Policy~\citep{zha2026trace2policy} applies a regression gate when refining decision rules, and self-feedback methods revise through verbal critiques~\citep{madaan2023selfrefine,shinn2023reflexion}. RFDPO instead returns the observed item-level consequences of the preceding edit to the optimizer, and it retains changed candidates even when validation performance decreases while recording their effects.
 
 \paragraph{Behavioral evaluation and regression tracking.}
-Aggregate accuracy can conceal important changes in model behavior. CheckList~\citep{ribeiro2020checklist} demonstrates the limitations of aggregate evaluation, while negative flips have motivated regression-free model updating~\citep{yan2021positive}. Paired outcome comparisons also have a long history in statistical evaluation~\citep{mcnemar1947sampling}. For LLM applications, \citet{ma2024regression} highlight how previously correct behavior can break following API updates. Related studies show that small prompt changes can alter model predictions~\citep{salinas2024butterfly}, motivating sensitivity and consistency measures~\citep{errica2025wrong}. However, some apparent prompt sensitivity may result from evaluation artifacts~\citep{hua2025flaw}. Unlike evaluations of prompt perturbations or model updates, our work tracks labeled recoveries and regressions across successive prompt optimization revisions using benchmark-specific correctness criteria. We additionally measure churn to distinguish the extent of behavioral change from the net accuracy difference. This distinction is particularly relevant when several recovered examples are offset by regressions, leaving aggregate performance nearly unchanged.
+Aggregate accuracy can conceal important changes in model behavior~\citep{ribeiro2020checklist}; negative flips have motivated regression-free model updating~\citep{yan2021positive}, and paired outcome comparisons have a long history in statistical evaluation~\citep{mcnemar1947sampling}. For LLM applications, previously correct behavior can break following API updates~\citep{ma2024regression}, and small prompt changes can alter predictions~\citep{salinas2024butterfly,sclar2024quantifying,errica2025wrong}, although some apparent sensitivity results from evaluation artifacts~\citep{hua2025flaw}. Our work tracks labeled recoveries and regressions across successive optimization revisions and measures churn to distinguish the extent of behavioral change from the net accuracy difference. This distinction matters most when recovered examples are offset by regressions, leaving aggregate performance nearly unchanged.
 
 \paragraph{Evaluation protocols and generalization.}
-Prompt optimization results depend on evaluation settings, including data splits, solver models, baseline prompts, and feedback availability. Consequently, published APO scores are not directly comparable across different protocols (Appendix~\ref{app:prior}, Table~\ref{tab:prior}). Moreover, improvements on tuning data may not generalize to unseen examples~\citep{recht2019imagenet}, and benchmark contamination presents additional evaluation concerns~\citep{oren2023proving}. Test-set exposure is particularly relevant: Trace2Policy reports a refinement round informed by held-out errors~\citep{zha2026trace2policy}. In our diagnostic experiment, providing test examples as feedback yielded an accuracy of 95.3\%, compared with 73.4\% when they were withheld (Appendix~\ref{app:oracle}). This diagnostic illustrates the importance of distinguishing optimization feedback from held-out evaluation. RFDPO excludes test examples from feedback and prompt selection within each optimization run. Because validation examples also contribute feedback, we treat validation performance as a tuning measure and separately report performance changes on test examples to examine generalization.
-
-
+Published APO scores depend on data splits, solver models, baseline prompts, and feedback availability, and are not directly comparable across protocols (Appendix~\ref{app:prior}). Improvements on tuning data may not generalize~\citep{recht2019imagenet}, and contamination presents additional concerns~\citep{oren2023proving}. In our diagnostic experiment, providing test examples as feedback yielded an accuracy of 95.3\%, compared with 73.4\% when they were withheld (Appendix~\ref{app:oracle}). RFDPO therefore excludes test examples from feedback and selection, and we treat validation performance, which also feeds the optimizer, as a tuning measure.
 
 \section{RFDPO}
 \label{sec:method}
 
-We introduce Reflective Feedback-Driven Prompt Optimization (RFDPO) that uses item-level evaluation outcomes to guide prompt revisions. RFDPO extends conventional feedback-driven optimization by explicitly identifying examples that become correct or incorrect after each revision and returning these changes to the optimizer. Figure~\ref{fig:arch} illustrates the overall workflow.
-
 \subsection{Prompt Representation and Evaluation}
 
-RFDPO uses a solver LLM to execute tasks and an optimizer LLM to revise prompts, without modifying the solver's parameters. Following MPO~\citep{sharma2026mpo}, each prompt contains five sections: System Role, Context, Task Details, Constraints, and Output Format. These sections remain fixed throughout optimization, allowing RFDPO to track which parts of a prompt are modified.
-
-The tool operates on three disjoint sets: mining ($M$), validation ($V$), and test ($T$). Mining examples provide feedback for prompt revisions, while validation examples are used for candidate selection and, from the second round, also contribute feedback. The test set is excluded from optimization and evaluated only with the initial and returned prompts.
+RFDPO uses a solver LLM to execute tasks and an optimizer LLM to revise prompts, without modifying the solver's parameters (Figure~\ref{fig:arch}). Following MPO~\citep{sharma2026mpo}, each prompt contains five fixed sections (System Role, Context, Task Details, Constraints, Output Format), allowing RFDPO to track which parts of a prompt are modified. Mining examples ($M$) provide feedback for revisions; validation examples ($V$) are used for selection and, from the second round, also contribute feedback; test examples ($T$) are never shown to the optimizer and, within a run, are evaluated only with the initial and returned prompts.
 
 \subsection{Item-Level Transition Tracking}
 \label{sec:metric}
 
-RFDPO measures the effect of each revision by comparing example-level correctness before and after an edit. Let $c_i(p)\in\{0,1\}$ denote the observed correctness of example $i$ under prompt $p$. Given two prompts $p$ and $q$ evaluated on the same example set $D$, we define the recovered ($R$) and regressed ($G$) examples as
+Let $c_i(p)\in\{0,1\}$ denote the observed correctness of example $i$ under prompt $p$. Given two prompts $p$ and $q$ evaluated on the same example set $D$, we define the recovered ($R$) and regressed ($G$) examples as
 \vspace{-8px}
 \begin{equation}
 R=\{i\in D:c_i(p)=0,\ c_i(q)=1\},
@@ -135,113 +123,43 @@ R=\{i\in D:c_i(p)=0,\ c_i(q)=1\},
 \begin{equation}
 G=\{i\in D:c_i(p)=1,\ c_i(q)=0\}.
 \end{equation}
-
-We further define the net change $N$ and churn $C$ as
-\vspace{-8px}
-\begin{equation}
-N=|R|-|G|,\qquad C=|R|+|G|.
-\end{equation}
-
-The net change corresponds to $|D|$ times the accuracy difference, whereas churn captures the total number of examples whose correctness changes. Thus, revisions with the same accuracy change may exhibit substantially different recovery and regression patterns, as illustrated in Figure~\ref{fig:metric}.
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\columnwidth]{figures/fig_metric.pdf}
-\caption{Example of item-level transitions. Three examples are recovered and two regress, producing a net gain of one correct example and a churn of five.}
-\label{fig:metric}
-\end{figure}
-
-Transitions are measured between consecutive revisions on $M$ and $V$, and between the initial and returned prompts on $T$, using matched evaluable example IDs.
+The net change $N=|R|-|G|$ corresponds to $|D|$ times the accuracy difference, whereas churn $C=|R|+|G|$ counts all examples whose correctness changes; an answer that changes from one wrong value to another is not counted (Appendix~\ref{app:eval}). Revisions with the same accuracy change can therefore show very different recovery and regression patterns (Figure~\ref{fig:metric}, Appendix~\ref{app:algorithm}). Transitions are measured between consecutive revisions on $M$ and $V$, and between the initial and returned prompts on $T$, using matched evaluable example IDs.
 
 \subsection{Feedback-Driven Prompt Revision}
 \label{sec:optimization}
+\label{sec:selection}
 
-Algorithm~\ref{alg:reflect} presents the RFDPO optimization procedure. The solver first evaluates the initial prompt, and the optimizer generates a revision using the observed outcomes. From the second round, the optimizer additionally receives the recoveries and regressions caused by the preceding revision on $M$ and $V$, together with the affected questions, solver responses, gold answers, previous text of modified sections, and validation accuracy changes.
-
-Each valid, changed candidate is evaluated and committed as the starting point for the next round, even if its validation accuracy decreases. This allows subsequent revisions to build on earlier edits without a regression-based acceptance gate.
-
-Under best-validation selection, RFDPO returns the committed candidate with the highest validation accuracy, breaking ties by mining accuracy and candidate order. Once a candidate is committed, the seed is not reconsidered; if no candidate is committed, the seed is retained.
-
-RFDPO also records prompt versions, modified sections, item-level outcomes, and model-call token usage and costs. These records support analysis of optimization trajectories, behavioral changes, and resource consumption.
-
-\begin{algorithm}[!t]
-\caption{RFDPO optimization with edit-effect feedback}
-\label{alg:reflect}
-\small
-\begin{algorithmic}[1]
-\Require seed $p_0$; disjoint $M,V,T$; $\textsc{Opt}$; $\textsc{Solve}$; round budget $B$
-\State $s_0,v_0 \gets \textsc{Solve}(p_0,M),\ \textsc{Solve}(p_0,V)$
-\State $\tau_0 \gets \textsc{Solve}(p_0,T)$ \Comment{baseline; measured only}
-\State $\mathcal{H}\gets\emptyset$; $(p,s,v)\gets(p_0,s_0,v_0)$; $\rho\gets\emptyset$
-\For{$t=1$ \textbf{to} $B$}
-  \If{skip threshold reached, or no mining failures} \State \textbf{break} \EndIf
-  \State $q\gets\textsc{Opt}(p,s,v,\rho)$ \Comment{mining items and feedback}
-  \If{$q=p$} \State \textbf{continue} \EndIf
-  \State $s',v'\gets\textsc{Solve}(q,M),\ \textsc{Solve}(q,V)$
-  \State $\rho\gets((R,G)(s\!\to\!s'),(R,G)(v\!\to\!v'))$
-  \State append $(q,s',v')$ to $\mathcal{H}$ \Comment{no regression gate}
-  \State $(p,s,v)\gets(q,s',v')$
-\EndFor
-\State $p^*\gets p_0$ if $\mathcal{H}=\emptyset$; otherwise select from $\mathcal{H}$
-\Statex \hspace{\algorithmicindent} by validation accuracy, then mining accuracy
-\State $\tau^* \gets \textsc{Solve}(p^*,T)$ \Comment{measured only}
-\State \Return $p^*$, and $(R,G)(\tau_0\!\to\!\tau^*;T)$
-\end{algorithmic}
-\end{algorithm}
-
-
+From the second round, the optimizer receives the recoveries and regressions observed after the preceding revision on $M$ and $V$, together with the affected questions, solver responses, gold answers, previous text of modified sections, and validation accuracy changes (Algorithm~\ref{alg:reflect}, Appendix~\ref{app:algorithm}). Each changed candidate is committed as the starting point for the next round, even if its validation accuracy decreases, so later revisions can build on earlier edits without a regression gate. RFDPO returns the committed candidate with the highest validation accuracy; when two rounds tie on validation accuracy, it returns the one with higher mining accuracy. If no candidate is committed, the seed is retained. We adopted this rule after a GPT-4o-mini PUPA run showed its second round ahead of the final round on both sets; eight earlier GPT-4o-mini runs (PUPA, IFBench, and six MMLU subjects) used a final-round rule and are reported as recorded (\S\ref{sec:valtest}). RFDPO also records prompt versions, modified sections, item-level outcomes, and token costs.
 
 \section{Experimental Setup}
 \label{sec:setup}
 
-We evaluate 5 benchmarks using RFDPO and 2 solver models, covering different task types, answer formats, and scoring criteria. Table~\ref{tab:setup} summarizes the benchmark configurations.
+\paragraph{Benchmarks.}
+\textbf{LegalBench-Hearsay}~\citep{guha2023legalbench} evaluates binary classification of statements under U.S.\ hearsay law. \textbf{MMLU}~\citep{hendrycks2021mmlu} contributes six four-way multiple-choice subjects (college mathematics, computer security, econometrics, high school biology, philosophy, professional law), each optimized independently, with macro-averaged accuracy. \textbf{IFBench}~\citep{pyatkin2025ifbench} counts an example as correct only when a programmatic verifier in the style of IFEval~\citep{zhou2023ifeval} finds all applicable constraints satisfied. \textbf{AIME}~\citep{maa2025aime} uses problems from 2022--2024 for optimization and the 30 problems from 2025 for testing. \textbf{PUPA}~\citep{li2025papillon} evaluates privacy-conscious delegation to an external LLM; we optimize only the query-redaction prompt and report accuracy as the share of items with composite score $(\mathrm{quality}+1-\mathrm{leakage})/2 \geq 0.7$ (mean composite scores, as reported by GEPA, are in Appendix~\ref{app:prior}).
 
-\subsection{Benchmarks}
-
-We select five benchmarks covering diverse tasks, including legal reasoning, general knowledge, instruction following, mathematical reasoning, and privacy preservation.
-
-\textbf{LegalBench-Hearsay}~\citep{guha2023legalbench} evaluates binary classification of statements under U.S. hearsay law.
-
-\textbf{MMLU}~\citep{hendrycks2021mmlu} consists of four-way multiple-choice questions. We select six subjects: college mathematics, computer security, econometrics, high school biology, philosophy, and professional law, optimizing each independently and reporting macro-averaged accuracy.
-
-\textbf{IFBench}~\citep{pyatkin2025ifbench} evaluates compliance with verifiable output constraints. An example is correct only when all applicable constraints are satisfied, using a programmatic verifier partly based on IFEval~\citep{zhou2023ifeval}.
-
-\textbf{AIME}~\citep{maa2025aime} evaluates mathematical reasoning with integer answers between 0 and 999. We use problems from 2022--2024 for optimization and the 30 problems from 2025 for testing.
-
-\textbf{PUPA}~\citep{li2025papillon} evaluates privacy-conscious delegation to an external LLM. We optimize only the query-redaction prompt. Correctness requires a composite score $(\mathrm{quality}+1-\mathrm{leakage})/2$ of at least $0.7$.
-
-\begin{table*}[!t]
+\begin{table}[!t]
 \centering
 \small
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{lllcc}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llc}
 \toprule
 \rowcolor{midblue}
-Benchmark & Task & Reported metric & Train $\rightarrow$ $M$/$V$ & Test \\
+Benchmark & Task & $M$/$V$/$T$ evaluated \\
 \midrule
-LegalBench-Hearsay & Binary classification & Accuracy & $50\rightarrow 25/25$ & 49 \\
-MMLU (6 subjects) & Multiple choice & Accuracy, macro-avg. & $50\rightarrow 25/25$ & 66 each \\
-IFBench & Instruction following & Accuracy & $40\rightarrow  $26/ 14$ & 42 \\
-AIME (2022--24 $\rightarrow$ 2025) & Mathematical reasoning & Accuracy & $90\rightarrow 58/32$ & 30 \\
-PUPA & Privacy-conscious delegation & Accuracy (composite $\geq 0.7$) & $60\rightarrow 30/30$ & 40 \\
+Hearsay & Binary classification & 25/25/49 \\
+MMLU (6 subj.) & Multiple choice & 25/25/66$^{a}$ \\
+IFBench & Instruction following & 20/19/42$^{b}$ \\
+ & & 25/14/42$^{b}$ \\
+AIME & Integer answer & 58/32/30 \\
+PUPA & Private-query rewriting & 29/30/38$^{c}$ \\
 \bottomrule
-\end{tabular}}
-\caption{Benchmarks and evaluation splits. MMLU splits are per subject. Test sizes precede provider-block exclusions.}
+\end{tabular}
+\caption{Evaluated split sizes, identical for both solvers unless noted. Differences from the assigned sizes are items blocked by the provider's content filter, which we exclude rather than score as wrong. $^{a}$Per subject; professional law 25/22/63. $^{b}$GPT-4o-mini (assigned 20/20/42) and GPT-4.1 Mini (assigned 26/14/42). $^{c}$Assigned 30/30/40.}
 \label{tab:setup}
-\end{table*}
+\end{table}
 
-\subsection{Models and Experimental Protocol}
-
-We use GPT-4o-mini~\citep{openai2024gpt4o} and GPT-4.1 Mini~\citep{openai2025gpt41} as solvers, both with temperature $0$, and GPT-5~\citep{openai2025gpt5} as the optimizer with temperature $0.7$. PUPA additionally uses a fixed GPT-4.1 external model and GPT-5 as its quality judge.
-
-All experiments use seed $0$ and at most three optimization rounds. Optimization is skipped when initial mining accuracy reaches $95\%$, except for PUPA. 
-
-The evaluation includes 19 baseline/final records: seven non-MMLU configurations and twelve independently optimized MMLU subjects. Both endpoints of each matched pair are evaluated within the same run. Two earlier AIME runs, which used a 2,048-token output limit, are reported separately in Appendix~\ref{app:aime_extra} and excluded from the analyses.
-
-We report test accuracy, validation accuracy changes, recovery, regression, and churn. We also examine revision-level transitions and recorded token consumption. Detailed run configurations, scoring procedures, and optimizer instructions are provided in Appendices~\ref{app:config}, \ref{app:eval}, and \ref{app:prompts}.
-
-
-
+\paragraph{Models and protocol.}
+GPT-4o-mini~\citep{openai2024gpt4o} and GPT-4.1 Mini~\citep{openai2025gpt41} serve as solvers at temperature $0$, and GPT-5~\citep{openai2025gpt5} as the optimizer at temperature $0.7$; PUPA also uses a fixed GPT-4.1 external model and a GPT-5 quality judge. All runs use seed $0$ and at most three rounds, and optimization is skipped when initial mining accuracy reaches $95\%$, except for PUPA. The evaluation includes 19 baseline/final records, seven non-MMLU configurations and twelve MMLU subjects, with both endpoints evaluated within the same run. Items blocked by the provider's content filter are excluded (Table~\ref{tab:setup}). Run configurations, scoring, and optimizer instructions are in Appendices~\ref{app:config}--\ref{app:prompts}.
 
 \section{Results}
 \label{sec:results}
@@ -249,7 +167,7 @@ We report test accuracy, validation accuracy changes, recovery, regression, and 
 \subsection{Item-Level Performance Changes}
 \label{sec:itemresults}
 
-We first examine how prompt optimization affects individual test examples. Table~\ref{tab:main} reports test accuracy before and after optimization, validation accuracy changes, and the number of recovered and regressed examples. Figure~\ref{fig:rr} visualizes these transitions, while Appendix~\ref{app:gap} provides the individual accuracy records.
+Table~\ref{tab:main} reports test accuracy before and after optimization, validation accuracy changes, and recovered and regressed test examples (see also Figure~\ref{fig:rr}, Appendix~\ref{app:gap}).
 
 \begin{table*}[!t]
 \centering
@@ -258,51 +176,40 @@ We first examine how prompt optimization affects individual test examples. Table
 \begin{tabular}{llrrrrrrr}
 \toprule
 \rowcolor{midblue}
-Benchmark & Solver & \multicolumn{3}{c}{Test accuracy (\%)} &
-\shortstack{$\Delta V$\\(pp)} &
+ &  & \multicolumn{3}{c}{Test accuracy (\%)} & &
 \multicolumn{3}{c}{Test transitions} \\
 \cmidrule(lr){3-5}\cmidrule(lr){7-9}
-& & Seed & Final & $\Delta T$ & & $|R|$ & $|G|$ & Churn (\%) \\
+\rowcolor{midblue}
+Benchmark & Solver & Seed & Returned & $\Delta T$ & $\Delta V$ & $|R|$ & $|G|$ & Churn (\%) \\
 \midrule
 AIME & GPT-4.1 Mini & 53.3 & 50.0 & $-3.3$ & $+6.2$ & 3 & 4 & 7 (23.3) \\
 \rowcolor{softgreen}
-PUPA & GPT-4o-mini & 55.3 & 65.8 & $+10.5$ & $+13.3$ & 7 & 3 & 10 (26.3) \\
+PUPA & GPT-4o-mini$^\dagger$ & 55.3 & 65.8 & $+10.5$ & $+13.3$ & 7 & 3 & 10 (26.3) \\
 \rowcolor{softgreen}
 PUPA & GPT-4.1 Mini & 44.7 & 71.1 & $+26.3$ & $+23.3$ & 10 & 0 & 10 (26.3) \\
 \rowcolor{softgreen}
-IFBench & GPT-4o-mini & 40.5 & 45.2 & $+4.8$ & $+15.8$ & 6 & 4 & 10 (23.8) \\
+IFBench & GPT-4o-mini$^\dagger$ & 40.5 & 45.2 & $+4.8$ & $+15.8$ & 6 & 4 & 10 (23.8) \\
 \rowcolor{softgreen}
 IFBench & GPT-4.1 Mini & 42.9 & 66.7 & $+23.8$ & $+14.3$ & 12 & 2 & 14 (33.3) \\
 Hearsay & GPT-4o-mini & 71.4 & 69.4 & $-2.0$ & $+12.0$ & 8 & 9 & 17 (34.7) \\
 \rowcolor{softgreen}
 Hearsay & GPT-4.1 Mini & 71.4 & 73.5 & $+2.0$ & $+20.0$ & 7 & 6 & 13 (26.5) \\
 \rowcolor{softgreen}
-MMLU (macro) & GPT-4o-mini & 75.1 & 77.2 & $+2.0$ & $+5.5$ & 31 & 23 & 54 (13.7) \\
+MMLU (macro) & GPT-4o-mini$^\dagger$ & 75.1 & 77.2 & $+2.0$ & $+5.5$ & 31 & 23 & 54 (13.7) \\
 \rowcolor{softgreen}
 MMLU (macro) & GPT-4.1 Mini & 81.0 & 83.3 & $+2.3$ & $-0.7$ & 17 & 8 & 25 (6.4) \\
 \bottomrule
 \end{tabular}
-\caption{Seed-to-returned test accuracy, validation accuracy change, and item-level transitions. Green rows indicate positive test changes. Churn percentages use evaluated test items. MMLU accuracy is macro-averaged across six subjects, while transitions sum 393 items. PUPA (38 items) and professional law (63 items) exclude provider-blocked examples. Earlier AIME runs with other solvers are described in Appendix~\ref{app:aime_extra}.}
+\caption{Seed and returned prompts on test, with the validation change $\Delta V$; changes are in percentage points, computed from unrounded accuracies. $|R|$ and $|G|$ count recovered and regressed test items; churn is $|R|+|G|$, with its share of evaluated test items. Green rows have positive $\Delta T$. PUPA accuracy is the share of items with composite score $\geq 0.7$ (not the mean composite of Appendix~\ref{app:prior}). MMLU accuracy is macro-averaged over six subjects, and its transitions are summed over 393 items. $^\dagger$Returned by the earlier final-round rule (\S\ref{sec:selection}).}
 \label{tab:main}
 \end{table*}
 
-\begin{figure*}[!t]
-\centering
-\includegraphics[width=0.94\textwidth]{figures/fig_recovered_regressed.pdf}
-\caption{Recovered and regressed test examples across benchmarks and solvers. Diamonds indicate net changes. MMLU transitions are aggregated across six subjects.}
-\label{fig:rr}
-\end{figure*}
-
-Test accuracy increased in seven of the nine reported configurations, with the largest gain of 26.3 percentage points on PUPA using GPT-4.1 Mini. However, aggregate improvements do not fully represent the changes in individual predictions.
-
-On LegalBench-Hearsay, a net change of only one correct example concealed 13--17 changed outcomes, corresponding to 27--35\% of the test set. Similarly, IFBench with GPT-4.1 Mini recovered 12 examples but regressed two, yielding a net gain of ten. On MMLU with GPT-4o-mini, 54 examples changed correctness despite a net improvement of only eight.
-
-Across five configurations, churn was at least five times the absolute net change. These results show that small accuracy differences can conceal substantial recovery and regression, motivating item-level analysis alongside aggregate performance.
+Test accuracy increased in seven of the nine configurations, by up to 26.3 percentage points on PUPA with GPT-4.1 Mini, but aggregate improvements do not fully represent changes in individual predictions. On LegalBench-Hearsay, a net change of one example concealed 13--17 changed outcomes, 27--35\% of the test set, and on MMLU with GPT-4o-mini, 54 examples changed correctness for a net gain of eight. IFBench with GPT-4.1 Mini, in contrast, recovered 12 examples and regressed two, a net gain of ten. In five configurations, churn was at least five times the absolute net change. These results show that small accuracy differences can conceal substantial recovery and regression. In a production pipeline, each such change is an input whose handling changes without any sign in the headline score.
 
 \subsection{Validation-to-Test Transfer}
 \label{sec:valtest}
 
-We next examine whether improvements observed during optimization transfer to held-out test examples. Among the 19 records, 17 returned edited prompts. Of these, validation accuracy increased in 12, remained unchanged in three, and decreased in two. Table~\ref{tab:gap} summarizes the corresponding validation and test changes.
+Of the 19 records, 17 returned edited prompts; validation accuracy increased in 12, remained unchanged in three, and decreased in two (Table~\ref{tab:gap}).
 
 \begin{table}[!t]
 \centering
@@ -325,36 +232,217 @@ $\mathbf{+7.9}$ & $\mathbf{+5.2}$ \\
 \label{tab:gap}
 \end{table}
 
-Of the 12 runs with improved validation accuracy, nine also improved test accuracy, while three lost one test example each. These cases occurred on AIME with GPT-4.1 Mini ($+6.2$ validation, $-3.3$ test points), Hearsay with GPT-4o-mini ($+12.0$, $-2.0$), and MMLU computer security with GPT-4o-mini ($+8.0$, $-1.5$).
+Three of these 12 lost one test example each: AIME with GPT-4.1 Mini ($+6.2$ validation, $-3.3$ test points), Hearsay with GPT-4o-mini ($+12.0$, $-2.0$), and MMLU computer security with GPT-4o-mini ($+8.0$, $-1.5$). On average, validation accuracy improved by 7.9 percentage points and test accuracy by 5.2, about 66\% of the validation gain; the difference was smaller for MMLU ($+2.9$ vs.\ $+2.6$) than for the other benchmarks ($+15.0$ vs.\ $+8.9$). Since validation examples also provide feedback, these results describe the transfer of tuning gains rather than improvements on an independent set. Because the optimizer sees every failure and success on its working set, it could also inflate tuning accuracy by copying those items into the prompt; its instructions forbid reusing the scenario of any shown item (Appendix~\ref{app:sysprompt}), and returned prompts showed no verbatim copying of benchmark examples beyond a generic mathematical phrase and a True/False answer template (Appendix~\ref{app:overlap}).
 
-Across the 17 edited-prompt returns, validation accuracy improved by 7.9 percentage points on average, compared with 5.2 points on test data. The test gain was therefore approximately 66\% of the average validation gain. The difference was smaller for MMLU ($+2.9$ validation versus $+2.6$ test) than for the other benchmarks ($+15.0$ versus $+8.9$).
-Since validation examples also provide optimization feedback, these results describe the transfer of tuning gains to held-out examples rather than improvements on an independent validation set.
-
-\paragraph{Verbatim overlap.}
-Because the optimizer sees every failure and success on its working set, it could inflate tuning accuracy by pasting those items, or paraphrases of them, into the prompt. Its instructions therefore forbid reusing the scenario of any shown item and prefer abstract rules (Appendix~\ref{app:prompts}). We also checked whether returned prompts contained eight-word sequences copied from benchmark examples. Sixteen of the 19 prompts showed no such overlap. The remaining three contained either a generic mathematical phrase or a True/False answer template (Appendix~\ref{app:overlap}). The check detects only verbatim copying; paraphrase is guarded by the instruction alone.
+\paragraph{Effect of the selection rule.}
+In three of the eight final-round runs, the returned round had lower validation accuracy than round~2 (PUPA: 53.3\% vs.\ 63.3\%). Under best-validation selection, five of the eight would have returned an earlier round (Appendix~\ref{app:selection}), raising the mean validation gain of the 17 returns from $+7.9$ to $+9.7$ points. The only alternative round we evaluated on test, after the run, was PUPA round~2, which scored 63.2\% against 65.8\% for the returned round.
 
 \subsection{Prompt Revision Behavior}
 \label{sec:edits}
 
-We analyze how the optimizer modifies prompts across successive rounds. In round 1, where no effect report of a previous edit is available, the optimizer modified an average of 4.3 of the five prompt sections, compared with 1.3 in rounds 2--3, where it receives recovery and regression feedback on its previous edit. Revisions thus became more localized after the initial round.
+In round 1, where no effect report is available, the optimizer modified an average of 4.3 of the five prompt sections, compared with 1.3 in rounds 2--3, where it receives recovery and regression feedback on its previous edit; revisions thus became more localized.
 
 % Nevertheless, smaller edits did not eliminate regressions. Later rounds recovered 56 mining examples while regressing 54, compared with 59 recoveries and 27 regressions in round 1. This indicates that revisions continued to introduce new failures even when fewer prompt sections were modified.
 
-\paragraph{Effect-report ablation (exploratory).}
-To see what the effect report contributes beyond the optimization round, we ran an exploratory ablation on LegalBench-Hearsay using GPT-4o-mini. Both conditions replayed the same round-1 prompt and continued through rounds 2 and 3. They differed in whether the optimizer received the item-level effect report and its accompanying instructions (Appendix~\ref{app:sysprompt}). We performed five runs per condition (Appendix~\ref{app:ablation}).
+\paragraph{Effect-report ablation.}
+\label{sec:ablation}
+To see what the report contributes beyond the round, we replayed the same round-1 prompt on LegalBench-Hearsay with GPT-4o-mini and continued through rounds 2 and 3, with and without the item-level effect report and its accompanying instructions (five runs each; Table~\ref{tab:ablation}, Appendix~\ref{app:ablation}). The removed instructions all refer to the report, for example by asking the optimizer to keep edits linked to recovered examples, so the ablation tests the report and its instructions as one feedback component.
 
-Without the report, round-2 revisions already modified only 1.6 prompt sections on average, compared with 2.0 when the report was included. Thus, narrower edits also occur without the report.
+\begin{table}[!t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrr}
+\toprule
+\rowcolor{midblue}
+Mean per run & Report & No report \\
+\midrule
+Mining changes per round & 3.1 & 5.2 \\
+Regressions per round ($M{+}V$) & 1.9 & 4.3 \\
+Net gain per round ($M{+}V$) & 3.4 & 2.8 \\
+New mining flips, rounds 2--3 & 2.4 & 6.6 \\
+Undoing mining flips, rounds 2--3 & 3.8 & 3.8 \\
+Test change (points) & $-5.3$ & $-5.7$ \\
+\bottomrule
+\end{tabular}
+\caption{Effect-report ablation on LegalBench-Hearsay with GPT-4o-mini, five runs per condition. A \emph{new} flip changes a mining example that the previous round left unchanged; an \emph{undoing} flip reverses the previous round's flip.}
+\label{tab:ablation}
+\end{table}
 
-The report did change the number of changed outcomes. With it, an average of 3.1 mining examples changed correctness per round, compared with 5.2 without it ($p=0.024$, exact permutation test over runs, uncorrected). This average pools rounds 2 and 3, and round 3 starts from different parent prompts in the two conditions. Both conditions achieved similar net gains of 0.3 and 0.2 mining examples per round, respectively.
-
-Test accuracy fell in both conditions, by 5.3 and 5.7 percentage points with and without the report, respectively, so neither condition improved test accuracy. We therefore treat the churn difference as exploratory evidence about what item-level feedback changes in this setting, not as evidence that it improves accuracy.
+Without the report, round-2 revisions already modified only 1.6 sections, compared with 2.0 with it, so narrower edits also occur without the report. The report did reduce changed outcomes: 3.1 mining examples changed correctness per round with it, compared with 5.2 without it ($p=0.024$, exact permutation test over runs), and regressions on $M$ and $V$ fell from 4.3 to 1.9 per round. The reduction came from new flips (2.4 vs.\ 6.6 per run), while flips undoing the previous round were equally frequent, and net gains stayed similar (3.4 vs.\ 2.8 per round). Test accuracy changed similarly in both conditions ($-5.3$ and $-5.7$ points), so the report's contribution lies in stability: a similar net gain with fewer broken examples.
 
 \subsection{Resource Consumption}
 \label{sec:resources}
 
-Finally, we examine the computational resources recorded during optimization. Table~\ref{tab:resources} summarizes optimizer calls, token consumption, and logged inference costs across the matched configurations.
+Each non-MMLU configuration used three optimizer calls and cost \$0.21--\$4.80 at logged prices, including seed and final evaluations; optimizer input ranged from 14K tokens for Hearsay to 498K for AIME (Table~\ref{tab:resources}, Appendix~\ref{app:resources}). PUPA incurred additional costs from external-model responses and quality judgments, while MMLU totals aggregate six independent subject runs. Because transitions reuse the per-item outcomes that any evaluation produces, tracking them adds no model calls.
 
-\begin{table*}[!t]
+\section{Discussion}
+\label{sec:discussion}
+
+\paragraph{Beyond aggregate accuracy.}
+Churn of at least five times the net change in five of nine configurations shows that an optimized prompt may introduce failures on examples that previously worked; in a production pipeline, these are inputs handled correctly before the update. Recovery and regression tracking makes such changes visible, allowing developers to distinguish newly corrected examples from newly introduced failures and to review a prompt change as they would a code change, against the examples it fixed and broke. This aligns with regression testing for evolving LLM applications~\citep{ma2024regression}.
+
+\paragraph{Role of item-level feedback.}
+Our motivating question was whether repeated feedback could reduce regressions while keeping scores high. Later revisions were more localized, but the ablation shows that this also happens without the report; what the report changed was the outcome, reducing mining-set churn from 5.2 to 3.1 examples per round and regressions from 4.3 to 1.9 at similar net gains. For pipelines whose downstream systems depend on stable outputs, this stability is valuable in itself; test accuracy changed similarly in both conditions.
+
+\paragraph{Generalization and reporting implications.}
+Improvements during optimization do not necessarily transfer to unseen examples. Average test gains were about 66\% of validation gains, and three runs lost test accuracy despite validation improvements, so validation performance should be read as a tuning result. The selection rule should be fixed in advance, since final-round and best-validation selection would have returned different prompts in five of eight runs. We recommend reporting recovery, regression, and churn alongside validation and test accuracy, prompt versions, evaluation exclusions, and cost; RFDPO records all of these without additional solver calls (Appendix~\ref{app:artifacts}).
+
+\section{Conclusion}
+Aggregate accuracy captures the overall effect of prompt optimization but obscures which examples improve or regress. Motivated by prompt maintenance in an industrial pipeline, we presented RFDPO, which tracks item-level recoveries, regressions, and churn, feeds them back to the optimizer, and records every revision with its effect. Across five benchmarks and two solvers, churn was at least five times the absolute net change in five of nine configurations, test gains were about 66\% of validation gains, and item-level feedback reduced churn and regressions at similar net gains. These findings highlight that prompt optimization can introduce failures despite aggregate improvements, motivating the reporting of recovery, regression, churn, and validation-to-test transfer alongside accuracy.
+
+\section*{Limitations}
+\label{sec:limitations}
+
+\paragraph{Evaluation scope.}
+RFDPO was motivated by an industrial pipeline but has so far been evaluated on public benchmarks. Our evaluation covers five benchmarks, two closed-weight solvers, and one optimizer, with a single seed and relatively small test sets. We did not evaluate open-weight models or longer optimization trajectories. Differences in selection rules and evaluation configurations also limit cross-model comparisons.
+
+\paragraph{Evaluation variability.}
+Observed recovery and regression may partly reflect model output variability rather than prompt changes, as shown by unchanged-prompt re-evaluations, and transitions are attributed to a revision as a whole rather than to individual section edits. PUPA additionally relies on an LLM judge, and items blocked by the provider's content filter are excluded rather than scored as errors. Churn counts changes in correctness only, so an answer that changes from one wrong value to another is not counted.
+
+\paragraph{Feedback ablation.}
+Our ablation covers one benchmark and solver, with five runs per condition, and its effect may differ on other tasks.
+
+\paragraph{Generalization and data exposure.}
+Validation examples are used for both feedback and selection, potentially inflating tuning gains. Test examples remain excluded from feedback within each run, but small test sets limit generalization claims. Our verbatim-overlap check also cannot detect paraphrased copying or semantic memorization.
+
+
+\section*{Ethical Considerations}
+Data come from public benchmarks, resplit as described in Table~\ref{tab:setup}. PUPA contains personal information from
+public user--LLM conversations. Hosted solver and optimizer APIs receive the original queries during evaluation and
+feedback; redaction protects only the designated external model. String-matched leakage does not capture paraphrased or
+inferred information. No data from the industrial pipeline that motivated this work were used. Released traces would
+contain item IDs and outcomes only, without raw inputs, predictions, or gold text (Appendix~\ref{app:artifacts}).
+
+\FloatBarrier
+\bibliography{custom}
+
+% ACL rule: appendices must stay two-column (single column only for math-heavy sections).
+\appendix
+
+\section{Run Configuration and Scoring}
+\label{app:config}
+\subsection{Analysis Population and Settings}
+\label{app:population}
+The analysis uses 19 completed records: seven non-MMLU runs and twelve independently optimized MMLU
+subjects, taking the latest completed record within each fixed run group.
+
+All recorded solvers use temperature 0.0 and the GPT-5 optimizer uses 0.7, with at most three rounds and one optimizer
+call per round. Table~\ref{tab:config} gives the configured solver output limits and splits for both solvers.
+The response ledgers identify GPT-4o-mini-2024-07-18, GPT-4.1-mini-2025-04-14, and GPT-5-2025-08-07; some entries retain
+model aliases rather than dated identifiers. PUPA additionally uses GPT-4.1 as its fixed external model and GPT-5 as judge.
+
+\begin{table*}[!tp]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{llcccl}
+\toprule
+\rowcolor{midblue}Benchmark & Solver & Assigned $M/V$ & Val.\ fraction & Solver limit & Selection \\
+\midrule
+AIME & 4.1 Mini & 58/32 & 0.35 & 16,000 & best validation \\
+PUPA & 4o-mini & 30/30 & 0.50 & 2,048 & final round \\
+PUPA & 4.1 Mini & 30/30 & 0.50 & 2,048 & best validation \\
+IFBench & 4o-mini & 20/20 & 0.50 & 2,048 & final round \\
+IFBench & 4.1 Mini & 26/14 & 0.35 & 4,096 & best validation \\
+Hearsay & both & 25/25 & 0.50 & 2,048 & best validation \\
+MMLU (per subject) & 4o-mini & 25/25 & 0.50 & 2,048 & final round \\
+MMLU (per subject) & 4.1 Mini & 25/25 & 0.50 & 2,048 & best validation \\
+\bottomrule
+\end{tabular}
+\caption{Recorded settings for the matched runs. Solver limit is the configured maximum output tokens, not observed
+consumption. Assigned pools precede provider-block exclusions; evaluated sizes are in Table~\ref{tab:setup}. Actual
+resource use is in Table~\ref{tab:resources}.}
+\label{tab:config}
+\end{table*}
+
+\paragraph{Candidate handling.}
+Every changed candidate is committed and becomes the next parent. Best-validation selection returns the committed
+candidate with the highest validation accuracy; when two rounds tie on validation accuracy, it returns the one with
+higher mining accuracy. The seed is excluded once a
+candidate commits. The eight runs marked ``final round'' finished before this rule was adopted (\S\ref{sec:selection};
+Appendix~\ref{app:selection}). Optimization is skipped at seed mining accuracy $\geq 0.95$, except on PUPA. This
+retained the seed for GPT-4.1 Mini college mathematics and biology. IFBench with GPT-4.1 Mini proposed no change in
+round 2.
+
+\subsection{Optimization Procedure and Transition Example}
+\label{app:algorithm}
+Algorithm~\ref{alg:reflect} gives the optimization loop, and Figure~\ref{fig:metric} illustrates the transition counts.
+
+\begin{algorithm}[htbp]
+\caption{RFDPO optimization with edit-effect feedback}
+\label{alg:reflect}
+\small
+\begin{algorithmic}[1]
+\Require seed $p_0$; disjoint $M,V,T$; $\textsc{Opt}$; $\textsc{Solve}$; round budget $B$
+\State $s_0,v_0 \gets \textsc{Solve}(p_0,M),\ \textsc{Solve}(p_0,V)$
+\State $\tau_0 \gets \textsc{Solve}(p_0,T)$ \Comment{baseline; measured only}
+\State $\mathcal{H}\gets\emptyset$; $(p,s,v)\gets(p_0,s_0,v_0)$; $\rho\gets\emptyset$
+\If{seed mining accuracy $\geq 0.95$ and task is not PUPA} \State $B\gets 0$ \Comment{skip optimization} \EndIf
+\For{$t=1$ \textbf{to} $B$}
+  \If{no mining failures} \State \textbf{break} \EndIf
+  \State $q\gets\textsc{Opt}(p,s,v,\rho)$ \Comment{mining items and feedback}
+  \If{$q=p$} \State \textbf{continue} \EndIf
+  \State $s',v'\gets\textsc{Solve}(q,M),\ \textsc{Solve}(q,V)$
+  \State $\rho\gets((R,G)(s\!\to\!s'),(R,G)(v\!\to\!v'))$
+  \State append $(q,s',v')$ to $\mathcal{H}$ \Comment{no regression gate}
+  \State $(p,s,v)\gets(q,s',v')$
+\EndFor
+\State $p^*\gets p_0$ if $\mathcal{H}=\emptyset$; otherwise select from $\mathcal{H}$
+\Statex \hspace{\algorithmicindent} by validation accuracy; validation ties go to the
+\Statex \hspace{\algorithmicindent} higher mining accuracy
+\State $\tau^* \gets \textsc{Solve}(p^*,T)$ \Comment{measured only}
+\State \Return $p^*$, and $(R,G)(\tau_0\!\to\!\tau^*;T)$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig_metric.pdf}
+\caption{Example of item-level transitions. Three items are recovered and two regress, giving a net gain of one item
+and a churn of five.}
+\label{fig:metric}
+\end{figure}
+
+\subsection{Effect of the Selection Rule}
+\label{app:selection}
+Table~\ref{tab:selection} applies the best-validation rule to the recorded rounds of the eight final-round runs. Only
+validation and mining accuracy are needed, so no new evaluation is involved. The one alternative round evaluated on
+test after the run, PUPA round~2, scored 63.2\% accuracy (mean composite 78.2), against 65.8\% (79.9) for the returned round~3.
+
+\begin{table*}[!tp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccccc}
+\toprule
+\rowcolor{midblue}Run (GPT-4o-mini) & Seed $V$ & Returned ($V$) & Best-val.\ ($V$) & $\Delta V$ returned & $\Delta V$ best-val. \\
+\midrule
+PUPA & 40.0 & 3 (53.3) & 2 (63.3) & $+13.3$ & $+23.3$ \\
+IFBench & 36.8 & 3 (52.6) & 2 (68.4) & $+15.8$ & $+31.6$ \\
+MMLU college math. & 84.0 & 3 (80.0) & 3 (80.0) & $-4.0$ & $-4.0$ \\
+MMLU computer sec. & 72.0 & 3 (80.0) & 1 (80.0)$^{a}$ & $+8.0$ & $+8.0$ \\
+MMLU econometrics & 60.0 & 3 (72.0) & 3 (72.0)$^{b}$ & $+12.0$ & $+12.0$ \\
+MMLU high sch.\ biol. & 92.0 & 3 (96.0) & 1 or 3 (96.0)$^{c}$ & $+4.0$ & $+4.0$ \\
+MMLU philosophy & 80.0 & 3 (84.0) & 3 (84.0)$^{b}$ & $+4.0$ & $+4.0$ \\
+MMLU prof.\ law & 59.1 & 3 (68.2) & 2 (72.7) & $+9.1$ & $+13.6$ \\
+\midrule
+Mean & & & & $+7.8$ & $+11.6$ \\
+\bottomrule
+\end{tabular}
+\caption{Returned round under the final-round rule versus the round the best-validation rule would return, with
+validation accuracy in parentheses. Accuracy in \%, changes in points. $^{a}$Validation tie; round~1 has higher mining accuracy (92.0 vs.\ 84.0). $^{b}$Validation
+tie with earlier rounds; round~3 has the highest mining accuracy. $^{c}$Rounds 1 and 3 tie on both validation and mining accuracy; either gives the same
+$\Delta V$.}
+\label{tab:selection}
+\end{table*}
+
+\subsection{Resource Consumption}
+\label{app:resources}
+Table~\ref{tab:resources} lists optimizer calls, token use, and logged cost per configuration. PUPA also pays for
+external-model responses and quality judgments.
+
+\begin{table*}[!tp]
 \centering
 \small
 \setlength{\tabcolsep}{5pt}
@@ -379,130 +467,11 @@ MMLU (six subjects) & GPT-4o-mini & 18 & 123.0 & 77.1 & 2,014.2 & 1.32 \\
 MMLU (six subjects) & GPT-4.1 Mini & 11 & 75.7 & 34.2 & 1,170.8 & 1.10 \\
 \bottomrule
 \end{tabular}
-\caption{Inference consumption across matched configurations. K denotes 1,000 tokens. All-role totals include solver, optimizer, and applicable external-model and judge calls, including seed and final evaluations. Costs use configured prices. MMLU aggregates six subjects; two GPT-4.1 Mini subject runs skipped optimization.}
+\caption{Inference consumption across matched configurations. K denotes 1,000 tokens. All-role totals include solver,
+optimizer, and applicable external-model and judge calls, including seed and final evaluations. Costs use configured
+prices. MMLU aggregates six subjects; two GPT-4.1 Mini subject runs skipped optimization.}
 \label{tab:resources}
 \end{table*}
-
-Resource consumption varied considerably across tasks. Three optimizer calls required approximately 498K input tokens for AIME with GPT-4.1 Mini, compared with 14K for Hearsay, a difference of roughly 35 times. PUPA incurred additional costs from external-model responses and quality judgments, while MMLU totals aggregate independent optimization runs across six subjects.
-
-These measurements document the resource requirements of RFDPO across different benchmark configurations.
-
-
-\section{Discussion}
-\label{sec:discussion}
-
-\paragraph{Beyond aggregate accuracy.}
-Our findings highlight the limitations of evaluating prompt optimization solely through aggregate accuracy. In five of the nine configurations, churn was at least five times the absolute net change, with a single-item improvement or decline concealing up to 17 changed outcomes. Such changes are important in practice because an optimized prompt may introduce failures on examples that previously worked. Recovery and regression tracking makes these changes visible, allowing developers to distinguish newly corrected examples from newly introduced failures. This aligns with regression testing for LLM applications, where previously correct behavior must be monitored as systems evolve~\citep{ma2024regression}.
-
-\paragraph{Role of item-level feedback.}
-The optimizer made more localized revisions in later rounds, but our ablation shows that this behavior cannot be attributed solely to the effect report. Nevertheless, providing item-level feedback reduced average mining-set churn from 5.2 to 3.1 examples per round while maintaining similar net gains. This suggests that explicit recovery and regression feedback may help limit unintended changes without necessarily improving overall accuracy. However, the evidence remains exploratory, as the ablation covers one benchmark and solver with five runs per condition, pools two rounds, and includes additional optimizer instructions with the report. Test accuracy declined in both conditions, so we do not interpret the reduced churn as improved generalization.
-
-\paragraph{Generalization and reporting implications.}
-Improvements during optimization do not necessarily transfer to unseen examples. Across edited-prompt returns, average test gains were approximately 61\% of average validation gains, and four runs experienced test declines despite validation improvements. Because validation examples also guide optimization, their performance should be interpreted as tuning results rather than independent evidence of generalization. We therefore recommend reporting recovery, regression, and churn alongside validation and test accuracy, prompt versions, evaluation exclusions, and resource consumption. These measurements can be obtained from existing item-level evaluations without additional solver calls. RFDPO automatically records this information, supporting more transparent analysis of prompt optimization (Appendix~\ref{app:artifacts}).
-
-
-\section{Conclusion}
-Aggregate accuracy captures the overall effect of prompt optimization but obscures which examples improve or regress. We presented RFDPO, an auditable optimizer that tracks item-level recoveries, regressions, and churn and incorporates this feedback into subsequent revisions. Across five benchmarks and two solver models, a single-item net change concealed up to 17 changed outcomes, while churn was at least five times the absolute net change in five of nine configurations. Average held-out test gains were approximately 61\% of validation gains. An exploratory Hearsay ablation showed that item-level feedback reduced churn at similar net gains but did not improve test accuracy. These findings highlight that prompt optimization can introduce failures despite aggregate improvements, motivating the reporting of recovery, regression, churn, and validation-to-test transfer alongside accuracy.
-
-\section*{Limitations}
-\label{sec:limitations}
-
-\paragraph{Evaluation scope.}
-Our evaluation covers five benchmarks, two closed-weight solvers, and one optimizer, with a single seed and relatively small test sets. We did not evaluate open-weight models or longer optimization trajectories. Differences in selection rules and evaluation configurations also limit cross-model comparisons.
-
-\paragraph{Evaluation variability.}
-Observed recovery and regression may partly reflect model output variability rather than prompt changes, as shown by unchanged-prompt re-evaluations. PUPA additionally relies on an LLM judge, while the IFBench verifier supports only a subset of constraint types.
-
-\paragraph{Feedback ablation.}
-Our exploratory ablation covers one benchmark and solver, with five runs per condition. It combines two optimization rounds, and the effect report includes additional optimizer instructions. Although feedback reduced mining-set churn, it did not improve test accuracy, and its effect may not generalize.
-
-\paragraph{Generalization and data exposure.}
-Validation examples are used for both feedback and selection, potentially inflating tuning gains. Test examples remain excluded from feedback within each run, but small test sets limit generalization claims. Our verbatim-overlap check also cannot detect paraphrased copying or semantic memorization.
-
-
-\section*{Ethical Considerations}
-Data come from public benchmarks, resplit as described in Table~\ref{tab:setup}. PUPA contains personal information from
-public user--LLM conversations. Hosted solver and optimizer APIs receive the original queries during evaluation and
-feedback; redaction protects only the designated external model. String-matched leakage does not capture paraphrased or
-inferred information. Released traces would contain item IDs and outcomes only, without raw inputs, predictions, or
-gold text (Appendix~\ref{app:artifacts}).
-
-\FloatBarrier
-\bibliography{custom}
-
-\onecolumn
-\appendix
-
-\newcommand{\appsec}[2]{\par\vspace{4pt}\noindent\makebox[2em][l]{\bfseries\ref{#1}}{\bfseries #2}\,\dotfill\,{\bfseries\pageref{#1}}\par\vspace{1pt}}
-\newcommand{\appsubsec}[2]{\par\noindent\hspace{2em}\makebox[2.4em][l]{\ref{#1}}#2\,\dotfill\,\pageref{#1}\par}
-
-\begin{center}{\large\bfseries Appendix Contents}\end{center}
-{\small
-\appsec{app:config}{Run Configuration and Scoring}
-\appsubsec{app:population}{Analysis Population and Settings}
-\appsubsec{app:eval}{Scoring and Evaluable Items}
-\appsubsec{app:prior}{Related-Work Protocol Comparison}
-\appsec{app:prompts}{Prompt and Feedback Specification}
-\appsubsec{app:sysprompt}{Optimizer System Prompt}
-\appsubsec{app:insertions}{Task-Specific Insertions}
-\appsubsec{app:seed}{Seed Prompt Example}
-\appsubsec{app:feedback}{Per-Round Feedback}
-\appsec{app:results}{Detailed Results and Trajectories}
-\appsubsec{app:gap}{Paired Accuracy and Test Transitions}
-\appsubsec{app:rounds}{Round-by-Round Trajectories}
-\appsubsec{app:evolution}{Worked Prompt Changes}
-\appsubsec{app:ablation}{Effect-Report Ablation}
-\appsubsec{app:aime_extra}{Additional AIME Runs}
-\appsec{app:noisebugs}{Evaluation Checks and Artifacts}
-\appsubsec{app:noise}{Re-evaluation of an Unchanged Prompt}
-\appsubsec{app:oracle}{Test-Exposure Diagnostic}
-\appsubsec{app:overlap}{Verbatim-Overlap Check}
-\appsubsec{app:artifacts}{Artifacts and Reproducibility}
-}
-\bigskip
-
-\section{Run Configuration and Scoring}
-\label{app:config}
-\subsection{Analysis Population and Settings}
-\label{app:population}
-The analysis uses 19 completed records: seven non-MMLU runs and twelve independently optimized MMLU
-subjects, taking the latest completed record within each fixed run group.
-
-All recorded solvers use temperature 0.0 and the GPT-5 optimizer uses 0.7, with at most three rounds and one optimizer
-call per round. Table~\ref{tab:config} gives the configured solver output limits and splits for both solvers.
-The response ledgers identify GPT-4o-mini-2024-07-18, GPT-4.1-mini-2025-04-14, and GPT-5-2025-08-07; some entries retain
-model aliases rather than dated identifiers. PUPA additionally uses GPT-4.1 as its fixed external model and GPT-5 as judge.
-
-\begin{table}[htbp]
-\centering
-\small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{llccr}
-\toprule
-\rowcolor{midblue}Benchmark & Solver & Assigned $M/V$ & Val.\ fraction & Solver limit \\
-\midrule
-AIME & 4.1 Mini & 58/32 & 0.35 & 16,000 \\
-PUPA & 4o-mini & 30/30 & 0.50 & 2,048 \\
-PUPA & 4.1 Mini & 30/30 & 0.50 & 2,048 \\
-IFBench & 4o-mini & 26/14 & 0.35 & 2,048 \\
-IFBench & 4.1 Mini & 26/14 & 0.35 & 4,096 \\
-Hearsay & both & 25/25 & 0.50 & 2,048 \\
-MMLU (per subject) & 4o-mini & 25/25 & 0.50 & 2,048 \\
-MMLU (per subject) & 4.1 Mini & 25/25 & 0.50 & 2,048 \\
-\bottomrule
-\end{tabular}
-\caption{Recorded settings for the matched runs. Solver limit is the configured maximum output tokens, not observed
-consumption. Assigned pools precede provider-block exclusions: GPT-4o-mini IFBench evaluates 19 validation items and
-GPT-4.1 Mini evaluates 25 mining items. Actual resource use is in Table~\ref{tab:resources}.}
-\label{tab:config}
-\end{table}
-
-\paragraph{Candidate handling.}
-Every changed candidate is committed and becomes the next parent. Best-validation selection compares committed
-candidates, breaking ties by mining accuracy and then retaining the earlier candidate; the seed is excluded once a
-candidate commits. Eight matched runs used final-round selection instead (GPT-4o-mini PUPA, IFBench, and six MMLU
-subjects). Optimization is skipped at seed mining accuracy $\geq 0.95$, except on PUPA. This retained the seed for
-GPT-4.1 Mini college mathematics and biology. IFBench with GPT-4.1 Mini proposed no change in round 2.
 
 \FloatBarrier
 \subsection{Scoring and Evaluable Items}
@@ -523,17 +492,27 @@ composite $(\text{quality}+1-\text{leakage})/2$ reaches 0.7; reported PUPA accur
 rewrite prompt is optimized.
 
 \paragraph{Denominators and accounting.}
-Provider-blocked items are excluded rather than scored as incorrect: PUPA evaluates 38 of 40 test items and MMLU
-professional law 63 of 66, identically for both solvers. Transitions are computed over common evaluated IDs, so
+Provider-blocked items are excluded rather than scored as incorrect, so some accuracies have denominators below the
+assigned split (Table~\ref{tab:setup}). PUPA evaluates 29 of 30 mining and 38 of 40 test items; MMLU professional law
+evaluates 22 of 25 validation and 63 of 66 test items; both hold for both solvers. IFBench evaluates 19 of 20
+validation items with GPT-4o-mini and 25 of 26 mining items with GPT-4.1 Mini. The two IFBench runs were assigned
+different splits (20/20 and 26/14; Table~\ref{tab:config}). Transitions are computed over common evaluated IDs, so
 $\Delta\mathrm{acc}=(|R|-|G|)/|D|$ and $C=|R|+|G|=|N|+2\min(|R|,|G|)$; MMLU transitions sum subjects while its
 accuracy is macro-averaged.
+
+\paragraph{What churn does not count.}
+Churn counts correctness changes only. On test, items wrong under both the seed and the returned prompt but with a
+different wrong answer number 9 of 30 for AIME, 14 for MMLU with GPT-4o-mini (college mathematics 4, computer security
+1, econometrics 2, biology 1, philosophy 2, professional law 4), and 9 for MMLU with GPT-4.1 Mini (0, 1, 1, 0, 3, 4).
+Hearsay has a single wrong label per item, and IFBench and PUPA are scored as pass/fail and by a score threshold, so
+for them churn counts only crossings of the pass criterion.
 
 \subsection{Related-Work Protocol Comparison}
 \label{app:prior}
 Table~\ref{tab:prior} expands the protocol comparison in Related Work. Rows differ in task variant, baseline, data,
 models, and feedback, so the reported changes describe each protocol rather than rank optimizers.
 
-\begin{table}[htbp]
+\begin{table*}[!tp]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
@@ -557,13 +536,15 @@ GEPA~\citep{agrawal2026gepa} & 2022--24 problems (90) split into train and valid
 \midrule
 \rowcolor{midgreen}\multicolumn{5}{l}{\textbf{PUPA}} \\
 GEPA~\citep{agrawal2026gepa} & 111 / 111 / 221 & Qwen3-8B, GPT-4.1 Mini & reflective LLM, Pareto selection & $80.82\rightarrow 91.85$; $78.57\rightarrow 94.47$ \\
-\rowcolor{softblue}This paper & 30 / 30 / 40 (38 scored) & GPT-4o-mini, GPT-4.1 Mini & GPT-5, item-level effect report & $68.5\rightarrow 79.9$; $68.2\rightarrow 80.7$ \\
+\rowcolor{softblue}This paper & 30 / 30 / 40 (29 / 30 / 38 evaluated) & GPT-4o-mini, GPT-4.1 Mini & GPT-5, item-level effect report & mean composite: $68.5\rightarrow 79.9$; $68.2\rightarrow 80.7$ \\
 \bottomrule
 \end{tabular}
 \caption{Published evaluation protocols on shared benchmarks. Rows differ in data, solver, baseline prompt, feedback
-access, and evaluation budget. Changes follow solver-column order; PUPA changes are composite scores, as reported by GEPA.}
+access, and evaluation budget. Changes follow solver-column order. PUPA changes are mean composite scores
+$\times 100$, the metric GEPA reports; they are not the thresholded accuracy (share of items with composite
+$\geq 0.7$) reported in Table~\ref{tab:main}, which for our runs is $55.3\rightarrow 65.8$ and $44.7\rightarrow 71.1$.}
 \label{tab:prior}
-\end{table}
+\end{table*}
 
 \FloatBarrier
 \section{Prompt and Feedback Specification}
@@ -681,24 +662,27 @@ hide details -- an unusable rewrite scores just as badly as a leaky one.
 \label{app:seed}
 The AIME seed illustrates the five-section schema. Other benchmark seeds are included in the source archive.
 Only line breaks are adjusted below.
-{\small
+{\footnotesize
 \begin{verbatim}
 ## System Role
 You are a competition mathematician.
 
 ## Context
-You will be given a competition-style math problem whose answer is always
-an integer between 0 and 999.
+You will be given a competition-style
+math problem whose answer is always an
+integer between 0 and 999.
 
 ## Task Details
 Solve the problem.
 
 ## Constraints
-The final answer must be an integer between 0 and 999.
+The final answer must be an integer
+between 0 and 999.
 
 ## Output Format
-After your work, write the final numeric answer on its own line in exactly
-this form:
+After your work, write the final numeric
+answer on its own line in exactly this
+form:
 #### <number>
 \end{verbatim}
 }
@@ -721,11 +705,19 @@ outcomes, followed by prompt excerpts illustrating the recorded revisions.
 
 \subsection{Paired Accuracy and Test Transitions}
 \label{app:gap}
-Table~\ref{tab:pergap} lists all 19 matched records, including each MMLU subject. It combines the tuning/test
-accuracy pairs with the test recoveries and regressions. Summing the subject counts gives the MMLU totals in
-Table~\ref{tab:main}. ``Edited'' distinguishes returned candidates from retained seeds, not an improvement gate.
+Table~\ref{tab:pergap} lists all 19 matched records, including each MMLU subject, and Figure~\ref{fig:rr} plots the
+test transitions. Summing the subject counts gives the MMLU totals in Table~\ref{tab:main}. ``Edited'' distinguishes
+returned candidates from retained seeds, not an improvement gate.
 
-\begin{table}[htbp]
+\begin{figure*}[!tp]
+\centering
+\includegraphics[width=0.94\textwidth]{figures/fig_recovered_regressed.pdf}
+\caption{Recovered and regressed test items across benchmarks and solvers. Diamonds indicate net changes. MMLU
+transitions are summed over six subjects.}
+\label{fig:rr}
+\end{figure*}
+
+\begin{table*}[!tp]
 \centering
 \small
 \setlength{\tabcolsep}{3pt}
@@ -760,7 +752,7 @@ MMLU high sch.\ biol. & 4.1 Mini & no & -- & 0.0 & 87.9 $\rightarrow$ 87.9 & 0.0
 green rows have positive test deltas. MMLU subjects have 66 assigned test items (63 evaluated for professional law).
 Dashes denote unmeasured validation after a high-baseline skip; zero $\Delta V$ denotes the retained seed.}
 \label{tab:pergap}
-\end{table}
+\end{table*}
 
 \FloatBarrier
 \subsection{Round-by-Round Trajectories}
@@ -769,7 +761,7 @@ Table~\ref{tab:rounds} records the seven matched non-MMLU trajectories. Round 0 
 with the preceding committed prompt, not with the seed. Stars mark best-validation returns and daggers final-round
 returns. MMLU subject-level endpoints remain in Table~\ref{tab:pergap}; full committed trajectories are in the analysis records.
 
-\begin{table}[htbp]
+\begin{table*}[!tp]
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
@@ -817,22 +809,24 @@ Hearsay & 4.1 Mini & 0 & 80.0 & 76.0 & -- & -- & -- \\
 Con constraints, OF output format. In IFBench with GPT-4.1 Mini, rounds 1 and 3 tie on validation and round 1
 is returned on its higher mining accuracy.}
 \label{tab:rounds}
-\end{table}
+\end{table*}
 
 Across the 20 committed rounds in Table~\ref{tab:rounds}, nine regressed more mining items than they recovered and six
-lowered validation accuracy.
+lowered validation accuracy. In both final-round runs shown (daggers), the returned round~3 has lower validation
+accuracy than round~2: 53.3\% vs.\ 63.3\% for PUPA and 52.6\% vs.\ 68.4\% for IFBench. Appendix~\ref{app:selection}
+reports what the best-validation rule would have returned.
 
 \FloatBarrier
 \subsection{Worked Prompt Changes}
 \label{app:evolution}
-The excerpts below show the returned Task Details of two runs. Context and Constraints also changed in Hearsay;
-System Role and Output Format were unchanged there, and IFBench's Output Format was pinned.
+The excerpt below shows the returned Task Details of one run. The same revision also changed Context and Constraints,
+so the outcome changes below belong to the revision as a whole, not to this section alone.
 
 \paragraph{Hearsay, GPT-4.1 Mini.}
 The seed's Task Details consisted of ``Decide whether the given statement is hearsay.'' The returned round-2 section
-is reproduced below with formatting adjusted. Validation changed from 76.0\% to 96.0\%, while test accuracy changed
-from 35/49 to 36/49: seven recoveries and six regressions. The explicit procedure raised validation sharply while
-moving thirteen test outcomes for a one-item net gain.
+is reproduced below with formatting adjusted. Between the seed and this prompt, validation changed from 76.0\% to
+96.0\%, and test accuracy from 35/49 to 36/49, with seven recoveries and six regressions: a one-item net gain that
+moved thirteen test outcomes. Some of these flips may be re-evaluation noise (Appendix~\ref{app:noise}).
 
 \begin{promptbox}[title={\textbf{Hearsay: returned Task Details} (round 2 excerpt)},fontupper=\small]{softgreen}
 Decide whether the given statement is hearsay by applying this decision procedure and explain your steps
@@ -853,19 +847,6 @@ effect on the listener where content truth is irrelevant under Step 3.\par
 \textit{Step 6.} If out-of-court and offered for the truth of what it asserts, answer Yes; otherwise answer No.
 \end{promptbox}
 
-\paragraph{IFBench, GPT-4.1 Mini.}
-The seed's Task Details was ``Answer the user's request.'' Round 1 rewrote four sections, adding constraint extraction,
-planning, and verification; the excerpt below shows its Task Details. Validation changed from 57.1\% to 71.4\%, and
-test accuracy from 18/42 to 28/42 (twelve recoveries, two regressions). The \texttt{FINAL RESPONSE:} marker stayed fixed,
-so only the post-marker answer was checked.
-
-\begin{promptbox}[title={\textbf{IFBench: returned Task Details} (round 1 excerpt)},fontupper=\small]{softblue}
-Your job is to: read the prompt and explicitly extract every constraint; plan content that satisfies all constraints
-exactly; verify counts and formats on your draft before producing the final response. Prefer visible reasoning for these rule-application
-tasks: write your working steps before the final answer line so you can check and fix issues. Only the content after the final marker is
-scored.
-\end{promptbox}
-
 \FloatBarrier
 \subsection{Effect-Report Ablation}
 \label{app:ablation}
@@ -877,7 +858,7 @@ successes only, and the report-specific instructions are removed from its system
 We ran five runs per arm and alternated which arm ran first. Table~\ref{tab:ablation_rounds} gives edit sizes and item
 transitions per round; Table~\ref{tab:ablation_runs} gives run-level means.
 
-\begin{table}[htbp]
+\begin{table*}[!tp]
 \centering
 \small
 \setlength{\tabcolsep}{3.5pt}
@@ -898,9 +879,9 @@ transitions per round; Table~\ref{tab:ablation_runs} gives run-level means.
 \caption{Edit sizes and item transitions of the five runs per arm, summed over runs. Round 3 starts from different
 round-2 prompts in the two arms, so only round 2 compares edits from an identical parent prompt.}
 \label{tab:ablation_rounds}
-\end{table}
+\end{table*}
 
-\begin{table}[htbp]
+\begin{table*}[!tp]
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
@@ -921,46 +902,22 @@ Test change from seed (points) & $-5.3$ & $-5.7$ & 1.000 \\
 \caption{Run-level means over five runs per arm. Per-round metrics average the two optimizer rounds of a run. $p$ is an
 exact two-sided permutation test on run means, uncorrected for multiple comparisons.}
 \label{tab:ablation_runs}
-\end{table}
+\end{table*}
 
-Validation and test differences between the arms are within run-to-run variation.
+Validation and test differences between the arms are within run-to-run variation. Figure~\ref{fig:ablation} splits
+the mining flips of rounds 2--3 by item: a flip either undoes the previous round's flip on the same item or changes an
+item the previous round left alone (a new flip). Undoing flips are equally common in both arms (19 each); new flips
+fall from 33 to 12. Items that regressed in one round were recovered in the next round 10 of 26 times with the report
+and 14 of 28 times without it.
 
-\FloatBarrier
-\subsection{Additional AIME Runs}
-\label{app:aime_extra}
-Two earlier AIME runs used a 2,048-token output limit and the earlier final-round selection rule, and are excluded
-from the matched analyses. With Claude Haiku~4.5~\citep{anthropic2025haiku45} as solver, three rounds were committed and
-the third was returned; validation accuracy rose from 62.5\% to 78.1\% and test accuracy from 26.7\% to 33.3\% (8/30 to
-10/30, two recoveries and no regressions). With GPT-4o-mini, the last round's validation accuracy (12.5\%) fell below the
-baseline's (15.6\%), so the seed prompt was returned. Its two test evaluations of this identical prompt solved 4 and 3 of
-30 problems. Table~\ref{tab:aime_extra} also lists later re-evaluations of that prompt, and of the round-1 prompt returned
-in the GPT-4.1 Mini run (Table~\ref{tab:main}), with GPT-4o-mini as solver. The 16,000-token limit used for GPT-4.1 Mini
-solved one more problem than the 2,048-token limit, and the GPT-4.1 Mini prompt regressed three problems against the
-baseline at the same limit.
-
-\begin{table}[htbp]
+\begin{figure*}[!tp]
 \centering
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{llrr}
-\toprule
-\rowcolor{midblue}Solver & Evaluated prompt & Token limit & Test correct \\
-\midrule
-Claude Haiku 4.5 & seed & 2,048 & 8/30 \\
- & returned (round 3) & 2,048 & 10/30 \\
-\midrule
-GPT-4o-mini & seed & 2,048 & 4/30 \\
- & returned (the seed, unchanged) & 2,048 & 3/30 \\
- & seed, re-evaluated & 2,048 & 4/30 \\
- & seed, re-evaluated & 16,000 & 5/30 \\
- & GPT-4.1 Mini round-1 prompt & 16,000 & 2/30 \\
-\bottomrule
-\end{tabular}
-\caption{Problems solved out of the 30 AIME 2025 test problems in the earlier runs and in re-evaluations of fixed
-prompts. The GPT-4o-mini returned prompt is identical to its seed, so the 4/30 and 3/30 rows differ only by
-re-evaluation noise.}
-\label{tab:aime_extra}
-\end{table}
+\includegraphics[width=\textwidth]{figures/fig3_ablation_mechanics.pdf}
+\caption{Effect-report ablation (Hearsay, GPT-4o-mini, five runs per arm). Left: items changing correctness per round
+on $M$ and $V$, one dot per run, with arm means. Right: mining flips in rounds 2--3, summed over runs, split into flips
+that undo the previous round's flip and new flips.}
+\label{fig:ablation}
+\end{figure*}
 
 \FloatBarrier
 \section{Evaluation Checks and Artifacts}
@@ -968,11 +925,11 @@ re-evaluation noise.}
 
 \subsection{Re-evaluation of an Unchanged Prompt}
 \label{app:noise}
-A GPT-4o-mini IFBench run that returned no edited prompt re-evaluated an unchanged prompt on the same 42 test items:
-one outcome changed (no recoveries, one regression). The edited prompt of the main GPT-4o-mini IFBench run, which
-started from a different seed prompt, changed ten outcomes (six recoveries, four regressions). A GPT-4o-mini AIME run
-that returned its seed prompt shows the same effect: two evaluations of the identical prompt solved 4 and 3 of 30
-problems (Appendix~\ref{app:aime_extra}).
+In a separate GPT-4o-mini IFBench run, the returned prompt was identical to the seed, so its two evaluations on the
+same 42 test items measure re-evaluation noise: one outcome changed (no recoveries, one regression). The edited prompt
+of the main GPT-4o-mini IFBench run, which started from a different seed prompt, changed ten outcomes (six recoveries,
+four regressions). In an earlier GPT-4o-mini AIME run, the returned prompt was likewise identical to the seed, and its
+two test evaluations solved 4 and 3 of 30 problems. Both runs are excluded from all other analyses.
 
 \subsection{Test-Exposure Diagnostic}
 \label{app:oracle}
@@ -988,7 +945,7 @@ its word 8-grams with all string fields in the train and test dataset files, inc
 the 19 prompts share none, and three share some (Table~\ref{tab:overlap}). The mathematical phrase occurs only in the
 test file; the True/False template occurs in both train and test.
 
-\begin{table}[htbp]
+\begin{table*}[!tp]
 \centering
 \small
 \setlength{\tabcolsep}{3pt}
@@ -1004,7 +961,7 @@ MMLU computer sec. & 4.1 Mini & 1033 & 5 & false false c true false d false true
 \caption{Runs with any shared 8-gram. ``Prompt'' is the number of distinct 8-grams in the returned prompt. The shared
 strings are a generic mathematical phrase and a True/False answer-option pattern.}
 \label{tab:overlap}
-\end{table}
+\end{table*}
 The optimizer prompt also prohibits reusing the scenario of any shown item (Appendix~\ref{app:prompts}).
 
 \FloatBarrier
